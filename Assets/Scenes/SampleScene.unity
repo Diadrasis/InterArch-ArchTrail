@@ -602,7 +602,6 @@ GameObject:
   - component: {fileID: 243908167}
   - component: {fileID: 243908166}
   - component: {fileID: 243908171}
-  - component: {fileID: 243908172}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -648,7 +647,7 @@ MonoBehaviour:
   createMarkerInUserPosition: 1
   disableEmulatorInPublish: 1
   emulatorCompass: 0
-  emulatorPosition: {x: 0, y: 0}
+  emulatorPosition: {x: 23.72413, y: 37.98}
   findLocationByIP: 0
   lerpCompassValueForMarker: 1
   markerTooltip: Current Location
@@ -821,26 +820,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 243908165}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 679215e7fa063e9458288c9a3d65a80b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  userCoordinares: {x: 23.72408, y: 37.97994}
-  markerCoordinates: {x: 23.72485, y: 37.97836}
-  compassTrueHeading: 0
---- !u!114 &243908172
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 243908165}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a19841452d46eb45a45e8312e3788e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 848caf44e7447cc49b2f06cf125be936, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  radiusKM: 0.1
+  segments: 32
 --- !u!1 &295527423
 GameObject:
   m_ObjectHideFlags: 0
@@ -1190,7 +1176,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1653032228
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1381,7 +1367,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1894837981}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c5ed341b97098e48aecb2e9d48672c7, type: 3}
   m_Name: 

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class MainManager : MonoBehaviour
 {
     OnlineMaps instance;
+    private OnlineMapsMarker playerMarker;
     public Button btnLayer,btnCurrentLoc;
     public Text infoText;
     public float time = 3;
@@ -32,7 +33,21 @@ public class MainManager : MonoBehaviour
             Permission.RequestUserPermission(Permission.FineLocation);
             StartCoroutine(GetStarting());
         }
-        
+        playerMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), null, "Player");
+
+        // Get instance of LocationService.
+        OnlineMapsLocationService locationService = OnlineMapsLocationService.instance;
+
+        if (locationService == null)
+        {
+            Debug.LogError(
+                "Location Service not found.\nAdd Location Service Component (Component / Infinity Code / Online Maps / Plugins / Location Service).");
+            return;
+        }
+
+        // Subscribe to the change location event.
+        locationService.OnLocationChanged += OnLocationChanged;
+
 #endif
     }
 
@@ -145,5 +160,14 @@ public class MainManager : MonoBehaviour
         {
             map.mapType = "google.relief";
         }
+    }
+
+    private void OnLocationChanged(Vector2 position)
+    {
+        // Change the position of the marker.
+        playerMarker.position = position;
+
+        // Redraw map.
+        OnlineMaps.instance.Redraw();
     }
 }
