@@ -34,22 +34,15 @@ public class MainManager : MonoBehaviour
             Permission.RequestUserPermission(Permission.FineLocation);
             if (Permission.HasUserAuthorizedPermission(Permission.FineLocation))
             {
-                if(locationService.IsLocationServiceRunning())
-                locationService.StartLocationService();
+                if (locationService.IsLocationServiceRunning())
+                    locationService.StartLocationService();
                 else
                 {
-                    if (instance.position == new Vector2(0, 0))
-                    {
-                        //locationService.StopLocationService();
-                        btnCurrentLoc.onClick.RemoveListener(() => CheckMyLocation());
-                        btnCurrentLoc.onClick.AddListener(() => StartCoroutine(OpenSettings()));
-                        //StartCoroutine(OpenSettings());
-                    }
+                    StartCoroutine(OpenSettings());
                 }
-            }                
-            
-        }
+            }
 
+        }
         playerMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), null, "Player");
 
         if (locationService == null)
