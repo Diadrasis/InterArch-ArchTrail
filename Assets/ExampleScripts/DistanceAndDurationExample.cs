@@ -7,23 +7,27 @@ using System;
 public class DistanceAndDurationExample : MonoBehaviour
 {
     public float radiusKM = 0.1f;
-
+    //public GameObject circle;
     /// <summary>
     /// Number of segments
     /// </summary>
     public int segments = 32;
-
+    //private OnlineMapsMarker marker;
+    double lng, lat;
     /// <summary>
     /// This method is called when a user clicks on a map
     /// </summary>
-    private void OnMapClick()
+    private IEnumerator CreateMarker()
     {
+        Debug.Log("CreateMarker");
         // Get the coordinates under cursor
-        double lng, lat;
+        yield return new WaitForSeconds(1f);
+        lng = OnlineMaps.instance.position.x;
+        lat = OnlineMaps.instance.position.y;
         OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
 
         // Create a new marker under cursor
-        OnlineMapsMarkerManager.CreateItem(lng, lat, "Marker " + OnlineMapsMarkerManager.CountItems);
+        OnlineMapsMarkerManager.CreateItem(lng, lat, "Marker5 " + OnlineMapsMarkerManager.CountItems);
 
         OnlineMaps map = OnlineMaps.instance;
 
@@ -58,7 +62,15 @@ public class DistanceAndDurationExample : MonoBehaviour
         }
 
         // Create a new polygon to draw a circle
-        OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingPoly(points, Color.red, 3));
+        if(OnlineMaps.instance.position.x <= lng)
+        OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingPoly(points, Color.red, 13));
+        OnlineMaps.instance.AddMarker(OnlineMaps.instance.position,"AAA");
+        List<OnlineMapsMarker> markers = OnlineMapsMarkerManager.instance.items;
+
+        float distance = OnlineMapsUtils.DistanceBetweenPoints(markers[0].position,markers[1].position).magnitude;
+        Debug.Log(distance);
+
+        yield break;
     }
 
     /// <summary>
@@ -66,9 +78,26 @@ public class DistanceAndDurationExample : MonoBehaviour
     /// </summary>
     private void Start()
     {
+        //marker = OnlineMaps.instance.AddMarker(OnlineMaps.instance.position, "Marker");
         // Subscribe to click on map event
-        OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
+        //OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
+        StartCoroutine(CreateMarker());
     }
+
+    /*private void Update()
+    {
+        circle.transform.position = OnlineMapsTileSetControl.instance.GetWorldPosition(marker.position);
+
+        OnlineMaps api = OnlineMaps.instance;
+
+        Vector2 distance = OnlineMapsUtils.DistanceBetweenPoints(api.topLeftPosition, api.bottomRightPosition);
+
+        float scaleX = radiusKM / distance.x * api.tilesetSize.x;
+        float scaleY = radiusKM / distance.y * api.tilesetSize.y;
+        float scale = (scaleX + scaleY) / 2;
+
+        circle.transform.localScale = new Vector3(scale, segments, scale);
+    }*/
 
 }
 

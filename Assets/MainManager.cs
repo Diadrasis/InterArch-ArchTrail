@@ -9,7 +9,7 @@ public class MainManager : MonoBehaviour
 {
     OnlineMaps instance;
     private OnlineMapsMarker playerMarker;
-    public Button btnLayer,btnCurrentLoc;
+    public Button btnLayer, btnCurrentLoc;
     public Text infoText;
     public float time = 3;
     private float angle;
@@ -19,24 +19,38 @@ public class MainManager : MonoBehaviour
     private Vector2 toPosition;
     private double fromTileX, fromTileY, toTileX, toTileY;
     private int moveZoom;
+    OnlineMapsLocationService locationService;
 
-   
+
     void Start()
     {
-       
+        locationService = OnlineMapsLocationService.instance;
         //StartCoroutine(GetStarting());
-        btnLayer.onClick.AddListener(()=>CheckLayer());
+        btnLayer.onClick.AddListener(() => CheckLayer());
         btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
 #if PLATFORM_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Permission.RequestUserPermission(Permission.FineLocation);
-            StartCoroutine(GetStarting());
+            if (Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+            {
+                if(locationService.IsLocationServiceRunning())
+                locationService.StartLocationService();
+                else
+                {
+                    if (instance.position == new Vector2(0, 0))
+                    {
+                        //locationService.StopLocationService();
+                        btnCurrentLoc.onClick.RemoveListener(() => CheckMyLocation());
+                        btnCurrentLoc.onClick.AddListener(() => StartCoroutine(OpenSettings()));
+                        //StartCoroutine(OpenSettings());
+                    }
+                }
+            }                
+            
         }
-        playerMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), null, "Player");
 
-        // Get instance of LocationService.
-        OnlineMapsLocationService locationService = OnlineMapsLocationService.instance;
+        playerMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), null, "Player");
 
         if (locationService == null)
         {
@@ -47,57 +61,66 @@ public class MainManager : MonoBehaviour
 
         // Subscribe to the change location event.
         locationService.OnLocationChanged += OnLocationChanged;
+        //locationService.OnGetLocation = 
 
 #endif
     }
 
-    IEnumerator GetStarting()
-    {
+    /* IEnumerator GetStarting()
+     {
 
-#if UNITY_EDITOR
-        int editorMaxWait = 15;
-        while (Input.location.status == LocationServiceStatus.Stopped && editorMaxWait > 0)
-        {
-            yield return new WaitForSecondsRealtime(1);
-            editorMaxWait--;
-        }
-#endif
-        // Start service before querying location
-        Input.location.Start();
-        if (!Input.location.isEnabledByUser)
-            yield break;
+ #if UNITY_EDITOR
+         int editorMaxWait = 15;
+         while (Input.location.status == LocationServiceStatus.Stopped && editorMaxWait > 0)
+         {
+             yield return new WaitForSecondsRealtime(1);
+             editorMaxWait--;
+         }
+ #endif
+         // Start service before querying location
+         Input.location.Start();
+         if (!Input.location.isEnabledByUser)
+             yield break;
 
-        // Wait until service initializes
-        int maxWait = 20;
-        while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
-        {
-            yield return new WaitForSeconds(1);
-            maxWait--;
-        }
+         // Wait until service initializes
+         int maxWait = 20;
+         while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
+         {
+             yield return new WaitForSeconds(1);
+             maxWait--;
+         }
 
-        // Service didn't initialize in 20 seconds
-        if (maxWait < 1)
-        {
-            print("Timed out");
-            yield break;
-        }
+         // Service didn't initialize in 20 seconds
+         if (maxWait < 1)
+         {
+             print("Timed out");
+             yield break;
+         }
 
-        // Connection has failed
-        if (Input.location.status == LocationServiceStatus.Failed)
-        {
-            infoText.text = "Can't get location";
-            print("Unable to determine device location");
-            yield break;
-        }
-        else
-        {
-            print("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
-        }
-       
-        Input.location.Stop();
-    }
+         // Connection has failed
+         if (Input.location.status == LocationServiceStatus.Failed)
+         {
+             infoText.text = "Can't get location";
+             print("Unable to determine device location");
+             yield break;
+         }
+         else
+         {
+             print("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
+         }
+
+         Input.location.Stop();
+     }*/
     void Update()
     {
+        /*#if PLATFORM_ANDROID
+                if (Permission.HasUserAuthorizedPermission(Permission.FineLocation) && !locationService.IsLocationServiceRunning())
+                {
+                    infoText.text = "Authorize location";
+                    StartCoroutine(OpenSettings());
+                }
+        #endif
+        */
         if (!isMovement) return;
 
         // update relative position
@@ -117,7 +140,32 @@ public class MainManager : MonoBehaviour
         OnlineMaps.instance.SetPosition(px, py);
         infoText.text = "Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp;
     }
+    IEnumerator OpenSettings()
+    {
+        yield return new WaitForSeconds(1f);
+        try
+        {
+            using (var unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using (AndroidJavaObject currentActivityObject = unityClass.GetStatic<AndroidJavaObject>("currentActivity"))
+            {
+                string packageName = currentActivityObject.Call<string>("getPackageName");
 
+                using (var uriClass = new AndroidJavaClass("android.net.Uri"))
+                using (AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("fromParts", "package", packageName, null))
+                using (var intentObject = new AndroidJavaObject("android.content.Intent", "android.settings.ACTION_LOCATION_SOURCE_SETTINGS", uriObject))
+                {
+                    intentObject.Call<AndroidJavaObject>("addCategory", "android.intent.category.DEFAULT");
+                    intentObject.Call<AndroidJavaObject>("setFlags", 0x10000000);
+                    currentActivityObject.Call("startActivity", intentObject);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+        yield break;
+    }
     void CheckMyLocation()
     {
         fromPosition = OnlineMaps.instance.position;
@@ -147,12 +195,13 @@ public class MainManager : MonoBehaviour
     void CheckLayer()
     {
         OnlineMaps map = OnlineMaps.instance;
-        if(map.mapType == "google.relief")
+        if (map.mapType == "google.relief")
         {
             map.mapType = "google.terrain";
 
-        }else 
-        if(map.mapType == "google.terrain")
+        }
+        else
+        if (map.mapType == "google.terrain")
         {
             map.mapType = "google.satelite";
         }
