@@ -738,7 +738,7 @@ MonoBehaviour:
   updatePosition: 1
   useCompassForMarker: 0
   useGPSEmulator: 1
-  desiredAccuracy: 100
+  desiredAccuracy: 10
   updateDistance: 10
 --- !u!114 &243908168
 MonoBehaviour:

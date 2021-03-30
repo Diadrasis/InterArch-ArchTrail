@@ -31,9 +31,10 @@ public class MainManager : MonoBehaviour
     }
     void Start()
     {
-        
+        locationService = OnlineMapsLocationService.instance;
         btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
         InitLocation();
+        toPosition = new Vector2(37.98f, 23.72413f);
         //StartCoroutine(GetStarting());
     }
     void InitLocation()
@@ -170,14 +171,14 @@ public class MainManager : MonoBehaviour
                     using (var unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
                     using (AndroidJavaObject currentActivityObject = unityClass.GetStatic<AndroidJavaObject>("currentActivity"))
                     {
-                        *//*string packageName = currentActivityObject.Call<string>("getPackageName");
+                        string packageName = currentActivityObject.Call<string>("getPackageName");
 
                         using (var uriClass = new AndroidJavaClass("android.net.Uri"))
-                        using (AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("fromParts", "package", packageName, null))*//*
-                        using (var intentObject = new AndroidJavaObject("android.content.Intent", "android.settings.ACTION_LOCATION_SOURCE_SETTINGS"*//*, uriObject*//*))
+                        using (AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("fromParts", "package", packageName, null))
+                        using (var intentObject = new AndroidJavaObject("android.content.Intent", "android.settings.ACTION_LOCATION_SOURCE_SETTINGS", uriObject))
                         {
-                            *//*intentObject.Call<AndroidJavaObject>("addCategory", "android.intent.category.DEFAULT");
-                            intentObject.Call<AndroidJavaObject>("setFlags", 0x10000000);*//*
+                            intentObject.Call<AndroidJavaObject>("addCategory", "android.intent.category.DEFAULT");
+                            intentObject.Call<AndroidJavaObject>("setFlags", 0x10000000);
                             currentActivityObject.Call("startActivity", intentObject);
                         }
                     }
@@ -197,7 +198,7 @@ public class MainManager : MonoBehaviour
         fromPosition = OnlineMaps.instance.position;
 
         // to GPS position;
-        toPosition = /*new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude)*/ OnlineMapsLocationService.instance.position;
+        toPosition = new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude);
 
         // calculates tile positions
         moveZoom = OnlineMaps.instance.zoom;
@@ -249,15 +250,15 @@ public class MainManager : MonoBehaviour
     IEnumerator CheckAppLocation()
     {
         //Vector2 currentPos = new Vector2(37.98f, 23.72413f);
-        float distance = OnlineMapsUtils.DistanceBetweenPoints(OnlineMaps.instance.position,new Vector2(38f, 23.72413f)).magnitude;
-        if (distance <= 100)
+        //float distance = OnlineMapsUtils.DistanceBetweenPoints(OnlineMaps.instance.position,new Vector2(38f, 23.72413f)).magnitude;
+        if (locationService.desiredAccuracy <= toPosition.magnitude)
         {
             infoText.text = "You are in the correct area";
             btnLayer.onClick.AddListener(() => CheckLayer());
             btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
             Debug.Log("Accuracy"+Input.location.lastData.horizontalAccuracy);
             Debug.Log("Long " + Input.location.lastData.longitude + " Lat: " + Input.location.lastData.latitude);
-            Debug.Log(distance);
+            Debug.Log(OnlineMaps.instance.position.magnitude);
             Debug.Log(locationService.desiredAccuracy);
         }
         else
@@ -266,6 +267,10 @@ public class MainManager : MonoBehaviour
             locationService.StopLocationService();
             btnLayer.onClick.RemoveListener(() => CheckLayer());
             btnCurrentLoc.onClick.RemoveListener(() => CheckMyLocation());
+            Debug.Log("Accuracy" + Input.location.lastData.horizontalAccuracy);
+            Debug.Log("Long " + Input.location.lastData.longitude + " Lat: " + Input.location.lastData.latitude);
+            Debug.Log(OnlineMaps.instance.position.magnitude);
+            Debug.Log(locationService.desiredAccuracy);
         }
         yield break;
     }
