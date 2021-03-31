@@ -11,7 +11,7 @@ public class MainManager : MonoBehaviour
     OnlineMaps instance;
     private OnlineMapsMarker playerMarker;
     public Button btnLayer, btnCurrentLoc, btnGPS;
-    public Text infoText;
+    public Text infoText, blackText;
     public float time = 3;
     private float angle;
 
@@ -21,12 +21,12 @@ public class MainManager : MonoBehaviour
     private double fromTileX, fromTileY, toTileX, toTileY;
     private int moveZoom;
     OnlineMapsLocationService locationService;
-    //public GameObject blackScreen;
+    public GameObject blackScreen;
 
     private void Awake()
     {
-
         Application.runInBackground = true;
+        blackScreen.SetActive(false);
 
     }
     void Start()
@@ -34,8 +34,10 @@ public class MainManager : MonoBehaviour
         locationService = OnlineMapsLocationService.instance;
         btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
         InitLocation();
-        toPosition = new Vector2(37.98f, 23.72413f);
+        toPosition = new Vector2(37.17928f, 21.91794f);
+        locationService.OnLocationChanged += CheckAppLocation;
         //StartCoroutine(GetStarting());
+        infoText.text = "Start";
     }
     void InitLocation()
     {
@@ -59,17 +61,6 @@ public class MainManager : MonoBehaviour
     {
         if (locationService == null) return false;
 
-#if PLATFORM_ANDROID
-        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
-        {
-            Permission.RequestUserPermission(Permission.FineLocation);
-            if (Permission.HasUserAuthorizedPermission(Permission.FineLocation))
-            {
-                locationService.StartLocationService();
-                locationService.IsLocationServiceRunning();
-            }
-        }
-#endif
         if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
         {
             if (locationService.useGPSEmulator)
@@ -77,18 +68,48 @@ public class MainManager : MonoBehaviour
             {
                 Debug.Log(locationService);
                 infoText.text = "Checking location";
-                StartCoroutine(CheckAppLocation());
+                //blackScreen.SetActive(false);
+                CheckAppLocation(toPosition);
                 return true;
             }
             else
             {
-                infoText.text = "Press the gps button";
-                StartCoroutine(CheckAppLocation());
+                isAndroidBuild();
+                //blackScreen.SetActive(true);
+                blackText.text = "Press the gps button";
+                //StartCoroutine(CheckAppLocation());
                 return true;
             }
             
         }
         return false;
+    }
+    void isAndroidBuild()
+    {
+        infoText.text = "Android prin na dei pws eimai se android";
+#if PLATFORM_ANDROID
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+        {
+            Permission.RequestUserPermission(Permission.FineLocation);
+            //Permission.RequestUserPermission(Permission.ExternalStorageWrite);
+            infoText.text = "Android sto permission";
+        }
+#endif
+        if (!locationService.TryStartLocationService())
+        {
+            blackScreen.SetActive(true);
+            blackText.text = "Press the gps button to grant the location permission of your mobile";
+            //locationService.StopLocationService();
+        }
+        else
+        {
+            infoText.text = "Android sto else pou douleuoun ola kai kala";
+            CheckAppLocation(toPosition);
+            //Permission.RequestUserPermission(Permission.ExternalStorageWrite);
+            /*blackScreen.SetActive(false);
+            locationService.StartLocationService();
+            locationService.IsLocationServiceRunning();*/
+        }
     }
 
     /* IEnumerator GetStarting()
@@ -138,6 +159,8 @@ public class MainManager : MonoBehaviour
 }*/
     void Update()
     {
+        infoText.text = "Stin update";
+        isAndroidBuild();
         if (!isMovement) return;
 
         // update relative position
@@ -195,10 +218,11 @@ public class MainManager : MonoBehaviour
     }*/
     void CheckMyLocation()
     {
+        infoText.text = "Sto check my location";
         fromPosition = OnlineMaps.instance.position;
 
         // to GPS position;
-        toPosition = new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude);
+        //toPosition = new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude);
 
         // calculates tile positions
         moveZoom = OnlineMaps.instance.zoom;
@@ -240,6 +264,7 @@ public class MainManager : MonoBehaviour
 
     private void OnLocationChanged(Vector2 position)
     {
+        infoText.text = "On location Changed";
         // Change the position of the marker.
         playerMarker.position = position;
 
@@ -247,32 +272,34 @@ public class MainManager : MonoBehaviour
         OnlineMaps.instance.Redraw();
     }
 
-    IEnumerator CheckAppLocation()
+    void CheckAppLocation(Vector2 loc)
     {
         //Vector2 currentPos = new Vector2(37.98f, 23.72413f);
         //float distance = OnlineMapsUtils.DistanceBetweenPoints(OnlineMaps.instance.position,new Vector2(38f, 23.72413f)).magnitude;
-        if (locationService.desiredAccuracy <= toPosition.magnitude)
+        loc = new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude);
+        float distance = OnlineMapsUtils.DistanceBetweenPoints(toPosition, loc).magnitude;
+        if (distance <= OnlineMapsLocationService.instance.desiredAccuracy)
         {
+            //loc = new Vector2 (Input.location.lastData.latitude, Input.location.lastData.longitude);
             infoText.text = "You are in the correct area";
             btnLayer.onClick.AddListener(() => CheckLayer());
             btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
             Debug.Log("Accuracy"+Input.location.lastData.horizontalAccuracy);
             Debug.Log("Long " + Input.location.lastData.longitude + " Lat: " + Input.location.lastData.latitude);
-            Debug.Log(OnlineMaps.instance.position.magnitude);
+            Debug.Log(OnlineMaps.instance.position.sqrMagnitude);
             Debug.Log(locationService.desiredAccuracy);
+            blackScreen.SetActive(false);
         }
         else
         {
-            infoText.text = "Please go near the area of GPS Location";
+            blackScreen.SetActive(true);
+            blackText.text = "Please go near the area, you are " + distance.ToString("F4") +" km away";
+            //locationService.
             locationService.StopLocationService();
             btnLayer.onClick.RemoveListener(() => CheckLayer());
             btnCurrentLoc.onClick.RemoveListener(() => CheckMyLocation());
-            Debug.Log("Accuracy" + Input.location.lastData.horizontalAccuracy);
-            Debug.Log("Long " + Input.location.lastData.longitude + " Lat: " + Input.location.lastData.latitude);
-            Debug.Log(OnlineMaps.instance.position.magnitude);
-            Debug.Log(locationService.desiredAccuracy);
+            
         }
-        yield break;
     }
 
     public void OpenNativeAndroidSettings()

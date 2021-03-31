@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Diadrasis/Emma/_Scenes/Splash.unity
     guid: 56f01e379359b6f40a206ccac0f7e487
   - enabled: 1

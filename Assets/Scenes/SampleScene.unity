@@ -334,7 +334,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &82638177
 RectTransform:
   m_ObjectHideFlags: 0
@@ -362,13 +362,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 82638176}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.392}
+  m_Color: {r: 0.1981132, g: 0.19530971, b: 0.19530971, a: 0.8509804}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -737,7 +737,7 @@ MonoBehaviour:
   trueHeading: 0
   updatePosition: 1
   useCompassForMarker: 0
-  useGPSEmulator: 1
+  useGPSEmulator: 0
   desiredAccuracy: 10
   updateDistance: 10
 --- !u!114 &243908168
@@ -830,7 +830,28 @@ MonoBehaviour:
   labels: 1
   language: en
   lockRedraw: 0
-  markers: []
+  markers:
+  - label: Current Location
+    range:
+      max: 20
+      min: 1
+      maxLimit: 20
+      minLimit: 1
+    tags: []
+    _enabled: 1
+    latitude: 37.9799995422363
+    longitude: 23.7241306304932
+    _scale: 1
+    align: 4
+    locked: 0
+    markerColliderRect:
+      serializedVersion: 2
+      x: -0.5
+      y: -0.5
+      width: 1
+      height: 1
+    texture: {fileID: 2800000, guid: 545ad402ba28f8e4eb2b6ac0328984e7, type: 3}
+    _rotation: 0
   needRedraw: 1
   notInteractUnderGUI: 1
   provider: 2
@@ -871,9 +892,9 @@ MonoBehaviour:
   useWebplayerProxy: 1
   webplayerProxyURL: http://service.infinity-code.com/redirect.php?
   width: 0
-  latitude: 37.97993087768555
-  longitude: 23.724220275878906
-  _zoom: 20
+  latitude: 37.17927932739258
+  longitude: 21.917940139770508
+  _zoom: 15
   _activeTypeSettings: 
 --- !u!4 &243908170
 Transform:
@@ -1468,7 +1489,9 @@ MonoBehaviour:
   btnCurrentLoc: {fileID: 151783394}
   btnGPS: {fileID: 1653032229}
   infoText: {fileID: 222442434}
+  blackText: {fileID: 2104981461}
   time: 3
+  blackScreen: {fileID: 82638176}
 --- !u!4 &1894837983
 Transform:
   m_ObjectHideFlags: 0
@@ -1636,7 +1659,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1644,7 +1667,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 80
+    m_FontSize: 60
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 5
@@ -1652,8 +1675,8 @@ MonoBehaviour:
     m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 1
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Is not on the gps signal
 --- !u!222 &2104981462
