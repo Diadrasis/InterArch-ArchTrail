@@ -10,14 +10,14 @@ public class MainManager : MonoBehaviour
 {
     OnlineMaps instance;
     private OnlineMapsMarker playerMarker;
-    public Button btnLayer, btnCurrentLoc, btnGPS;
+    public Button btnLayer, btnCurrentLoc, btnGPS, btnClose;
     public Text infoText, blackText;
     public float time = 3;
     private float angle;
 
     private bool isMovement;
-    private Vector2 fromPosition;
-    private Vector2 toPosition;
+    private Vector2 fromPosition, toPosition;
+    private Vector2 toPositionTest;
     private double fromTileX, fromTileY, toTileX, toTileY;
     private int moveZoom;
     OnlineMapsLocationService locationService;
@@ -27,14 +27,17 @@ public class MainManager : MonoBehaviour
     {
         Application.runInBackground = true;
         blackScreen.SetActive(false);
-
+        btnClose.gameObject.SetActive(false);
+        //OpenCloseCanvas(false);
     }
     void Start()
     {
         locationService = OnlineMapsLocationService.instance;
         btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
+        btnClose.onClick.AddListener(() => CloseCanvas());
         InitLocation();
-        toPosition = new Vector2(37.17928f, 21.91794f);
+        toPosition = new Vector2(21.91794f, 37.17928f); //correct position for app
+        toPositionTest = new Vector2(23.72402f, 37.97994f); //for testing purposes
         locationService.OnLocationChanged += CheckAppLocation;
         //StartCoroutine(GetStarting());
         infoText.text = "Start";
@@ -42,7 +45,7 @@ public class MainManager : MonoBehaviour
     void InitLocation()
     {
         locationService = OnlineMapsLocationService.instance;
-        playerMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), null, "Player");
+        playerMarker = OnlineMapsMarkerManager.CreateItem(toPosition, null, "Player");
 
         if (locationService == null)
         {
@@ -68,8 +71,8 @@ public class MainManager : MonoBehaviour
             {
                 Debug.Log(locationService);
                 infoText.text = "Checking location";
-                //blackScreen.SetActive(false);
-                CheckAppLocation(toPosition);
+                //CheckAppLocation(toPosition);
+                CheckAppLocation(toPositionTest);
                 return true;
             }
             else
@@ -97,18 +100,17 @@ public class MainManager : MonoBehaviour
 #endif
         if (!locationService.TryStartLocationService())
         {
+            //OpenCloseCanvas(true);
             blackScreen.SetActive(true);
             blackText.text = "Press the gps button to grant the location permission of your mobile";
             //locationService.StopLocationService();
         }
         else
         {
-            infoText.text = "Android sto else pou douleuoun ola kai kala";
-            CheckAppLocation(toPosition);
-            //Permission.RequestUserPermission(Permission.ExternalStorageWrite);
-            /*blackScreen.SetActive(false);
-            locationService.StartLocationService();
-            locationService.IsLocationServiceRunning();*/
+            //blackScreen.SetActive(false);
+            //infoText.text = "Android sto else pou douleuoun ola kai kala";
+            //CheckAppLocation(toPosition);
+            CheckAppLocation(OnlineMaps.instance.position);
         }
     }
 
@@ -159,8 +161,9 @@ public class MainManager : MonoBehaviour
 }*/
     void Update()
     {
-        infoText.text = "Stin update";
-        isAndroidBuild();
+        //infoText.text = "Stin update";
+       OnLocationChanged(new Vector2(23.8f, 38.1f));
+        //isAndroidBuild();
         if (!isMovement) return;
 
         // update relative position
@@ -174,10 +177,11 @@ public class MainManager : MonoBehaviour
         }
 
         // Set new position
-        double px = (toTileX - fromTileX) * angle + fromTileX;
-        double py = (toTileY - fromTileY) * angle + fromTileY;
-        OnlineMaps.instance.projection.TileToCoordinates(px, py, moveZoom, out px, out py);
-        OnlineMaps.instance.SetPosition(px, py);
+        //OnlineMaps.instance.zoomRange = 18f;
+        //double px = (toTileX - fromTileX) * angle + fromTileX;
+        //double py = (toTileY - fromTileY) * angle + fromTileY;
+        //OnlineMaps.instance.projection.TileToCoordinates(px, py, moveZoom, out px, out py);
+        //OnlineMaps.instance.SetPosition(px, py);
         infoText.text = "Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp;
     }
    /* IEnumerator OpenSettings()
@@ -218,16 +222,13 @@ public class MainManager : MonoBehaviour
     }*/
     void CheckMyLocation()
     {
-        infoText.text = "Sto check my location";
         fromPosition = OnlineMaps.instance.position;
-
-        // to GPS position;
-        //toPosition = new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude);
 
         // calculates tile positions
         moveZoom = OnlineMaps.instance.zoom;
         OnlineMaps.instance.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
-        OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
+        OnlineMaps.instance.projection.CoordinatesToTile(toPositionTest.x, toPositionTest.y, moveZoom, out toTileX, out toTileY);
+        //OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
 
         // if tile offset < 4, then start smooth movement
         if (OnlineMapsUtils.Magnitude(fromTileX, fromTileY, toTileX, toTileY) < 4)
@@ -240,7 +241,7 @@ public class MainManager : MonoBehaviour
         }
         else // too far
         {
-            OnlineMaps.instance.position = toPosition;
+            OnlineMaps.instance.position = toPositionTest;
         }
     }
     void CheckLayer()
@@ -264,37 +265,35 @@ public class MainManager : MonoBehaviour
 
     private void OnLocationChanged(Vector2 position)
     {
-        infoText.text = "On location Changed";
-        // Change the position of the marker.
+        position = new Vector2(23.8f, 38.1f);//locationService.position;
         playerMarker.position = position;
 
         // Redraw map.
-        OnlineMaps.instance.Redraw();
+        //OnlineMaps.instance.Redraw();
     }
 
     void CheckAppLocation(Vector2 loc)
     {
-        //Vector2 currentPos = new Vector2(37.98f, 23.72413f);
-        //float distance = OnlineMapsUtils.DistanceBetweenPoints(OnlineMaps.instance.position,new Vector2(38f, 23.72413f)).magnitude;
-        loc = new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude);
-        float distance = OnlineMapsUtils.DistanceBetweenPoints(toPosition, loc).magnitude;
-        if (distance <= OnlineMapsLocationService.instance.desiredAccuracy)
+        loc = OnlineMaps.instance.position;//new Vector2(23.8f, 38.1f);//new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude);
+        //float distance = OnlineMapsUtils.DistanceBetweenPoints(toPosition, loc).sqrMagnitude;
+        float distance = OnlineMapsUtils.DistanceBetweenPoints(toPositionTest, loc).sqrMagnitude;
+        if (distance <= locationService.desiredAccuracy)
         {
-            //loc = new Vector2 (Input.location.lastData.latitude, Input.location.lastData.longitude);
-            infoText.text = "You are in the correct area";
+            //infoText.text = "You are in the correct area "+loc+" with set position "+ toPosition;
+            infoText.text = "You are in the correct area " + loc + " with set position " + toPositionTest;
             btnLayer.onClick.AddListener(() => CheckLayer());
             btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
-            Debug.Log("Accuracy"+Input.location.lastData.horizontalAccuracy);
-            Debug.Log("Long " + Input.location.lastData.longitude + " Lat: " + Input.location.lastData.latitude);
-            Debug.Log(OnlineMaps.instance.position.sqrMagnitude);
-            Debug.Log(locationService.desiredAccuracy);
             blackScreen.SetActive(false);
+            //OpenCloseCanvas(false);
+
         }
         else
         {
+            //OpenCloseCanvas(true);
             blackScreen.SetActive(true);
-            blackText.text = "Please go near the area, you are " + distance.ToString("F4") +" km away";
-            //locationService.
+            btnClose.gameObject.SetActive(true);
+            //blackText.text = "Please go near the area. Your location is: "+loc+" and the marker is: "+ toPosition;
+            //blackText.text = "Please go near the area. Your location is: " + loc + " and the marker is: " + toPositionTest;
             locationService.StopLocationService();
             btnLayer.onClick.RemoveListener(() => CheckLayer());
             btnCurrentLoc.onClick.RemoveListener(() => CheckMyLocation());
@@ -311,4 +310,27 @@ public class MainManager : MonoBehaviour
     {
         locationService.StopLocationService();
     }
+
+    void BeOnThePlace()
+    {
+        Vector2 pos = new Vector2(23.8f, 38.1f);
+        infoText.text = "You are in the correct area " + pos + " with set position " + toPositionTest;
+        btnLayer.onClick.AddListener(() => CheckLayer());
+        btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
+        blackScreen.SetActive(false);
+        //OpenCloseCanvas(false);
+    }
+
+    void CloseCanvas()
+    {
+        blackScreen.SetActive(false);
+    }
+
+    /*public void CloseCanvas()
+    {
+        if (blackScreen.activeInHierarchy)
+        {
+            blackScreen.SetActive(false);
+        }
+    }*/
 }

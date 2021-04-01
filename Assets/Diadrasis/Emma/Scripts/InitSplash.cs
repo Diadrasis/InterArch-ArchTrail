@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class InitSplash : MonoBehaviour
 {
-    public Animator animAppLogo, animEspaLogo, animDiadrasisLogo/*, animUniLogo,ministry1logo, ministry2logo*/, animPanel;
+    public Animator animAppLogo, /*animEspaLogo,*/ animDiadrasisLogo/*, animUniLogo,ministry1logo, ministry2logo*/, animPanel;
     //public GameObject menuPanel;
 
     public static int isStarted;
@@ -45,9 +45,9 @@ public class InitSplash : MonoBehaviour
         yield return new WaitForSeconds(0.7f);
         animAppLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
-        animEspaLogo.SetBool("show", true);
+        /*animEspaLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
-        animEspaLogo.SetBool("show", false);
+        animEspaLogo.SetBool("show", false);*/
         yield return new WaitForSeconds(0.7f);
         animDiadrasisLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
