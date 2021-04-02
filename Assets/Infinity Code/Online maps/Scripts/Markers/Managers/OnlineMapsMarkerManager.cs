@@ -38,7 +38,7 @@ public class OnlineMapsMarkerManager : OnlineMapsMarkerManagerBase<OnlineMapsMar
     {
         if (texture == null) texture = defaultTexture;
         OnlineMapsMarker marker = _CreateItem(longitude, latitude);
-        marker.texture = texture;
+        marker.defaultTexture = texture;
         marker.label = label;
         marker.align = defaultAlign;
         marker.Init();
@@ -77,7 +77,7 @@ public class OnlineMapsMarkerManager : OnlineMapsMarkerManagerBase<OnlineMapsMar
 
             marker.range = jitem.ChildValue<OnlineMapsRange>("range");
             marker.label = jitem.ChildValue<string>("label");
-            marker.texture = OnlineMapsUtils.GetObject(jitem.ChildValue<int>("texture")) as Texture2D;
+            marker.defaultTexture = OnlineMapsUtils.GetObject(jitem.ChildValue<int>("texture")) as Texture2D;
             marker.align = (OnlineMapsAlign)jitem.ChildValue<int>("align");
             marker.rotation = jitem.ChildValue<float>("rotation");
             marker.enabled = jitem.ChildValue<bool>("enabled");
@@ -113,6 +113,6 @@ public class OnlineMapsMarkerManager : OnlineMapsMarkerManagerBase<OnlineMapsMar
     {
         base.Update();
 
-        // if (allowAddMarkerByM && Input.GetKeyUp(KeyCode.M)) CreateItem(OnlineMapsControlBase.instance.GetCoords());
+       if (allowAddMarkerByM && Input.GetKeyUp(KeyCode.M)) CreateItem(OnlineMapsControlBase.instance.GetCoords());
     }
 }

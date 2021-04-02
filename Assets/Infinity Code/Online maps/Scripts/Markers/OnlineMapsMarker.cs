@@ -38,7 +38,7 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
     /// <strong>Must enable "Read / Write enabled".</strong>\n
     /// After changing the texture you need to call OnlineMapsMarker.Init.
     /// </summary>
-    public Texture2D texture;
+    public Texture2D defaultTexture;
 
     private Color32[] _colors;
     private int _height;
@@ -353,11 +353,11 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
     /// <param name="height">Height of the marker texture.</param>
     public void Init(int? width = null, int? height = null)
     {
-        if (texture != null)
+        if (defaultTexture != null)
         {
-            if (map.target == OnlineMapsTarget.texture) _colors = texture.GetPixels32();
-            _width = _textureWidth = width ?? texture.width;
-            _height = _textureHeight = height ?? texture.height;
+            if (map.target == OnlineMapsTarget.texture) _colors = defaultTexture.GetPixels32();
+            _width = _textureWidth = width ?? defaultTexture.width;
+            _height = _textureHeight = height ?? defaultTexture.height;
         }
         else
         {
@@ -384,7 +384,7 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
     public override OnlineMapsXML Save(OnlineMapsXML parent)
     {
         OnlineMapsXML element = base.Save(parent);
-        element.Create("Texture", texture);
+        element.Create("Texture", defaultTexture);
         element.Create("Align", (int) align);
         element.Create("Rotation", rotation);
         return element;
@@ -475,4 +475,5 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
 
         locked = false;
     }
+    
 }

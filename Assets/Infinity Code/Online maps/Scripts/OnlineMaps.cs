@@ -716,7 +716,7 @@ public class OnlineMaps : MonoBehaviour, ISerializationCallbackReceiver
 
         marker = new OnlineMapsMarker
         {
-            texture = markerTexture,
+            defaultTexture = markerTexture,
             label = label,
             align = defaultMarkerAlign
         };

@@ -141,7 +141,7 @@ public static class OnlineMapsPrefs
 
             marker.range = m.Get<OnlineMapsRange>("Range");
             marker.label = m.Get<string>("Label");
-            marker.texture = GetObject(m.Get<int>("Texture")) as Texture2D;
+            marker.defaultTexture = GetObject(m.Get<int>("Texture")) as Texture2D;
             marker.align = (OnlineMapsAlign)m.Get<int>("Align");
             marker.rotation = m.Get<float>("Rotation");
             markers.Add(marker);

@@ -1937,9 +1937,9 @@ public class OnlineMapsTileSetControl : OnlineMapsControlBase3D
             fx = fx * OnlineMapsUtils.tileSize - offset.x;
             fy = (fy - ty) * OnlineMapsUtils.tileSize - offset.y;
 
-            if (marker.texture == null)
+            if (marker.defaultTexture == null)
             {
-                marker.texture = map.defaultMarkerTexture;
+                marker.defaultTexture = map.defaultMarkerTexture;
                 marker.Init();
             }
 
@@ -2000,20 +2000,20 @@ public class OnlineMapsTileSetControl : OnlineMapsControlBase3D
 
             if (OnGenerateMarkerVertices != null) OnGenerateMarkerVertices(marker, markersVertices, vIndex);
 
-            if (marker.texture == map.defaultMarkerTexture)
+            if (marker.defaultTexture == map.defaultMarkerTexture)
             {
                 usedTexturesMarkerIndex[0].Add(usedMarkersCount);
             }
             else
             {
-                int textureIndex = usedTextures.IndexOf(marker.texture);
+                int textureIndex = usedTextures.IndexOf(marker.defaultTexture);
                 if (textureIndex != -1)
                 {
                     usedTexturesMarkerIndex[textureIndex].Add(usedMarkersCount);
                 }
                 else
                 {
-                    usedTextures.Add(marker.texture);
+                    usedTextures.Add(marker.defaultTexture);
                     usedTexturesMarkerIndex.Add(new List<int>(32));
                     usedTexturesMarkerIndex[usedTexturesMarkerIndex.Count - 1].Add(usedMarkersCount);
                 }
