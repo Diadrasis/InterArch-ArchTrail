@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,8 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/MoveMarkerOnRouteExample")]
     public class MoveMarkerOnRouteExample : MonoBehaviour
     {
+        public string googleAPIKey;
+
         /// <summary>
         /// Start location name
         /// </summary>
@@ -61,8 +63,12 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
+            if (string.IsNullOrEmpty(googleAPIKey)) Debug.LogWarning("Please specify Google API Key");
+
             // Looking for a route between locations.
-            OnlineMapsGoogleDirections.Find(fromPlace, toPlace).OnComplete += OnComplete;
+            OnlineMapsGoogleDirections request = new OnlineMapsGoogleDirections(googleAPIKey, fromPlace, toPlace);
+            request.OnComplete += OnComplete;
+            request.Send();
         }
 
         private void OnComplete(string response)
@@ -81,14 +87,14 @@ namespace InfinityCode.OnlineMapsExamples
             List<OnlineMapsGoogleDirectionsResult.Step> steps = firstRoute.legs.SelectMany(l => l.steps).ToList();
 
             // Create a new marker in first point.
-            marker = OnlineMaps.instance.AddMarker(steps[0].start_location, "Car");
+            marker = OnlineMapsMarkerManager.CreateItem(steps[0].start_location, "Car");
 
             // Gets points of route.
             points = firstRoute.overview_polylineD;
 
             // Draw the route.
             OnlineMapsDrawingLine route = new OnlineMapsDrawingLine(points, Color.red, 3);
-            OnlineMaps.instance.AddDrawingElement(route);
+            OnlineMapsDrawingElementManager.AddItem(route);
 
             pointIndex = 0;
         }

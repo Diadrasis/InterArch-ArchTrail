@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections;
@@ -45,7 +45,7 @@ public class OnlineMapsJSON
         if (obj == null) return null;
         try
         {
-            return Convert.ChangeType(obj, type);
+            return Convert.ChangeType(obj, type, OnlineMapsUtils.numberFormat);
         }
         catch (Exception exception)
         {
@@ -662,12 +662,17 @@ public class OnlineMapsJSON
     /// <returns>JSON</returns>
     public static OnlineMapsJSONItem Serialize(object obj)
     {
+        if (obj is Action) return new OnlineMapsJSONValue(obj, OnlineMapsJSONValue.ValueType.NULL);
 #if !UNITY_WP_8_1 || UNITY_EDITOR
         if (obj == null || obj is DBNull) return new OnlineMapsJSONValue(obj, OnlineMapsJSONValue.ValueType.NULL);
 #else
         if (obj == null) return new OnlineMapsJSONValue(obj, OnlineMapsJSONValue.ValueType.NULL);
 #endif
         if (obj is string || obj is bool || obj is int || obj is long || obj is short || obj is float || obj is double) return new OnlineMapsJSONValue(obj);
+        if (obj is UnityEngine.Object)
+        {
+            if (!(obj is Component || obj is ScriptableObject)) return new OnlineMapsJSONValue((obj as UnityEngine.Object).GetInstanceID());
+        }
         if (obj is IDictionary)
         {
             IDictionary d = obj as IDictionary;
@@ -701,7 +706,13 @@ public class OnlineMapsJSON
         foreach (FieldInfo field in fields)
         {
             string fieldName = field.Name;
-            if (field.Attributes == (FieldAttributes.Private | FieldAttributes.InitOnly)) fieldName = fieldName.Trim('<', '>');
+            if (field.Attributes == (FieldAttributes.Private | FieldAttributes.InitOnly))
+            {
+                int startIndex = fieldName.IndexOf('<') + 1;
+                int endIndex = fieldName.IndexOf('>', startIndex);
+                if (endIndex != -1 && startIndex != -1) fieldName = fieldName.Substring(startIndex, endIndex - startIndex);
+                else fieldName = fieldName.Trim('<', '>');
+            }
             o.Add(fieldName, Serialize(field.GetValue(obj)));
         }
         return o;        

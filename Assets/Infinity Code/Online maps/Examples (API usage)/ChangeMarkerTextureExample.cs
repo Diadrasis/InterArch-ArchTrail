@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -20,9 +20,9 @@ namespace InfinityCode.OnlineMapsExamples
             if (GUI.Button(new Rect(10, 10, 100, 20), "Change markers"))
             {
                 // ... all markers will change the texture.
-                foreach (OnlineMapsMarker marker in OnlineMaps.instance.markers)
+                foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
                 {
-                    marker.defaultTexture = newMarkerTexture;
+                    marker.texture = newMarkerTexture;
                     marker.Init();
                 }
 

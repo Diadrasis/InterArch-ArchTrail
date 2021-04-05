@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +27,7 @@ namespace InfinityCode.OnlineMapsExamples
 
 	    private void Start ()
         {
-            marker = OnlineMaps.instance.AddMarker(Vector2.zero, "Hello World");
+            marker = OnlineMapsMarkerManager.CreateItem(Vector2.zero, "Hello World");
             marker.OnDrawTooltip = delegate {  };
 
             OnlineMaps.instance.OnUpdateLate += OnUpdateLate;
@@ -35,7 +35,7 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void OnUpdateLate()
         {
-            OnlineMapsMarkerBase tooltipMarker = OnlineMaps.instance.tooltipMarker;
+            OnlineMapsMarkerBase tooltipMarker = OnlineMapsTooltipDrawerBase.tooltipMarker;
             if (tooltipMarker == marker)
             {
                 if (tooltip == null)
@@ -53,7 +53,7 @@ namespace InfinityCode.OnlineMapsExamples
             }
             else if (tooltip != null)
             {
-                OnlineMapsUtils.DestroyImmediate(tooltip);
+                OnlineMapsUtils.Destroy(tooltip);
                 tooltip = null;
             }
         }

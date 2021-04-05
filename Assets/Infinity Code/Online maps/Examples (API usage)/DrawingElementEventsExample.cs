@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,7 +25,7 @@ namespace InfinityCode.OnlineMapsExamples
             element.OnPress += OnPress;
             element.OnRelease += OnRelease;
             element.OnDoubleClick += OnDoubleClick;
-            OnlineMaps.instance.AddDrawingElement(element);
+            OnlineMapsDrawingElementManager.AddItem(element);
 
             List<Vector2> poly = new List<Vector2>
             {
@@ -44,7 +44,7 @@ namespace InfinityCode.OnlineMapsExamples
             polyElement.OnPress += OnPress;
             polyElement.OnRelease += OnRelease;
             polyElement.OnDoubleClick += OnDoubleClick;
-            OnlineMaps.instance.AddDrawingElement(polyElement);
+            OnlineMapsDrawingElementManager.AddItem(polyElement);
 
             // Create tooltip for poly.
             polyElement.tooltip = "Drawing Element";

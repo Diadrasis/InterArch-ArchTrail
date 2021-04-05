@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -12,10 +12,14 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/RotateCameraByCompassExample")]
     public class RotateCameraByCompassExample : MonoBehaviour
     {
+        private OnlineMapsCameraOrbit cameraOrbit;
+
         private void Start()
         {
             // Subscribe to compass event
             OnlineMapsLocationService.instance.OnCompassChanged += OnCompassChanged;
+
+            cameraOrbit = OnlineMapsCameraOrbit.instance;
         }
 
         /// <summary>
@@ -25,7 +29,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void OnCompassChanged(float f)
         {
             // Rotate the camera.
-            OnlineMapsTileSetControl.instance.cameraRotation.y = f * 360;
+            cameraOrbit.rotation.y = f * 360;
         }
     }
 }

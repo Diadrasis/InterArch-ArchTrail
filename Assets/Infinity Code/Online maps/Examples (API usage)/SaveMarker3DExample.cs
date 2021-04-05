@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -43,7 +43,7 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsControlBase3D control = OnlineMapsControlBase3D.instance;
 
             // Create new marker
-            OnlineMapsMarker3D marker = control.AddMarker3D(control.GetCoords(), markerPrefab);
+            OnlineMapsMarker3D marker = OnlineMapsMarker3DManager.CreateItem(control.GetCoords(), markerPrefab);
             marker.scale = markerScale;
         }
 
@@ -56,7 +56,7 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsXML xml = new OnlineMapsXML("Markers");
 
             // Save markers data
-            foreach (OnlineMapsMarker3D marker in OnlineMapsControlBase3D.instance.markers3D)
+            foreach (OnlineMapsMarker3D marker in OnlineMapsMarker3DManager.instance)
             {
                 // Create marker node
                 xml.Create("Marker", marker.position);
@@ -100,7 +100,7 @@ namespace InfinityCode.OnlineMapsExamples
                 Vector2 position = node.Value<Vector2>();
 
                 // Create marker
-                OnlineMapsMarker3D marker = OnlineMapsControlBase3D.instance.AddMarker3D(position, markerPrefab);
+                OnlineMapsMarker3D marker = OnlineMapsMarker3DManager.CreateItem(position, markerPrefab);
                 marker.scale = markerScale;
             }
         }

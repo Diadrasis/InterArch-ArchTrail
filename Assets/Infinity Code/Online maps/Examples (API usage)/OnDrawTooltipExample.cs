@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -18,7 +18,7 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsMarkerBase.OnMarkerDrawTooltip += OnMarkerDrawTooltip;
 
             // Create new event OnDrawTooltip for custom marker.
-            OnlineMaps.instance.AddMarker(new Vector2(), null, "New marker").OnDrawTooltip += OnDrawTooltip;
+            OnlineMapsMarkerManager.CreateItem(new Vector2(), null, "New marker").OnDrawTooltip += OnDrawTooltip;
         }
 
         private void DrawBoxAroundMarker(OnlineMapsMarker marker)

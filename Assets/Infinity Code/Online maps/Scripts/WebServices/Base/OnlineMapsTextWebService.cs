@@ -1,27 +1,32 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 
 /// <summary>
-/// The base class for working with the web services returns text response
+/// The base class for working with the web services returns text response.
 /// </summary>
 public abstract class OnlineMapsTextWebService: OnlineMapsWebServiceAPI
 {
     /// <summary>
-    /// Event that occurs when a response is received from webservice
+    /// Event that occurs when a response is received from webservice.
     /// </summary>
     public Action<string> OnComplete;
-
-    /// <summary>
-    /// Event that occurs when a success response is received from webservice
-    /// </summary>
-    public new Action<OnlineMapsTextWebService> OnSuccess;
 
     /// <summary>
     /// Event that occurs when an error response is received from webservice
     /// </summary>
     public new Action<OnlineMapsTextWebService> OnFailed;
+
+    /// <summary>
+    /// This event is occurs after other events, before disposing the request
+    /// </summary>
+    public new Action<OnlineMapsTextWebService> OnFinish;
+
+    /// <summary>
+    /// Event that occurs when a success response is received from webservice
+    /// </summary>
+    public new Action<OnlineMapsTextWebService> OnSuccess;
 
     /// <summary>
     /// Response string
@@ -41,12 +46,7 @@ public abstract class OnlineMapsTextWebService: OnlineMapsWebServiceAPI
 
     public override void Destroy()
     {
-        if (this is OnlineMapsGoogleAPIQuery)
-        {
-            OnlineMapsGoogleAPIQuery q = this as OnlineMapsGoogleAPIQuery;
-            if (q.OnDispose != null) q.OnDispose(q);
-        }
-        else if (OnDispose != null) OnDispose(this);
+        if (OnDispose != null) OnDispose(this);
 
         www = null;
         _response = string.Empty;
@@ -61,32 +61,25 @@ public abstract class OnlineMapsTextWebService: OnlineMapsWebServiceAPI
     /// </summary>
     protected void OnRequestComplete(OnlineMapsWWW www)
     {
-        if (www != null && www.isDone)
+        if (www == null || !www.isDone) return;
+
+        _status = www.hasError ? OnlineMapsQueryStatus.error : OnlineMapsQueryStatus.success;
+        _response = _status == OnlineMapsQueryStatus.success ? www.text : www.error;
+
+        if (OnComplete != null) OnComplete(_response);
+        if (status == OnlineMapsQueryStatus.success)
         {
-            _status = string.IsNullOrEmpty(www.error) ? OnlineMapsQueryStatus.success : OnlineMapsQueryStatus.error;
-            _response = _status == OnlineMapsQueryStatus.success ? www.text : www.error;
-
-            if (OnComplete != null) OnComplete(_response);
-            if (status == OnlineMapsQueryStatus.success)
-            {
-                if (OnSuccess != null) OnSuccess(this);
-            }
-            else
-            {
-                if (OnFailed != null) OnFailed(this);
-            }
-
-            if (this is OnlineMapsGoogleAPIQuery)
-            {
-                OnlineMapsGoogleAPIQuery q = this as OnlineMapsGoogleAPIQuery;
-                if (q.OnFinish != null) q.OnFinish(q);
-            }
-            else if (OnFinish != null) OnFinish(this);
-
-            _status = OnlineMapsQueryStatus.disposed;
-            _response = null;
-            this.www = null;
-            customData = null;
+            if (OnSuccess != null) OnSuccess(this);
         }
+        else
+        {
+            if (OnFailed != null) OnFailed(this);
+        }
+        if (OnFinish != null) OnFinish(this);
+
+        _status = OnlineMapsQueryStatus.disposed;
+        _response = null;
+        this.www = null;
+        customData = null;
     }
 }

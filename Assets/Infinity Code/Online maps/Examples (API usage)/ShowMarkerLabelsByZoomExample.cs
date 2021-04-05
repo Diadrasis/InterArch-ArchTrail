@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -16,12 +16,12 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMaps map = OnlineMaps.instance;
 
             // Create a new markers.
-            OnlineMapsMarker marker1 = map.AddMarker(new Vector2(0, 0), null, "Marker 1");
-            OnlineMapsMarker marker2 = map.AddMarker(new Vector2(10, 0), null, "Marker 2");
+            OnlineMapsMarker marker1 = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), null, "Marker 1");
+            OnlineMapsMarker marker2 = OnlineMapsMarkerManager.CreateItem(new Vector2(10, 0), null, "Marker 2");
 
             // Store data about labels.
-            marker1.customData = new ShowMarkerLabelsByZoomItem(marker1.label, new OnlineMapsRange(3, 10));
-            marker2.customData = new ShowMarkerLabelsByZoomItem(marker2.label, new OnlineMapsRange(8, 15));
+            marker1["data"] = new ShowMarkerLabelsByZoomItem(marker1.label, new OnlineMapsRange(3, 10));
+            marker2["data"] = new ShowMarkerLabelsByZoomItem(marker2.label, new OnlineMapsRange(8, 15));
 
             // Sunscribe to ChangeZoom event.
             map.OnChangeZoom += OnChangeZoom;
@@ -31,9 +31,9 @@ namespace InfinityCode.OnlineMapsExamples
         private void OnChangeZoom()
         {
             OnlineMaps map = OnlineMaps.instance;
-            foreach (OnlineMapsMarker marker in map.markers)
+            foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
             {
-                ShowMarkerLabelsByZoomItem item = marker.customData as ShowMarkerLabelsByZoomItem;
+                ShowMarkerLabelsByZoomItem item = marker["data"] as ShowMarkerLabelsByZoomItem;
                 if (item == null) continue;
 
                 // Update marker labels.

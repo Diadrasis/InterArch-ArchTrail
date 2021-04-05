@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -7,6 +7,7 @@ using UnityEngine;
 /// Stores keys to all supported services and automatically uses them in requests.
 /// </summary>
 [AddComponentMenu("Infinity Code/Online Maps/Plugins/Key Manager")]
+[OnlineMapsPlugin("Key Manager", typeof(OnlineMapsControlBase), true)]
 public class OnlineMapsKeyManager: MonoBehaviour
 {
     private static OnlineMapsKeyManager instance;
@@ -27,6 +28,11 @@ public class OnlineMapsKeyManager: MonoBehaviour
     public string googleMaps;
 
     /// <summary>
+    /// HERE API key
+    /// </summary>
+    public string hereApiKey;
+
+    /// <summary>
     /// Here App Code
     /// </summary>
     public string hereAppCode;
@@ -35,6 +41,11 @@ public class OnlineMapsKeyManager: MonoBehaviour
     /// Here App ID
     /// </summary>
     public string hereAppID;
+
+    /// <summary>
+    /// Mapbox Access Token
+    /// </summary>
+    public string mapboxAccessToken;
 
     /// <summary>
     /// Open Route Service key
@@ -76,11 +87,27 @@ public class OnlineMapsKeyManager: MonoBehaviour
     }
 
     /// <summary>
-    /// Is there a key for Here
+    /// Is there a app id and app code for Here
     /// </summary>
     public static bool hasHere
     {
         get { return !string.IsNullOrEmpty(HereAppCode()) && !string.IsNullOrEmpty(HereAppID()); }
+    }
+
+    /// <summary>
+    /// Is there a key for Here
+    /// </summary>
+    public static bool hasHereKey
+    {
+        get { return !string.IsNullOrEmpty(HereApiKey()); }
+    }
+
+    /// <summary>
+    /// Is there an access token for Mapbox
+    /// </summary>
+    public static bool hasMapbox
+    {
+        get { return !string.IsNullOrEmpty(Mapbox()); }
     }
 
     /// <summary>
@@ -143,6 +170,16 @@ public class OnlineMapsKeyManager: MonoBehaviour
     }
 
     /// <summary>
+    /// Returns Here Api Key if present
+    /// </summary>
+    /// <returns>Here Api Key or null</returns>
+    public static string HereApiKey()
+    {
+        if (instance != null) return instance.hereApiKey;
+        return null;
+    }
+
+    /// <summary>
     /// Returns Here App Code if present
     /// </summary>
     /// <returns>Here App Code or null</returns>
@@ -159,6 +196,16 @@ public class OnlineMapsKeyManager: MonoBehaviour
     public static string HereAppID()
     {
         if (instance != null) return instance.hereAppID;
+        return null;
+    }
+
+    /// <summary>
+    /// Returns Mapbox Access Token if present
+    /// </summary>
+    /// <returns>Mapbox Access Token or null</returns>
+    public static string Mapbox()
+    {
+        if (instance != null) return instance.mapboxAccessToken;
         return null;
     }
 

@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -11,6 +11,11 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/FindLocationExample")]
     public class FindLocationExample : MonoBehaviour
     {
+        /// <summary>
+        /// Google API Key
+        /// </summary>
+        public  string googleAPIKey;
+
         /// <summary>
         /// Add marker at first found location.
         /// </summary>
@@ -33,11 +38,14 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
+            if (string.IsNullOrEmpty(googleAPIKey)) Debug.LogWarning("Please specify Google API Key");
+
             // Start search Chicago.
-            OnlineMapsGoogleGeocoding query = OnlineMapsGoogleGeocoding.Find("Chicago");
+            OnlineMapsGoogleGeocoding request = new OnlineMapsGoogleGeocoding("Chicago", googleAPIKey);
+            request.Send();
 
             // Specifies that search results should be sent to OnFindLocationComplete.
-            query.OnComplete += OnFindLocationComplete;
+            request.OnComplete += OnFindLocationComplete;
         }
 
         private void OnFindLocationComplete(string result)
@@ -51,7 +59,7 @@ namespace InfinityCode.OnlineMapsExamples
             if (position != Vector2.zero)
             {
                 // Create a new marker at the position of Chicago.
-                if (addMarker) OnlineMaps.instance.AddMarker(position, "Chicago");
+                if (addMarker) OnlineMapsMarkerManager.CreateItem(position, "Chicago");
 
                 // Set best zoom
                 if (setZoom)

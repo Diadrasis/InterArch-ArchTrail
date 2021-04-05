@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Linq;
 using UnityEngine;
@@ -77,7 +77,7 @@ namespace InfinityCode.OnlineMapsExamples
                     if (route.shape != null)
                     {
                         OnlineMapsDrawingElement line = new OnlineMapsDrawingLine(route.shape.Select(v => new Vector2((float) v.longitude, (float) v.latitude)).ToList(), colors[colorIndex++]);
-                        OnlineMaps.instance.AddDrawingElement(line);
+                        OnlineMapsDrawingElementManager.AddItem(line);
                     }
                 }
             }

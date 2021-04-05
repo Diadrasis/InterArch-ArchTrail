@@ -1,9 +1,11 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace InfinityCode.OnlineMapsExamples
 {
@@ -43,7 +45,7 @@ namespace InfinityCode.OnlineMapsExamples
             // Create a random markers.
             for (int i = 0; i < countMarkers; i++)
             {
-                OnlineMapsMarker marker = OnlineMaps.instance.AddMarker(new Vector2(Random.Range(-180f, 180f), Random.Range(-90, 90)));
+                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(new Vector2(Random.Range(-180f, 180f), Random.Range(-90, 90)));
                 marker.label = "Marker " + i;
                 markers.Add(marker);
             }
@@ -56,7 +58,7 @@ namespace InfinityCode.OnlineMapsExamples
         {
             List<MarkerGroup> groups = new List<MarkerGroup>();
 
-            for (int zoom = OnlineMaps.MAXZOOM; zoom >= 3; zoom--)
+            for (int zoom = OnlineMaps.MAXZOOM; zoom >= OnlineMaps.MINZOOM; zoom--)
             {
                 List<OnlineMapsMarker> ms = markers.Select(m => m).ToList();
 
@@ -85,10 +87,10 @@ namespace InfinityCode.OnlineMapsExamples
                                 group = new MarkerGroup(zoom, groupTexture);
                                 groups.Add(group);
                                 group.Add(marker);
-                                if (marker.range.min == 3) marker.range.min = zoom + 1;
+                                if (Math.Abs(marker.range.min - OnlineMaps.MINZOOM) < float.Epsilon) marker.range.min = zoom + 1;
                             }
                             group.Add(marker2);
-                            if (marker2.range.min == 3) marker2.range.min = zoom + 1;
+                            if (Math.Abs(marker2.range.min - OnlineMaps.MINZOOM) < float.Epsilon) marker2.range.min = zoom + 1;
                             ms.RemoveAt(k);
                             px = group.tilePositionX;
                             py = group.tilePositionY;
@@ -115,7 +117,7 @@ namespace InfinityCode.OnlineMapsExamples
             {
                 markers = new List<OnlineMapsMarker>();
                 this.zoom = zoom;
-                instance = OnlineMaps.instance.AddMarker(Vector2.zero, texture);
+                instance = OnlineMapsMarkerManager.CreateItem(Vector2.zero, texture);
                 instance.align = OnlineMapsAlign.Center;
                 instance.range = new OnlineMapsRange(zoom, zoom);
             }
@@ -131,10 +133,10 @@ namespace InfinityCode.OnlineMapsExamples
 
             public void Apply(Texture2D font)
             {
-                int width = instance.defaultTexture.width;
-                int height = instance.defaultTexture.height;
+                int width = instance.texture.width;
+                int height = instance.texture.height;
                 Texture2D texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
-                Color[] colors = instance.defaultTexture.GetPixels();
+                Color[] colors = instance.texture.GetPixels();
 
                 char[] cText = markers.Count.ToString().ToCharArray();
 
@@ -167,7 +169,7 @@ namespace InfinityCode.OnlineMapsExamples
 
                 texture.SetPixels(colors);
                 texture.Apply();
-                instance.defaultTexture = texture;
+                instance.texture = texture;
             }
         }
     }

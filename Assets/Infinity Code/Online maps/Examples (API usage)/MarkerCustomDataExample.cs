@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -14,17 +14,17 @@ namespace InfinityCode.OnlineMapsExamples
         private void Start()
         {
             // Create a new markers.
-            OnlineMapsMarker marker1 = OnlineMaps.instance.AddMarker(Vector2.zero, "Marker 1");
-            OnlineMapsMarker marker2 = OnlineMaps.instance.AddMarker(new Vector2(10, 0), "Marker 2");
+            OnlineMapsMarker marker1 = OnlineMapsMarkerManager.CreateItem(Vector2.zero, "Marker 1");
+            OnlineMapsMarker marker2 = OnlineMapsMarkerManager.CreateItem(new Vector2(10, 0), "Marker 2");
 
             // Create new XML and store it in customData.
             OnlineMapsXML xml1 = new OnlineMapsXML("MarkerData");
             xml1.Create("ID", "marker1");
-            marker1.customData = xml1;
+            marker1["data"] = xml1;
 
             OnlineMapsXML xml2 = new OnlineMapsXML("MarkerData");
             xml2.Create("ID", "marker2");
-            marker2.customData = xml2;
+            marker2["data"] = xml2;
 
             // Subscribe to click event.
             marker1.OnClick += OnMarkerClick;
@@ -34,7 +34,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void OnMarkerClick(OnlineMapsMarkerBase marker)
         {
             // Try get XML from customData.
-            OnlineMapsXML xml = marker.customData as OnlineMapsXML;
+            OnlineMapsXML xml = marker["data"] as OnlineMapsXML;
 
             if (xml == null)
             {

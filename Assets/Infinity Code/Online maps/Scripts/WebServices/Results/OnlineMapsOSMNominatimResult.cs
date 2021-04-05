@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -99,10 +99,10 @@ public class OnlineMapsOSMNominatimResult
         if (!string.IsNullOrEmpty(bb))
         {
             string[] bbParts = bb.Split(',');
-            double w = Double.Parse(bbParts[0]);
-            double e = Double.Parse(bbParts[1]);
-            double s = Double.Parse(bbParts[2]);
-            double n = Double.Parse(bbParts[3]);
+            double w = Double.Parse(bbParts[0], OnlineMapsUtils.numberFormat);
+            double e = Double.Parse(bbParts[1], OnlineMapsUtils.numberFormat);
+            double s = Double.Parse(bbParts[2], OnlineMapsUtils.numberFormat);
+            double n = Double.Parse(bbParts[3], OnlineMapsUtils.numberFormat);
             boundingbox = new Rect((float)w, (float)n, (float)(e - w), (float)(s - n));
         }
         

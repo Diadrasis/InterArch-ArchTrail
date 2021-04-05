@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections;
@@ -19,13 +19,13 @@ public abstract class OnlineMapsJSONItem: IEnumerable<OnlineMapsJSONItem>
     public abstract OnlineMapsJSONItem this[int index] { get; }
 
     /// <summary>
-    /// Get the element by key.\n
-    /// Supports XPath like selectors:\n
-    /// ["key"] - get element by key.\n
-    /// ["key1/key2"] - get element key2, which is a child of the element key1.\n
-    /// ["key/N"] - where N is number. Get array element by index N, which is a child of the element key1.\n
-    /// ["key/*"] - get all array elements, which is a child of the element key1.\n
-    /// ["//key"] - get all elements with the key on the first or the deeper levels of the current element. \n
+    /// Get the element by key.<br/>
+    /// Supports XPath like selectors:<br/>
+    /// ["key"] - get element by key.<br/>
+    /// ["key1/key2"] - get element key2, which is a child of the element key1.<br/>
+    /// ["key/N"] - where N is number. Get array element by index N, which is a child of the element key1.<br/>
+    /// ["key/*"] - get all array elements, which is a child of the element key1.<br/>
+    /// ["//key"] - get all elements with the key on the first or the deeper levels of the current element.<br/>
     /// </summary>
     /// <param name="key">Element key</param>
     /// <returns>Element</returns>
@@ -49,7 +49,9 @@ public abstract class OnlineMapsJSONItem: IEnumerable<OnlineMapsJSONItem>
     /// <returns>Value</returns>
     public T ChildValue<T>(string childName)
     {
-        return this[childName].Value<T>();
+        OnlineMapsJSONItem el = this[childName];
+        if (el == null) return default(T);
+        return el.Value<T>();
     }
 
     /// <summary>
@@ -113,7 +115,7 @@ public abstract class OnlineMapsJSONItem: IEnumerable<OnlineMapsJSONItem>
     /// <returns>Value</returns>
     public virtual T Value<T>()
     {
-        return default(T);
+        return (T)Value(typeof(T));
     }
 
     /// <summary>

@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void Start()
         {
             // Create a new marker.
-            OnlineMapsMarker marker = OnlineMaps.instance.AddMarker(OnlineMaps.instance.position, "My Marker");
+            OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(OnlineMaps.instance.position, "My Marker");
 
             // Subscribe to OnLongPress event.
             marker.OnLongPress += OnMarkerLongPress;

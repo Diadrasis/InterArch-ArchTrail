@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -30,7 +30,7 @@ namespace InfinityCode.OnlineMapsExamples
 
             //Create a marker to show the current GPS coordinates.
             //Instead of "null", you can specify the texture desired marker.
-            locationMarker = control.AddMarker3D(Vector2.zero, prefab);
+            locationMarker = OnlineMapsMarker3DManager.CreateItem(Vector2.zero, prefab);
 
             //Hide handle until the coordinates are not received.
             locationMarker.enabled = false;

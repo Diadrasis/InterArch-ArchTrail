@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -11,31 +11,18 @@ using System.Threading;
 #endif
 
 /// <summary>
-/// This class is responsible for drawing the map.\n
-/// <strong>Please do not use it if you do not know what you're doing.</strong>\n
+/// This class is responsible for drawing the map.<br/>
+/// <strong>Please do not use it if you do not know what you're doing.</strong><br/>
 /// Perform all operations with the map through other classes.
 /// </summary>
 public class OnlineMapsBuffer
 {
-    /// <summary>
-    /// Allows you to manually control the sorting marker in a mode Drawing to Texture.
-    /// </summary>
-    public static Func<IEnumerable<OnlineMapsMarker>, IEnumerable<OnlineMapsMarker>> OnSortMarker;
-
-    /// <summary>
-    /// Can the buffer unload tiles?
-    /// </summary>
     public bool allowUnloadTiles = true;
 
     /// <summary>
     /// Reference to OnlineMaps.
     /// </summary>
-    public OnlineMaps api;
-
-    /// <summary>
-    /// Zoom for which the map displayed.
-    /// </summary>
-    public int apiZoom;
+    public OnlineMaps map;
 
     /// <summary>
     /// Position the tile, which begins buffer.
@@ -44,27 +31,20 @@ public class OnlineMapsBuffer
 
     public Color32[] frontBuffer;
 
-    public bool generateSmartBuffer = false;
+    public OnlineMapsVector2i frontBufferPosition;
 
     /// <summary>
-    /// Height of the map.
+    /// Height of the buffer.
     /// </summary>
     public int height;
-
-    /// <summary>
-    /// Type redraw the map.
-    /// </summary>
-    public OnlineMapsRedrawType redrawType;
 
     /// <summary>
     /// The current status of the buffer.
     /// </summary>
     public OnlineMapsBufferStatus status = OnlineMapsBufferStatus.wait;
-    public Color32[] smartBuffer;
-    public bool updateBackBuffer;
 
     /// <summary>
-    /// Width of the map.
+    /// Width of the buffer.
     /// </summary>
     public int width;
 
@@ -74,23 +54,12 @@ public class OnlineMapsBuffer
     private List<OnlineMapsTile> newTiles;
 
     private Color32[] backBuffer;
-    private int bufferZoom;
-    private bool disposed;
-    private OnlineMapsVector2i frontBufferPosition;
-    private bool needUnloadTiles;
-    private double apiLongitude;
-    private double apiLatitude;
 
-    /// <summary>
-    /// Position for which the map displayed.
-    /// </summary>
-    public Vector2 apiPosition
-    {
-        get
-        {
-            return new Vector2((float)apiLongitude, (float)apiLatitude);
-        }
-    }
+    private bool disposed;
+    public bool needUnloadTiles;
+
+    public StateProps lastState;
+    public StateProps renderState;
 
     /// <summary>
     /// The coordinates of the top-left the point of map that displays.
@@ -99,25 +68,35 @@ public class OnlineMapsBuffer
     {
         get
         {
-            int countX = api.width / OnlineMapsUtils.tileSize;
-            int countY = api.height / OnlineMapsUtils.tileSize;
+            int countX = renderState.width / OnlineMapsUtils.tileSize;
+            int countY = renderState.height / OnlineMapsUtils.tileSize;
 
             double px, py;
-            api.projection.CoordinatesToTile(apiLongitude, apiLatitude, apiZoom, out px, out py);
+            map.projection.CoordinatesToTile(renderState.longitude, renderState.latitude, renderState.zoom, out px, out py);
 
             px -= countX / 2f;
             py -= countY / 2f;
 
-            api.projection.TileToCoordinates(px, py, apiZoom, out px, out py);
+            map.projection.TileToCoordinates(px, py, renderState.zoom, out px, out py);
             return new Vector2((float)px, (float)py);
         }
     }
 
-    public OnlineMapsBuffer(OnlineMaps api)
+    public OnlineMapsBuffer(OnlineMaps map)
     {
-        this.api = api;
-        apiZoom = api.zoom;
-        api.GetPosition(out apiLongitude, out apiLatitude);
+        this.map = map;
+
+        lastState = new StateProps
+        {
+            floatZoom = map.floatZoom,
+            width = map.width,
+            height = map.height
+        };
+
+        map.GetPosition(out lastState.longitude, out lastState.latitude);
+        map.GetCorners(out lastState.leftLongitude, out lastState.topLatitude, out lastState.rightLongitude, out lastState.bottomLatitude);
+        renderState = lastState;
+
         newTiles = new List<OnlineMapsTile>();
     }
 
@@ -132,15 +111,17 @@ public class OnlineMapsBuffer
                 if (disposed) return;
                 if (tile.status == OnlineMapsTileStatus.disposed) continue;
 
+                OnlineMapsRasterTile rTile = tile as OnlineMapsRasterTile;
+
 #if !UNITY_WEBGL
                 int counter = 20;
-                while (tile.colors.Length < OnlineMapsUtils.sqrTileSize && counter > 0)
+                while (rTile.colors.Length < OnlineMapsUtils.sqrTileSize && counter > 0)
                 {
                     OnlineMapsUtils.ThreadSleep(1);
                     counter--;
                 }
 #endif
-                    tile.ApplyColorsToChilds();
+                rTile.ApplyColorsToChilds();
             }
             if (newTiles.Count > 0) newTiles.Clear();
         }
@@ -182,9 +163,11 @@ public class OnlineMapsBuffer
         int py = tile.y / 2;
 
         OnlineMapsTile parent;
-        if (!OnlineMapsTile.GetTile(zoom, px, py, out parent))
+        if (!map.tileManager.GetTile(zoom, px, py, out parent))
         {
-            parent = new OnlineMapsTile(px, py, zoom, api) {OnSetColor = OnTileSetColor};
+            parent = map.control.CreateTile(px, py, zoom);
+            OnlineMapsRasterTile rParent = parent as OnlineMapsRasterTile;
+            if (rParent != null) rParent.OnSetColor = OnTileSetColor;
         }
 
         newParentTiles.Add(parent);
@@ -199,17 +182,11 @@ public class OnlineMapsBuffer
     {
         try
         {
-            OnSortMarker = null;
-
-            lock (OnlineMapsTile.lockTiles)
-            {
-                foreach (OnlineMapsTile tile in OnlineMapsTile.tiles) tile.Dispose();
-                OnlineMapsTile.tiles = null;
-            }
+            map.tileManager.Reset();
 
             frontBuffer = null;
             backBuffer = null;
-            smartBuffer = null;
+            map = null;
 
             status = OnlineMapsBufferStatus.disposed;
             newTiles = null;
@@ -225,13 +202,20 @@ public class OnlineMapsBuffer
     {
         try
         {
-            api.GetPosition(out apiLongitude, out apiLatitude);
-            apiZoom = api.zoom;
+            lastState = new StateProps
+            {
+                floatZoom = map.floatZoom,
+                width = map.width,
+                height = map.height
+            };
+
+            map.GetPosition(out lastState.longitude, out lastState.latitude);
+            map.GetCorners(out lastState.leftLongitude, out lastState.topLatitude, out lastState.rightLongitude, out lastState.bottomLatitude);
 
             while (!disposed)
             {
 #if !UNITY_WEBGL
-                while (status != OnlineMapsBufferStatus.start && api.renderInThread)
+                while (status != OnlineMapsBufferStatus.start && map.renderInThread)
                 {
                     if (disposed) return;
                     OnlineMapsUtils.ThreadSleep(1);
@@ -239,39 +223,40 @@ public class OnlineMapsBuffer
 #endif
 
                 status = OnlineMapsBufferStatus.working;
-                double px = 0, py = 0;
+
+                renderState = new StateProps
+                {
+                    floatZoom = map.floatZoom,
+                    width = map.width,
+                    height = map.height
+                };
 
                 try
                 {
-                    api.GetPosition(out px, out py);
-                    int zoom = api.zoom;
-
-                    bool fullRedraw = redrawType == OnlineMapsRedrawType.full;
-                    if (newTiles != null && api.target == OnlineMapsTarget.texture) ApplyNewTiles();
+                    map.GetPosition(out renderState.longitude, out renderState.latitude);
+                    map.GetCorners(out renderState.leftLongitude, out renderState.topLatitude, out renderState.rightLongitude, out renderState.bottomLatitude);
+                    
+                    if (newTiles != null && map.control.resultIsTexture) ApplyNewTiles();
 
                     if (disposed) return;
 
-                    bool backBufferUpdated = UpdateBackBuffer(px, py, zoom, fullRedraw);
+                    UpdateBackBuffer();
                     if (disposed) return;
 
-                    if (api.target == OnlineMapsTarget.texture)
+                    if (map.control.resultIsTexture)
                     {
-                        GetFrontBufferPosition(px, py, bufferPosition, zoom, api.width, api.height);
-
-                        if (backBufferUpdated)
-                        {
-                            for (int i = 0; i < api.drawingElements.Count; i++)
-                            {
-                                OnlineMapsDrawingElement element = api.drawingElements[i];
-                                if (disposed) return;
-                                element.Draw(backBuffer, bufferPosition, width, height, zoom);
-                            }
-                            SetMarkersToBuffer(api.markers);
-                        }
+                        GetFrontBufferPosition();
+                        UpdateFrontBuffer();
 
                         if (disposed) return;
-                        if (generateSmartBuffer && api.useSmartTexture) UpdateSmartBuffer(api.width, api.height);
-                        else UpdateFrontBuffer(api.width, api.height);
+
+                        foreach (OnlineMapsDrawingElement element in map.control.drawingElementManager)
+                        {
+                            if (disposed) return;
+                            element.Draw(frontBuffer, new Vector2(bufferPosition.x + (float)frontBufferPosition.x / OnlineMapsUtils.tileSize, bufferPosition.y + (float)frontBufferPosition.y / OnlineMapsUtils.tileSize), renderState.width, renderState.height, renderState.floatZoom);
+                        }
+
+                        if (map.control.OnDrawMarkers != null) map.control.OnDrawMarkers();
                     }
                 }
                 catch (Exception exception)
@@ -281,14 +266,10 @@ public class OnlineMapsBuffer
                 }
 
                 status = OnlineMapsBufferStatus.complete;
-                apiLongitude = px;
-                apiLatitude = py;
-                apiZoom = api.zoom;
 
-                if (needUnloadTiles) UnloadOldTiles();
-
+                lastState = renderState;
 #if !UNITY_WEBGL
-                if (!api.renderInThread) break;
+                if (!map.renderInThread) break;
 #else
                 break;
 #endif
@@ -299,41 +280,27 @@ public class OnlineMapsBuffer
         }
     }
 
-    private OnlineMapsVector2i GetBackBufferPosition(double px, double py, OnlineMapsVector2i _bufferPosition, int zoom, int apiWidth, int apiHeight)
-    {
-        api.projection.CoordinatesToTile(px, py, zoom, out px, out py);
-
-        int countX = apiWidth / OnlineMapsUtils.tileSize + 2;
-        int countY = apiHeight / OnlineMapsUtils.tileSize + 2;
-
-        px -= countX / 2f + _bufferPosition.x - 1;
-        py -= countY / 2f + _bufferPosition.y - 1;
-
-        int ix = (int) (px / countX * width);
-        int iy = (int) (py / countY * height);
-
-        return new OnlineMapsVector2i(ix, iy);
-    }
-
     public void GetCorners(out double tlx, out double tly, out double brx, out double bry)
     {
-        int countX = api.width / OnlineMapsUtils.tileSize;
-        int countY = api.height / OnlineMapsUtils.tileSize;
+        int countX = renderState.width / OnlineMapsUtils.tileSize;
+        int countY = renderState.height / OnlineMapsUtils.tileSize;
 
-        api.projection.CoordinatesToTile(apiLongitude, apiLatitude, apiZoom, out tlx, out tly);
+        map.projection.CoordinatesToTile(renderState.longitude, renderState.latitude, renderState.zoom, out tlx, out tly);
 
-        brx = tlx + countX / 2f;
-        bry = tly + countY / 2f;
-        tlx -= countX / 2f;
-        tly -= countY / 2f;
+        float coof = renderState.zoomCoof;
 
-        api.projection.TileToCoordinates(tlx, tly, apiZoom, out tlx, out tly);
-        api.projection.TileToCoordinates(brx, bry, apiZoom, out brx, out bry);
+        brx = tlx + countX / 2f * coof;
+        bry = tly + countY / 2f * coof;
+        tlx -= countX / 2f * coof;
+        tly -= countY / 2f * coof;
 
-        int max = (1 << apiZoom) * OnlineMapsUtils.tileSize;
-        if (max == api.width)
+        map.projection.TileToCoordinates(tlx, tly, renderState.zoom, out tlx, out tly);
+        map.projection.TileToCoordinates(brx, bry, renderState.zoom, out brx, out bry);
+
+        long max = (1L << renderState.zoom) * OnlineMapsUtils.tileSize;
+        if (max == renderState.width && Math.Abs(coof) < float.Epsilon)
         {
-            double lng = apiLongitude + 180;
+            double lng = renderState.longitude + 180;
             tlx = lng + 0.001;
             if (tlx > 180) tlx -= 360;
 
@@ -342,29 +309,32 @@ public class OnlineMapsBuffer
         }
     }
 
-    private void GetFrontBufferPosition(double px, double py, OnlineMapsVector2i _bufferPosition, int zoom, int apiWidth, int apiHeight)
+    private void GetFrontBufferPosition()
     {
-        OnlineMapsVector2i pos = GetBackBufferPosition(px, py, _bufferPosition, zoom, apiWidth, apiHeight);
-        int ix = pos.x;
-        int iy = pos.y;
+        double px, py;
+
+        // Tile of center position
+        map.projection.CoordinatesToTile(renderState.longitude, renderState.latitude, renderState.zoom, out px, out py);
+
+        int countX = renderState.width / OnlineMapsUtils.tileSize;
+        int countY = renderState.height / OnlineMapsUtils.tileSize;
+
+        // Tile center position in the backbuffer
+        px -= bufferPosition.x;
+        py -= bufferPosition.y;
+
+        // Top-left frontbuffer tile in the backbuffer
+        px -= countX / 2f * renderState.zoomCoof;
+        py -= countY / 2f * renderState.zoomCoof;
+
+        // Top-left frontbuffer pixel in the backbuffer
+        int ix = (int) (px * OnlineMapsUtils.tileSize);
+        int iy = (int) (py * OnlineMapsUtils.tileSize);
 
         if (iy < 0) iy = 0;
-        else if (iy >= height - apiHeight) iy = height - apiHeight;
+        else if (iy >= (int)(height - renderState.height * renderState.zoomCoof)) iy = (int)(height - renderState.height * renderState.zoomCoof);
 
         frontBufferPosition = new OnlineMapsVector2i(ix, iy);
-    }
-
-    private Rect GetMarkerRect(OnlineMapsMarker marker)
-    {
-        const int s = OnlineMapsUtils.tileSize;
-
-        double tx, ty;
-        marker.GetTilePosition(out tx, out ty);
-
-        tx -= bufferPosition.x;
-        ty -= bufferPosition.y;
-        OnlineMapsVector2i ip = marker.GetAlignedPosition((int)(tx * s), (int)(ty * s));
-        return new Rect(ip.x, ip.y, marker.width, marker.height);
     }
 
     private void InitTile(int zoom, OnlineMapsVector2i pos, int maxY, List<OnlineMapsTile> newBaseTiles, int y, int px)
@@ -374,18 +344,20 @@ public class OnlineMapsBuffer
 
         OnlineMapsTile tile;
 
-        if (!OnlineMapsTile.GetTile(zoom, px, py, out tile))
+        if (!map.tileManager.GetTile(zoom, px, py, out tile))
         {
             OnlineMapsTile parent = null;
 
-            if (!api.useCurrentZoomTiles)
+            if (renderState.zoom - zoom > map.countParentLevels)
             {
                 int ptx = px / 2;
                 int pty = py / 2;
-                if (OnlineMapsTile.GetTile(zoom - 1, ptx, pty, out parent)) parent.used = true;
+                if (map.tileManager.GetTile(zoom - 1, ptx, pty, out parent)) parent.used = true;
             }
 
-            tile = new OnlineMapsTile(px, py, zoom, api, parent) { OnSetColor = OnTileSetColor };
+            tile = map.control.CreateTile(px, py, zoom);
+            tile.parent = parent;
+            if (tile is OnlineMapsRasterTile) (tile as OnlineMapsRasterTile).OnSetColor = OnTileSetColor;
         }
 
         newBaseTiles.Add(tile);
@@ -394,7 +366,7 @@ public class OnlineMapsBuffer
 
     private void InitTiles(int zoom, int countX, OnlineMapsVector2i pos, int countY, int maxY, List<OnlineMapsTile> newBaseTiles)
     {
-        int maxX = 1 << bufferZoom;
+        int maxX = 1 << renderState.zoom;
         for (int x = 0; x < countX; x++)
         {
             int px = x + pos.x;
@@ -405,14 +377,14 @@ public class OnlineMapsBuffer
         }
     }
 
-    private void OnTileSetColor(OnlineMapsTile tile)
+    private void OnTileSetColor(OnlineMapsRasterTile tile)
     {
-        if (tile.zoom == bufferZoom) SetBufferTile(tile);
+        if (tile.zoom == renderState.zoom) SetBufferTile(tile);
     }
 
     private Rect SetBufferTile(OnlineMapsTile tile, int? offsetX = null)
     {
-        if (api.target == OnlineMapsTarget.tileset) return default(Rect);
+        if (!map.control.resultIsTexture) return default(Rect);
 
         const int s = OnlineMapsUtils.tileSize;
         int i = 0;
@@ -424,7 +396,7 @@ public class OnlineMapsBuffer
         if (px < 0) px += maxX;
         else if (px >= maxX) px -= maxX;
 
-        if (api.width == maxX * s && px < 2 && !offsetX.HasValue) SetBufferTile(tile, maxX);
+        if (renderState.width == maxX * s && px < 2 && !offsetX.HasValue) SetBufferTile(tile, maxX);
 
         if (offsetX.HasValue) px += offsetX.Value;
 
@@ -438,10 +410,11 @@ public class OnlineMapsBuffer
             const int hs = s / 2;
             int sx = tile.x % 2 * hs;
             int sy = tile.y % 2 * hs;
-            if (SetBufferTileFromParent(tile, px, py, s / 2, sx, sy)) return new Rect(px, py, OnlineMapsUtils.tileSize, OnlineMapsUtils.tileSize);
+            if (SetBufferTileFromParent(tile, px, py, s / 2, sx, sy)) return new Rect(px, py, s, s);
         }
 
-        Color32[] colors = tile.colors;
+        OnlineMapsRasterTile rTile = tile as OnlineMapsRasterTile;
+        Color32[] colors = rTile.colors;
 
         lock (colors)
         {
@@ -493,7 +466,8 @@ public class OnlineMapsBuffer
             return SetBufferTileFromParent(parent, px, py, size / 2, sx, sy);
         }
 
-        Color32[] colors = parent.colors;
+        OnlineMapsRasterTile rParent = parent as OnlineMapsRasterTile;
+        Color32[] colors = rParent.colors;
         int scale = s / size;
 
         if (colors.Length != OnlineMapsUtils.sqrTileSize) return false;
@@ -502,19 +476,40 @@ public class OnlineMapsBuffer
 
         lock (colors)
         {
-            for (int y = 0; y < size; y++)
+            if (size == hs)
             {
-                int oys = (ry - y) * s + sx;
-                int scaledY = y * scale + py;
-                for (int x = 0; x < size; x++)
+                for (int y = 0; y < hs; y++)
                 {
-                    Color32 clr = colors[oys + x];
-                    int scaledX = x * scale + px;
-
-                    for (int by = scaledY; by < scaledY + scale; by++)
+                    int oys = (ry - y) * s + sx;
+                    int bp = (y * 2 + py) * width + px;
+                    for (int x = 0; x < hs; x++)
                     {
-                        int bpy = by * width + scaledX;
-                        for (int bx = bpy; bx < bpy + scale; bx++) backBuffer[bx] = clr;
+                        Color32 clr = colors[oys + x];
+
+                        backBuffer[bp] = clr;
+                        backBuffer[bp + width] = clr;
+                        backBuffer[++bp] = clr;
+                        backBuffer[bp + width] = clr;
+                        bp++;
+                    }
+                }
+            }
+            else
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    int oys = (ry - y) * s + sx;
+                    int scaledY = y * scale + py;
+                    for (int x = 0; x < size; x++)
+                    {
+                        Color32 clr = colors[oys + x];
+                        int scaledX = x * scale + px;
+
+                        for (int by = scaledY; by < scaledY + scale; by++)
+                        {
+                            int bpy = by * width + scaledX;
+                            for (int bx = bpy; bx < bpy + scale; bx++) backBuffer[bx] = clr;
+                        }
                     }
                 }
             }
@@ -523,167 +518,30 @@ public class OnlineMapsBuffer
         return true;
     }
 
-    private void SetColorToBuffer(Color clr, OnlineMapsVector2i ip, int y, int x)
+    public void SetColorToBuffer(Color clr, OnlineMapsVector2i ip, int y, int x)
     {
         if (Math.Abs(clr.a) < float.Epsilon) return;
-        int bufferIndex = (ip.y + y) * width + ip.x + x;
+        int bufferIndex = (renderState.height - ip.y - y) * renderState.width + ip.x + x;
         if (clr.a < 1)
         {
             float alpha = clr.a;
-            Color bufferColor = backBuffer[bufferIndex];
+            Color bufferColor = frontBuffer[bufferIndex];
             clr.a = 1;
             clr.r = Mathf.Lerp(bufferColor.r, clr.r, alpha);
             clr.g = Mathf.Lerp(bufferColor.g, clr.g, alpha);
             clr.b = Mathf.Lerp(bufferColor.b, clr.b, alpha);
         }
-        backBuffer[bufferIndex] = clr;
+        frontBuffer[bufferIndex] = clr;
     }
 
-    private void SetMarkerToBuffer(OnlineMapsMarker marker, double sx, double sy, double ex, double ey)
-    {
-        const int s = OnlineMapsUtils.tileSize;
-
-        double mx, my;
-        marker.GetPosition(out mx, out my);
-        double px, py;
-        api.projection.CoordinatesToTile(mx, my, bufferZoom, out px, out py);
-
-        int maxX = 1 << bufferZoom;
-
-        bool isEntireWorld = api.width == maxX * s;
-        bool isBiggestThatBuffer = api.width + 512 == maxX * s;
-
-        if (isEntireWorld || isBiggestThatBuffer)
-        {
-            
-        }
-        else if (!(((mx > sx && mx < ex) || (mx + 360 > sx && mx + 360 < ex) ||
-             (mx - 360 > sx && mx - 360 < ex)) &&
-            my < sy && my > ey)) return;
-
-#if !UNITY_WEBGL
-        int maxCount = 20;
-        while (marker.locked && maxCount > 0)
-        {
-            OnlineMapsUtils.ThreadSleep(1);
-            maxCount--;
-        }
-#endif
-
-        marker.locked = true;
-
-        px -= bufferPosition.x;
-        py -= bufferPosition.y;
-
-        if (isEntireWorld)
-        {
-            double tx, ty;
-            api.projection.CoordinatesToTile(apiLongitude, apiLatitude, bufferZoom, out tx, out ty);
-            tx -= api.width / s / 2;
-
-            if (px < tx) px += maxX;
-        }
-        else
-        {
-            if (px < 0) px += maxX;
-            else if (px > maxX) px -= maxX;
-        }
-
-        OnlineMapsVector2i ip = marker.GetAlignedPosition((int) (px * s), (int) (py * s));
-
-        Color32[] markerColors = marker.colors;
-        if (markerColors == null || markerColors.Length == 0) return;
-
-        int markerWidth = marker.width;
-        int markerHeight = marker.height;
-
-        for (int y = 0; y < marker.height; y++)
-        {
-            if (disposed) return;
-            if (ip.y + y < 0 || ip.y + y >= height) continue;
-
-            int cy = (markerHeight - y - 1) * markerWidth;
-            
-            for (int x = 0; x < marker.width; x++)
-            {
-                if (ip.x + x < 0 || ip.x + x >= width) continue;
-            
-                try
-                {
-                    SetColorToBuffer(markerColors[cy + x], ip, y, x);
-                }
-                catch
-                {
-                }
-            }
-        }
-
-        if (isEntireWorld)
-        {
-            ip.x -= api.width;
-            for (int y = 0; y < marker.height; y++)
-            {
-                if (disposed) return;
-                if (ip.y + y < 0 || ip.y + y >= height) continue;
-
-                int cy = (markerHeight - y - 1) * markerWidth;
-
-                for (int x = 0; x < marker.width; x++)
-                {
-                    if (ip.x + x < 0 || ip.x + x >= width) continue;
-
-                    try
-                    {
-                        SetColorToBuffer(markerColors[cy + x], ip, y, x);
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-        }
-
-        marker.locked = false;
-    }
-
-    public void SetMarkersToBuffer(IEnumerable<OnlineMapsMarker> markers)
-    {
-        if (OnlineMapsControlBase.instance is OnlineMapsControlBase3D)
-        {
-            if (((OnlineMapsControlBase3D)OnlineMapsControlBase.instance).marker2DMode == OnlineMapsMarker2DMode.billboard)
-            {
-                return;
-            }
-        }
-
-        const int s = OnlineMapsUtils.tileSize;
-        int countX = api.width / s + 2;
-        int countY = api.height / s + 2;
-
-        double sx, sy, ex, ey;
-        api.projection.TileToCoordinates(bufferPosition.x, bufferPosition.y, bufferZoom, out sx, out sy);
-        api.projection.TileToCoordinates(bufferPosition.x + countX, bufferPosition.y + countY + 1, bufferZoom, out ex, out ey);
-
-        if (ex < sx) ex += 360;
-
-        IEnumerable<OnlineMapsMarker> usedMarkers = markers.Where(m => m.enabled && m.range.InRange(bufferZoom));
-        usedMarkers = OnSortMarker != null ? OnSortMarker(usedMarkers) : usedMarkers.OrderByDescending(m => m, new MarkerComparer());
-
-        foreach (OnlineMapsMarker marker in usedMarkers)
-        {
-            if (disposed) return;
-            SetMarkerToBuffer(marker, sx, sy, ex, ey);
-        }
-    }
-
-    private void UnloadOldTiles()
+    public void UnloadOldTiles()
     {
         needUnloadTiles = false;
 
 #if !UNITY_WEBGL
         int count = 100;
 
-        while (api.renderInThread && !allowUnloadTiles && count > 0)
+        while (map.renderInThread && !allowUnloadTiles && count > 0)
         {
             OnlineMapsUtils.ThreadSleep(1);
             count--;
@@ -693,131 +551,185 @@ public class OnlineMapsBuffer
 #endif
         lock (OnlineMapsTile.lockTiles)
         {
-            foreach (OnlineMapsTile tile in OnlineMapsTile.tiles)
+            foreach (OnlineMapsTile tile in map.tileManager.tiles)
             {
-                if (!tile.used && !tile.isBlocked) tile.Dispose();
+                if (!tile.used && !tile.isBlocked && tile.map == map) tile.Dispose();
             }
         }
     }
 
-    private bool UpdateBackBuffer(double px, double py, int zoom, bool fullRedraw)
+    public void UnloadOldTypes()
     {
-        int max = 1 << zoom;
+        try
+        {
+            lock (OnlineMapsTile.lockTiles)
+            {
+                foreach (OnlineMapsTile tile in map.tileManager.tiles)
+                {
+                    OnlineMapsRasterTile rt = tile as OnlineMapsRasterTile;
+                    if (rt != null && rt.map == map && map.activeType != rt.mapType)
+                    {
+                        tile.Dispose();
+                    }
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            Debug.Log(exception.Message);
+        }
+    }
 
+    private void UpdateBackBuffer()
+    {
         const int s = OnlineMapsUtils.tileSize;
-        int countX = api.width / s + 2;
-        int countY = api.height / s + 2;
+        int countX = renderState.width / s + 2;
+        int countY = renderState.height / s + 2;
 
         double cx, cy;
-        api.projection.CoordinatesToTile(px, py, zoom, out cx, out cy);
+        map.projection.CoordinatesToTile(renderState.longitude, renderState.latitude, renderState.zoom, out cx, out cy);
         OnlineMapsVector2i pos = new OnlineMapsVector2i((int)cx - countX / 2, (int)cy - countY / 2);
 
+        int max = 1 << renderState.zoom;
+
         if (pos.y < 0) pos.y = 0;
-        if (pos.y >= max - countY) pos.y = max - countY;
+        else if (pos.y >= max - countY) pos.y = max - countY;
 
-        if (api.target == OnlineMapsTarget.texture)
+        if (map.control.resultIsTexture)
         {
-            if (frontBuffer == null || frontBuffer.Length != api.width * api.height)
-            {
-                frontBuffer = new Color32[api.width * api.height];
-                fullRedraw = true;
-            }
-
+            if (frontBuffer == null || frontBuffer.Length != renderState.width * renderState.height) frontBuffer = new Color32[renderState.width * renderState.height];
             if (backBuffer == null || width != countX * s || height != countY * s)
             {
                 width = countX * s;
                 height = countY * s;
                 backBuffer = new Color32[height * width];
-
-                fullRedraw = true;
             }
         }
 
-        if (!updateBackBuffer && !fullRedraw && bufferZoom == zoom && bufferPosition != null && bufferPosition == pos) return false;
-
-        updateBackBuffer = false;
-
         bufferPosition = pos;
-        bufferZoom = zoom;
 
         List<OnlineMapsTile> newBaseTiles = new List<OnlineMapsTile>();
 
         lock (OnlineMapsTile.lockTiles)
         {
-            for (int i = 0; i < OnlineMapsTile.tiles.Count; i++) OnlineMapsTile.tiles[i].used = false;
+            for (int i = 0; i < map.tileManager.tiles.Count; i++) map.tileManager.tiles[i].used = false;
 
-            InitTiles(zoom, countX, pos, countY, max, newBaseTiles);
+            InitTiles(renderState.zoom, countX, pos, countY, max, newBaseTiles);
 
-            if (!api.useCurrentZoomTiles)
+            if (map.countParentLevels > 0)
             {
                 List<OnlineMapsTile> newParentTiles = newBaseTiles;
-                for (int z = zoom - 1; z > Mathf.Max(zoom - 5, 2); z--) newParentTiles = CreateParents(newParentTiles, z);
+                for (int z = renderState.zoom - 1; z >= Mathf.Max(renderState.zoom - map.countParentLevels, OnlineMaps.MINZOOM); z--) newParentTiles = CreateParents(newParentTiles, z);
             }
 
-            if (api.target != OnlineMapsTarget.tileset) for (int i = 0; i < newBaseTiles.Count; i++) SetBufferTile(newBaseTiles[i]);
+            if (map.control.resultIsTexture) for (int i = 0; i < newBaseTiles.Count; i++) SetBufferTile(newBaseTiles[i]);
         }
 
         needUnloadTiles = true;
-
-        return true;
     }
 
-    private void UpdateFrontBuffer(int apiWidth, int apiHeight)
+    private void UpdateFrontBuffer()
     {
-        int i = 0;
+        float zoomCoof = renderState.zoomCoof;
+        int w = renderState.width;
+        int h = renderState.height;
+        int bufferSize = height * width;
 
-        for (int y = frontBufferPosition.y + apiHeight - 1; y >= frontBufferPosition.y; y--)
+        for (int y = 0; y < h; y++)
         {
-            if (disposed) return;
-            Array.Copy(backBuffer, frontBufferPosition.x + y * width, frontBuffer, i, apiWidth);
-            i += apiWidth;
-        }
-    }
+            float fy = y * zoomCoof + frontBufferPosition.y;
+            int iy1 = (int) fy;
+            int iyw1 = iy1 * width;
+            int iyw2 = iyw1 + width + 1;
+            if (iyw2 >= bufferSize - 1) continue;
+            
+            int fby = (h - y - 1) * w;
+            float fx = frontBufferPosition.x;
 
-    private void UpdateSmartBuffer(int apiWidth, int apiHeight)
-    {
-        int w = apiWidth;
-        int hw = w / 2;
-        int hh = apiHeight / 2;
-
-        if (smartBuffer == null || smartBuffer.Length != hw * hh) smartBuffer = new Color32[hw * hh];
-
-        for (int y = 0; y < hh; y++)
-        {
-            if (disposed) return;
-
-            int sy = (hh - y - 1) * hw;
-            int fy = (y * 2 + frontBufferPosition.y) * width + frontBufferPosition.x;
-            int fny = (y * 2 + frontBufferPosition.y + 1) * width + frontBufferPosition.x + 1;
-            for (int x = 0, x2 = 0; x < hw; x++, x2 += 2)
+            for (int x = 0; x < w; x++)
             {
-                Color32 clr1 = backBuffer[fy + x2];
-                Color32 clr2 = backBuffer[fny + x2];
-
-                clr1.r = (byte)((clr1.r + clr2.r) / 2);
-                clr1.g = (byte)((clr1.g + clr2.g) / 2);
-                clr1.b = (byte)((clr1.b + clr2.b) / 2);
-
-                smartBuffer[sy + x] = clr1;
+                Color32 clr1 = backBuffer[iyw1 + (int)fx];
+                frontBuffer[fby++] = clr1;
+                fx += zoomCoof;
             }
         }
     }
 
-    internal class MarkerComparer : IComparer<OnlineMapsMarkerBase>
+    /// <summary>
+    /// The main properties of the map
+    /// </summary>
+    public struct StateProps
     {
-        public int Compare(OnlineMapsMarkerBase m1, OnlineMapsMarkerBase m2)
-        {
-            double m1x, m1y, m2x, m2y;
-            m1.GetPosition(out m1x, out m1y);
-            m2.GetPosition(out m2x, out m2y);
+        /// <summary>
+        /// Longitude of the center point
+        /// </summary>
+        public double longitude;
 
-            if (m1y > m2y) return 1;
-            if (Math.Abs(m1y - m2y) < double.Epsilon)
+        /// <summary>
+        /// Latitude of the center point
+        /// </summary>
+        public double latitude;
+
+        /// <summary>
+        /// Latitude of the top border
+        /// </summary>
+        public double topLatitude;
+
+        /// <summary>
+        /// Longitude of the left border
+        /// </summary>
+        public double leftLongitude;
+
+        /// <summary>
+        /// Latitude of the bottom border
+        /// </summary>
+        public double bottomLatitude;
+
+        /// <summary>
+        /// Longitude of the right border
+        /// </summary>
+        public double rightLongitude;
+
+        /// <summary>
+        /// Zoom
+        /// </summary>
+        public int zoom;
+
+        /// <summary>
+        /// Width of the map
+        /// </summary>
+        public int width;
+
+        /// <summary>
+        /// Height of the map
+        /// </summary>
+        public int height;
+
+        /// <summary>
+        /// The scaling factor for zoom
+        /// </summary>
+        public float zoomCoof;
+
+        /// <summary>
+        /// The fractional part of zoom
+        /// </summary>
+        public float zoomScale;
+
+        private float _floatZoom;
+
+        /// <summary>
+        /// Float zoom
+        /// </summary>
+        public float floatZoom
+        {
+            get { return _floatZoom; }
+            set
             {
-                if (m1x < m2x) return 1;
-                return 0;
+                _floatZoom = value;
+                zoom = (int) value;
+                zoomScale = _floatZoom - zoom;
+                zoomCoof = 1 - zoomScale / 2;
             }
-            return -1;
         }
     }
 }

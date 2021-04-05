@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void Start()
         {
             // Subscribe to the event preparation of tooltip style.
-            OnlineMaps.instance.OnPrepareTooltipStyle += OnPrepareTooltipStyle;
+            OnlineMapsGUITooltipDrawer.OnPrepareTooltipStyle += OnPrepareTooltipStyle;
         }
 
         private void OnPrepareTooltipStyle(ref GUIStyle style)

@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -17,7 +17,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void Start()
         {
             // Create a new marker.
-            playerMarker = OnlineMaps.instance.AddMarker(new Vector2(0, 0), null, "Player");
+            playerMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), null, "Player");
 
             // Get instance of LocationService.
             OnlineMapsLocationService locationService = OnlineMapsLocationService.instance;

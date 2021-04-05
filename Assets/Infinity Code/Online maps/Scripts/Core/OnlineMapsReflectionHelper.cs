@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -43,15 +43,15 @@ public static class OnlineMapsReflectionHelper
     }
 
     /// <summary>
-    /// Get the OnlineMapsOpenRouteService.Description attribute from Enum.
+    /// Get OnlineMapsDescription attribute from Enum.
     /// </summary>
     /// <param name="value">Enum value</param>
-    /// <returns>OnlineMapsOpenRouteService.Description attribute</returns>
+    /// <returns>OnlineMapsDescription attribute</returns>
     public static string GetEnumDescription(Enum value)
     {
         FieldInfo fi = value.GetType().GetField(value.ToString());
 
-        OnlineMapsOpenRouteService.DescriptionAttribute[] attributes = (OnlineMapsOpenRouteService.DescriptionAttribute[])fi.GetCustomAttributes(typeof(OnlineMapsOpenRouteService.DescriptionAttribute), false);
+        OnlineMapsDescriptionAttribute[] attributes = (OnlineMapsDescriptionAttribute[])fi.GetCustomAttributes(typeof(OnlineMapsDescriptionAttribute), false);
 
         if (attributes.Length > 0) return attributes[0].Description;
         return value.ToString();
@@ -229,7 +229,6 @@ public static class OnlineMapsReflectionHelper
 #else
         return type.GetTypeInfo().IsGenericType;
 #endif
-
     }
 
     /// <summary>

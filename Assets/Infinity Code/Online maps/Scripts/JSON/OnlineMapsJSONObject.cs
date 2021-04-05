@@ -1,10 +1,11 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using UnityEngine;
 
 /// <summary>
 /// The wrapper for JSON dictonary.
@@ -60,6 +61,21 @@ public class OnlineMapsJSONObject : OnlineMapsJSONItem
         _table[name] = value;
     }
 
+    public void Add(string name, object value)
+    {
+        if (value is string || value is bool || value is int || value is long || value is short || value is float || value is double)  _table[name] = new OnlineMapsJSONValue(value);
+        else if (value is UnityEngine.Object)
+        {
+            _table[name] = new OnlineMapsJSONValue((value as UnityEngine.Object).GetInstanceID());
+        }
+        else _table[name] = OnlineMapsJSON.Serialize(value);
+    }
+
+    public void Add(string name, object value, OnlineMapsJSONValue.ValueType valueType)
+    {
+        _table[name] = new OnlineMapsJSONValue(value, valueType);
+    }
+
     public override OnlineMapsJSONItem AppendObject(object obj)
     {
         Combine(OnlineMapsJSON.Serialize(obj));
@@ -97,7 +113,18 @@ public class OnlineMapsJSONObject : OnlineMapsJSONItem
     public object Deserialize(Type type, IEnumerable<MemberInfo> members)
     {
         object v = Activator.CreateInstance(type);
+        DeserializeObject(v, members);
+        return v;
+    }
 
+    public void DeserializeObject(object obj, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public)
+    { 
+        IEnumerable<MemberInfo> members = OnlineMapsReflectionHelper.GetMembers(obj.GetType(), bindingFlags);
+        DeserializeObject(obj, members);
+    }
+
+    public void DeserializeObject(object obj, IEnumerable<MemberInfo> members)
+    {
         foreach (MemberInfo member in members)
         {
 #if !NETFX_CORE
@@ -130,8 +157,8 @@ public class OnlineMapsJSONObject : OnlineMapsJSONItem
                 if (_table.TryGetValue(member.Name, out item))
                 {
                     Type t = memberType == MemberTypes.Field ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
-                    if (memberType == MemberTypes.Field) ((FieldInfo)member).SetValue(v, item.Deserialize(t));
-                    else ((PropertyInfo)member).SetValue(v, item.Deserialize(t), null);
+                    if (memberType == MemberTypes.Field) ((FieldInfo)member).SetValue(obj, item.Deserialize(t));
+                    else ((PropertyInfo)member).SetValue(obj, item.Deserialize(t), null);
                     continue;
                 }
             }
@@ -142,15 +169,13 @@ public class OnlineMapsJSONObject : OnlineMapsJSONItem
                     if (_table.TryGetValue(alias.aliases[j], out item))
                     {
                         Type t = memberType == MemberTypes.Field ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
-                        if (memberType == MemberTypes.Field) ((FieldInfo)member).SetValue(v, item.Deserialize(t));
-                        else ((PropertyInfo)member).SetValue(v, item.Deserialize(t), null);
+                        if (memberType == MemberTypes.Field) ((FieldInfo)member).SetValue(obj, item.Deserialize(t));
+                        else ((PropertyInfo)member).SetValue(obj, item.Deserialize(t), null);
                         break;
                     }
                 }
             }
         }
-
-        return v;
     }
 
     private OnlineMapsJSONItem Get(string key)
@@ -251,6 +276,6 @@ public class OnlineMapsJSONObject : OnlineMapsJSONItem
     public override object Value(Type type)
     {
         if (OnlineMapsReflectionHelper.IsValueType(type)) return Activator.CreateInstance(type);
-        return null;
+        return Deserialize(type);
     }
 }

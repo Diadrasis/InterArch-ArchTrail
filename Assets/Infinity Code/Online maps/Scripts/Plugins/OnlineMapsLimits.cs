@@ -1,24 +1,26 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
+using System;
 using UnityEngine;
 
 /// <summary>
 /// Class to limit the position and zoom of the map.
 /// </summary>
 [AddComponentMenu("Infinity Code/Online Maps/Plugins/Limits")]
-[System.Serializable]
-public class OnlineMapsLimits : MonoBehaviour
+[Serializable]
+[OnlineMapsPlugin("Limits", typeof(OnlineMapsControlBase))]
+public class OnlineMapsLimits : MonoBehaviour, IOnlineMapsSavableComponent
 {
     /// <summary>
     /// The minimum zoom value.
     /// </summary>
-    public int minZoom = OnlineMaps.MINZOOM;
+    public float minZoom = OnlineMaps.MINZOOM;
 
     /// <summary>
     /// The maximum zoom value. 
     /// </summary>
-    public int maxZoom = OnlineMaps.MAXZOOM;
+    public float maxZoom = OnlineMaps.MAXZOOM;
 
     /// <summary>
     /// The minimum latitude value.
@@ -55,9 +57,42 @@ public class OnlineMapsLimits : MonoBehaviour
     /// </summary>
     public bool usePositionRange;
 
+    private OnlineMapsSavableItem[] savableItems;
+    private OnlineMaps map;
+
+    public OnlineMapsSavableItem[] GetSavableItems()
+    {
+        if (savableItems != null) return savableItems;
+
+        savableItems = new[]
+        {
+            new OnlineMapsSavableItem("limits", "Limits", SaveSettings)
+            {
+                loadCallback = LoadSettings
+            }
+        };
+
+        return savableItems;
+    }
+
+    public void LoadSettings(OnlineMapsJSONObject json)
+    {
+        json.DeserializeObject(this);
+    }
+
+    private void OnEnable()
+    {
+        map = GetComponent<OnlineMaps>();
+    }
+
+    private OnlineMapsJSONItem SaveSettings()
+    {
+        return OnlineMapsJSON.Serialize(this);
+    }
+
     private void Start()
     {
-        if (useZoomRange) OnlineMaps.instance.zoomRange = new OnlineMapsRange(minZoom, maxZoom);
-        if (usePositionRange) OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(minLatitude, minLongitude, maxLatitude, maxLongitude, positionRangeType);
+        if (useZoomRange) map.zoomRange = new OnlineMapsRange(minZoom, maxZoom);
+        if (usePositionRange) map.positionRange = new OnlineMapsPositionRange(minLatitude, minLongitude, maxLatitude, maxLongitude, positionRangeType);
     }
 }

@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEditor;
 using UnityEngine;
@@ -14,19 +14,20 @@ public class OnlineMapsRangePropertyDrawer : PropertyDrawer
         SerializedProperty pMinLimit = property.FindPropertyRelative("minLimit");
         SerializedProperty pMaxLimit = property.FindPropertyRelative("maxLimit");
 
-        label.text = string.Format("{0} ({1}-{2})", label.text, pMin.intValue, pMax.intValue);
+        label = new GUIContent(label);
+        label.text = string.Format("{0} ({1:F1}-{2:F1})", label.text, pMin.floatValue, pMax.floatValue);
         position = EditorGUI.PrefixLabel(position, label);
 
-        float min = pMin.intValue;
-        float max = pMax.intValue;
+        float min = pMin.floatValue;
+        float max = pMax.floatValue;
 
         EditorGUI.BeginChangeCheck();
-        EditorGUI.MinMaxSlider(position, ref min, ref max, pMinLimit.intValue, pMaxLimit.intValue);
+        EditorGUI.MinMaxSlider(position, ref min, ref max, pMinLimit.floatValue, pMaxLimit.floatValue);
         if (EditorGUI.EndChangeCheck())
         {
             if (min > max) min = max;
-            pMin.intValue = Mathf.RoundToInt(min);
-            pMax.intValue = Mathf.RoundToInt(max);
+            pMin.floatValue = min;
+            pMax.floatValue = max;
         }
     }
 }

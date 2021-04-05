@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -24,12 +24,12 @@ namespace InfinityCode.OnlineMapsExamples
         private void Start()
         {
             // Create a new markers.
-            OnlineMapsMarker3D marker1 = OnlineMapsControlBase3D.instance.AddMarker3D(new Vector2(0, 0), prefab);
-            OnlineMapsMarker3D marker2 = OnlineMapsControlBase3D.instance.AddMarker3D(new Vector2(10, 0), prefab);
+            OnlineMapsMarker3D marker1 = OnlineMapsMarker3DManager.CreateItem(new Vector2(0, 0), prefab);
+            OnlineMapsMarker3D marker2 = OnlineMapsMarker3DManager.CreateItem(new Vector2(10, 0), prefab);
 
             // Create new customData.
-            marker1.customData = new MarkerClickCountExampleCustomData();
-            marker2.customData = new MarkerClickCountExampleCustomData();
+            marker1["clickCount"] = new MarkerClickCountExampleCustomData();
+            marker2["clickCount"] = new MarkerClickCountExampleCustomData();
 
             // Subscribe to click event.
             marker1.OnClick += OnMarkerClick;
@@ -45,7 +45,7 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void OnMarkerClick(OnlineMapsMarkerBase marker)
         {
-            MarkerClickCountExampleCustomData data = marker.customData as MarkerClickCountExampleCustomData;
+            MarkerClickCountExampleCustomData data = marker["clickCount"] as MarkerClickCountExampleCustomData;
             if (data == null) return;
 
             data.clickCount++;

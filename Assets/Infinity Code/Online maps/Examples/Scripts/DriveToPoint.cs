@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using UnityEngine;
@@ -42,7 +42,7 @@ namespace InfinityCode.OnlineMapsDemos
 
             map.GetPosition(out lng, out lat);
 
-            marker = control.AddMarker3D(lng, lat, prefab);
+            marker = OnlineMapsMarker3DManager.CreateItem(lng, lat, prefab);
             marker.scale = markerScale;
             marker.rotationY = rotation;
         }
@@ -53,7 +53,7 @@ namespace InfinityCode.OnlineMapsDemos
 
             if (targetMarker == null)
             {
-                targetMarker = control.AddMarker3D(targetLng, targetLat, targetPrefab);
+                targetMarker = OnlineMapsMarker3DManager.CreateItem(targetLng, targetLat, targetPrefab);
                 targetMarker.scale = targetScale;
             }
             else targetMarker.SetPosition(targetLng, targetLat);
@@ -71,13 +71,8 @@ namespace InfinityCode.OnlineMapsDemos
                 go.transform.SetParent(transform, false);
                 lineRenderer = go.AddComponent<LineRenderer>();
                 lineRenderer.material = lineRendererMaterial;
-#if UNITY_2017_3_OR_NEWER
                 lineRenderer.positionCount = 2;
                 lineRenderer.widthCurve = AnimationCurve.Constant(0, 1, 10);
-#else
-                lineRenderer.SetVertexCount(2);
-                lineRenderer.SetWidth(10, 10);
-#endif
             }
             else lineRenderer.enabled = true;
 

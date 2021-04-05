@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,23 +17,15 @@ namespace InfinityCode.OnlineMapsDemos
         public Transform camera2D;
         public Transform camera3D;
 
-        public Shader tileShader;
-
         public float CameraChangeTime = 1;
 
-        private GUIStyle activeRowStyle;
         private float animValue;
         private OnlineMaps map;
-        private OnlineMapsTileSetControl control;
         private bool is2D = true;
         private bool isCameraModeChange;
-        private GUIStyle rowStyle;
-        private string search = "";
-        private OnlineMapsMarker searchMarker;
 
         private Transform fromTransform;
         private Transform toTransform;
-        private bool preventDoubleWarning;
 
         public void ChangeMode()
         {
@@ -68,47 +60,14 @@ namespace InfinityCode.OnlineMapsDemos
 
         public void SetElevations()
         {
-            if (preventDoubleWarning)
-            {
-                preventDoubleWarning = false;
-                return;
-            }
-            if (!OnlineMapsKeyManager.hasBingMaps || string.IsNullOrEmpty(control.bingAPI))
-            {
-                Debug.LogWarning("Please enter Map / Key Manager / Bing Maps");
-                preventDoubleWarning = true;
-                elevationsToggle.isOn = false;
-                return;
-            }
-
-            control.useElevation = elevationsToggle.isOn;
-            map.Redraw();
-        }
-
-        private void OnFindLocationComplete(string result)
-        {
-            Vector2 position = OnlineMapsGoogleGeocoding.GetCoordinatesFromResult(result);
-
-            if (position == Vector2.zero) return;
-
-            if (searchMarker == null) searchMarker = map.AddMarker(position, search);
-            else
-            {
-                searchMarker.position = position;
-                searchMarker.label = search;
-            }
-
-            if (map.zoom < 13) map.zoom = 13;
-
-            map.position = position;
+            OnlineMapsElevationManagerBase.instance.enabled = elevationsToggle.isOn;
             map.Redraw();
         }
 
         private void Start()
         {
             map = OnlineMaps.instance;
-            control = OnlineMapsTileSetControl.instance;
-            control.useElevation = false;
+            OnlineMapsElevationManagerBase.instance.enabled = false;
         }
 
         private void Update()

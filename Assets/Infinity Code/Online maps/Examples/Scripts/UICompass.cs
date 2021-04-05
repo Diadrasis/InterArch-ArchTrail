@@ -1,17 +1,19 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
 namespace InfinityCode.OnlineMapsDemos
 {
+    [AddComponentMenu("Infinity Code/Online Maps/Demos/UICompass")]
     public class UICompass : MonoBehaviour
     {
         public bool animated = true;
         public float duration = 0.3f;
         public RectTransform arrow;
 
-        private OnlineMapsControlBase3D control;
+        private OnlineMapsCameraOrbit cameraOrbit;
+
         private float targetPan;
         private float startPan;
         private float progress;
@@ -19,12 +21,12 @@ namespace InfinityCode.OnlineMapsDemos
 
         private float rotation
         {
-            get { return Mathf.Repeat(control.cameraRotation.y, 360); }
+            get { return Mathf.Repeat(cameraOrbit.rotation.y, 360); }
         }
 
         private void OnCameraControl()
         {
-            arrow.rotation = Quaternion.Euler(0, 0, control.cameraRotation.y);
+            arrow.rotation = Quaternion.Euler(0, 0, cameraOrbit.rotation.y);
         }
 
         public void RotateLeft()
@@ -46,7 +48,7 @@ namespace InfinityCode.OnlineMapsDemos
         {
             if (!animated)
             {
-                control.cameraRotation.y = pan;
+                cameraOrbit.rotation.y = pan;
                 return;
             }
 
@@ -58,15 +60,16 @@ namespace InfinityCode.OnlineMapsDemos
 
         private void Start()
         {
-            control = OnlineMapsControlBase3D.instance;
-            if (control == null)
+            cameraOrbit = OnlineMapsCameraOrbit.instance;
+
+            if (cameraOrbit == null)
             {
-                Debug.LogWarning("UI Compass requires 3D control.");
+                Debug.LogWarning("UI Compass requires Online Maps Camera Orbit.");
                 Destroy(gameObject);
                 return;
             }
 
-            control.OnCameraControl += OnCameraControl;
+            cameraOrbit.OnCameraControl += OnCameraControl;
         }
 
         private void Update()
@@ -80,7 +83,7 @@ namespace InfinityCode.OnlineMapsDemos
                 isAnim = false;
             }
 
-            control.cameraRotation.y = Mathf.Lerp(startPan, targetPan, progress);
+            cameraOrbit.rotation.y = Mathf.Lerp(startPan, targetPan, progress);
         }
     }
 }

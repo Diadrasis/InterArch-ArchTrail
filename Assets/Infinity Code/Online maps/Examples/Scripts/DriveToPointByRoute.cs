@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using UnityEngine;
@@ -39,7 +39,7 @@ namespace InfinityCode.OnlineMapsDemos
 
             map.GetPosition(out lng, out lat);
 
-            marker = control.AddMarker3D(lng, lat, prefab);
+            marker = OnlineMapsMarker3DManager.CreateItem(lng, lat, prefab);
             marker.scale = markerScale;
             marker.rotationY = rotation;
         }
@@ -50,7 +50,7 @@ namespace InfinityCode.OnlineMapsDemos
 
             if (targetMarker == null)
             {
-                targetMarker = control.AddMarker3D(targetLng, targetLat, targetPrefab);
+                targetMarker = OnlineMapsMarker3DManager.CreateItem(targetLng, targetLat, targetPrefab);
                 targetMarker.scale = targetScale;
             }
             else targetMarker.SetPosition(targetLng, targetLat);
@@ -67,8 +67,9 @@ namespace InfinityCode.OnlineMapsDemos
                 return;
             }
 
-            OnlineMapsGoogleDirections request = OnlineMapsGoogleDirections.Find(new Vector2((float)lng, (float)lat), control.GetCoords());
+            OnlineMapsGoogleDirections request = new OnlineMapsGoogleDirections(OnlineMapsKeyManager.GoogleMaps(), new Vector2((float)lng, (float)lat), control.GetCoords());
             request.OnComplete += OnRequestComplete;
+            request.Send();
         }
 
         private void OnRequestComplete(string response)
@@ -84,7 +85,7 @@ namespace InfinityCode.OnlineMapsDemos
             if (route == null)
             {
                 route = new OnlineMapsDrawingLine(points, Color.green, 3);
-                OnlineMaps.instance.AddDrawingElement(route);
+                OnlineMapsDrawingElementManager.AddItem(route);
             }
             else route.points = points;
 

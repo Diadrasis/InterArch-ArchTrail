@@ -1,5 +1,7 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
+
+using System;
 
 /// <summary>
 /// Class of range.
@@ -10,24 +12,29 @@ public class OnlineMapsRange
     /// <summary>
     /// Maximum value.
     /// </summary>
-    public int max = int.MaxValue;
+    public float max = float.MaxValue;
 
     /// <summary>
     /// Minimum value.
     /// </summary>
-    public int min = int.MinValue;
+    public float min = float.MinValue;
 
     /// <summary>
-    /// Maximum limit.\n
-    /// Uses in inpector.
+    /// Maximum limit.<br/>
+    /// Uses in inspector.
     /// </summary>
-    public int maxLimit = OnlineMaps.MAXZOOM;
+    public float maxLimit = OnlineMaps.MAXZOOM;
 
     /// <summary>
-    /// Minimum limit.\n
-    /// Uses in inpector.
+    /// Minimum limit.<br/>
+    /// Uses in inspector.
     /// </summary>
-    public int minLimit = OnlineMaps.MINZOOM;
+    public float minLimit = OnlineMaps.MINZOOM;
+
+    public OnlineMapsRange()
+    {
+        
+    }
 
     /// <summary>
     /// Constructor.
@@ -36,7 +43,7 @@ public class OnlineMapsRange
     /// <param name="max">Maximum value.</param>
     /// <param name="minLimit">Minimum limit.</param>
     /// <param name="maxLimit">Maximum limit.</param>
-    public OnlineMapsRange(int min = int.MinValue, int max = int.MaxValue, int minLimit = OnlineMaps.MINZOOM, int maxLimit = OnlineMaps.MAXZOOM)
+    public OnlineMapsRange(float min = float.MinValue, float max = float.MaxValue, float minLimit = OnlineMaps.MINZOOM, float maxLimit = OnlineMaps.MAXZOOM)
     {
         this.min = min;
         this.max = max;
@@ -49,21 +56,11 @@ public class OnlineMapsRange
     /// </summary>
     /// <param name="value">Value</param>
     /// <returns>Value corresponding to the specified range.</returns>
-    public int CheckAndFix(int value)
+    public float CheckAndFix(float value)
     {
-        //FixZeroRange();
         if (value < min) value = min;
         if (value > max) value = max;
         return value;
-    }
-
-    private void FixZeroRange()
-    {
-        if (min == 0 && max == 0)
-        {
-            min = int.MinValue;
-            max = int.MaxValue;
-        }
     }
 
     /// <summary>
@@ -71,9 +68,8 @@ public class OnlineMapsRange
     /// </summary>
     /// <param name="value">Value</param>
     /// <returns>True - if the number is in the range, false - if not.</returns>
-    public bool InRange(int value)
+    public bool InRange(float value)
     {
-        //FixZeroRange();
         return value >= min && value <= max;
     }
 
@@ -92,15 +88,15 @@ public class OnlineMapsRange
     /// <param name="newMin">Minimum value.</param>
     /// <param name="newMax">Maximum value.</param>
     /// <returns>True - if the range is changed, false - if not changed.</returns>
-    public bool Update(int newMin, int newMax)
+    public bool Update(float newMin, float newMax)
     {
         bool changed = false;
-        if (newMin != min)
+        if (Math.Abs(newMin - min) > float.Epsilon)
         {
             min = newMin;
             changed = true;
         }
-        if (newMax != max)
+        if (Math.Abs(newMax - max) > float.Epsilon)
         {
             max = newMax;
             changed = true;

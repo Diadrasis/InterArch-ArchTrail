@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -16,28 +16,28 @@ public class OnlineMapsGooglePlacesAutocompleteResult
     public string description;
 
     /// <summary>
-    /// Unique token that you can use to retrieve additional information about this place in a Place Details request. \n
-    /// Although this token uniquely identifies the place, the converse is not true. A place may have many valid reference tokens. \n
-    /// It's not guaranteed that the same token will be returned for any given place across different searches. \n
+    /// Unique token that you can use to retrieve additional information about this place in a Place Details request. <br/>
+    /// Although this token uniquely identifies the place, the converse is not true. A place may have many valid reference tokens. <br/>
+    /// It's not guaranteed that the same token will be returned for any given place across different searches. <br/>
     /// Note: The reference is deprecated in favor of place_id. 
     /// </summary>
     public string reference;
 
     /// <summary>
-    /// Unique stable identifier denoting this place. \n
-    /// This identifier may not be used to retrieve information about this place, but can be used to consolidate data about this place, and to verify the identity of a place across separate searches. \n
+    /// Unique stable identifier denoting this place. <br/>
+    /// This identifier may not be used to retrieve information about this place, but can be used to consolidate data about this place, and to verify the identity of a place across separate searches. <br/>
     /// Note: The id is deprecated in favor of place_id.
     /// </summary>
     public string id;
-    
+
     /// <summary>
-    /// Unique identifier for a place. \n
-    /// To retrieve information about the place, pass this identifier in the placeId field of a Places API request.\n
+    /// Unique identifier for a place. <br/>
+    /// To retrieve information about the place, pass this identifier in the placeId field of a Places API request.<br/>
     /// </summary>
     public string place_id;
 
     /// <summary>
-    /// Array of types that apply to this place. \n
+    /// Array of types that apply to this place. <br/>
     /// For example: [ "political", "locality" ] or [ "establishment", "geocode" ].
     /// </summary>
     public string[] types;
@@ -51,6 +51,8 @@ public class OnlineMapsGooglePlacesAutocompleteResult
     /// These describe the location of the entered term in the prediction result text, so that the term can be highlighted if desired.
     /// </summary>
     public MatchedSubstring matchedSubstring;
+
+    public string structured_formatting;
 
     public OnlineMapsGooglePlacesAutocompleteResult()
     {
@@ -75,6 +77,7 @@ public class OnlineMapsGooglePlacesAutocompleteResult
             else if (n.name == "reference") reference = n.Value();
             else if (n.name == "term") terms.Add(new Term(n));
             else if (n.name == "matched_substring") matchedSubstring = new MatchedSubstring(n);
+            else if (n.name == "structured_formatting") structured_formatting = n.Value();
             else Debug.Log(n.name);
         }
 

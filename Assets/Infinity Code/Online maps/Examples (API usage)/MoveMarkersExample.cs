@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -28,7 +28,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void Start()
         {
             OnlineMaps map = OnlineMaps.instance;
-            marker = map.AddMarker(map.position);
+            marker = OnlineMapsMarkerManager.CreateItem(map.position);
             fromPosition = map.topLeftPosition;
             toPosition = map.bottomRightPosition;
         }

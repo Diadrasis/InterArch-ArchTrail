@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using UnityEngine;
@@ -15,31 +15,39 @@ namespace InfinityCode.OnlineMapsDemos
         public Vector3 cameraOffset = new Vector3(-10, -3, 0);
 
         public float tiltSpeed = 1;
+        public float altitudeChangeSpeed = 100;
+        public AnimationCurve altitudeZoomCurve = AnimationCurve.Linear(0, 19, 1, 13);
+        public float maxAltitude = 4000; // meters
 
         private double px, py;
         public float tilt = 0;
 
         public float rotateSpeed = 1;
+        
+        private OnlineMaps map;
+        private OnlineMapsElevationManagerBase elevationManager;
+        private OnlineMapsTileSetControl control;
 
         private void Start()
         {
-            OnlineMaps api = OnlineMaps.instance;
+            map = OnlineMaps.instance;
+            control = OnlineMapsTileSetControl.instance;
+            elevationManager = OnlineMapsElevationManagerBase.instance;
 
-            Vector3 position = OnlineMapsTileSetControl.instance.GetWorldPosition(api.position);
-            position.y = altitude *
-                         OnlineMapsTileSetControl.instance.GetBestElevationYScale(api.topLeftPosition,
-                             api.bottomRightPosition) * OnlineMapsTileSetControl.instance.elevationScale;
+            double tlx, tly, brx, bry;
+            map.GetCorners(out tlx, out tly, out brx, out bry);
+
+            Vector3 position = control.GetWorldPosition(map.position);
+            position.y = altitude;
+            if (elevationManager != null) position.y *= OnlineMapsElevationManagerBase.GetBestElevationYScale(tlx, tly, brx, bry) * elevationManager.scale;
+
             gameObject.transform.position = position;
-
-            api.GetPosition(out px, out py);
+            map.GetPosition(out px, out py);
         }
 
-        void Update()
+        private void Update()
         {
             const float maxTilt = 50;
-
-            OnlineMaps api = OnlineMaps.instance;
-            OnlineMapsTileSetControl control = OnlineMapsTileSetControl.instance;
 
             if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
             {
@@ -56,18 +64,27 @@ namespace InfinityCode.OnlineMapsDemos
                 else tilt = 0;
             }
 
+            if (Input.GetKey(KeyCode.W))
+            {
+                altitude += altitudeChangeSpeed * Time.deltaTime;
+            }
+            else if (Input.GetKey(KeyCode.S))
+            {
+                altitude -= altitudeChangeSpeed * Time.deltaTime;
+            }
+
             tilt = Mathf.Clamp(tilt, -maxTilt, maxTilt);
             container.transform.localRotation = Quaternion.Euler(tilt, 0, 0);
 
-            if (tilt != 0)
+            if (Math.Abs(tilt) > float.Epsilon)
             {
                 transform.Rotate(Vector3.up, tilt * rotateSpeed * Time.deltaTime);
             }
 
             double tlx, tly, brx, bry, dx, dy;
 
-            api.GetTopLeftPosition(out tlx, out tly);
-            api.GetBottomRightPosition(out brx, out bry);
+            map.GetTopLeftPosition(out tlx, out tly);
+            map.GetBottomRightPosition(out brx, out bry);
 
             OnlineMapsUtils.DistanceBetweenPoints(tlx, tly, brx, bry, out dx, out dy);
 
@@ -82,11 +99,17 @@ namespace InfinityCode.OnlineMapsDemos
             px += ox;
             py += oy;
 
-            api.SetPosition(px, py);
+            map.SetPositionAndZoom(px, py, altitudeZoomCurve.Evaluate(altitude / maxAltitude));
 
             Vector3 pos = transform.position;
-            pos.y = altitude * control.GetBestElevationYScale(tlx, tly, brx, bry) * control.elevationScale;
+            pos.y = altitude;
+            if (elevationManager != null) pos.y *= OnlineMapsElevationManagerBase.GetBestElevationYScale(tlx, tly, brx, bry) * elevationManager.scale;
             transform.position = pos;
+
+            Vector2 distance = OnlineMapsUtils.DistanceBetweenPoints(map.topLeftPosition, map.bottomRightPosition);
+            OnlineMapsControlBaseDynamicMesh.instance.sizeInScene = distance * 1000;
+            Vector3 d = transform.position - OnlineMapsControlBaseDynamicMesh.instance.center;
+            map.transform.position = new Vector3(d.x, map.transform.position.y, d.z);
 
             Camera.main.transform.position = transform.position - transform.rotation * cameraOffset;
             Camera.main.transform.LookAt(transform);

@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -64,6 +64,11 @@ public class OnlineMapsJSONArray : OnlineMapsJSONItem
         if (collection == null) return;
         array.AddRange(collection.array);
         _count += collection._count;
+    }
+
+    public void AddRange(OnlineMapsJSONItem collection)
+    {
+        AddRange(collection as OnlineMapsJSONArray);
     }
 
     public override object Deserialize(Type type)

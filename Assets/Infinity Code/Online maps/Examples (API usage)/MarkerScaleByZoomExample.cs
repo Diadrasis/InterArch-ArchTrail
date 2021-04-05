@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -27,7 +27,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void Start()
         {
             // Create a new marker.
-            marker = OnlineMaps.instance.AddMarker(new Vector2(15, 15));
+            marker = OnlineMapsMarkerManager.CreateItem(new Vector2(15, 15));
 
             // Subscribe to change zoom.
             OnlineMaps.instance.OnChangeZoom += OnChangeZoom;

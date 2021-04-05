@@ -1,10 +1,10 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Collections.Generic;
 
 /// <summary>
-/// Bing Maps Elevation API response object.\n
+/// Bing Maps Elevation API response object.<br/>
 /// https://msdn.microsoft.com/en-us/library/jj158961.aspx
 /// </summary>
 public class OnlineMapsBingMapsElevationResult

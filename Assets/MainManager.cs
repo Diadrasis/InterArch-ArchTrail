@@ -5,27 +5,27 @@ using UnityEngine;
 using Stathis.Android;
 using UnityEngine.Android;
 using UnityEngine.UI;
+using System.Linq;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
     private OnlineMapsMarker playerMarker;
     public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec;//btnRec to record the path and save it
-    public Text infoText, blackText;
+    public TextMeshProUGUI infoText, blackText;
     public float time = 3;
     private float angle;
 
-    private bool isMovement;
+    private bool isMovement, isAutoMarkerEnabled, isNewAreaSet;
     private Vector2 fromPosition, toPosition;
     private Vector2 toPositionTest;
     private double fromTileX, fromTileY, toTileX, toTileY;
     private int moveZoom;
     OnlineMapsLocationService locationService;
-    public GameObject blackScreen, settingsScreen;
+    public GameObject blackScreen, settingsScreen, markerIns;
+    private static string prefsKey = "markers";
 
-    //to create a new area to look around
-    /*private List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
-    private List<Vector2> markerPositions = new List<Vector2>();
-    private OnlineMapsDrawingPoly polygon;*/
+
     private void Awake()
     {
         Application.runInBackground = true;
@@ -46,10 +46,13 @@ public class MainManager : MonoBehaviour
         toPosition = new Vector2(21.91794f, 37.17928f); //correct position for app
         toPositionTest = new Vector2(23.72402f, 37.97994f); //for testing purposes
         locationService.OnLocationChanged += CheckAppLocation;
+        OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
         settingsScreen.SetActive(false);
     }
+
     void InitLocation()
     {
+        isNewAreaSet = false;
         locationService = OnlineMapsLocationService.instance;
         //playerMarker = locationService.marker2DTexture.LoadImage();
         playerMarker = OnlineMapsMarkerManager.CreateItem(toPosition, null, "Player");
@@ -76,9 +79,9 @@ public class MainManager : MonoBehaviour
         //CheckMyLocation();
         OnlineMaps.instance.position = toPosition;
         OnlineMaps.instance.Redraw();
-        //playerMarker = OnlineMapsMarkerManager.CreateItem(toPosition, null, "Player")
+        //playerMarker = OnlineMapsMarkerManager.CreateItem(toPosition, null, "Player");
         OnlineMaps.instance.zoomRange = new OnlineMapsRange(15, 20);//constrain zoom
-        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(37.17f, 21.91f, 37.18f, 21.92f);//constraint to messini area
+        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(37.17f, 21.90f, 37.18f, 21.92f);//constraint to messini area
         
     }
     private bool CheckForLocationServices()
@@ -250,6 +253,7 @@ public class MainManager : MonoBehaviour
         settingsScreen.SetActive(false);
         OnLocationChanged(locationService.position);
         CheckMyLocation();
+        OnlineMapsMarkerManager.RemoveAllItems();
         //btnLayer.onClick.AddListener(() => CheckLayer());
         btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
         OnlineMaps.instance.zoomRange = new OnlineMapsRange(5, 20);
@@ -264,5 +268,43 @@ public class MainManager : MonoBehaviour
     void CloseCanvas()
     {
         blackScreen.SetActive(false);
+    }
+
+    private void OnMapClick()
+    {
+        isNewAreaSet = true;
+        // Get the coordinates under the cursor.
+        double lng, lat;
+        OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
+
+        // Create a label for the marker.
+        string label = "Marker " + (OnlineMapsMarkerManager.CountItems + 1);
+
+        // Create a new marker.
+        OnlineMapsMarkerManager.CreateItem(lng, lat, label);
+        //Instantiate(markerIns, new Vector2((float)lng, (float)lat), Quaternion.identity);
+        OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(
+        OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(),Color.red,3));
+    }
+    //when user enters markers on map, save on new area restrict and walk around
+    void SaveNewMarkersAndArea()
+    {
+        //float distLastMarkers = OnlineMapsUtils.DistanceBetweenPoints();//distance between last markers, if they are near then the new area will save to device and also user will be able to save it in a button and access if they want to visit again
+        if (isNewAreaSet)/*user is about to use OnMapClick*/
+        {
+            OnlineMapsXML xml = new OnlineMapsXML("Markers");
+
+            foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
+            {
+                // Create marker node
+                OnlineMapsXML markerNode = xml.Create("Marker");
+                markerNode.Create("Position", marker.position);
+                markerNode.Create("Label", marker.label);
+            }
+
+            // Save xml string
+            PlayerPrefs.SetString(prefsKey, xml.outerXml);
+            PlayerPrefs.Save();
+        }
     }
 }

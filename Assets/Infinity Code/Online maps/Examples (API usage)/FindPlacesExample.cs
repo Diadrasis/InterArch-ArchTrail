@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -57,7 +57,7 @@ namespace InfinityCode.OnlineMapsExamples
                 Debug.Log(result.location);
 
                 // Create a marker at the location of the result.
-                OnlineMapsMarker marker = OnlineMaps.instance.AddMarker(result.location, result.name);
+                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(result.location, result.name);
                 markers.Add(marker);
             }
 

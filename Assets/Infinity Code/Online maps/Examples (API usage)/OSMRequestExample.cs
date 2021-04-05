@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,11 @@ namespace InfinityCode.OnlineMapsExamples
 
             // Create OSM Overpass request where highway is primary or residential
             string requestData = String.Format("node({0},{1},{2},{3});way(bn)[{4}];(._;>;);out;",
-                bottomRight.y, topLeft.x, topLeft.y, bottomRight.x, "'highway'~'primary|residential'");
+                bottomRight.y.ToString(OnlineMapsUtils.numberFormat), 
+                topLeft.x.ToString(OnlineMapsUtils.numberFormat), 
+                topLeft.y.ToString(OnlineMapsUtils.numberFormat), 
+                bottomRight.x.ToString(OnlineMapsUtils.numberFormat), 
+                "'highway'~'primary|residential'");
 
             // Send request and subscribe to complete event
             OnlineMapsOSMAPIQuery.Find(requestData).OnComplete += OnComplete;

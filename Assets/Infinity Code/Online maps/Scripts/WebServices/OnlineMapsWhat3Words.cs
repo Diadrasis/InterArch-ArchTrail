@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Text;
@@ -16,7 +16,7 @@ public class OnlineMapsWhat3Words:OnlineMapsTextWebService
     private OnlineMapsWhat3Words(StringBuilder url)
     {
         _status = OnlineMapsQueryStatus.downloading;
-        www = OnlineMapsUtils.GetWWW(url);
+        www = new OnlineMapsWWW(url);
         www.OnComplete += OnRequestComplete;
     }
 
@@ -41,7 +41,11 @@ public class OnlineMapsWhat3Words:OnlineMapsTextWebService
         url.Append("?format=json&key=").Append(key);
         url.Append("&addr=").Append(addr);
         if (!string.IsNullOrEmpty(lang)) url.Append("&lang=").Append(lang);
-        if (focus.HasValue) url.Append("&focus=").Append(focus.Value.y).Append(",").Append(focus.Value.x);
+        if (focus.HasValue)
+        {
+            url.Append("&focus=").Append(focus.Value.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                .Append(focus.Value.x.ToString(OnlineMapsUtils.numberFormat));
+        }
         if (clip != null) clip.AppendURL(url);
         if (count.HasValue) url.Append("&count=").Append(count.Value);
         if (display != Display.full)
@@ -116,12 +120,6 @@ public class OnlineMapsWhat3Words:OnlineMapsTextWebService
         return OnlineMapsJSON.Deserialize<OnlineMapsWhat3WordsGridResult>(response);
     }
 
-    [Obsolete("Fixed a typo. Use GetLanguagesResult.")]
-    public static OnlineMapsWhat3WordsLanguagesResult GetLanguadesResult(string response)
-    {
-        return GetLanguagesResult(response);
-    }
-
     /// <summary>
     /// Converts the response string from Get Languages to result object.
     /// </summary>
@@ -144,7 +142,11 @@ public class OnlineMapsWhat3Words:OnlineMapsTextWebService
 
         StringBuilder url = new StringBuilder(endpoint);
         url.Append("grid?format=json&key=").Append(key);
-        url.Append("&bbox=").Append(bbox.top).Append(",").Append(bbox.right).Append(",").Append(bbox.bottom).Append(",").Append(bbox.left);
+        url.Append("&bbox=")
+            .Append(bbox.top.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+            .Append(bbox.right.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+            .Append(bbox.bottom.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+            .Append(bbox.left.ToString(OnlineMapsUtils.numberFormat));
         return new OnlineMapsWhat3Words(url);
     }
 
@@ -162,21 +164,23 @@ public class OnlineMapsWhat3Words:OnlineMapsTextWebService
 
         StringBuilder url = new StringBuilder(endpoint).Append("reverse");
         url.Append("?format=json&key=").Append(key);
-        url.Append("&coords=").Append(coords.y).Append(",").Append(coords.x);
+        url.Append("&coords=")
+            .Append(coords.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+            .Append(coords.x.ToString(OnlineMapsUtils.numberFormat));
         if (!string.IsNullOrEmpty(lang)) url.Append("&lang=").Append(lang);
         if (display != Display.full) url.Append("&display=").Append(display);
         return new OnlineMapsWhat3Words(url);
     }
 
     /// <summary>
-    /// Returns a blend of the three most relevant 3 word address candidates for a given location, based on a full or partial 3 word address. \n
+    /// Returns a blend of the three most relevant 3 word address candidates for a given location, based on a full or partial 3 word address. <br/>
     /// The specified 3 word address may either be a full 3 word address or a partial 3 word address containing the first 2 words in full and at least 1 character of the 3rd word.StandardBlend provides the search logic that powers the search box on map.what3words.com and in the what3words mobile apps.
     /// </summary>
     /// <param name="key">A valid API key</param>
     /// <param name="addr">The full or partial 3 word address to obtain blended candidates for. At minimum this must be the first two complete words plus at least one character from the third word</param>
     /// <param name="multilingual">
-    /// StandardBlend is provided via 2 variant resources; single language and multilingual. \n
-    /// The single language standardblend resource requires a language to be specified.The input full or partial 3 word address will be interpreted as being in the specified language and all results will be in this language. \n
+    /// StandardBlend is provided via 2 variant resources; single language and multilingual. <br/>
+    /// The single language standardblend resource requires a language to be specified.The input full or partial 3 word address will be interpreted as being in the specified language and all results will be in this language. <br/>
     /// The multilingual standardblend-ml resource can accept an optional language. If specified, this will ensure that the standardblend-ml resource will look for results in this language, in addition to any other languages that yield relevant results.
     /// </param>
     /// <param name="lang">If specified, this parameter must be a supported 3 word address language as an ISO 639-1 2 letter code.</param>
@@ -191,7 +195,12 @@ public class OnlineMapsWhat3Words:OnlineMapsTextWebService
         url.Append("?format=json&key=").Append(key);
         url.Append("&addr=").Append(addr);
         if (!string.IsNullOrEmpty(lang)) url.Append("&lang=").Append(lang);
-        if (focus.HasValue) url.Append("&focus=").Append(focus.Value.y).Append(",").Append(focus.Value.x);
+        if (focus.HasValue)
+        {
+            url.Append("&focus=")
+                .Append(focus.Value.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                .Append(focus.Value.x.ToString(OnlineMapsUtils.numberFormat));
+        }
         return new OnlineMapsWhat3Words(url);
     }
 
@@ -249,9 +258,25 @@ public class OnlineMapsWhat3Words:OnlineMapsTextWebService
         public void AppendURL(StringBuilder url)
         {
             url.Append("&clip=");
-            if (type == 0) url.Append("radius(").Append(v2).Append(",").Append(v1).Append(",").Append(v3).Append(")");
-            else if (type == 1) url.Append("focus(").Append(v1).Append(")");
-            else if (type == 2) url.Append("bbox(").Append(v2).Append(",").Append(v3).Append(",").Append(v4).Append(",").Append(v1).Append(")");
+            if (type == 0)
+            {
+                url.Append("radius(")
+                    .Append(v2.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(v1.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(v3.ToString(OnlineMapsUtils.numberFormat)).Append(")");
+            }
+            else if (type == 1)
+            {
+                url.Append("focus(").Append(v1.ToString(OnlineMapsUtils.numberFormat)).Append(")");
+            }
+            else if (type == 2)
+            {
+                url.Append("bbox(")
+                    .Append(v2.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(v3.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(v4.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(v1.ToString(OnlineMapsUtils.numberFormat)).Append(")");
+            }
         }
     }
 

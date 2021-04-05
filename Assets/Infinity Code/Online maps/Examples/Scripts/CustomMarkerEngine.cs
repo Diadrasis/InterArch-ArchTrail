@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using UnityEngine.UI;
 
 namespace InfinityCode.OnlineMapsDemos
 {
+    [AddComponentMenu("Infinity Code/Online Maps/Demos/CustomMarkerEngine")]
     public class CustomMarkerEngine : MonoBehaviour
     {
         private List<MarkerInstance> markers;
@@ -49,7 +50,7 @@ namespace InfinityCode.OnlineMapsDemos
             control = OnlineMapsTileSetControl.instance;
 
             map.OnMapUpdated += UpdateMarkers;
-            control.OnCameraControl += UpdateMarkers;
+            OnlineMapsCameraOrbit.instance.OnCameraControl += UpdateMarkers;
 
             markers = new List<MarkerInstance>();
 
@@ -76,28 +77,13 @@ namespace InfinityCode.OnlineMapsDemos
 
         private void UpdateMarkers()
         {
-            double tlx, tly, brx, bry;
-            map.GetCorners(out tlx, out tly, out brx, out bry);
-
-            /*if (brx < tlx)
-            {
-                if (map.position.x > 0) brx += 360;
-                else tlx -= 360;
-            }*/
-
-            foreach (MarkerInstance marker in markers) UpdateMarker(marker, tlx, tly, brx, bry);
+            foreach (MarkerInstance marker in markers) UpdateMarker(marker);
         }
 
-        private void UpdateMarker(MarkerInstance marker, double tlx, double tly, double brx, double bry)
+        private void UpdateMarker(MarkerInstance marker)
         {
             double px = marker.data.longitude;
             double py = marker.data.latitude;
-
-            /*if (px < tlx || px > brx || py < bry || py > tly)
-            {
-                marker.gameObject.SetActive(false);
-                return;
-            }*/
 
             Vector2 screenPosition = control.GetScreenPosition(px, py);
 
@@ -111,8 +97,6 @@ namespace InfinityCode.OnlineMapsDemos
             RectTransform markerRectTransform = marker.transform;
 
             if (!marker.gameObject.activeSelf) marker.gameObject.SetActive(true);
-
-            screenPosition.y += markerRectTransform.rect.height / 2;
 
             Vector2 point;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(markerRectTransform.parent as RectTransform, screenPosition, worldCamera, out point);

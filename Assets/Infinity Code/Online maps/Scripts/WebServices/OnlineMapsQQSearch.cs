@@ -1,10 +1,10 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Text;
 
 /// <summary>
-/// Class to work with QQ Search.\n
+/// Class to work with QQ Search.<br/>
 /// http://lbs.qq.com/webservice_v1/guide-search.html
 /// </summary>
 public class OnlineMapsQQSearch:OnlineMapsTextWebService
@@ -15,7 +15,7 @@ public class OnlineMapsQQSearch:OnlineMapsTextWebService
 
         StringBuilder builder = new StringBuilder("http://apis.map.qq.com/ws/place/v1/search?key=").Append(key).Append("&keyword=").Append(OnlineMapsWWW.EscapeURL(keyword));
         p.AppendParams(builder);
-        www = OnlineMapsUtils.GetWWW(builder);
+        www = new OnlineMapsWWW(builder);
         www.OnComplete += OnRequestComplete;
     }
 
@@ -47,13 +47,13 @@ public class OnlineMapsQQSearch:OnlineMapsTextWebService
     public class Params
     {
         /// <summary>
-        /// Filter criteria.\n
+        /// Filter criteria.<br/>
         /// http://lbs.qq.com/webservice_v1/guide-search.html#filter_detail
         /// </summary>
         public string filter;
 
         /// <summary>
-        /// Sort by.\n
+        /// Sort by.<br/>
         /// http://lbs.qq.com/webservice_v1/guide-search.html#orderby_detail
         /// </summary>
         public string orderby;
@@ -82,7 +82,7 @@ public class OnlineMapsQQSearch:OnlineMapsTextWebService
         /// </summary>
         /// <param name="region">Retrieves the region name, city name, such as Beijing.</param>
         /// <param name="auto_extend">
-        /// TRUE: the current city search results, then automatically expand the scope; \n
+        /// TRUE: the current city search results, then automatically expand the scope; <br/>
         /// FALSE: Search only in the current city.
         /// </param>
         /// <param name="lng">Longitude of the center location.</param>
@@ -132,15 +132,24 @@ public class OnlineMapsQQSearch:OnlineMapsTextWebService
             {
                 builder.Append("&boundary=region(").Append(region);
                 builder.Append(",").Append(auto_extend? "1": "0");
-                if (lng1.HasValue && lat1.HasValue) builder.Append(",").Append(lat1.Value).Append(",").Append(lng1.Value);
+                if (lng1.HasValue && lat1.HasValue)
+                {
+                    builder.Append(",").Append(lat1.Value.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                        .Append(lng1.Value.ToString(OnlineMapsUtils.numberFormat));
+                }
             }
             else if (type == SearchType.nearby)
             {
-                builder.Append("nearby(").Append(lat1.Value).Append(",").Append(lng1.Value).Append(",").Append(radius);
+                builder.Append("nearby(").Append(lat1.Value.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(lng1.Value.ToString(OnlineMapsUtils.numberFormat)).Append(",").Append(radius);
             }
             else if (type == SearchType.rectangle)
             {
-                builder.Append("rectangle(").Append(lat1.Value).Append(",").Append(lng1.Value).Append(",").Append(lat2.Value).Append(",").Append(lng2.Value);
+                builder.Append("rectangle(")
+                    .Append(lat1.Value.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(lng1.Value.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(lat2.Value.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(lng2.Value.ToString(OnlineMapsUtils.numberFormat));
             }
             builder.Append(")");
             if (!string.IsNullOrEmpty(filter)) builder.Append("&filter=").Append(filter);

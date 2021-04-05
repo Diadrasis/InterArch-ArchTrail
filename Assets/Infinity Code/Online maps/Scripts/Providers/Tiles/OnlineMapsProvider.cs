@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Linq;
@@ -120,10 +120,26 @@ public class OnlineMapsProvider
     }
 
     /// <summary>
+    /// Appends map types to the provider.
+    /// </summary>
+    /// <param name="newTypes">Map types</param>
+    public void AppendTypes(params MapType[] newTypes)
+    {
+        int l = _types.Length;
+        Array.Resize(ref _types, l + newTypes.Length);
+        for (int i = 0; i < newTypes.Length; i++)
+        {
+            MapType type = _types[l + i] = newTypes[i];
+            type.provider = this;
+            type.fullID = id + "." + type.id;
+        }
+    }
+
+    /// <summary>
     /// Creates a new provider, with the specified title.
     /// </summary>
     /// <param name="title">Provider title. Provider id = title.ToLower().</param>
-    /// <returns>Instance of provider</returns>
+    /// <returns>Instance of provider.</returns>
     public static OnlineMapsProvider Create(string title)
     {
         OnlineMapsProvider provider = new OnlineMapsProvider(title);
@@ -135,10 +151,10 @@ public class OnlineMapsProvider
     }
 
     /// <summary>
-    /// Gets an instance of a map type by ID.\n
-    /// ID - providerID or providerID(dot)typeID.\n
-    /// If the typeID is not specified returns the first map type of provider.
-    /// If the provider ID is not found, returns the first map type of the first provider.
+    /// Gets an instance of a map type by ID.<br/>
+    /// ID - providerID or providerID(dot)typeID.<br/>
+    /// If the typeID is not specified returns the first map type of provider.<br/>
+    /// If the provider ID is not found, returns the first map type of the first provider.<br/>
     /// Example: nokia or google.satellite
     /// </summary>
     /// <param name="mapTypeID">ID of map type</param>
@@ -164,6 +180,19 @@ public class OnlineMapsProvider
             }
         }
         return providers[0].types[0];
+    }
+
+    /// <summary>
+    /// Gets map type by index.
+    /// </summary>
+    /// <param name="index">Index of map type.</param>
+    /// <param name="repeat">TRUE - Repeat index value, FALSE - Clamp index value.</param>
+    /// <returns>Instance of map type.</returns>
+    public MapType GetByIndex(int index, bool repeat = false)
+    {
+        if (repeat) index = Mathf.RoundToInt(Mathf.Repeat(index, _types.Length - 1));
+        else index = Mathf.Clamp(index, 0, _types.Length);
+        return _types[index];
     }
 
     /// <summary>
@@ -255,7 +284,11 @@ public class OnlineMapsProvider
                     new MapType(SATELLITE)
                     {
                         urlWithLabels = "https://mt{rnd0-3}.googleapis.com/vt/lyrs=y&hl={lng}&x={x}&y={y}&z={zoom}",
-                        urlWithoutLabels = "https://khm{rnd0-3}.googleapis.com/kh?v=818&hl={lng}&x={x}&y={y}&z={zoom}",
+                        urlWithoutLabels = "https://khm{rnd0-3}.googleapis.com/kh?v={version}&hl={lng}&x={x}&y={y}&z={zoom}",
+                        extraFields = new []
+                        {
+                            new ExtraField("Tile version", "version", "865")
+                        }
                     },
                     new MapType(RELIEF)
                     {
@@ -285,7 +318,7 @@ public class OnlineMapsProvider
                 {
                     new MapType("Map")
                     {
-                        urlWithLabels = "https://api.mapbox.com/styles/v1/{userid}/{mapid}/tiles/256/{z}/{x}/{y}?access_token={accesstoken}",
+                        urlWithLabels = "https://api.mapbox.com/styles/v1/{userid}/{mapid}/tiles/256/{z}/{x}/{y}?events=true&access_token={accesstoken}",
                         extraFields = new []
                         {
                             new ExtraField("User ID", "userid"),
@@ -294,7 +327,7 @@ public class OnlineMapsProvider
                     },
                     new MapType("Satellite")
                     {
-                        urlWithoutLabels = "https://a.tiles.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token={accesstoken}"
+                        urlWithoutLabels = "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?events=true&access_token={accesstoken}"
                     }
                 },
 
@@ -305,7 +338,7 @@ public class OnlineMapsProvider
             },
             new OnlineMapsProvider("Mapbox classic")
             {
-                url = "https://b.tiles.mapbox.com/v4/{mapid}/{zoom}/{x}/{y}.png?access_token={accesstoken}",
+                url = "https://b.tiles.mapbox.com/v4/{mapid}/{zoom}/{x}/{y}.png?events=true&access_token={accesstoken}",
                 labelsEnabled = true,
 
                 _types = new []
@@ -348,9 +381,34 @@ public class OnlineMapsProvider
                     new MapType("19century", "19th century") { variantWithLabels = "army2-m" }, 
                 }
             }, 
+            new OnlineMapsProvider("nationalmap", "National Map")
+            {
+                url = "https://basemap.nationalmap.gov/arcgis/rest/services/{variant}/MapServer/tile/{z}/{y}/{x}",
+                //hasLabels = true,
+                _types = new []
+                {
+                    new MapType("USGSHydroCached")
+                    {
+                        variantWithLabels = "USGSHydroCached"
+                    }, 
+                    new MapType("USGSImagery")
+                    {
+                        variantWithoutLabels = "USGSImageryOnly",
+                        variantWithLabels = "USGSImageryTopo"
+                    }, 
+                    new MapType("USGSShadedReliefOnly")
+                    {
+                        variantWithoutLabels = "USGSShadedReliefOnly"
+                    }, 
+                    new MapType("USGSTopo")
+                    {
+                        variantWithLabels = "USGSTopo"
+                    }
+                }
+            }, 
             new OnlineMapsProvider("nokia", "Nokia Maps (here.com)")
             {
-                url = "https://{rnd1-4}.{prop2}.maps.cit.api.here.com/maptile/2.1/{prop}/newest/{variant}/{zoom}/{x}/{y}/256/png8?lg={lng}&app_id={appid}&app_code={appcode}",
+                url = "https://{rnd1-4}.{prop2}.maps.api.here.com/maptile/2.1/{prop}/newest/{variant}/{zoom}/{x}/{y}/256/png8?lg={lng}&app_id={appid}&app_code={appcode}",
                 twoLetterLanguage = false,
                 hasLanguage = true,
                 labelsEnabled = true,
@@ -380,12 +438,12 @@ public class OnlineMapsProvider
                     {
                         variant = "normal.day.custom",
                         propWithoutLabels = "basetile",
-                    }, 
+                    },
                     new MapType("normalDayGrey")
                     {
                         variant = "normal.day.grey",
                         propWithoutLabels = "basetile",
-                    }, 
+                    },
                     new MapType("normalDayMobile")
                     {
                         variant = "normal.day.mobile",
@@ -429,11 +487,11 @@ public class OnlineMapsProvider
                     new MapType("pedestrianDay")
                     {
                         variantWithLabels = "pedestrian.day"
-                    }, 
+                    },
                     new MapType("pedestrianNight")
                     {
                         variantWithLabels = "pedestrian.night"
-                    }, 
+                    },
                 },
 
                 extraFields = new []
@@ -537,17 +595,25 @@ public class OnlineMapsProvider
                 {
                     new MapType("Normal")
                     {
-                        urlWithoutLabels = "http://t{rnd0-7}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}"
+                        urlWithoutLabels = "https://t{rnd0-7}.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk={apikey}"
                     },
                     new MapType(SATELLITE)
                     {
-                        urlWithoutLabels = "http://t{rnd0-7}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}"
+                        urlWithoutLabels = "https://t{rnd0-7}.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk={apikey}"
                     },
                     new MapType(TERRAIN)
                     {
-                        urlWithoutLabels = "http://t{rnd0-7}.tianditu.cn/DataServer?T=ter_w&X={x}&Y={y}&L={z}"
+                        urlWithoutLabels = "https://t{rnd0-7}.tianditu.gov.cn/DataServer?T=ter_w&x={x}&y={y}&l={z}&tk={apikey}"
                     },
-                }
+                },
+
+                extraFields = new []
+                {
+                new ToggleExtraGroup("Anonymous", true, new []
+                {
+                    new ExtraField("API key", "apikey", "2ce94f67e58faa24beb7cb8a09780552")
+                })
+            }
             },
             new OnlineMapsProvider("virtualearth", "Virtual Earth (Bing Maps)")
             {
@@ -589,6 +655,7 @@ public class OnlineMapsProvider
                     new MapType("AMap Terrain") { urlWithLabels = "https://webrd03.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={zoom}" },
                     new MapType("MtbMap") { urlWithLabels = "http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png" },
                     new MapType("HikeBike") { urlWithLabels = "https://a.tiles.wmflabs.org/hikebike/{z}/{x}/{y}.png" },
+                    new MapType("Waze") { urlWithLabels = "https://worldtiles{rnd1-4}.waze.com/tiles/{z}/{x}/{y}.png" },
                 }
             }, 
             new OnlineMapsProvider("Custom")
@@ -612,64 +679,6 @@ public class OnlineMapsProvider
                 type.index = j;
             }
         }
-    }
-
-    public static string Upgrade(int providerID, int type)
-    {
-        StringBuilder builder = new StringBuilder();
-        if (providerID == 0) builder.Append("arcgis");
-        else if (providerID == 1) builder.Append("google");
-        else if (providerID == 2) builder.Append("nokia");
-        else if (providerID == 3) builder.Append("mapquest");
-        else if (providerID == 4) builder.Append("virtualearth");
-        else if (providerID == 5) builder.Append("osm");
-        else if (providerID == 6) builder.Append("sputnik");
-        else if (providerID == 7) builder.Append("amap");
-        else if (providerID == 999) builder.Append("custom").Append(".").Append("custom");
-        else
-        {
-            Debug.LogWarning("Trying to upgrade provider failed. Please select the provider manually.");
-            return "arcgis";
-        }
-
-        string[] availableTypes = OnlineMaps.GetAvailableTypes((OnlineMapsProviderEnum)providerID);
-
-        if (providerID < 8 && availableTypes.Length > type)
-        {
-            builder.Append(".");
-            builder.Append(availableTypes[type].ToLower());
-        }
-        
-        return builder.ToString();
-    }
-
-    /// <summary>
-    /// Appends map types to the provider.
-    /// </summary>
-    /// <param name="newTypes">Map types</param>
-    public void AppendTypes(params MapType[] newTypes)
-    {
-        int l = _types.Length;
-        Array.Resize(ref _types, l + newTypes.Length);
-        for (int i = 0; i < newTypes.Length; i++)
-        {
-            MapType type = _types[l + i] = newTypes[i];
-            type.provider = this;
-            type.fullID = id + "." + type.id;
-        }
-    }
-
-    /// <summary>
-    /// Gets map type by index.
-    /// </summary>
-    /// <param name="index">Index of map type.</param>
-    /// <param name="repeat">TRUE - Repeat index value, FALSE - Clamp index value.</param>
-    /// <returns>Instance of map type.</returns>
-    public MapType GetByIndex(int index, bool repeat = false)
-    {
-        if (repeat) index = Mathf.RoundToInt(Mathf.Repeat(index, _types.Length - 1));
-        else index = Mathf.Clamp(index, 0, _types.Length);
-        return _types[index];
     }
 
     /// <summary>
@@ -831,7 +840,7 @@ public class OnlineMapsProvider
         /// </summary>
         public string prop2
         {
-            get { return string.IsNullOrEmpty(_prop2)? provider.prop2: _prop2; }
+            get { return string.IsNullOrEmpty(_prop2) ? provider.prop2 : _prop2; }
             set { _prop2 = value; }
         }
 
@@ -956,13 +965,14 @@ public class OnlineMapsProvider
         }
 
         /// <summary>
-        /// Gets the URL to download the tile texture.
+        /// Gets the URL to download the tile texture
         /// </summary>
-        /// <param name="tile">Instence of tile.</param>
-        /// <returns>URL to tile texture.</returns>
+        /// <param name="tile">Instence of tile</param>
+        /// <returns>URL to tile texture</returns>
         public string GetURL(OnlineMapsTile tile)
         {
-            bool useLabels = hasLabels ? tile.labels : labelsEnabled;
+            OnlineMapsRasterTile rTile = tile as OnlineMapsRasterTile;
+            bool useLabels = hasLabels ? rTile.labels : labelsEnabled;
             if (useLabels)
             {
                 if (!string.IsNullOrEmpty(_urlWithLabels)) return GetURL(tile, _urlWithLabels, true);
@@ -992,7 +1002,7 @@ public class OnlineMapsProvider
                 if (v == "x") return tile.x.ToString();
                 if (v == "y") return tile.y.ToString();
                 if (v == "quad") return OnlineMapsUtils.TileToQuadKey(tile.x, tile.y, tile.zoom);
-                if (v == "lng") return tile.language;
+                if (v == "lng") return (tile as OnlineMapsRasterTile).language;
                 if (v == "ext") return ext;
                 if (v == "prop") return labels ? propWithLabels : propWithoutLabels;
                 if (v == "prop2") return prop2;
@@ -1008,6 +1018,19 @@ public class OnlineMapsProvider
             });
             if (logUrl) Debug.Log(url);
             return url;
+        }
+
+        public void LoadSettings(string settings)
+        {
+            if (string.IsNullOrEmpty(settings)) return;
+
+            TryLoadExtraFields(settings, extraFields);
+            TryLoadExtraFields(settings, provider.extraFields);
+        }
+
+        public override string ToString()
+        {
+            return fullID;
         }
 
         private void TryLoadExtraFields(string settings, IExtraField[] fields)
@@ -1030,14 +1053,6 @@ public class OnlineMapsProvider
                 foreach (IExtraField field in fields) if (field.TryLoadSettings(title, settings, i, contentSize)) break;
                 i += contentSize;
             }
-        }
-
-        public void LoadSettings(string settings)
-        {
-            if (string.IsNullOrEmpty(settings)) return;
-
-            TryLoadExtraFields(settings, extraFields);
-            TryLoadExtraFields(settings, provider.extraFields);
         }
 
         private bool TryUseExtraFields(ref string token)
@@ -1071,10 +1086,102 @@ public class OnlineMapsProvider
 
             return false;
         }
+    }
 
-        public override string ToString()
+    /// <summary>
+    /// Interface for extra fields tile provider
+    /// </summary>
+    public interface IExtraField
+    {
+        bool GetTokenValue(string token, bool useDefaultValue, out string value);
+        void SaveSettings(StringBuilder builder);
+        bool TryLoadSettings(string title, string settings, int index, int contentSize);
+    }
+
+    /// <summary>
+    /// Class for extra field
+    /// </summary>
+    public class ExtraField: IExtraField
+    {
+        /// <summary>
+        /// Title
+        /// </summary>
+        public string title;
+
+        /// <summary>
+        /// Value
+        /// </summary>
+        public string value;
+
+        /// <summary>
+        /// Default value
+        /// </summary>
+        public string defaultValue;
+
+        /// <summary>
+        /// Token (ID)
+        /// </summary>
+        public string token;
+
+        public ExtraField(string title, string token)
         {
-            return fullID;
+            this.title = title;
+            this.token = token;
+        }
+
+        public ExtraField(string title, string token, string defaultValue):this(title, token)
+        {
+            value = this.defaultValue = defaultValue;
+        }
+
+        public bool GetTokenValue(string token, bool useDefaultValue, out string value)
+        {
+            value = null;
+
+            if (this.token == token)
+            {
+                value = useDefaultValue? defaultValue: this.value;
+                return true;
+            }
+            return false;
+        }
+
+        public void SaveSettings(StringBuilder builder)
+        {
+            int titleLength = title.Length;
+            if (titleLength < 10) builder.Append("0");
+            builder.Append(titleLength);
+            builder.Append(title);
+
+            if (string.IsNullOrEmpty(value)) builder.Append(1).Append(1).Append(0);
+            else
+            {
+                StringBuilder dataBuilder = new StringBuilder();
+                int valueLength = value.Length;
+                dataBuilder.Append(valueLength.ToString().Length);
+                dataBuilder.Append(valueLength);
+                dataBuilder.Append(value);
+                builder.Append(dataBuilder.Length.ToString().Length);
+                builder.Append(dataBuilder.Length);
+                builder.Append(dataBuilder);
+            }
+        }
+
+        public bool TryLoadSettings(string title, string settings, int index, int contentSize)
+        {
+            if (this.title != title) return false;
+
+            int lengthSize = int.Parse(settings.Substring(index, 1));
+            if (lengthSize == 0) value = "";
+            else
+            {
+                index++;
+                int length = int.Parse(settings.Substring(index, lengthSize));
+                index += lengthSize;
+                value = settings.Substring(index, length);
+            }
+
+            return true;
         }
     }
 
@@ -1165,103 +1272,6 @@ public class OnlineMapsProvider
                 foreach (IExtraField field in fields) if (field.TryLoadSettings(fieldTitle, settings, i, contentLength)) break;
 
                 i += contentLength;
-            }
-
-            return true;
-        }
-    }
-
-    /// <summary>
-    /// Interface for extra fields tile provider
-    /// </summary>
-    public interface IExtraField
-    {
-        bool GetTokenValue(string token, bool useDefaultValue, out string value);
-        void SaveSettings(StringBuilder builder);
-        bool TryLoadSettings(string title, string settings, int index, int contentSize);
-    }
-
-    /// <summary>
-    /// Class for extra field
-    /// </summary>
-    public class ExtraField: IExtraField
-    {
-        /// <summary>
-        /// Title
-        /// </summary>
-        public string title;
-
-        /// <summary>
-        /// Value
-        /// </summary>
-        public string value;
-
-        /// <summary>
-        /// Default value
-        /// </summary>
-        public string defaultValue;
-
-        /// <summary>
-        /// Token (ID)
-        /// </summary>
-        public string token;
-
-        public ExtraField(string title, string token)
-        {
-            this.title = title;
-            this.token = token;
-        }
-
-        public ExtraField(string title, string token, string defaultValue):this(title, token)
-        {
-            this.defaultValue = defaultValue;
-        }
-
-        public bool GetTokenValue(string token, bool useDefaultValue, out string value)
-        {
-            value = null;
-
-            if (this.token == token)
-            {
-                value = useDefaultValue? defaultValue: this.value;
-                return true;
-            }
-            return false;
-        }
-
-        public void SaveSettings(StringBuilder builder)
-        {
-            int titleLength = title.Length;
-            if (titleLength < 10) builder.Append("0");
-            builder.Append(titleLength);
-            builder.Append(title);
-
-            if (string.IsNullOrEmpty(value)) builder.Append(1).Append(1).Append(0);
-            else
-            {
-                StringBuilder dataBuilder = new StringBuilder();
-                int valueLength = value.Length;
-                dataBuilder.Append(valueLength.ToString().Length);
-                dataBuilder.Append(valueLength);
-                dataBuilder.Append(value);
-                builder.Append(dataBuilder.Length.ToString().Length);
-                builder.Append(dataBuilder.Length);
-                builder.Append(dataBuilder);
-            }
-        }
-
-        public bool TryLoadSettings(string title, string settings, int index, int contentSize)
-        {
-            if (this.title != title) return false;
-
-            int lengthSize = int.Parse(settings.Substring(index, 1));
-            if (lengthSize == 0) value = "";
-            else
-            {
-                index++;
-                int length = int.Parse(settings.Substring(index, lengthSize));
-                index += lengthSize;
-                value = settings.Substring(index, length);
             }
 
             return true;

@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Linq;
 using UnityEngine;
@@ -12,10 +12,16 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/DistanceAndDurationExample")]
     public class DistanceAndDurationExample : MonoBehaviour
     {
+        public string googleAPIKey;
+
         private void Start()
         {
+            if (string.IsNullOrEmpty(googleAPIKey)) Debug.LogWarning("Please specify Google API Key");
+
             // Find route using Google Directions API
-            OnlineMapsGoogleDirections.Find("Los Angeles", new Vector2(-118.178960f, 35.063995f)).OnComplete += OnGoogleDirectionsComplete;
+            OnlineMapsGoogleDirections request = new OnlineMapsGoogleDirections(googleAPIKey, "Los Angeles", new Vector2(-118.178960f, 35.063995f));
+            request.OnComplete += OnGoogleDirectionsComplete;
+            request.Send();
         }
 
         /// <summary>
@@ -34,7 +40,7 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsGoogleDirectionsResult.Route route = result.routes[0];
 
             // Draw route on the map
-            OnlineMaps.instance.AddDrawingElement(new OnlineMapsDrawingLine(route.overview_polyline, Color.red, 3));
+            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(route.overview_polyline, Color.red, 3));
 
             // Calculate the distance
             int distance = route.legs.Sum(l => l.distance.value); // meters

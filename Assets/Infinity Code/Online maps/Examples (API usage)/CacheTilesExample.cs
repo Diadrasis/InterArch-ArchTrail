@@ -1,7 +1,7 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
-#if !UNITY_WEBPLAYER && (!UNITY_WP_8_1 || UNITY_EDITOR)
+#if !UNITY_WP_8_1 || UNITY_EDITOR
 
 using System.IO;
 using UnityEngine;
@@ -21,12 +21,13 @@ namespace InfinityCode.OnlineMapsExamples
         /// <returns>Local path for tile</returns>
         private static string GetTilePath(OnlineMapsTile tile)
         {
+            OnlineMapsRasterTile rTile = tile as OnlineMapsRasterTile;
             string[] parts =
             {
                 Application.persistentDataPath,
                 "OnlineMapsTileCache",
-                tile.mapType.provider.id,
-                tile.mapType.id,
+                rTile.mapType.provider.id,
+                rTile.mapType.id,
                 tile.zoom.ToString(),
                 tile.x.ToString(),
                 tile.y + ".png"
@@ -52,11 +53,11 @@ namespace InfinityCode.OnlineMapsExamples
                 tileTexture.wrapMode = TextureWrapMode.Clamp;
 
                 // Send texture to map.
-                if (OnlineMaps.instance.target == OnlineMapsTarget.texture)
+                if (OnlineMapsControlBase.instance.resultIsTexture)
                 {
-                    tile.ApplyTexture(tileTexture);
+                    (tile as OnlineMapsRasterTile).ApplyTexture(tileTexture);
                     OnlineMaps.instance.buffer.ApplyTile(tile);
-                    OnlineMapsUtils.DestroyImmediate(tileTexture);
+                    OnlineMapsUtils.Destroy(tileTexture);
                 }
                 else
                 {
@@ -70,7 +71,7 @@ namespace InfinityCode.OnlineMapsExamples
             else
             {
                 // If the tile is not cached, download tile with a standard loader.
-                OnlineMaps.instance.StartDownloadTile(tile);
+                OnlineMapsTileManager.StartDownloadTile(tile);
             }
         }
 
@@ -97,8 +98,7 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsTile.OnTileDownloaded += OnTileDownloaded;
 
             // Intercepts requests to the download of the tile.
-            if (OnlineMapsCache.instance != null) OnlineMapsCache.instance.OnStartDownloadTile += OnStartDownloadTile;
-            else OnlineMaps.instance.OnStartDownloadTile += OnStartDownloadTile;
+            OnlineMapsTileManager.OnStartDownloadTile += OnStartDownloadTile;
         }
     }
 }

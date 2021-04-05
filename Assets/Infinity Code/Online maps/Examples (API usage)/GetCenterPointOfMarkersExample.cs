@@ -1,6 +1,7 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
+using System.Linq;
 using UnityEngine;
 
 namespace InfinityCode.OnlineMapsExamples
@@ -19,7 +20,7 @@ namespace InfinityCode.OnlineMapsExamples
                 int zoom;
 
                 // Get the center point and zoom the best for all markers.
-                OnlineMapsUtils.GetCenterPointAndZoom(OnlineMaps.instance.markers, out center, out zoom);
+                OnlineMapsUtils.GetCenterPointAndZoom(OnlineMapsMarkerManager.instance.ToArray(), out center, out zoom);
 
                 // Change the position and zoom of the map.
                 OnlineMaps.instance.position = center;

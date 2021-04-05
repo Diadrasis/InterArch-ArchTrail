@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -18,39 +18,48 @@ namespace InfinityCode.OnlineMapsExamples
             map = OnlineMaps.instance;
 
             // Subscribe to the tile download event.
-            if (OnlineMapsCache.instance != null) OnlineMapsCache.instance.OnStartDownloadTile += OnStartDownloadTile;
-            else map.OnStartDownloadTile += OnStartDownloadTile;
+            OnlineMapsTileManager.OnStartDownloadTile += OnStartDownloadTile;
         }
 
         private void OnStartDownloadTile(OnlineMapsTile tile)
         {
+            // Note: create a texture only when you are sure that the tile exists.
+            // Otherwise, you will get a memory leak.
             Texture2D tileTexture = new Texture2D(256, 256);
 
             // Here your code to load tile texture from any source.
+            
+            // Note: If the tile will load asynchronously, set
+            // tile.status = OnlineMapsTileStatus.loading;
+            // Otherwise, the map will try to load the tile again and again.
 
             // Apply your texture in the buffer and redraws the map.
-            if (map.target == OnlineMapsTarget.texture)
+            if (map.control.resultIsTexture)
             {
                 // Apply tile texture
-                tile.ApplyTexture(tileTexture as Texture2D);
+                (tile as OnlineMapsRasterTile).ApplyTexture(tileTexture as Texture2D);
 
                 // Send tile to buffer
                 map.buffer.ApplyTile(tile);
 
                 // Destroy the texture, because it is no longer needed.
-                OnlineMapsUtils.DestroyImmediate(tileTexture);
+                OnlineMapsUtils.Destroy(tileTexture);
             }
             else
             {
                 // Send tile texture
-                tile.texture = tileTexture as Texture2D;
+                tile.texture = tileTexture;
 
                 // Change tile status
                 tile.status = OnlineMapsTileStatus.loaded;
             }
 
+            // Note: If the tile does not exist or an error occurred, set
+            // tile.status = OnlineMapsTileStatus.error;
+            // Otherwise, the map will try to load the tile again and again.
+
             // Redraw map (using best redraw type)
-            map.CheckRedrawType();
+            map.Redraw();
         }
     }
 }

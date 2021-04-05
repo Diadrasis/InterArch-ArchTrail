@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Collections;
 using System.Collections.Generic;
@@ -62,7 +62,7 @@ public class OnlineMapsOpenRouteServiceDirectionResult
         {
             get
             {
-                if (geometry_format == "encodedpolyline") return OnlineMapsUtils.DecodePolylinePointsD((string) geometry);
+                if (geometry_format == "encodedpolyline" || geometry_format == null) return OnlineMapsUtils.DecodePolylinePointsD((string) geometry);
                 if (geometry_format == "polyline" || geometry_format == "geojson")
                 {
                     IEnumerable ps;

@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using UnityEngine;
@@ -8,7 +8,8 @@ using UnityEngine;
 /// The class allows you to change the map location using the keyboard and the joystick.
 /// </summary>
 [AddComponentMenu("Infinity Code/Online Maps/Plugins/Keyboard Input")]
-public class OnlineMapsKeyboardInput : MonoBehaviour
+[OnlineMapsPlugin("Keyboard Input", typeof(OnlineMapsControlBase))]
+public class OnlineMapsKeyboardInput : MonoBehaviour, IOnlineMapsSavableComponent
 {
     /// <summary>
     /// Speed of moving the map.
@@ -19,15 +20,27 @@ public class OnlineMapsKeyboardInput : MonoBehaviour
     private double tileX;
     private double tileY;
     private bool ignoreChangePosition;
+    private OnlineMapsSavableItem[] savableItems;
+    private OnlineMapsCameraOrbit cameraOrbit;
 
-    private void Start()
+    public OnlineMapsSavableItem[] GetSavableItems()
     {
-        map = OnlineMaps.instance;
+        if (savableItems != null) return savableItems;
 
-        double lng, lat;
-        map.GetPosition(out lng, out lat);
-        map.projection.CoordinatesToTile(lng, lat, map.zoom, out tileX, out tileY);
-        map.OnChangePosition += OnChangePosition;
+        savableItems = new[]
+        {
+            new OnlineMapsSavableItem("keyboardInput", "Keyboard Input", SaveSettings)
+            {
+                loadCallback = LoadSettings
+            }
+        };
+
+        return savableItems;
+    }
+
+    private void LoadSettings(OnlineMapsJSONObject json)
+    {
+        json.DeserializeObject(this);
     }
 
     private void OnChangePosition()
@@ -39,6 +52,25 @@ public class OnlineMapsKeyboardInput : MonoBehaviour
         map.projection.CoordinatesToTile(lng, lat, map.zoom, out tileX, out tileY);
     }
 
+    private OnlineMapsJSONItem SaveSettings()
+    {
+        return OnlineMapsJSON.Serialize(new
+        {
+            speed
+        });
+    }
+
+    private void Start()
+    {
+        map = GetComponent<OnlineMaps>();
+        cameraOrbit = GetComponent<OnlineMapsCameraOrbit>();
+
+        double lng, lat;
+        map.GetPosition(out lng, out lat);
+        map.projection.CoordinatesToTile(lng, lat, map.zoom, out tileX, out tileY);
+        map.OnChangePosition += OnChangePosition;
+    }
+
     private void Update()
     {
         float latitudeSpeed = Input.GetAxis("Vertical") * Time.deltaTime;
@@ -46,15 +78,11 @@ public class OnlineMapsKeyboardInput : MonoBehaviour
 
         if (Math.Abs(latitudeSpeed) < float.Epsilon && Math.Abs(longitudeSpeed) < float.Epsilon) return;
 
-        if (map.control is OnlineMapsControlBase3D)
+        if (cameraOrbit != null)
         {
-            OnlineMapsControlBase3D control = map.control as OnlineMapsControlBase3D;
-            if (control.allowCameraControl)
-            {
-                Vector3 v = Quaternion.Euler(0, control.cameraRotation.y, 0) * new Vector3(longitudeSpeed, 0, latitudeSpeed);
-                longitudeSpeed = v.x;
-                latitudeSpeed = v.z;
-            }
+            Vector3 v = Quaternion.Euler(0, cameraOrbit.rotation.y, 0) * new Vector3(longitudeSpeed, 0, latitudeSpeed);
+            longitudeSpeed = v.x;
+            latitudeSpeed = v.z;
         }
 
         tileX += longitudeSpeed * speed;

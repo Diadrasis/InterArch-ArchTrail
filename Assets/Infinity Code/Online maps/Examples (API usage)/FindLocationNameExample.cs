@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -11,6 +11,11 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/FindLocationNameExample")]
     public class FindLocationNameExample : MonoBehaviour
     {
+        /// <summary>
+        /// Google API Key
+        /// </summary>
+        public string googleAPIKey;
+
         private void Start()
         {
             // Subscribe to click event.
@@ -23,14 +28,18 @@ namespace InfinityCode.OnlineMapsExamples
             Vector2 mouseCoords = OnlineMapsControlBase.instance.GetCoords();
 
             // Try find location name by coordinates.
-            OnlineMapsGoogleGeocoding query = OnlineMapsGoogleGeocoding.Find(mouseCoords);
-            query.OnComplete += OnQueryComplete;
+            OnlineMapsGoogleGeocoding request = new OnlineMapsGoogleGeocoding(mouseCoords, googleAPIKey);
+            request.Send();
+            request.OnComplete += OnRequestComplete;
         }
 
-        private void OnQueryComplete(string s)
+        private void OnRequestComplete(string s)
         {
             // Show response in console.
             Debug.Log(s);
+
+            OnlineMapsGoogleGeocodingResult[] results = OnlineMapsGoogleGeocoding.GetResults(s);
+            if (results.Length > 0) Debug.Log(results[0].formatted_address);
         }
     }
 }

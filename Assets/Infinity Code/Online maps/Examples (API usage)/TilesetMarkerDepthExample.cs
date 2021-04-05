@@ -1,7 +1,8 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace InfinityCode.OnlineMapsExamples
@@ -30,17 +31,18 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMaps map = OnlineMaps.instance;
 
             // Create markers.
-            map.AddMarker(new Vector2(0, 0));
-            map.AddMarker(new Vector2(0, 0.01f));
-            map.AddMarker(new Vector2(0, -0.01f));
+            OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0));
+            OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0.01f));
+            OnlineMapsMarkerManager.CreateItem(new Vector2(0, -0.01f));
 
             // Sets a new comparer.
-            OnlineMapsTileSetControl.instance.markerComparer = new MarkerComparer();
+            OnlineMapsMarkerFlatDrawer drawer = (OnlineMapsTileSetControl.instance.markerDrawer as OnlineMapsMarkerFlatDrawer);
+            if (drawer != null) drawer.markerComparer = new MarkerComparer();
 
             // Get the center point and zoom the best for all markers.
             Vector2 center;
             int zoom;
-            OnlineMapsUtils.GetCenterPointAndZoom(map.markers, out center, out zoom);
+            OnlineMapsUtils.GetCenterPointAndZoom(OnlineMapsMarkerManager.instance.ToArray(), out center, out zoom);
 
             // Change the position and zoom of the map.
             map.position = center;

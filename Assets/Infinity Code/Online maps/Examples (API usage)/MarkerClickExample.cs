@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -16,13 +16,13 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMaps map = OnlineMaps.instance;
 
             // Add OnClick events to static markers
-            foreach (OnlineMapsMarker marker in map.markers)
+            foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
             {
                 marker.OnClick += OnMarkerClick;
             }
 
             // Add OnClick events to dynamic markers
-            OnlineMapsMarker dynamicMarker = map.AddMarker(Vector2.zero, null, "Dynamic marker");
+            OnlineMapsMarker dynamicMarker = OnlineMapsMarkerManager.CreateItem(Vector2.zero, null, "Dynamic marker");
             dynamicMarker.OnClick += OnMarkerClick;
         }
 

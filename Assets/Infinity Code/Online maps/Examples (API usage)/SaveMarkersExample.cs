@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -25,7 +25,7 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsXML xml = new OnlineMapsXML("Markers");
 
             // Save markers data
-            foreach (OnlineMapsMarker marker in OnlineMaps.instance.markers)
+            foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
             {
                 // Create marker node
                 OnlineMapsXML markerNode = xml.Create("Marker");
@@ -69,7 +69,7 @@ namespace InfinityCode.OnlineMapsExamples
                 string label = node.Get<string>("Label");
 
                 // Create marker
-                OnlineMaps.instance.AddMarker(position, label);
+                OnlineMapsMarkerManager.CreateItem(position, label);
             }
         }
     }

@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -44,7 +44,7 @@ namespace InfinityCode.OnlineMapsExamples
             Vector2 markerPosition = new Vector2(0, 0);
 
             // Create 3D marker
-            marker3D = control.AddMarker3D(markerPosition, markerPrefab);
+            marker3D = OnlineMapsMarker3DManager.CreateItem(markerPosition, markerPrefab);
 
             // Specifies that marker should be shown only when zoom from 1 to 10.
             marker3D.range = new OnlineMapsRange(1, 10);

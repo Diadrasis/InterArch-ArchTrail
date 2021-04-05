@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using UnityEngine;
@@ -10,6 +10,7 @@ namespace InfinityCode.OnlineMapsDemos
     /// <summary>
     /// Example is how to use a combination of data from Google Places API on bubble popup.
     /// </summary>
+    [AddComponentMenu("Infinity Code/Online Maps/Demos/UIBubblePopup")]
     public class UIBubblePopup : MonoBehaviour
     {
         /// <summary>
@@ -79,7 +80,7 @@ namespace InfinityCode.OnlineMapsDemos
             targetMarker = marker as OnlineMapsMarker;
 
             // Get a result item from instance of the marker
-            CData data = marker.customData as CData;
+            CData data = marker["data"] as CData;
             if (data == null) return;
 
             // Show the popup
@@ -92,11 +93,11 @@ namespace InfinityCode.OnlineMapsDemos
             // Destroy the previous photo
             if (photo.texture != null)
             {
-                OnlineMapsUtils.DestroyImmediate(photo.texture);
+                OnlineMapsUtils.Destroy(photo.texture);
                 photo.texture = null;
             }
 
-            OnlineMapsWWW www = OnlineMapsUtils.GetWWW(data.photo_url);
+            OnlineMapsWWW www = new OnlineMapsWWW(data.photo_url);
             www.OnComplete += OnDownloadPhotoComplete;
 
             // Initial update position
@@ -113,16 +114,26 @@ namespace InfinityCode.OnlineMapsDemos
             OnlineMaps.instance.OnChangeZoom += UpdateBubblePosition;
             OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
 
+            if (OnlineMapsControlBaseDynamicMesh.instance != null)
+            {
+                OnlineMapsControlBaseDynamicMesh.instance.OnMeshUpdated += UpdateBubblePosition;
+            }
+
+            if (OnlineMapsCameraOrbit.instance != null)
+            {
+                OnlineMapsCameraOrbit.instance.OnCameraControl += UpdateBubblePosition;
+            }
+
             if (datas != null)
             {
                 foreach (CData data in datas)
                 {
-                    OnlineMapsMarker marker = OnlineMaps.instance.AddMarker(data.longitude, data.latitude);
-                    marker.customData = data;
+                    OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(data.longitude, data.latitude);
+                    marker["data"] = data;
                     marker.OnClick += OnMarkerClick;
                 }
             }
-            
+
 
             // Initial hide popup
             bubble.SetActive(false);

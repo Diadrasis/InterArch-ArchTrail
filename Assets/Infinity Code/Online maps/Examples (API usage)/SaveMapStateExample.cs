@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,7 +31,7 @@ namespace InfinityCode.OnlineMapsExamples
 
             List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
 
-            map.markers = markers.ToArray();
+            OnlineMapsMarkerManager.SetItems(markers);
         }
 
         private void OnGUI()
@@ -44,10 +44,11 @@ namespace InfinityCode.OnlineMapsExamples
         {
             OnlineMaps map = OnlineMaps.instance;
 
-            OnlineMapsXML prefs = new OnlineMapsXML("Map");
+            //OnlineMapsXML prefs = new OnlineMapsXML("Map");
+
 
             // Save position and zoom
-            OnlineMapsXML generalSettings = prefs.Create("General");
+            /*OnlineMapsXML generalSettings = prefs.Create("General");
             generalSettings.Create("Coordinates", map.position);
             generalSettings.Create("Zoom", map.zoom);
 
@@ -55,10 +56,10 @@ namespace InfinityCode.OnlineMapsExamples
             map.SaveMarkers(prefs);
 
             // Save 3D markers
-            OnlineMapsControlBase3D.instance.SaveMarkers3D(prefs);
+            OnlineMapsJSONItem markers3DJSON = OnlineMapsMarker3DManager.instance.ToJSON();
 
             // Save settings to PlayerPrefs
-            PlayerPrefs.SetString(key, prefs.outerXml);
+            PlayerPrefs.SetString(key, prefs.outerXml);*/
         }
 
         private void Start()

@@ -1,7 +1,8 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 /// <summary>
@@ -62,7 +63,7 @@ public static class OnlineMapsDMSConverter
     /// <returns>True - success, False - otherwise</returns>
     public static bool ParseDMS(string dmsStr, out double value)
     {
-        if (double.TryParse(dmsStr, out value)) return true;
+        if (double.TryParse(dmsStr, NumberStyles.AllowDecimalPoint, OnlineMapsUtils.numberFormat, out value)) return true;
 
         string dms = dmsStr.Trim();
         dms = Regex.Replace(dms, "^ -", "");
@@ -80,13 +81,13 @@ public static class OnlineMapsDMSConverter
         switch (dmsArr.Length)
         {
             case 3:
-                value = double.Parse(dmsArr[0]) + double.Parse(dmsArr[1]) / 60 +  double.Parse(dmsArr[2]) / 3600;
+                value = double.Parse(dmsArr[0], OnlineMapsUtils.numberFormat) + double.Parse(dmsArr[1], OnlineMapsUtils.numberFormat) / 60 +  double.Parse(dmsArr[2], OnlineMapsUtils.numberFormat) / 3600;
                 break;
             case 2:
-                value = double.Parse(dmsArr[0]) + double.Parse(dmsArr[1]) / 60;
+                value = double.Parse(dmsArr[0], OnlineMapsUtils.numberFormat) + double.Parse(dmsArr[1], OnlineMapsUtils.numberFormat) / 60;
                 break;
             case 1:
-                value = double.Parse(dmsArr[0]);
+                value = double.Parse(dmsArr[0], OnlineMapsUtils.numberFormat);
                 break;
             default:
                 value = double.NaN;
@@ -140,7 +141,7 @@ public static class OnlineMapsDMSConverter
         {
             default:
                 d = Math.Round(deg, dp);
-                sd = d.ToString();
+                sd = d.ToString(OnlineMapsUtils.numberFormat);
                 if (d < 100) sd = "0" + sd;
                 if (d < 10) sd = "0" + sd;
                 dms = sd + "°";
@@ -149,9 +150,9 @@ public static class OnlineMapsDMSConverter
             case "deg+min":
                 double min = Math.Round(deg * 60, dp);
                 d = Math.Floor(min / 60);
-                sd = d.ToString();
+                sd = d.ToString(OnlineMapsUtils.numberFormat);
                 m = Math.Round(min % 60, dp);
-                sm = m.ToString();
+                sm = m.ToString(OnlineMapsUtils.numberFormat);
                 if (d < 100) sd = "0" + sd;
                 if (d < 10) sd = "0" + sd;
                 if (m < 10) sm = "0" + sm;
@@ -161,11 +162,11 @@ public static class OnlineMapsDMSConverter
             case "deg+min+sec":
                 var sec = Math.Round(deg * 3600,  dp);
                 d = Math.Floor(sec / 3600);
-                sd = d.ToString();
+                sd = d.ToString(OnlineMapsUtils.numberFormat);
                 m = Math.Floor(sec / 60) % 60;
-                sm = m.ToString();
+                sm = m.ToString(OnlineMapsUtils.numberFormat);
                 double s = Math.Round(sec % 60, dp);
-                string ss = s.ToString();
+                string ss = s.ToString(OnlineMapsUtils.numberFormat);
                 if (d < 100) sd = "0" + sd;
                 if (d < 10) sd = "0" + sd;
                 if (m < 10) sm = "0" + sm;

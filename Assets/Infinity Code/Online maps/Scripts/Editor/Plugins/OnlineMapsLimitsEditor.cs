@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEditor;
 using UnityEngine;
@@ -30,41 +30,10 @@ public class OnlineMapsLimitsEditor:Editor
         pPositionRangeType = serializedObject.FindProperty("positionRangeType");
     }
 
-    private void OnEnable()
-    {
-        CacheFields();
-    }
-
-    public override void OnInspectorGUI()
-    {
-        serializedObject.Update();
-        DrawZoomRangeGUI();
-        DrawPositionRangeGUI();
-        serializedObject.ApplyModifiedProperties();
-    }
-
-    private void DrawZoomRangeGUI()
-    {
-        EditorGUILayout.BeginHorizontal();
-        pUseZoomRange.boolValue = EditorGUILayout.Toggle(pUseZoomRange.boolValue, GUILayout.Width(10));
-        float min = pMinZoom.intValue;
-        float max = pMaxZoom.intValue;
-        EditorGUI.BeginChangeCheck();
-        EditorGUI.BeginDisabledGroup(!pUseZoomRange.boolValue);
-        EditorGUILayout.MinMaxSlider(new GUIContent("Zoom Range (" + min + "-" + max + ")"), ref min, ref max, OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM);
-        EditorGUI.EndDisabledGroup();
-        if (EditorGUI.EndChangeCheck())
-        {
-            pMinZoom.intValue = Mathf.RoundToInt(min);
-            pMaxZoom.intValue = Mathf.RoundToInt(max);
-        }
-        EditorGUILayout.EndHorizontal();
-    }
-
     private void DrawPositionRangeGUI()
     {
         EditorGUILayout.BeginHorizontal();
-        pUsePositionRange.boolValue = EditorGUILayout.Toggle(pUsePositionRange.boolValue, GUILayout.Width(10));
+        pUsePositionRange.boolValue = EditorGUILayout.Toggle(pUsePositionRange.boolValue, GUILayout.Width(14));
 
         EditorGUI.BeginDisabledGroup(!pUsePositionRange.boolValue);
         EditorGUILayout.LabelField("Position Range");
@@ -89,5 +58,37 @@ public class OnlineMapsLimitsEditor:Editor
         else if (pMaxLongitude.floatValue > 180) pMaxLongitude.floatValue = 180;
 
         EditorGUI.EndDisabledGroup();
+    }
+
+    private void DrawZoomRangeGUI()
+    {
+        EditorGUILayout.BeginHorizontal();
+        pUseZoomRange.boolValue = EditorGUILayout.Toggle(pUseZoomRange.boolValue, GUILayout.Width(14));
+        float min = pMinZoom.floatValue;
+        float max = pMaxZoom.floatValue;
+        EditorGUI.BeginChangeCheck();
+        EditorGUI.BeginDisabledGroup(!pUseZoomRange.boolValue);
+
+        EditorGUILayout.MinMaxSlider(new GUIContent("Zoom Range (" + min.ToString("F1") + "-" + max.ToString("F1") + ")"), ref min, ref max, OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM);
+        EditorGUI.EndDisabledGroup();
+        if (EditorGUI.EndChangeCheck())
+        {
+            pMinZoom.floatValue = Mathf.RoundToInt(min * 10) / 10f;
+            pMaxZoom.floatValue = Mathf.RoundToInt(max * 10) / 10f;
+        }
+        EditorGUILayout.EndHorizontal();
+    }
+
+    private void OnEnable()
+    {
+        CacheFields();
+    }
+
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+        DrawZoomRangeGUI();
+        DrawPositionRangeGUI();
+        serializedObject.ApplyModifiedProperties();
     }
 }

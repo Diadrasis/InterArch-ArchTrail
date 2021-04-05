@@ -1,10 +1,10 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Text;
 using UnityEngine;
 
-#if !UNITY_WEBPLAYER && !UNITY_WEBGL
+#if !UNITY_WEBGL
 using System.IO;
 #endif
 
@@ -76,7 +76,7 @@ namespace InfinityCode.OnlineMapsExamples
         /// </summary>
         private void LoadData()
         {
-#if !UNITY_WEBPLAYER && !UNITY_WEBGL
+#if !UNITY_WEBGL
             string filename = "test.gpx";
             if (File.Exists(filename))
             {

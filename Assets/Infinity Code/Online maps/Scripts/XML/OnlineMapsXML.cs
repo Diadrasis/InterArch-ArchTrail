@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections;
@@ -224,8 +224,11 @@ public class OnlineMapsXML : IEnumerable
         if (properties.Length == 2 && string.Equals(properties[0].Name, "HasValue", StringComparison.OrdinalIgnoreCase)) underlyingType = properties[1].PropertyType;
 #endif
 
-        MethodInfo method = OnlineMapsReflectionHelper.GetMethod(underlyingType, "Parse", new[] {typeof (string)});
-        if (method != null) obj = (T)method.Invoke(null, new[] { value });
+        MethodInfo method = OnlineMapsReflectionHelper.GetMethod(underlyingType, "Parse", new[] { typeof(string), typeof(IFormatProvider) });
+        if (method != null) return (T)method.Invoke(null, new object[] { value, OnlineMapsUtils.numberFormat });
+
+        method = OnlineMapsReflectionHelper.GetMethod(underlyingType, "Parse", new[] { typeof(string) });
+        if (method != null) return (T)method.Invoke(null, new[] { value });
 
         return obj;
     }
@@ -270,17 +273,6 @@ public class OnlineMapsXML : IEnumerable
     {
         if (newChild == null) return;
         AppendChild(newChild._element);
-    }
-
-    /// <summary>
-    /// Append a child element.
-    /// </summary>
-    /// <param name="newChild">Element.</param>
-    [Obsolete("This method has a typo. Use AppendChild.")]
-    public void AppentChild(OnlineMapsXML newChild)
-    {
-        if (_element == null || newChild._element == null) return;
-        _element.AppendChild(newChild._element);
     }
 
     /// <summary>
@@ -385,7 +377,7 @@ public class OnlineMapsXML : IEnumerable
     /// <returns>Child element.</returns>
     public OnlineMapsXML Create(string nodeName, float value)
     {
-        return Create(nodeName, value.ToString());
+        return Create(nodeName, value.ToString(OnlineMapsUtils.numberFormat));
     }
 
     /// <summary>
@@ -396,7 +388,7 @@ public class OnlineMapsXML : IEnumerable
     /// <returns>Child element.</returns>
     public OnlineMapsXML Create(string nodeName, double value)
     {
-        return Create(nodeName, value.ToString());
+        return Create(nodeName, value.ToString(OnlineMapsUtils.numberFormat));
     }
 
     /// <summary>
@@ -639,8 +631,13 @@ public class OnlineMapsXML : IEnumerable
 
         try
         {
-            MethodInfo method = OnlineMapsReflectionHelper.GetMethod(underlyingType, "Parse", new[] {typeof (string)});
-            if (method != null) obj = (T)method.Invoke(null, new[] { value });
+            MethodInfo method = OnlineMapsReflectionHelper.GetMethod(underlyingType, "Parse", new[] { typeof(string), typeof(IFormatProvider) });
+            if (method != null) obj = (T)method.Invoke(null, new object[] { value, OnlineMapsUtils.numberFormat });
+            else
+            {
+                method = OnlineMapsReflectionHelper.GetMethod(underlyingType, "Parse", new[] { typeof(string) });
+                obj = (T)method.Invoke(null, new[] { value });
+            }
         }
         catch (Exception exception)
         {

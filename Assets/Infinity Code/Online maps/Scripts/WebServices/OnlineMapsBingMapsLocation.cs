@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// This class is used to search for a location by address using Bing Maps Location API.\n
+/// This class is used to search for a location by address using Bing Maps Location API.<br/>
 /// https://msdn.microsoft.com/en-us/library/ff701715.aspx
 /// </summary>
 public class OnlineMapsBingMapsLocation: OnlineMapsTextWebService
@@ -21,7 +21,7 @@ public class OnlineMapsBingMapsLocation: OnlineMapsTextWebService
         url.AppendFormat("https://dev.virtualearth.net/REST/v1/Locations/{0}?key={1}&o=xml", OnlineMapsWWW.EscapeURL(query), key);
         if (includeNeighborhood) url.Append("&inclnb=1");
         if (maxResults > 0 && maxResults != 5) url.Append("&maxRes=").Append(maxResults);
-        www = OnlineMapsUtils.GetWWW(url);
+        www = new OnlineMapsWWW(url);
         www.OnComplete += OnRequestComplete;
     }
 
@@ -33,7 +33,7 @@ public class OnlineMapsBingMapsLocation: OnlineMapsTextWebService
         StringBuilder url = new StringBuilder();
         url.AppendFormat("https://dev.virtualearth.net/REST/v1/Locations/{0}?key={1}&o=xml", point.y + "," + point.x, key);
         if (includeNeighborhood) url.Append("&inclnb=1");
-        www = OnlineMapsUtils.GetWWW(url);
+        www = new OnlineMapsWWW(url);
         www.OnComplete += OnRequestComplete;
     }
 

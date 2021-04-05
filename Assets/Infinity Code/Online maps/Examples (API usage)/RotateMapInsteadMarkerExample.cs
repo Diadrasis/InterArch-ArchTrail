@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -12,11 +12,14 @@ namespace InfinityCode.OnlineMapsExamples
     public class RotateMapInsteadMarkerExample : MonoBehaviour
     {
         private OnlineMapsMarker marker;
+        private OnlineMapsCameraOrbit cameraOrbit;
 
         private void Start()
         {
+            cameraOrbit = OnlineMapsCameraOrbit.instance;
+
             // Create a new marker.
-            marker = OnlineMaps.instance.AddMarker(new Vector2(), "Player");
+            marker = OnlineMapsMarkerManager.CreateItem(new Vector2(), "Player");
 
             // Subscribe to UpdateBefore event.
             OnlineMaps.instance.OnUpdateBefore += OnUpdateBefore;
@@ -25,7 +28,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void OnUpdateBefore()
         {
             // Update camera rotation
-            OnlineMapsTileSetControl.instance.cameraRotation = new Vector2(30, marker.rotation * 360);
+            cameraOrbit.rotation = new Vector2(30, marker.rotation * 360);
         }
     }
 }

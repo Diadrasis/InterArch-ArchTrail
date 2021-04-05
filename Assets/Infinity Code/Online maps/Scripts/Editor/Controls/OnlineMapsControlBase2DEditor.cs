@@ -1,10 +1,11 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEditor;
 
 [CustomEditor(typeof(OnlineMapsControlBase2D), true)]
-public class OnlineMapsControlBase2DEditor : OnlineMapsControlBaseEditor
+public abstract class OnlineMapsControlBase2DEditor<T> : OnlineMapsControlBaseEditor<T>
+    where T: OnlineMapsControlBase2D
 {
 
 }

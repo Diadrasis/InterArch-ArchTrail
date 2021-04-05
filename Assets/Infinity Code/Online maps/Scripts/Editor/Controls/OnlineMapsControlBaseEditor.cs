@@ -1,63 +1,55 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
-using System;
-using System.Globalization;
 using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(OnlineMapsControlBase), true)]
-public class OnlineMapsControlBaseEditor:Editor
+public abstract class OnlineMapsControlBaseEditor<T> : OnlineMapsFormattedEditor
+    where T : OnlineMapsControlBase
 {
-    public static void CheckMultipleInstances(OnlineMapsControlBase control, ref bool dirty)
+    protected OnlineMaps map;
+    protected T control;
+
+    protected LayoutItem warningLayoutItem;
+
+    protected SerializedProperty allowUserControl;
+    protected SerializedProperty allowZoom;
+    protected SerializedProperty invertTouchZoom;
+    protected SerializedProperty zoomInOnDoubleClick;
+    protected SerializedProperty zoomMode;
+    protected SerializedProperty smoothZoom;
+    protected SerializedProperty zoomSensitivity;
+
+    protected override void CacheSerializedFields()
     {
-        OnlineMapsControlBase[] controls = control.GetComponents<OnlineMapsControlBase>();
-        if (controls.Length > 1)
-        {
-            EditorGUILayout.BeginVertical(GUI.skin.box);
-
-            EditorGUILayout.HelpBox("Problem detected:\nMultiple instances of controls.\nYou can use only one control.", MessageType.Error);
-
-            int controlIndex = -1;
-
-            for (int i = 0; i < controls.Length; i++)
-            {
-                if (GUILayout.Button("Use " + controls[i].GetType())) controlIndex = i;
-            }
-
-            if (controlIndex != -1)
-            {
-                OnlineMapsControlBase activeControl = controls[controlIndex];
-                foreach (OnlineMapsControlBase c in controls) if (c != activeControl) OnlineMapsUtils.DestroyImmediate(c);
-                dirty = true;
-            }
-
-            EditorGUILayout.EndVertical();
-        }
+        allowUserControl = serializedObject.FindProperty("allowUserControl");
+        allowZoom = serializedObject.FindProperty("allowZoom");
+        invertTouchZoom = serializedObject.FindProperty("invertTouchZoom");
+        zoomInOnDoubleClick = serializedObject.FindProperty("zoomInOnDoubleClick");
+        zoomMode = serializedObject.FindProperty("zoomMode");
+        zoomMode = serializedObject.FindProperty("zoomMode");
+        smoothZoom = serializedObject.FindProperty("smoothZoom");
+        zoomSensitivity = serializedObject.FindProperty("zoomSensitivity");
     }
 
-    public static void CheckTarget(OnlineMaps map, OnlineMapsTarget target, ref bool dirty)
+    protected override void GenerateLayoutItems()
     {
-        if (map == null) return;
-        if (map.target == target) return;
+        base.GenerateLayoutItems();
 
-        EditorGUILayout.BeginVertical(GUI.skin.box);
-
-        string targetName = Enum.GetName(typeof(OnlineMapsTarget), target);
-        targetName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(targetName);
-        EditorGUILayout.HelpBox("Problem detected:\nWrong target.\nFor this control target must be " + targetName + "!", MessageType.Error);
-        if (GUILayout.Button("Fix Target"))
-        {
-            map.target = target;
-            dirty = true;
-        }
-
-        EditorGUILayout.EndVertical();
+        warningLayoutItem = rootLayoutItem.Create("WarningArea");
+        rootLayoutItem.Create(allowUserControl);
+        LayoutItem lZoom = rootLayoutItem.Create(allowZoom);
+        lZoom.drawGroup = LayoutItem.Group.valueOn;
+        lZoom.Create(zoomMode);
+        lZoom.Create(zoomSensitivity);
+        lZoom.Create(zoomInOnDoubleClick);
+        lZoom.Create(invertTouchZoom);
+        lZoom.Create(smoothZoom);
     }
 
-    public static OnlineMaps GetOnlineMaps(OnlineMapsControlBase control)
+    private static OnlineMaps GetOnlineMaps(OnlineMapsControlBase control)
     {
-        if (control == null) return null;
         OnlineMaps map = control.GetComponent<OnlineMaps>();
 
         if (map == null)
@@ -70,7 +62,6 @@ public class OnlineMapsControlBaseEditor:Editor
             {
                 map = control.gameObject.AddComponent<OnlineMaps>();
                 UnityEditorInternal.ComponentUtility.MoveComponentUp(map);
-                if (control is OnlineMapsTileSetControl) map.target = OnlineMapsTarget.tileset;
             }
 
             EditorGUILayout.EndVertical();
@@ -78,13 +69,30 @@ public class OnlineMapsControlBaseEditor:Editor
         return map;
     }
 
-    public override void OnInspectorGUI()
+    protected override void OnDisable()
     {
-        GUILayout.Label("Please do not use this Control.\nIt is the base class for other Controls.", OnlineMapsEditor.warningStyle);
+        base.OnDisable();
 
-        if (GUILayout.Button("Remove"))
-        {
-            OnlineMapsUtils.DestroyImmediate(target);
-        }
+        map = null;
+        control = null;
+    }
+
+    protected override void OnEnableBefore()
+    {
+        base.OnEnableBefore();
+
+        control = (T)target;
+        map = GetOnlineMaps(control);
+        if (control.GetComponent<OnlineMapsMarkerManager>() == null) control.gameObject.AddComponent<OnlineMapsMarkerManager>();
+    }
+
+    protected override void OnSetDirty()
+    {
+        base.OnSetDirty();
+
+        EditorUtility.SetDirty(map);
+        EditorUtility.SetDirty(control);
+
+        if (OnlineMaps.isPlaying) map.Redraw();
     }
 }

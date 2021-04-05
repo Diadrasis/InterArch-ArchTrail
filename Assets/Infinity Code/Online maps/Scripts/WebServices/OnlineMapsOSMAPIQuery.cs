@@ -1,29 +1,25 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// This class is used to request to Open Street Map Overpass API.\n
-/// You can create a new instance using OnlineMapsOSMAPIQuery.Find.\n
-/// Open Street Map Overpass API documentation: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide \n
-/// You can test your queries using: http://overpass-turbo.eu/ \n
+/// This class is used to request to Open Street Map Overpass API.<br/>
+/// You can create a new instance using OnlineMapsOSMAPIQuery.Find.<br/>
+/// Open Street Map Overpass API documentation: http://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide <br/>
+/// You can test your queries using: http://overpass-turbo.eu/ 
 /// </summary>
 public class OnlineMapsOSMAPIQuery: OnlineMapsTextWebService
 {
-    /// <summary>
-    /// Constructor.
-    /// Use OnlineMapsOSMAPIQuery.Find for create request.
-    /// </summary>
-    /// <param name="data">Overpass QL request</param>
+    private static string osmURL = "https://overpass-api.de/api/interpreter?data=";
+
     private OnlineMapsOSMAPIQuery(string data)
     {
         _status = OnlineMapsQueryStatus.downloading;
-        string url = "https://overpass.kumi.systems/api/interpreter?data=" + OnlineMapsWWW.EscapeURL(data);
-        www = OnlineMapsUtils.GetWWW(url);
+        string url = osmURL + OnlineMapsWWW.EscapeURL(data);
+        www = new OnlineMapsWWW(url);
         www.OnComplete += OnRequestComplete;
     }
 
@@ -35,6 +31,15 @@ public class OnlineMapsOSMAPIQuery: OnlineMapsTextWebService
     public static OnlineMapsOSMAPIQuery Find(string data)
     {
         return new OnlineMapsOSMAPIQuery(data);
+    }
+
+    public static void InitOSMServer(OnlineMapsOSMOverpassServer server)
+    {
+        if (server == OnlineMapsOSMOverpassServer.main) osmURL = "https://overpass-api.de/api/interpreter?data=";
+        else if (server == OnlineMapsOSMOverpassServer.main2) osmURL = "https://z.overpass-api.de/api/interpreter?data=";
+        else if (server == OnlineMapsOSMOverpassServer.french) osmURL = "https://overpass.openstreetmap.fr/api/interpreter?data=";
+        else if (server == OnlineMapsOSMOverpassServer.taiwan) osmURL = "https://overpass.nchc.org.tw/api/interpreter?data=";
+        else if (server == OnlineMapsOSMOverpassServer.kumiSystems) osmURL = "https://overpass.kumi.systems/api/interpreter?data=";
     }
 
     /// <summary>
@@ -184,7 +189,7 @@ public class OnlineMapsOSMAPIQuery: OnlineMapsTextWebService
     }
 
     /// <summary>
-    /// Fast XML parser optimized for OSM response.\n
+    /// Fast XML parser optimized for OSM response.<br/>
     /// It has very limited support for XML and is not recommended for parsing any data except OSM response.
     /// </summary>
     public class OSMXMLNode
@@ -298,93 +303,6 @@ public class OnlineMapsOSMAPIQuery: OnlineMapsTextWebService
                 }
                 i++;
             }
-        }
-
-        private void ParseValue(string s, ref int i)
-        {
-            int it = 0;
-            while (i < l)
-            {
-                if (it++ > 1000000)
-                {
-                    Debug.Log("it > 1000000");
-                    return;
-                }
-                char c = s[i];
-                if (c == '<')
-                {
-                    if (s[i + 1] == '/')
-                    {
-                        int it2 = 0;
-                        while (i < l)
-                        {
-                            if (it2++ > 1000)
-                            {
-                                Debug.Log("it2 > 1000");
-                                return;
-                            }
-
-                            if (s[i] == '>')
-                            {
-                                i++;
-                                return;
-                            }
-                            i++;
-                        }
-                    }
-                    else ParseChild(s, ref i);
-                }
-                else if (c == ' ' || c == '\n' || c == '\t')
-                {
-                    // Ignore
-                }
-                else
-                {
-                    //Load string value
-                    int si = i;
-                    int ei = -1;
-                    int it2 = 0;
-                    while (i < l)
-                    {
-                        if (it2++ > 1000)
-                        {
-                            Debug.Log("it2 > 1000");
-                            return;
-                        }
-                        if (s[i] == '<' && s[i + 1] == '/')
-                        {
-                            ei = i;
-                            break;
-                        }
-                        i++;
-                    }
-                    value = s.Substring(si, ei - si);
-                    it2 = 0;
-                    while (i < l)
-                    {
-                        if (it2++ > 1000)
-                        {
-                            Debug.Log("it2 > 1000");
-                            return;
-                        }
-
-                        if (s[i] == '>')
-                        {
-                            i++;
-                            return;
-                        }
-                        i++;
-                    }
-                }
-                i++;
-            }
-        }
-
-        private void ParseChild(string s, ref int i)
-        {
-            OSMXMLNode child = new OSMXMLNode(s, ref i);
-            if (childs == null) childs = new List<OSMXMLNode>();
-            childs.Add(child);
         }
 
         public string GetAttribute(string key)
@@ -524,7 +442,6 @@ public class OnlineMapsOSMAPIQuery: OnlineMapsTextWebService
                 i = ei + 1;
                 GetAttributeValue(s, i, out si, out ei);
                 string value = s.Substring(si, ei - si);
-                
                 attributeKeys[attributeCount] = key;
                 attributeValues[attributeCount] = value;
                 attributeCount++;
@@ -533,6 +450,93 @@ public class OnlineMapsOSMAPIQuery: OnlineMapsTextWebService
                 return true;
             }
             return false;
+        }
+
+        private void ParseChild(string s, ref int i)
+        {
+            OSMXMLNode child = new OSMXMLNode(s, ref i);
+            if (childs == null) childs = new List<OSMXMLNode>();
+            childs.Add(child);
+        }
+
+        private void ParseValue(string s, ref int i)
+        {
+            int it = 0;
+            while (i < l)
+            {
+                if (it++ > 1000000)
+                {
+                    Debug.Log("it > 1000000");
+                    return;
+                }
+                char c = s[i];
+                if (c == '<')
+                {
+                    if (s[i + 1] == '/')
+                    {
+                        int it2 = 0;
+                        while (i < l)
+                        {
+                            if (it2++ > 1000)
+                            {
+                                Debug.Log("it2 > 1000");
+                                return;
+                            }
+
+                            if (s[i] == '>')
+                            {
+                                i++;
+                                return;
+                            }
+                            i++;
+                        }
+                    }
+                    else ParseChild(s, ref i);
+                }
+                else if (c == ' ' || c == '\n' || c == '\t')
+                {
+                    // Ignore
+                }
+                else
+                {
+                    //Load string value
+                    int si = i;
+                    int ei = -1;
+                    int it2 = 0;
+                    while (i < l)
+                    {
+                        if (it2++ > 1000)
+                        {
+                            Debug.Log("it2 > 1000");
+                            return;
+                        }
+                        if (s[i] == '<' && s[i + 1] == '/')
+                        {
+                            ei = i;
+                            break;
+                        }
+                        i++;
+                    }
+                    value = s.Substring(si, ei - si);
+                    it2 = 0;
+                    while (i < l)
+                    {
+                        if (it2++ > 1000)
+                        {
+                            Debug.Log("it2 > 1000");
+                            return;
+                        }
+
+                        if (s[i] == '>')
+                        {
+                            i++;
+                            return;
+                        }
+                        i++;
+                    }
+                }
+                i++;
+            }
         }
     }
 }

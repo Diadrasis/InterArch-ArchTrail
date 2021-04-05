@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections;
@@ -9,18 +9,22 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 /// <summary>
 /// Helper class, which contains all the basic methods.
 /// </summary>
+#if UNITY_EDITOR
+[InitializeOnLoad]
+#endif
 public static class OnlineMapsUtils
 {
-    /// <summary>
-    /// Intercepts requests to download and allows you to create a custom query behavior.
-    /// </summary>
-    public static Func<string, OnlineMapsWWW> OnGetWWW;
+    public static string persistentDataPath;
 
     /// <summary>
     /// Arcseconds in meters.
@@ -71,6 +75,21 @@ public static class OnlineMapsUtils
     /// tileSize squared, to accelerate the calculations.
     /// </summary>
     public const int sqrTileSize = tileSize * tileSize;
+
+    public static CultureInfo cultureInfo
+    {
+        get { return CultureInfo.InvariantCulture; }
+    }
+
+    public static NumberFormatInfo numberFormat
+    {
+        get { return cultureInfo.NumberFormat; }
+    }
+
+    static OnlineMapsUtils()
+    {
+        persistentDataPath = Application.persistentDataPath;
+    }
 
     /// <summary>
     /// The angle between the two points in degree.
@@ -190,7 +209,7 @@ public static class OnlineMapsUtils
 
     public static T DeepCopy<T>(object obj)
     {
-        return (T)DeepCopy(obj, typeof(T));
+        return (T) DeepCopy(obj, typeof (T));
     }
 
     public static object DeepCopy(object obj, Type targetType)
@@ -344,15 +363,18 @@ public static class OnlineMapsUtils
     /// Removes a gameobject, component or asset.
     /// </summary>
     /// <param name="obj">The object to destroy.</param>
-    public static void DestroyImmediate(UnityEngine.Object obj)
+    public static void Destroy(Object obj)
     {
         if (obj == null) return;
 
 #if UNITY_EDITOR
-        if (Application.isPlaying) UnityEngine.Object.Destroy(obj);
-        else UnityEngine.Object.DestroyImmediate(obj);
+        if (OnlineMaps.isPlaying)
+        {
+            if (obj.GetInstanceID() < 0) Object.Destroy(obj);
+        }
+        else Object.DestroyImmediate(obj);
 #else
-        UnityEngine.Object.Destroy(obj);
+        Object.Destroy(obj);
 #endif
     }
 
@@ -373,6 +395,7 @@ public static class OnlineMapsUtils
         double sizeX2 = Math.Abs(R * Math.Acos(sctY * sctY + cctY * cctY * cX));
         float sizeX = (float)((sizeX1 + sizeX2) / 2.0);
         float sizeY = (float)(R * Math.Acos(scfY * sctY + ccfY * cctY));
+        if (float.IsNaN(sizeX)) sizeX = 0;
         if (float.IsNaN(sizeY)) sizeY = 0;
         return new Vector2(sizeX, sizeY);
     }
@@ -397,7 +420,37 @@ public static class OnlineMapsUtils
         double sizeX2 = Math.Abs(R * Math.Acos(sctY * sctY + cctY * cctY * cX));
         dx = (sizeX1 + sizeX2) / 2.0;
         dy = R * Math.Acos(scfY * sctY + ccfY * cctY);
+        if (double.IsNaN(dx)) dx = 0;
         if (double.IsNaN(dy)) dy = 0;
+    }
+
+    /// <summary>
+    /// The distance between two geographical coordinates with altitude.
+    /// </summary>
+    /// <param name="x1">Longitude 1</param>
+    /// <param name="y1">Latitude 1</param>
+    /// <param name="a1">Altitude 1 (km)</param>
+    /// <param name="x2">Longitude 2</param>
+    /// <param name="y2">Latitude 2</param>
+    /// <param name="a2">Altitude 2 (km)</param>
+    /// <returns>Distance (km).</returns>
+    public static double DistanceBetweenPoints(double x1, double y1, double a1, double x2, double y2, double a2)
+    {
+        double r = R + Math.Min(a1, a2);
+        double scfY = Math.Sin(y1 * Deg2Rad);
+        double sctY = Math.Sin(y2 * Deg2Rad);
+        double ccfY = Math.Cos(y1 * Deg2Rad);
+        double cctY = Math.Cos(y2 * Deg2Rad);
+        double cX = Math.Cos((x1 - x2) * Deg2Rad);
+        double sizeX1 = Math.Abs(r * Math.Acos(scfY * scfY + ccfY * ccfY * cX));
+        double sizeX2 = Math.Abs(r * Math.Acos(sctY * sctY + cctY * cctY * cX));
+        double dx = (sizeX1 + sizeX2) / 2.0;
+        double dy = r * Math.Acos(scfY * sctY + ccfY * cctY);
+        if (double.IsNaN(dx)) dx = 0;
+        if (double.IsNaN(dy)) dy = 0;
+        double d = Math.Sqrt(dx * dx + dy * dy);
+        double hd = Math.Abs(a1 - a2);
+        return Math.Sqrt(d * d + hd * hd);
     }
 
     /// <summary>
@@ -441,7 +494,7 @@ public static class OnlineMapsUtils
                     else
                     {
                         double ox, oy;
-                        if (type == 0) DistanceBetweenPoints((double)pv1, (double)pv2, (double)v1, (double)v2, out ox, out oy);
+                        if (type == 0) DistanceBetweenPoints((double) pv1, (double) pv2, (double) v1, (double) v2, out ox, out oy);
                         else DistanceBetweenPoints((float)pv1, (float)pv2, (float)v1, (float)v2, out ox, out oy);
                         dx += ox;
                         dy += oy;
@@ -487,6 +540,7 @@ public static class OnlineMapsUtils
         double sizeX2 = Math.Abs(R * Math.Acos(sctY * sctY + cctY * cctY * cX));
         double sizeX = (sizeX1 + sizeX2) / 2.0;
         double sizeY = R * Math.Acos(scfY * sctY + ccfY * cctY);
+        if (double.IsNaN(sizeX)) sizeX = 0;
         if (double.IsNaN(sizeY)) sizeY = 0;
         return Math.Sqrt(sizeX * sizeX + sizeY * sizeY);
     }
@@ -525,10 +579,11 @@ public static class OnlineMapsUtils
     /// <param name="markers">Array of markers.</param>
     /// <param name="center">Center point.</param>
     /// <param name="zoom">Best zoom.</param>
-    public static void GetCenterPointAndZoom(OnlineMapsMarkerBase[] markers, out Vector2 center, out int zoom)
+    /// <param name="inset">Inset for finding a cropped zoom level.</param>
+    public static void GetCenterPointAndZoom(OnlineMapsMarkerBase[] markers, out Vector2 center, out int zoom, Vector2 inset = default(Vector2))
     {
         center = new Vector2();
-        zoom = 3;
+        zoom = OnlineMaps.MINZOOM;
         if (markers == null || markers.Length == 0) return;
 
         OnlineMaps map = OnlineMaps.instance;
@@ -567,13 +622,16 @@ public static class OnlineMapsUtils
 
         int width = map.width;
         int height = map.height;
+        double xTileOffset = inset.x * width;
+        double yTileOffset = inset.y * height;
+
 
         float countX = width / (float)tileSize / 2;
         float countY = height / (float)tileSize / 2;
 
         bool useZoomMin = false;
 
-        for (int z = OnlineMaps.MAXZOOM; z > 3; z--)
+        for (int z = OnlineMaps.MAXZOOM; z > OnlineMaps.MINZOOM; z--)
         {
             bool success = true;
 
@@ -594,13 +652,15 @@ public static class OnlineMapsUtils
 
                 px -= cx - countX;
                 py -= cy - countY;
+                px *= tileSize;
+                py *= tileSize;
 
                 if (marker is OnlineMapsMarker)
                 {
                     useZoomMin = true;
                     OnlineMapsMarker m = marker as OnlineMapsMarker;
-                    OnlineMapsVector2i ip = m.GetAlignedPosition((int)(px * tileSize), (int)(py * tileSize));
-                    if (ip.x < 0 || ip.y < 0 || ip.x + m.width > width || ip.y + m.height > height)
+                    OnlineMapsVector2i ip = m.GetAlignedPosition((int)px, (int)py);
+                    if (ip.x < xTileOffset || ip.y < yTileOffset || ip.x + m.width > width - xTileOffset || ip.y + m.height > height - yTileOffset)
                     {
                         success = false;
                         break;
@@ -608,7 +668,7 @@ public static class OnlineMapsUtils
                 }
                 else if (marker is OnlineMapsMarker3D)
                 {
-                    if (px < 0 || py < 0 || px > width || py > height)
+                    if (px < xTileOffset || py < yTileOffset || px > width - xTileOffset || py > height - yTileOffset)
                     {
                         success = false;
                         break;
@@ -627,7 +687,7 @@ public static class OnlineMapsUtils
             }
         }
 
-        zoom = 3;
+        zoom = OnlineMaps.MINZOOM;
     }
 
     /// <summary>
@@ -636,10 +696,11 @@ public static class OnlineMapsUtils
     /// <param name="positions">Array of coordinates</param>
     /// <param name="center">Center coordinate</param>
     /// <param name="zoom">Best zoom</param>
-    public static void GetCenterPointAndZoom(Vector2[] positions, out Vector2 center, out int zoom)
+    /// <param name="inset">Inset for finding a cropped zoom level.</param>
+    public static void GetCenterPointAndZoom(Vector2[] positions, out Vector2 center, out int zoom, Vector2 inset = default(Vector2))
     {
         center = new Vector2();
-        zoom = 3;
+        zoom = OnlineMaps.MINZOOM;
         if (positions == null || positions.Length == 0) return;
 
         OnlineMaps map = OnlineMaps.instance;
@@ -677,11 +738,13 @@ public static class OnlineMapsUtils
 
         int width = map.width;
         int height = map.height;
+        double xTileOffset = inset.x * width;
+        double yTileOffset = inset.y * height;
 
         float countX = width / (float)tileSize / 2;
         float countY = height / (float)tileSize / 2;
 
-        for (int z = OnlineMaps.MAXZOOM; z > 3; z--)
+        for (int z = OnlineMaps.MAXZOOM; z > OnlineMaps.MINZOOM; z--)
         {
             bool success = true;
 
@@ -701,8 +764,10 @@ public static class OnlineMapsUtils
 
                 px -= cx - countX;
                 py -= cy - countY;
+                px *= tileSize;
+                py *= tileSize;
 
-                if (px < 0 || py < 0 || px > width || py > height)
+                if (px < xTileOffset || py < yTileOffset || px > width - xTileOffset || py > height - yTileOffset)
                 {
                     success = false;
                     break;
@@ -715,11 +780,11 @@ public static class OnlineMapsUtils
             }
         }
 
-        zoom = 3;
+        zoom = OnlineMaps.MINZOOM;
     }
 
     /// <summary>
-    /// Given a start point, angle and distance, this will calculate the destina­tion point travelling along a (shortest distance) great circle arc.
+    /// Given a start point, angle and distance, this will calculate the destination point travelling along a (shortest distance) great circle arc.
     /// </summary>
     /// <param name="lng">Longitude of start point</param>
     /// <param name="lat">Latitude of start point</param>
@@ -776,7 +841,7 @@ public static class OnlineMapsUtils
         int state;
         resultx = 0;
         resulty = 0;
-
+        
         float m = (p22x - p21x) * (p11y - p21y) - (p22y - p21y) * (p11x - p21x);
         float n = (p22y - p21y) * (p12x - p11x) - (p22x - p21x) * (p12y - p11y);
 
@@ -797,6 +862,7 @@ public static class OnlineMapsUtils
     {
         return GetIntersectionPointOfTwoLines(new Vector2(p11.x, p11.z), new Vector2(p12.x, p12.z), new Vector2(p21.x, p21.z), new Vector2(p22.x, p22.z), out state);
     }
+
     public static Object GetObject(int tid)
     {
 #if UNITY_EDITOR
@@ -806,6 +872,7 @@ public static class OnlineMapsUtils
         return null;
 #endif
     }
+
     public static void GetValuesFromEnum(StringBuilder builder, string key, Type type, int value)
     {
         builder.Append("&").Append(key).Append("=");
@@ -822,50 +889,6 @@ public static class OnlineMapsUtils
                 addSeparator = true;
             }
         }
-    }
-
-    /// <summary>
-    /// Gets Webplayes safe URL.
-    /// </summary>
-    /// <param name="url">Original URL.</param>
-    /// <returns>Webplayer safe URL.</returns>
-    public static OnlineMapsWWW GetWWW(string url)
-    {
-#if UNITY_IOS
-        url = url.Replace("|", "%7C");
-#endif
-
-        if (OnGetWWW != null)
-        {
-            OnlineMapsWWW www = OnGetWWW(url);
-            if (www != null) return www;
-        }
-
-#if UNITY_WEBPLAYER || (UNITY_WEBGL && !UNITY_EDITOR)
-        if (OnlineMaps.instance.useWebplayerProxy) 
-        {
-#if UNITY_WEBPLAYER
-            return new OnlineMapsWWW(OnlineMaps.instance.webplayerProxyURL + url);
-#else
-            string[] webglUseProxyFor =
-            {
-                ".virtualearth.net"
-            };
-            if (webglUseProxyFor.Any(p => url.Contains(p))) return new OnlineMapsWWW(OnlineMaps.instance.webplayerProxyURL + url);
-#endif
-        }
-#endif
-        return new OnlineMapsWWW(url);
-    }
-
-    /// <summary>
-    /// Gets Webplayes safe URL.
-    /// </summary>
-    /// <param name="url">Original URL.</param>
-    /// <returns>Webplayer safe URL.</returns>
-    public static OnlineMapsWWW GetWWW(StringBuilder url)
-    {
-        return GetWWW(url.ToString());
     }
 
     /// <summary>
@@ -957,20 +980,19 @@ public static class OnlineMapsUtils
 
     public static Vector2 LineIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4)
     {
-        double Ax, Bx, Cx, Ay, By, Cy, d, e, f, num, offset;
         double x1lo, x1hi, y1lo, y1hi;
 
-        Ax = p2.x - p1.x;
-        Bx = p3.x - p4.x;
+        double Ax = p2.x - p1.x;
+        double Bx = p3.x - p4.x;
 
         if (Ax < 0)
         {
-            x1lo = p2.x;
+            x1lo = p2.x; 
             x1hi = p1.x;
         }
         else
         {
-            x1hi = p2.x;
+            x1hi = p2.x; 
             x1lo = p1.x;
         }
 
@@ -983,17 +1005,17 @@ public static class OnlineMapsUtils
             if (x1hi < p3.x || p4.x < x1lo) return Vector2.zero;
         }
 
-        Ay = p2.y - p1.y;
-        By = p3.y - p4.y;
+        double Ay = p2.y - p1.y;
+        double By = p3.y - p4.y;
 
         if (Ay < 0)
         {
-            y1lo = p2.y;
+            y1lo = p2.y; 
             y1hi = p1.y;
         }
         else
         {
-            y1hi = p2.y;
+            y1hi = p2.y; 
             y1lo = p1.y;
         }
 
@@ -1006,10 +1028,10 @@ public static class OnlineMapsUtils
             if (y1hi < p3.y || p4.y < y1lo) return Vector2.zero;
         }
 
-        Cx = p1.x - p3.x;
-        Cy = p1.y - p3.y;
-        d = By * Cx - Bx * Cy;
-        f = Ay * Bx - Ax * By;
+        double Cx = p1.x - p3.x;
+        double Cy = p1.y - p3.y;
+        double d = By * Cx - Bx * Cy;
+        double f = Ay * Bx - Ax * By;
 
         if (f > 0)
         {
@@ -1020,7 +1042,7 @@ public static class OnlineMapsUtils
             if (d > 0 || d < f) return Vector2.zero;
         }
 
-        e = Ax * Cy - Ay * Cx;
+        double e = Ax * Cy - Ay * Cx;
 
         if (f > 0)
         {
@@ -1035,8 +1057,8 @@ public static class OnlineMapsUtils
 
         Vector2 intersection;
 
-        num = d * Ax;
-        offset = same_sign(num, f) ? f * 0.5 : -f * 0.5;
+        double num = d * Ax;
+        double offset = same_sign(num, f) ? f * 0.5 : -f * 0.5;
         intersection.x = (float)(p1.x + (num + offset) / f);
 
         num = d * Ay;
@@ -1057,7 +1079,7 @@ public static class OnlineMapsUtils
         bool c = false;
         for (i = 0, j = poly.Count - 1; i < poly.Count; j = i++)
         {
-            if (((poly[i].y <= y && y < poly[j].y) || (poly[j].y <= y && y < poly[i].y)) &&
+            if (((poly[i].y <= y && y < poly[j].y) || (poly[j].y <= y && y < poly[i].y)) && 
                 x < (poly[j].x - poly[i].x) * (y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x)
                 c = !c;
         }
@@ -1098,8 +1120,8 @@ public static class OnlineMapsUtils
             {
                 if (i > 0)
                 {
-                    Vector2 p1 = (Vector2)v2;
-                    Vector2 p2 = (Vector2)v1;
+                    Vector2 p1 = (Vector2) v2;
+                    Vector2 p2 = (Vector2) v1;
                     if (((p2.y <= y && y < p1.y) || (p1.y <= y && y < p2.y)) && x < (p1.x - p2.x) * (y - p2.y) / (p1.y - p2.y) + p2.x) c = !c;
                 }
             }
@@ -1116,10 +1138,10 @@ public static class OnlineMapsUtils
             {
                 if (valueType == 1)
                 {
-                    float p1x = (float)v4;
-                    float p1y = (float)v3;
-                    float p2x = (float)v2;
-                    float p2y = (float)v1;
+                    float p1x = (float) v4;
+                    float p1y = (float) v3;
+                    float p2x = (float) v2;
+                    float p2y = (float) v1;
 
                     if (((p2y <= y && y < p1y) || (p1y <= y && y < p2y)) && x < (p1x - p2x) * (y - p2y) / (p1y - p2y) + p2x) c = !c;
                 }
@@ -1204,6 +1226,7 @@ public static class OnlineMapsUtils
     /// <returns>Mercator coordinates</returns>
     public static Vector2 LatLongToMercat(float x, float y)
     {
+        // TODO: Move to projection
         float sy = Mathf.Sin(y * Mathf.Deg2Rad);
         return new Vector2((x + 180) / 360, 0.5f - Mathf.Log((1 + sy) / (1 - sy)) / pi4);
     }
@@ -1215,6 +1238,7 @@ public static class OnlineMapsUtils
     /// <param name="y">Latitude</param>
     public static void LatLongToMercat(ref float x, ref float y)
     {
+        // TODO: Move to projection
         float sy = Mathf.Sin(y * Mathf.Deg2Rad);
         x = (x + 180) / 360;
         y = 0.5f - Mathf.Log((1 + sy) / (1 - sy)) / pi4;
@@ -1227,157 +1251,10 @@ public static class OnlineMapsUtils
     /// <param name="y">Latitude</param>
     public static void LatLongToMercat(ref double x, ref double y)
     {
+        // TODO: Move to projection
         double sy = Math.Sin(y * Deg2Rad);
         x = (x + 180) / 360;
         y = 0.5 - Math.Log((1 + sy) / (1 - sy)) / (Math.PI * 4);
-    }
-
-    /// <summary>
-    /// Converts geographic coordinates to the index of the tile.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="x">Longitude</param>
-    /// <param name="y">Latitude</param>
-    /// <param name="zoom">Zoom</param>
-    /// <returns>Tile index</returns>
-    [Obsolete("Use OnlineMaps.instance.projection.CoordinatesToTile")]
-    private static OnlineMapsVector2i LatLongToTile(float x, float y, int zoom)
-    {
-        LatLongToMercat(ref x, ref y);
-        uint mapSize = (uint)tileSize << zoom;
-        int px = (int)Clip(x * mapSize + 0.5, 0, mapSize - 1);
-        int py = (int)Clip(y * mapSize + 0.5, 0, mapSize - 1);
-        int ix = px / tileSize;
-        int iy = py / tileSize;
-
-        return new OnlineMapsVector2i(ix, iy);
-    }
-
-    /// <summary>
-    /// Converts geographic coordinates to the index of the tile.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="p">Geographic coordinates (X - Lng, Y - Lat)</param>
-    /// <param name="zoom">Zoom</param>
-    /// <returns>Tile index</returns>
-    [Obsolete("Use OnlineMaps.instance.projection.CoordinatesToTile")]
-    public static OnlineMapsVector2i LatLongToTile(Vector2 p, int zoom)
-    {
-        return LatLongToTile(p.x, p.y, zoom);
-    }
-
-    /// <summary>
-    /// Converts geographic coordinates to the index of the tile.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="x">Longitude.</param>
-    /// <param name="y">Latitude.</param>
-    /// <param name="zoom">Zoom</param>
-    /// <returns>Tile index</returns>
-    [Obsolete("Use OnlineMaps.instance.projection.CoordinatesToTile")]
-    public static OnlineMapsVector2i LatLongToTile(double x, double y, int zoom)
-    {
-        LatLongToMercat(ref x, ref y);
-        uint mapSize = (uint)tileSize << zoom;
-        int px = (int)Clip(x * mapSize + 0.5, 0, mapSize - 1);
-        int py = (int)Clip(y * mapSize + 0.5, 0, mapSize - 1);
-        int ix = px / tileSize;
-        int iy = py / tileSize;
-
-        return new OnlineMapsVector2i(ix, iy);
-    }
-
-    /// <summary>
-    /// Converts geographic coordinates to the index of the tile.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="dx">Longitude</param>
-    /// <param name="dy">Latitude</param>
-    /// <param name="zoom">Zoom</param>
-    /// <param name="tx">Tile X</param>
-    /// <param name="ty">Tile Y</param>
-    [Obsolete("Use OnlineMaps.instance.projection.CoordinatesToTile")]
-    public static void LatLongToTiled(double dx, double dy, int zoom, out double tx, out double ty)
-    {
-        double sy = Math.Sin(dy * Deg2Rad);
-        dx = (dx + 180) / 360;
-        dy = 0.5 - Math.Log((1 + sy) / (1 - sy)) / (Math.PI * 4);
-        uint mapSize = (uint)tileSize << zoom;
-        double px = dx * mapSize + 0.5;
-        double py = dy * mapSize + 0.5;
-        if (px < 0) px = 0;
-        else if (px > mapSize - 1) px = mapSize - 1;
-        if (py < 0) py = 0;
-        else if (py > mapSize - 1) py = mapSize - 1;
-        tx = px / tileSize;
-        ty = py / tileSize;
-    }
-
-    /// <summary>
-    /// Converts geographic coordinates to tile coordinates.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="p">Geographic coordinates (X - Lng, Y - Lat)</param>
-    /// <param name="zoom">Zoom</param>
-    /// <returns>Tile coordinates</returns>
-    [Obsolete("Use OnlineMaps.instance.projection.CoordinatesToTile")]
-    public static Vector2 LatLongToTilef(Vector2 p, int zoom)
-    {
-        LatLongToMercat(ref p.x, ref p.y);
-        uint mapSize = (uint)tileSize << zoom;
-        float px = (float)Clip(p.x * mapSize + 0.5, 0, mapSize - 1);
-        float py = (float)Clip(p.y * mapSize + 0.5, 0, mapSize - 1);
-        float fx = px / tileSize;
-        float fy = py / tileSize;
-
-        return new Vector2(fx, fy);
-    }
-
-    /// <summary>
-    /// Converts geographic coordinates to tile coordinates.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="p">Geographic coordinates (X - Lng, Y - Lat)</param>
-    /// <param name="zoom">Zoom</param>
-    /// <param name="fx">Tile X</param>
-    /// <param name="fy">Tile Y</param>
-    [Obsolete("Use OnlineMaps.instance.projection.CoordinatesToTile")]
-    public static void LatLongToTilef(Vector2 p, int zoom, out float fx, out float fy)
-    {
-        LatLongToMercat(ref p.x, ref p.y);
-        uint mapSize = (uint)tileSize << zoom;
-        float px = (float)Clip(p.x * mapSize + 0.5, 0, mapSize - 1);
-        float py = (float)Clip(p.y * mapSize + 0.5, 0, mapSize - 1);
-        fx = px / tileSize;
-        fy = py / tileSize;
-    }
-
-    /// <summary>
-    /// Converts geographic coordinates to tile coordinates.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="x">Longitude</param>
-    /// <param name="y">Latitude</param>
-    /// <param name="zoom">Zoom</param>
-    /// <returns>Tile coordinates</returns>
-    [Obsolete("Use OnlineMaps.instance.projection.CoordinatesToTile")]
-    public static Vector2 LatLongToTilef(float x, float y, int zoom)
-    {
-        LatLongToMercat(ref x, ref y);
-        uint mapSize = (uint)tileSize << zoom;
-        float px = (float)Clip(x * mapSize + 0.5, 0, mapSize - 1);
-        float py = (float)Clip(y * mapSize + 0.5, 0, mapSize - 1);
-        float fx = px / tileSize;
-        float fy = py / tileSize;
-
-        return new Vector2(fx, fy);
     }
 
     /// <summary>
@@ -1391,17 +1268,6 @@ public static class OnlineMapsUtils
     public static double Magnitude(double p1x, double p1y, double p2x, double p2y)
     {
         return Math.Sqrt((p2x - p1x) * (p2x - p1x) + (p2y - p1y) * (p2y - p1y));
-    }
-
-    [Obsolete]
-    public static void MercatToLatLong(double mx, double my, out double x, out double y)
-    {
-        uint mapSize = (uint)tileSize << 20;
-        double px = Clip(mx * mapSize + 0.5, 0, mapSize - 1);
-        double py = Clip(my * mapSize + 0.5, 0, mapSize - 1);
-        mx = px / tileSize;
-        my = py / tileSize;
-        TileToLatLong(mx, my, 20, out x, out y);
     }
 
     public static Vector2 NearestPointStrict(Vector2 point, Vector2 lineStart, Vector2 lineEnd)
@@ -1443,29 +1309,17 @@ public static class OnlineMapsUtils
         return n;
     }
 
-    /// <summary>
-    /// Converts tile coordinates to geographic coordinates.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="x">Tile X</param>
-    /// <param name="y">Tile Y</param>
-    /// <param name="zoom">Zoom</param>
-    /// <returns>Geographic coordinates (X - Lng, Y - Lat)</returns>
-    [Obsolete("Use OnlineMaps.instance.projection.TileToCoordinates")]
-    public static Vector2 TileToLatLong(int x, int y, int zoom)
-    {
-        double mapSize = tileSize << zoom;
-        double lx = 360 * (Repeat(x * tileSize, 0, mapSize - 1) / mapSize - 0.5);
-        double ly = 90 -
-                    360 * Math.Atan(Math.Exp(-(0.5 - Clip(y * tileSize, 0, mapSize - 1) / mapSize) * 2 * Math.PI)) /
-                    Math.PI;
-        return new Vector2((float)lx, (float)ly);
-    }
-
     public static double SqrMagnitude(double p1x, double p1y, double p2x, double p2y)
     {
         return (p2x - p1x) * (p2x - p1x) + (p2y - p1y) * (p2y - p1y);
+    }
+
+    public static string StrReplace(string str, string[] origin, string[] replace)
+    {
+        if (origin == null || replace == null) return str;
+
+        for (int i = 0; i < Mathf.Min(origin.Length, replace.Length); i++) str = str.Replace(origin[i], replace[i]);
+        return str;
     }
 
     public static void ThreadSleep(int millisecondsTimeout)
@@ -1476,58 +1330,6 @@ public static class OnlineMapsUtils
         OnlineMapsThreadWINRT.Sleep(millisecondsTimeout);
 #endif
 
-    }
-
-    /// <summary>
-    /// Converts tile coordinates to geographic coordinates.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="x">Tile X</param>
-    /// <param name="y">Tile Y</param>
-    /// <param name="zoom">Zoom</param>
-    /// <returns>Geographic coordinates (X - Lng, Y - Lat)</returns>
-    [Obsolete("Use OnlineMaps.instance.projection.TileToCoordinates")]
-    public static Vector2 TileToLatLong(float x, float y, int zoom)
-    {
-        double mapSize = tileSize << zoom;
-        double lx = 360 * (Repeat(x * tileSize, 0, mapSize - 1) / mapSize - 0.5);
-        double ly = 90 -
-                    360 * Math.Atan(Math.Exp(-(0.5 - Clip(y * tileSize, 0, mapSize - 1) / mapSize) * 2 * Math.PI)) /
-                    Math.PI;
-        return new Vector2((float)lx, (float)ly);
-    }
-
-    /// <summary>
-    /// Converts tile coordinates to geographic coordinates.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="tx">Tile X</param>
-    /// <param name="ty">Tile Y</param>
-    /// <param name="zoom">Zoom</param>
-    /// <param name="lx">Longitude</param>
-    /// <param name="ly">Latitude</param>
-    [Obsolete("Use OnlineMaps.instance.projection.TileToCoordinates")]
-    public static void TileToLatLong(double tx, double ty, int zoom, out double lx, out double ly)
-    {
-        double mapSize = tileSize << zoom;
-        lx = 360 * (Repeat(tx * tileSize, 0, mapSize - 1) / mapSize - 0.5);
-        ly = 90 - 360 * Math.Atan(Math.Exp(-(0.5 - Clip(ty * tileSize, 0, mapSize - 1) / mapSize) * 2 * Math.PI)) / Math.PI;
-    }
-
-    /// <summary>
-    /// Converts tile coordinates to geographic coordinates.
-    /// What is the tiles, and how it works, you can read here:
-    /// https://developers.google.com/maps/documentation/javascript/v2/overlays?csw=1#Google_Maps_Coordinates
-    /// </summary>
-    /// <param name="p">Tile coordinates</param>
-    /// <param name="zoom">Zoom</param>
-    /// <returns>Geographic coordinates (X - Lng, Y - Lat)</returns>
-    [Obsolete("Use OnlineMaps.instance.projection.TileToCoordinates")]
-    public static Vector2 TileToLatLong(Vector2 p, int zoom)
-    {
-        return TileToLatLong(p.x, p.y, zoom);
     }
 
     /// <summary>
@@ -1574,7 +1376,7 @@ public static class OnlineMapsUtils
         return quadKey;
     }
 
-    public static IEnumerable<int> Triangulate(List<Vector2> points)
+    public static List<int> Triangulate(List<Vector2> points)
     {
         List<int> indices = new List<int>(18);
 
@@ -1594,7 +1396,7 @@ public static class OnlineMapsUtils
         int nv = n;
         int count = 2 * nv;
 
-        for (int v = nv - 1; nv > 2;)
+        for (int v = nv - 1; nv > 2; )
         {
             if (count-- <= 0) return indices;
 
@@ -1702,7 +1504,7 @@ public static class OnlineMapsUtils
         float bp = (C.x - B.x) * (P.y - B.y) - (C.y - B.y) * (P.x - B.x);
         float ap = (B.x - A.x) * (P.y - A.y) - (B.y - A.y) * (P.x - A.x);
         float cp = (A.x - C.x) * (P.y - C.y) - (A.y - C.y) * (P.x - C.x);
-        return (bp >= 0.0f) && (cp >= 0.0f) && (ap >= 0.0f);
+        return bp > 0.0f && cp > 0.0f && ap > 0.0f;
     }
 
     private static bool TriangulateInsideTriangle(float ax, float ay, float bx, float by, float cx, float cy, float px, float py)

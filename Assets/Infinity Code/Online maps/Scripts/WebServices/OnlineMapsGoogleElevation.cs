@@ -1,17 +1,17 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// The Elevation API provides elevation data for all locations on the surface of the earth, including depth locations on the ocean floor (which return negative values). \n
-/// In those cases where Google does not possess exact elevation measurements at the precise location you request, the service will interpolate and return an averaged value using the four nearest locations.\n
-/// With the Elevation API, you can develop hiking and biking applications, mobile positioning applications, or low resolution surveying applications. \n
+/// The Elevation API provides elevation data for all locations on the surface of the earth, including depth locations on the ocean floor (which return negative values).<br/>
+/// In those cases where Google does not possess exact elevation measurements at the precise location you request, the service will interpolate and return an averaged value using the four nearest locations.<br/>
+/// With the Elevation API, you can develop hiking and biking applications, mobile positioning applications, or low resolution surveying applications. <br/>
 /// https://developers.google.com/maps/documentation/elevation/
 /// </summary>
-public class OnlineMapsGoogleElevation:OnlineMapsGoogleAPIQuery
+public class OnlineMapsGoogleElevation: OnlineMapsTextWebService
 {
     protected OnlineMapsGoogleElevation()
     {
@@ -21,7 +21,9 @@ public class OnlineMapsGoogleElevation:OnlineMapsGoogleAPIQuery
     protected OnlineMapsGoogleElevation(Vector2 location, string key, string client, string signature)
     {
         _status = OnlineMapsQueryStatus.downloading;
-        StringBuilder url = new StringBuilder("https://maps.googleapis.com/maps/api/elevation/xml?sensor=false&locations=").Append(location.y).Append(",").Append(location.x);
+        StringBuilder url = new StringBuilder("https://maps.googleapis.com/maps/api/elevation/xml?sensor=false&locations=")
+            .Append(location.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+            .Append(location.x.ToString(OnlineMapsUtils.numberFormat));
         Download(url, key, client, signature);
     }
 
@@ -32,7 +34,8 @@ public class OnlineMapsGoogleElevation:OnlineMapsGoogleAPIQuery
 
         for (int i = 0; i < locations.Length; i++)
         {
-            url.Append(locations[i].y).Append(",").Append(locations[i].x);
+            url.Append(locations[i].y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                .Append(locations[i].x.ToString(OnlineMapsUtils.numberFormat));
             if (i < locations.Length - 1) url.Append("|");
         }
 
@@ -47,7 +50,8 @@ public class OnlineMapsGoogleElevation:OnlineMapsGoogleAPIQuery
 
         for (int i = 0; i < path.Length; i++)
         {
-            url.Append(path[i].y).Append(",").Append(path[i].x);
+            url.Append(path[i].y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                .Append(path[i].x.ToString(OnlineMapsUtils.numberFormat));
             if (i < path.Length - 1) url.Append("|");
         }
 
@@ -63,7 +67,7 @@ public class OnlineMapsGoogleElevation:OnlineMapsGoogleAPIQuery
 
         if (!string.IsNullOrEmpty(client)) url.Append("&client=").Append(client);
         if (!string.IsNullOrEmpty(signature)) url.Append("&signature=").Append(signature);
-        www = OnlineMapsUtils.GetWWW(url);
+        www = new OnlineMapsWWW(url);
         www.OnComplete += OnRequestComplete;
     }
 
@@ -74,11 +78,11 @@ public class OnlineMapsGoogleElevation:OnlineMapsGoogleAPIQuery
     /// Location on the earth from which to return elevation data.
     /// </param>
     /// <param name="key">
-    /// Your application's API key. \n
+    /// Your application's API key. <br/>
     /// This key identifies your application for purposes of quota management.
     /// </param>
     /// <param name="client">
-    /// Client ID identifies you as a Maps API for Work customer and enables support and purchased quota for your application. \n
+    /// Client ID identifies you as a Maps API for Work customer and enables support and purchased quota for your application.<br/>
     /// Requests made without a client ID are not eligible for Maps API for Work benefits.
     /// </param>
     /// <param name="signature">
@@ -97,11 +101,11 @@ public class OnlineMapsGoogleElevation:OnlineMapsGoogleAPIQuery
     /// Locations on the earth from which to return elevation data.
     /// </param>
     /// <param name="key">
-    /// Your application's API key.\n
+    /// Your application's API key.<br/>
     /// This key identifies your application for purposes of quota management.
     /// </param>
     /// <param name="client">
-    /// Client ID identifies you as a Maps API for Work customer and enables support and purchased quota for your application.\n
+    /// Client ID identifies you as a Maps API for Work customer and enables support and purchased quota for your application.<br/>
     /// Requests made without a client ID are not eligible for Maps API for Work benefits.
     /// </param>
     /// <param name="signature">
@@ -118,15 +122,15 @@ public class OnlineMapsGoogleElevation:OnlineMapsGoogleAPIQuery
     /// </summary>
     /// <param name="path">Path on the earth for which to return elevation data. </param>
     /// <param name="samples">
-    /// Specifies the number of sample points along a path for which to return elevation data. \n
+    /// Specifies the number of sample points along a path for which to return elevation data.<br/>
     /// The samples parameter divides the given path into an ordered set of equidistant points along the path.
     /// </param>
     /// <param name="key">
-    /// Your application's API key. \n
+    /// Your application's API key.<br/>
     /// This key identifies your application for purposes of quota management.
     /// </param>
     /// <param name="client">
-    /// Client ID identifies you as a Maps API for Work customer and enables support and purchased quota for your application. \n
+    /// Client ID identifies you as a Maps API for Work customer and enables support and purchased quota for your application.<br/>
     /// Requests made without a client ID are not eligible for Maps API for Work benefits.
     /// </param>
     /// <param name="signature">

@@ -1,5 +1,5 @@
-/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -25,10 +25,10 @@ namespace InfinityCode.OnlineMapsExamples
             }
 
             // Intercept elevation request
-            control.OnGetElevation += OnGetElevation;
+            OnlineMapsElevationManagerBase.instance.OnGetElevation += OnGetElevation;
         }
 
-        private void OnGetElevation(Vector2 topLeftCoords, Vector2 bottomRightCoords)
+        private void OnGetElevation(double leftLongitude, double topLatitude, double rightLongitude, double bottomLatitude)
         {
             // Elevation map must be 32x32
             short[,] elevation = new short[32, 32];
@@ -36,7 +36,7 @@ namespace InfinityCode.OnlineMapsExamples
             // Here you get the elevation from own sources.
 
             // Set elevation map
-            control.SetElevationData(elevation);
+            OnlineMapsBingMapsElevationManager.instance.SetElevationData(elevation);
         }
     }
 }

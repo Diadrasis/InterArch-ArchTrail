@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,14 +12,24 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/FindDirectionExample")]
     public class FindDirectionExample : MonoBehaviour
     {
+        public string googleAPIKey;
+
         private void Start()
         {
+            if (string.IsNullOrEmpty(googleAPIKey)) Debug.LogWarning("Please specify Google API Key");
+
             // Begin to search a route from Los Angeles to the specified coordinates.
-            OnlineMapsGoogleDirections query = OnlineMapsGoogleDirections.Find("Los Angeles",
-                new Vector2(-118.178960f, 35.063995f));
+            OnlineMapsGoogleDirections request = new OnlineMapsGoogleDirections
+            (
+                googleAPIKey, 
+                "Los Angeles", // FROM (string or Vector2)
+                new Vector2(-118.178960f, 35.063995f) // TO (string or Vector2)
+            );
 
             // Specifies that search results must be sent to OnFindDirectionComplete.
-            query.OnComplete += OnFindDirectionComplete;
+            request.OnComplete += OnFindDirectionComplete;
+
+            request.Send();
         }
 
         private void OnFindDirectionComplete(string response)
@@ -48,7 +58,7 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsDrawingLine route = new OnlineMapsDrawingLine(result.routes[0].overview_polylineD, Color.green);
 
             // Draw the line route on the map.
-            OnlineMaps.instance.AddDrawingElement(route);
+            OnlineMapsDrawingElementManager.AddItem(route);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,8 +14,6 @@ namespace InfinityCode.OnlineMapsExamples
     {
         private void Start()
         {
-            OnlineMaps map = OnlineMaps.instance;
-
             List<Vector2> line = new List<Vector2>
             {
                 //Geographic coordinates
@@ -35,15 +33,14 @@ namespace InfinityCode.OnlineMapsExamples
             };
 
             // Draw line
-            map.AddDrawingElement(new OnlineMapsDrawingLine(line, Color.green, 5));
+            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(line, Color.green, 5));
 
             // Draw filled transparent poly
-            map.AddDrawingElement(new OnlineMapsDrawingPoly(poly, Color.red, 1, new Color(1, 1, 1, 0.5f)));
+            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingPoly(poly, Color.red, 1, new Color(1, 1, 1, 0.5f)));
 
             // Draw filled rectangle
             // (position, size, borderColor, borderWidth, backgroundColor)
-            map.AddDrawingElement(new OnlineMapsDrawingRect(new Vector2(2, 2), new Vector2(1, 1), Color.green, 1,
-                Color.blue));
+            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingRect(new Vector2(2, 2), new Vector2(1, 1), Color.green, 1, Color.blue));
         }
     }
 }

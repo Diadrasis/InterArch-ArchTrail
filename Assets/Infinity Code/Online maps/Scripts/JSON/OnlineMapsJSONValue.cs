@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,9 @@ using UnityEngine;
 /// </summary>
 public class OnlineMapsJSONValue : OnlineMapsJSONItem
 {
+    private ValueType _type;
+    private object _value;
+
     public override OnlineMapsJSONItem this[string key]
     {
         get { return null; }
@@ -82,9 +85,6 @@ public class OnlineMapsJSONValue : OnlineMapsJSONItem
         get { return _type; }
     }
 
-    private ValueType _type;
-    private object _value;
-
     /// <summary>
     /// Constructor
     /// </summary>
@@ -120,6 +120,7 @@ public class OnlineMapsJSONValue : OnlineMapsJSONItem
         if (_type == ValueType.STRING) WriteString(b);
         else if (_type == ValueType.NULL) b.Append("null");
         else if (_type == ValueType.BOOLEAN) b.Append((bool) _value ? "true" : "false");
+        else if (_type == ValueType.DOUBLE) b.Append(((double) value).ToString(OnlineMapsUtils.cultureInfo));
         else b.Append(value);
     }
 
@@ -130,6 +131,7 @@ public class OnlineMapsJSONValue : OnlineMapsJSONItem
 
     public override string ToString()
     {
+        if (type == ValueType.DOUBLE) return ((double) value).ToString(OnlineMapsUtils.cultureInfo);
         return value.ToString();
     }
 
@@ -149,12 +151,18 @@ public class OnlineMapsJSONValue : OnlineMapsJSONItem
         }
         else if (_type == ValueType.DOUBLE)
         {
-            if (t == typeof(double)) return Convert.ChangeType(_value, t);
-            if (t == typeof(float)) return Convert.ChangeType((double)_value, t);
+            if (t == typeof(double)) return Convert.ChangeType(_value, t, OnlineMapsUtils.numberFormat);
+            if (t == typeof(float)) return Convert.ChangeType((double)_value, t, OnlineMapsUtils.numberFormat);
         }
         else if (_type == ValueType.LONG)
         {
             if (t == typeof(long)) return Convert.ChangeType(_value, t);
+#if UNITY_EDITOR
+            if (t.IsSubclassOf(typeof(UnityEngine.Object)))
+            {
+                return UnityEditor.EditorUtility.InstanceIDToObject((int)(long)_value);
+            }
+#endif
 
             try
             {
@@ -168,18 +176,15 @@ public class OnlineMapsJSONValue : OnlineMapsJSONItem
         }
         else if (_type == ValueType.STRING)
         {
-            MethodInfo method = OnlineMapsReflectionHelper.GetMethod(t, "Parse", new[] { typeof(string) });
-            if (method != null) return method.Invoke(null, new[] {_value});
-            return null;
+            MethodInfo method = OnlineMapsReflectionHelper.GetMethod(t, "Parse", new[] { typeof(string), typeof(IFormatProvider) });
+            if (method != null) return method.Invoke(null, new object[] { value, OnlineMapsUtils.numberFormat });
+
+            method = OnlineMapsReflectionHelper.GetMethod(t, "Parse", new[] { typeof(string) });
+            return method.Invoke(null, new[] { value });
         }
         StringBuilder builder = new StringBuilder();
         ToJSON(builder);
         throw new InvalidCastException(t.FullName + "\n" + builder);
-    }
-
-    public override T Value<T>()
-    {
-        return (T) Value(typeof (T));
     }
 
     private void WriteString(StringBuilder b)

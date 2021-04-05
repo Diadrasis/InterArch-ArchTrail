@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -24,10 +24,10 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
 
             // Create a label for the marker.
-            string label = "Marker " + (OnlineMaps.instance.markers.Length + 1);
+            string label = "Marker " + (OnlineMapsMarkerManager.CountItems + 1);
 
             // Create a new marker.
-            OnlineMaps.instance.AddMarker(lng, lat, label);
+            OnlineMapsMarkerManager.CreateItem(lng, lat, label);
         }
     }
 }

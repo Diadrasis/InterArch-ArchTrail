@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -32,6 +32,21 @@ namespace InfinityCode.OnlineMapsExamples
 
         private float _borderWidth;
 
+        public void Clear()
+        {
+            if (polygon != null)
+            {
+                OnlineMapsDrawingElementManager.RemoveItem(polygon);
+                polygon = null;
+            }
+
+            foreach (OnlineMapsMarker marker in markers) OnlineMapsMarkerManager.RemoveItem(marker);
+            markers.Clear();
+
+            markerPositions.Clear();
+            changed = true;
+        }
+
         private void CheckMarkerPositions()
         {
             // Check the position of each marker.
@@ -55,7 +70,7 @@ namespace InfinityCode.OnlineMapsExamples
                 Vector2 cursorCoords = map.control.GetCoords();
 
                 // Create a new marker at the specified coordinates.
-                OnlineMapsMarker marker = map.AddMarker(cursorCoords, markerTexture, "Marker " + (map.markers.Length + 1));
+                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(cursorCoords, markerTexture, "Marker " + (OnlineMapsMarkerManager.CountItems + 1));
 
                 // Save marker and coordinates.
                 markerPositions.Add(cursorCoords);
@@ -108,7 +123,7 @@ namespace InfinityCode.OnlineMapsExamples
                 polygon = new OnlineMapsDrawingPoly(markerPositions, Color.black, borderWidth, new Color(1, 1, 1, 0.3f));
 
                 // Add an element to the map.
-                map.AddDrawingElement(polygon);
+                OnlineMapsDrawingElementManager.AddItem(polygon);
             }
 
             // Calculates area of ​​the polygon.

@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading;
 #endif
 
 /// <summary>
-/// This class manages the background threads.\n
+/// This class manages the background threads.<br/>
 /// <strong>Please do not use it if you do not know what you're doing.</strong>
 /// </summary>
 public class OnlineMapsThreadManager
@@ -26,6 +26,8 @@ public class OnlineMapsThreadManager
 #endif
     private List<Action> threadActions;
 #endif
+
+    private static List<Action> mainThreadActions;
 
     private OnlineMapsThreadManager(Action action)
     {
@@ -45,6 +47,27 @@ public class OnlineMapsThreadManager
 #endif
     }
 
+    private void Add(Action action)
+    {
+#if !UNITY_WEBGL
+        lock (threadActions)
+        {
+            threadActions.Add(action);
+        }
+#else
+        action();
+#endif
+    }
+
+    public static void AddMainThreadAction(Action action)
+    {
+        if (mainThreadActions == null) mainThreadActions = new List<Action>();
+        lock (mainThreadActions)
+        {
+            mainThreadActions.Add(action);
+        }
+    }
+
     /// <summary>
     /// Adds action queued for execution in a separate thread.
     /// </summary>
@@ -56,16 +79,6 @@ public class OnlineMapsThreadManager
         else instance.Add(action);
 #else
         throw new Exception("AddThreadAction not supported for WebGL.");
-#endif
-    }
-
-    private void Add(Action action)
-    {
-#if !UNITY_WEBGL
-        lock (threadActions)
-        {
-            threadActions.Add(action);
-        }
 #endif
     }
 
@@ -82,6 +95,27 @@ public class OnlineMapsThreadManager
             instance = null;
         }
 #endif
+    }
+
+    public static void ExecuteMainThreadActions()
+    {
+        if (mainThreadActions == null) return;
+
+        lock (mainThreadActions)
+        {
+            for (int i = 0; i < mainThreadActions.Count; i++)
+            {
+                try
+                {
+                    mainThreadActions[i].Invoke();
+                }
+                catch
+                {
+
+                }
+            }
+            mainThreadActions.Clear();
+        }
     }
 
     private void StartNextAction()

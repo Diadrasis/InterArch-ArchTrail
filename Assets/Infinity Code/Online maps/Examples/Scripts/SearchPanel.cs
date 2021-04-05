@@ -1,13 +1,14 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace InfinityCode.OnlineMapsDemos
 {
     [AddComponentMenu("Infinity Code/Online Maps/Demos/Search Panel")]
-    public class SearchPanel : MonoBehaviour
+    public class SearchPanel:MonoBehaviour
     {
         public InputField inputField;
         private OnlineMapsMarker marker;
@@ -23,7 +24,11 @@ namespace InfinityCode.OnlineMapsDemos
             if (inputField == null) return;
             if (inputField.text.Length < 3) return;
 
-            OnlineMapsGoogleGeocoding.Find(inputField.text).OnComplete += OnGeocodingComplete;
+            string locationName = inputField.text;
+
+            OnlineMapsGoogleGeocoding request = new OnlineMapsGoogleGeocoding(locationName, OnlineMapsKeyManager.GoogleMaps());
+            request.OnComplete += OnGeocodingComplete;
+            request.Send();
         }
 
         private void OnGeocodingComplete(string response)
@@ -40,10 +45,10 @@ namespace InfinityCode.OnlineMapsDemos
 
             Vector2 center;
             int zoom;
-            OnlineMapsUtils.GetCenterPointAndZoom(new []{r.geometry_bounds_northeast, r.geometry_bounds_southwest}, out center, out zoom);
+            OnlineMapsUtils.GetCenterPointAndZoom(new[] { r.geometry_bounds_northeast, r.geometry_bounds_southwest }, out center, out zoom);
             OnlineMaps.instance.zoom = zoom;
 
-            if (marker == null) marker = OnlineMaps.instance.AddMarker(r.geometry_location, r.formatted_address);
+            if (marker == null) marker = OnlineMapsMarkerManager.CreateItem(r.geometry_location, r.formatted_address);
             else
             {
                 marker.position = r.geometry_location;
@@ -53,7 +58,11 @@ namespace InfinityCode.OnlineMapsDemos
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return)) Search();
+            EventSystem eventSystem = EventSystem.current;
+            if ((Input.GetKeyUp(KeyCode.KeypadEnter) || Input.GetKeyUp(KeyCode.Return)) && eventSystem.currentSelectedGameObject == inputField.gameObject)
+            {
+                Search();
+            }
         }
     }
 }

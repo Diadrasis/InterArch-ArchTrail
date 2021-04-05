@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -35,7 +35,7 @@ namespace InfinityCode.OnlineMapsExamples
             int ity = (int)ty;
 
             // Get tile
-            OnlineMapsTile tile = OnlineMapsTile.GetTile(OnlineMaps.instance.zoom, itx, ity);
+            OnlineMapsTile tile = OnlineMaps.instance.tileManager.GetTile(OnlineMaps.instance.zoom, itx, ity);
 
             // If the tile exists, but is not yet loaded, take the parent
             while (tile != null && tile.status != OnlineMapsTileStatus.loaded)
@@ -57,7 +57,7 @@ namespace InfinityCode.OnlineMapsExamples
             double ry = ty - (int)ty;
 
             // For Target - Tileset
-            if (OnlineMaps.instance.target == OnlineMapsTarget.tileset)
+            if (!OnlineMapsControlBase.instance.resultIsTexture)
             {
                 Color color = tile.texture.GetPixelBilinear((float)rx, 1 - (float)ry);
                 Debug.Log(color);
@@ -66,7 +66,7 @@ namespace InfinityCode.OnlineMapsExamples
             else
             {
                 int row = (int)((1 - ry) * OnlineMapsUtils.tileSize);
-                Color color = tile.colors[(int)((row + rx) * OnlineMapsUtils.tileSize)];
+                Color color = (tile as OnlineMapsRasterTile).colors[(int)((row + rx) * OnlineMapsUtils.tileSize)];
                 Debug.Log(color);
             }
         }

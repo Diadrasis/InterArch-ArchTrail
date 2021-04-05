@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -11,6 +11,8 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/ResetCameraRotationExample")]
     public class ResetCameraRotationExample : MonoBehaviour
     {
+        public Vector2 defaultRotation = Vector2.zero;
+
         /// <summary>
         /// Time of animation (sec).
         /// </summary>
@@ -25,22 +27,22 @@ namespace InfinityCode.OnlineMapsExamples
         private bool isReset;
         private float camX;
         private float camY;
-        private OnlineMapsTileSetControl control;
+        private OnlineMapsCameraOrbit cameraOrbit;
 
         private void OnGUI()
         {
             if (GUI.Button(new Rect(5, 5, 100, 30), "Reset") && !isReset)
             {
                 // Store the current rotation, and marks that reset is started.
-                camX = control.cameraRotation.x;
-                camY = control.cameraRotation.y;
+                camX = cameraOrbit.rotation.x;
+                camY = cameraOrbit.rotation.y;
                 isReset = true;
             }
         }
 
         private void Start()
         {
-            control = OnlineMapsTileSetControl.instance;
+            cameraOrbit = OnlineMapsCameraOrbit.instance;
         }
 
         private void Update()
@@ -62,8 +64,8 @@ namespace InfinityCode.OnlineMapsExamples
 
             // Update the rotation of camera.
             float f = animationCurve.Evaluate(t);
-            control.cameraRotation.x = Mathf.Lerp(camX, 0, f);
-            control.cameraRotation.y = Mathf.Lerp(camY, 0, f);
+            cameraOrbit.rotation.x = Mathf.LerpAngle(camX, defaultRotation.x, f);
+            cameraOrbit.rotation.y = Mathf.Lerp(camY, defaultRotation.y, f);
         }
     }
 }

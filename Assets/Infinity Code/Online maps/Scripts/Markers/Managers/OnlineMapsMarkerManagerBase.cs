@@ -1,15 +1,33 @@
-﻿using System;
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
+using System;
+
+/// <summary>
+/// Base class for markers managers
+/// </summary>
+/// <typeparam name="T">Subclass of OnlineMapsMarkerManagerBase</typeparam>
+/// <typeparam name="U">Type of markers</typeparam>
 [Serializable]
-public abstract class OnlineMapsMarkerManagerBase<T, U> : OnlineMapsInteractiveElementManager<T, U>, IOnlineMapsSavableComponent
+public abstract class OnlineMapsMarkerManagerBase<T, U>: OnlineMapsInteractiveElementManager<T, U>, IOnlineMapsSavableComponent
     where T : OnlineMapsMarkerManagerBase<T, U>
-    where U : OnlineMapsMarkerBase
+    where U: OnlineMapsMarkerBase
 {
+    /// <summary>
+    /// Called when a marker is created
+    /// </summary>
+    public Action<U> OnCreateItem;
+
     protected OnlineMapsSavableItem[] savableItems;
+
+    /// <summary>
+    /// Scaling of 3D markers by default
+    /// </summary>
+    public float defaultScale = 1;
 
     public static void RemoveItemsByTag(params string[] tags)
     {
-        instance.RemoveByTag(tags);
+        if (instance != null) instance.RemoveByTag(tags);
     }
 
     protected U _CreateItem(double longitude, double latitude)
@@ -17,6 +35,7 @@ public abstract class OnlineMapsMarkerManagerBase<T, U> : OnlineMapsInteractiveE
         U item = Activator.CreateInstance<U>();
         item.SetPosition(longitude, latitude);
         items.Add(item);
+        if (OnCreateItem != null) OnCreateItem(item);
         return item;
     }
 
@@ -52,11 +71,11 @@ public abstract class OnlineMapsMarkerManagerBase<T, U> : OnlineMapsInteractiveE
 
     protected virtual void Start()
     {
-
+        
     }
 
     protected virtual void Update()
     {
-
+        
     }
 }

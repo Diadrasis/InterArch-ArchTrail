@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Collections.Generic;
@@ -30,6 +30,7 @@ namespace InfinityCode.OnlineMapsExamples
 
         private bool isSmoothZoomProceed;
         private bool waitZeroTouches;
+
         private OnlineMaps map;
         private OnlineMapsControlBase control;
 
@@ -73,9 +74,7 @@ namespace InfinityCode.OnlineMapsExamples
                 if (tx >= max) tx -= max;
                 else if (tx < 0) tx += max;
 
-                double lng, lat;
-                map.projection.TileToCoordinates(tx, ty, map.zoom, out lng, out lat);
-                map.SetPosition(lng, lat);
+                map.SetTilePosition(tx, ty);
 
                 // Reduces the current speed.
                 rsX *= friction;
@@ -88,8 +87,8 @@ namespace InfinityCode.OnlineMapsExamples
         /// </summary>
         private void OnMapPress()
         {
-            // Get coordinates of map
-            map.GetPosition(out ptx, out pty);
+            // Get tile coordinates of map
+            map.GetTilePosition(out ptx, out pty);
 
             // Is marked, that is the interaction with the map.
             isInteract = true;
@@ -140,7 +139,7 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
-            map = OnlineMaps.instance;;
+            map = OnlineMaps.instance; ;
             control = OnlineMapsControlBase.instance;
 
             // Subscribe to map events

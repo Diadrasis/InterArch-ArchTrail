@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -17,18 +17,16 @@ namespace InfinityCode.OnlineMapsDemos
         public bool centerOnMarker = true;
 
         private OnlineMaps map;
-        private OnlineMapsTileSetControl control;
         private OnlineMapsMarker3D marker;
         private double lng, lat;
 
         private void Start()
         {
             map = OnlineMaps.instance;
-            control = OnlineMapsTileSetControl.instance;
 
             map.GetPosition(out lng, out lat);
 
-            marker = control.AddMarker3D(lng, lat, prefab);
+            marker = OnlineMapsMarker3DManager.CreateItem(lng, lat, prefab);
             marker.scale = markerScale;
             marker.rotationY = rotation;
         }
@@ -48,7 +46,7 @@ namespace InfinityCode.OnlineMapsDemos
             marker.rotationY = rotation;
             marker.SetPosition(lng, lat);
             if (centerOnMarker) map.SetPosition(lng, lat);
-            if (rotateCamera) control.cameraRotation = new Vector2(control.cameraRotation.x, rotation + 180);
+            if (rotateCamera) OnlineMapsCameraOrbit.instance.rotation = new Vector2(OnlineMapsCameraOrbit.instance.rotation.x, rotation + 180);
         }
     }
 }

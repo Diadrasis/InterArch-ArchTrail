@@ -1,16 +1,16 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using System;
 using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// This class is used to search for a route by coordinates using Open Route Service.\n
-/// You can create a new instance using OnlineMapsOpenRouteService.Find.\n
+/// This class is used to search for a route by coordinates using Open Route Service.<br/>
+/// You can create a new instance using OnlineMapsOpenRouteService.Find.<br/>
 /// http://wiki.openstreetmap.org/wiki/OpenRouteService
 /// </summary>
-public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
+public class OnlineMapsOpenRouteService: OnlineMapsTextWebService
 {
     private const string endpoint = "https://api.openrouteservice.org/";
 
@@ -19,7 +19,7 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
         _status = OnlineMapsQueryStatus.downloading;
         p.Append(url);
 
-        www = OnlineMapsUtils.GetWWW(url);
+        www = new OnlineMapsWWW(url);
         www.OnComplete += OnRequestComplete;
     }
 
@@ -28,15 +28,10 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
     /// </summary>
     /// <param name="p">Parameters of request</param>
     /// <returns>Instance of the query</returns>
+    [Obsolete("Use OnlineMapsOpenRouteServiceDirections.Find instead")]
     public static OnlineMapsOpenRouteService Directions(DirectionParams p)
     {
         return new OnlineMapsOpenRouteService(new StringBuilder(endpoint).Append("directions?"), p);
-    }
-
-    [Obsolete("Open Route Service completely changed the API, and this method no longer works. Use OnlineMapsOpenRouteService.Directions instead.", true)]
-    public static OnlineMapsOpenRouteService Find(Vector2 start, Vector2 end, string lang, OnlineMapsOpenRouteServicePref pref = OnlineMapsOpenRouteServicePref.Fastest, bool noMotorways = false, bool noTollways = false, Vector2[] via = null)
-    {
-        return null;
     }
 
     /// <summary>
@@ -44,6 +39,7 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
     /// </summary>
     /// <param name="p">Parameters of the request</param>
     /// <returns>Instance of the query</returns>
+    [Obsolete("Use OnlineMapsOpenRouteServiceGeocode.Search instead")]
     public static OnlineMapsOpenRouteService Geocoding(GeocodingParams p)
     {
         return new OnlineMapsOpenRouteService(new StringBuilder(endpoint).Append("geocoding?"), p);
@@ -54,6 +50,7 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
     /// </summary>
     /// <param name="response">Response string</param>
     /// <returns>Result object</returns>
+    [Obsolete("Use OnlineMapsOpenRouteServiceDirections.GetResults instead")]
     public static OnlineMapsOpenRouteServiceDirectionResult GetDirectionResults(string response)
     {
         return OnlineMapsJSON.Deserialize<OnlineMapsOpenRouteServiceDirectionResult>(response);
@@ -64,6 +61,7 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
     /// </summary>
     /// <param name="response">Response string</param>
     /// <returns>Result object</returns>
+    [Obsolete("Use OnlineMapsOpenRouteServiceGeocode.GetResults instead")]
     public static OnlineMapsOpenRouteServiceGeocodingResult GetGeocodingResults(string response)
     {
         return OnlineMapsJSON.Deserialize<OnlineMapsOpenRouteServiceGeocodingResult>(response);
@@ -96,7 +94,8 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
     /// <summary>
     /// Parameters of the directions request
     /// </summary>
-    public class DirectionParams : Params
+    [Obsolete]
+    public class DirectionParams: Params
     {
         private OnlineMapsVector2d[] coordinates;
 
@@ -182,7 +181,7 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
             {
                 if (i > 0) builder.Append("|");
                 OnlineMapsVector2d c = coordinates[i];
-                builder.Append(c.x).Append(",").Append(c.y);
+                builder.Append(c.x.ToString(OnlineMapsUtils.numberFormat)).Append(",").Append(c.y.ToString(OnlineMapsUtils.numberFormat));
             }
 
             builder.Append("&profile=").Append(OnlineMapsReflectionHelper.GetEnumDescription(profile));
@@ -213,34 +212,24 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
         {
             [Description("driving-car")]
             drivingCar,
-
             [Description("driving-hgv")]
             drivingHgv,
-
             [Description("driving-regular")]
             cyclingRegular,
-
             [Description("cycling-road")]
             cyclingRoad,
-
             [Description("cycling-save")]
             cyclingSave,
-
             [Description("cycling-mountain")]
             cyclingMountain,
-
             [Description("cycling-tour")]
             cyclingTour,
-
             [Description("cycling-electric")]
             cyclingElectric,
-
             [Description("foot-walking")]
             footWalking,
-
             [Description("foot-hiking")]
             footHiking,
-
             [Description("wheelchair")]
             wheelchair
         }
@@ -276,6 +265,7 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
     /// <summary>
     /// Parameters of the geocoding request
     /// </summary>
+    [Obsolete]
     public class GeocodingParams : Params
     {
         /// <summary>
@@ -352,11 +342,27 @@ public class OnlineMapsOpenRouteService : OnlineMapsTextWebService
             base.Append(builder);
 
             if (!string.IsNullOrEmpty(query)) builder.Append("&query=").Append(query);
-            if (location.HasValue) builder.Append("&location=").Append(location.Value.x).Append(",").Append(location.Value.y);
+            if (location.HasValue) builder.Append("&location=")
+                .Append(location.Value.x.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                .Append(location.Value.y.ToString(OnlineMapsUtils.numberFormat));
             if (!string.IsNullOrEmpty(lang)) builder.Append("&lang=").Append(lang);
             if (boundary_type.HasValue) builder.Append("&boundary_type=").Append(boundary_type.Value);
-            if (rect != null) builder.Append("&rect=").Append(rect.left).Append(",").Append(rect.top).Append(",").Append(rect.right).Append(",").Append(rect.bottom);
-            if (circle != null) builder.Append("&circle=").Append(circle.lng).Append(",").Append(circle.lat).Append(",").Append(circle.radius);
+            if (rect != null)
+            {
+                builder.Append("&rect=")
+                    .Append(rect.left.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(rect.top.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(rect.right.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(rect.bottom.ToString(OnlineMapsUtils.numberFormat));
+            }
+
+            if (circle != null)
+            {
+                builder.Append("&circle=")
+                    .Append(circle.lng.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(circle.lat.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                    .Append(circle.radius.ToString(OnlineMapsUtils.numberFormat));
+            }
             builder.Append("&limit=").Append(limit);
 
             Debug.Log(builder.ToString());

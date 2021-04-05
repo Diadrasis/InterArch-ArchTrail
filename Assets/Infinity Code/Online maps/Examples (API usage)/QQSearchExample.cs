@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -53,7 +53,7 @@ namespace InfinityCode.OnlineMapsExamples
             foreach (OnlineMapsQQSearchResult.Data data in result.data)
             {
                 // Create a new marker for each POI
-                OnlineMaps.instance.AddMarker(data.location.lng, data.location.lat, data.title);
+                OnlineMapsMarkerManager.CreateItem(data.location.lng, data.location.lat, data.title);
             }
         }
     }

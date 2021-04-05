@@ -1,5 +1,5 @@
-﻿/*     INFINITY CODE 2013-2018      */
-/*   http://www.infinity-code.com   */
+﻿/*         INFINITY CODE         */
+/*   https://infinity-code.com   */
 
 using UnityEngine;
 
@@ -34,7 +34,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void Start()
         {
             // Create a new 3D marker.
-            OnlineMapsMarker3D marker = OnlineMapsControlBase3D.instance.AddMarker3D(OnlineMaps.instance.position,
+            OnlineMapsMarker3D marker = OnlineMapsMarker3DManager.CreateItem(OnlineMaps.instance.position,
                 prefab);
 
             // Subscribe to OnDrag event.
