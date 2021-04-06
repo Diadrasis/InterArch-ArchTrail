@@ -11,18 +11,18 @@ using TMPro;
 public class MainManager : MonoBehaviour
 {
     private OnlineMapsMarker playerMarker;
-    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec;//btnRec to record the path and save it
+    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec, btnMainHolder;//btnRec to record the path and save it
     public TextMeshProUGUI infoText, blackText;
     public float time = 3;
     private float angle;
 
-    private bool isMovement, isAutoMarkerEnabled, isNewAreaSet;
+    private bool isMovement, isAutoMarkerEnabled, isNewAreaSet, hasPlayed;
     private Vector2 fromPosition, toPosition;
     private Vector2 toPositionTest;
     private double fromTileX, fromTileY, toTileX, toTileY;
     private int moveZoom;
     OnlineMapsLocationService locationService;
-    public GameObject blackScreen, settingsScreen, markerIns;
+    public GameObject blackScreen, settingsScreen, /*markerIns,*/ menuAnim;
     private static string prefsKey = "markers";
 
 
@@ -42,6 +42,7 @@ public class MainManager : MonoBehaviour
         btnSettings.onClick.AddListener(() => OpenSettings());
         btnResetMap.onClick.AddListener(() => BeOnNewPlace());
         btnOriginalMap.onClick.AddListener(() => MessiniLocation());
+        btnMainHolder.onClick.AddListener(() => OpenCloseMenu());
         InitLocation();
         toPosition = new Vector2(21.91794f, 37.17928f); //correct position for app
         toPositionTest = new Vector2(23.72402f, 37.97994f); //for testing purposes
@@ -279,18 +280,20 @@ public class MainManager : MonoBehaviour
 
         // Create a label for the marker.
         string label = "Marker " + (OnlineMapsMarkerManager.CountItems + 1);
-
+        //float maxLng = OnlineMapsUtils.DistanceBetweenPoints(locationService.position.y,lng);
         // Create a new marker.
         OnlineMapsMarkerManager.CreateItem(lng, lat, label);
+        OnlineMaps.instance.zoomRange = new OnlineMapsRange(5, 20);
+        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(locationService.position.y,locationService.position.x,(float)lat,(float)lng, OnlineMapsPositionRangeType.center);
+        OnlineMaps.instance.Redraw();
         //Instantiate(markerIns, new Vector2((float)lng, (float)lat), Quaternion.identity);
-        OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(
-        OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(),Color.red,3));
+        //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(),Color.red,3));
     }
     //when user enters markers on map, save on new area restrict and walk around
     void SaveNewMarkersAndArea()
     {
         //float distLastMarkers = OnlineMapsUtils.DistanceBetweenPoints();//distance between last markers, if they are near then the new area will save to device and also user will be able to save it in a button and access if they want to visit again
-        if (isNewAreaSet)/*user is about to use OnMapClick*/
+        /*if (isNewAreaSet)*//*user is about to use OnMapClick*//*
         {
             OnlineMapsXML xml = new OnlineMapsXML("Markers");
 
@@ -305,6 +308,21 @@ public class MainManager : MonoBehaviour
             // Save xml string
             PlayerPrefs.SetString(prefsKey, xml.outerXml);
             PlayerPrefs.Save();
+        }*/
+    }
+
+    void OpenCloseMenu()
+    {
+        if (!hasPlayed)
+        {
+            menuAnim.GetComponent<Animator>().SetBool("Open", true);
+            hasPlayed = true;
         }
+        else
+        {
+            hasPlayed = false;   
+            menuAnim.GetComponent<Animator>().SetBool("Open", false);
+        }
+       
     }
 }
