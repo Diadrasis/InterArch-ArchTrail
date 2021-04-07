@@ -399,6 +399,14 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
         map.projection.CoordinatesToTile(longitude, latitude, 20, out p2x, out p2y);
         rotation = (float)(1.25 - OnlineMapsUtils.Angle2D(p1x, p1y, p2x, p2y) / 360);
     }
+    public override OnlineMapsXML Save(OnlineMapsXML parent)
+    {
+        OnlineMapsXML element = base.Save(parent);
+        element.Create("Texture", texture);
+        element.Create("Align", (int)align);
+        element.Create("Rotation", rotation);
+        return element;
+    }
 
     public override OnlineMapsJSONItem ToJSON()
     {

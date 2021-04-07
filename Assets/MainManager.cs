@@ -11,10 +11,11 @@ using TMPro;
 public class MainManager : MonoBehaviour
 {
     private OnlineMapsMarker playerMarker;
-    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec, btnMainHolder;//btnRec to record the path and save it
+    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec, btnMainHolder, btnSave;//btnRec to record the path and save it
     public TextMeshProUGUI infoText, blackText;
     public float time = 3;
     private float angle;
+    public TMP_InputField markerName;
 
     private bool isMovement, isAutoMarkerEnabled, isNewAreaSet, hasPlayed, isRecPath;
     private Vector2 fromPosition, toPosition;
@@ -45,13 +46,15 @@ public class MainManager : MonoBehaviour
         btnResetMap.onClick.AddListener(() => BeOnNewPlace());
         btnOriginalMap.onClick.AddListener(() => MessiniLocation());
         btnMainHolder.onClick.AddListener(() => OpenCloseMenu());
+        btnSave.gameObject.SetActive(false);
         InitLocation();
         toPosition = new Vector2(21.91794f, 37.17928f); //correct position for app
         toPositionTest = new Vector2(23.72402f, 37.97994f); //for testing purposes
         locationService.OnLocationChanged += CheckAppLocation;
-        
+        //markerName.text = PlayerPrefs.GetString("markers");
+        markerName.gameObject.SetActive(false);
         settingsScreen.SetActive(false);
-        TryLoadMarkers();
+        SaveLoad.TryLoadMarkers(prefsKey);
     }
 
     void InitLocation()
@@ -217,7 +220,7 @@ public class MainManager : MonoBehaviour
 
     void CheckAppLocation(Vector2 loc)
     {
-        loc = toPositionTest;//OnlineMaps.instance.position;//new Vector2(23.8f, 38.1f);//new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude);
+        loc = toPositionTest;//OnlineMaps.instance.position;//new Vector2(23.8f, 38.1f);
         //float distance = OnlineMapsUtils.DistanceBetweenPoints(toPosition, loc).sqrMagnitude;//correct for final build
         float distance = OnlineMapsUtils.DistanceBetweenPoints(toPositionTest, loc).sqrMagnitude;//testing
         if (distance <= locationService.desiredAccuracy)
@@ -240,7 +243,6 @@ public class MainManager : MonoBehaviour
             blackText.text = "Please go near the area. Your location is: " + loc + " and the marker is: " + toPositionTest; //testing
             btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
             //btnLayer.onClick.AddListener(() => CheckLayer());
-            //locationService.StopLocationService();            
         }
     }
     //to screencapture the path
@@ -304,7 +306,11 @@ public class MainManager : MonoBehaviour
         OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(-90 ,-180 ,90 ,180 , OnlineMapsPositionRangeType.center);
         OnlineMaps.instance.Redraw();
     }
-     void OpenSettings()
+    private void OnPress(OnlineMapsMarkerBase marker)
+    {
+        Debug.Log("OnPress");
+    }
+    void OpenSettings()
     {
         settingsScreen.SetActive(true);
         //TryLoadMarkers(); //load the saved markers and show them in a list of buttons
@@ -321,114 +327,32 @@ public class MainManager : MonoBehaviour
         // Get the coordinates under the cursor.
         double lng, lat;
         OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
-
+        markerName.gameObject.SetActive(true);
+        markerName.onEndEdit.AddListener((b)=>SaveLoad.SaveNewMarkersAndArea(prefsKey));
         // Create a label for the marker.
-        string label = "Marker " + (OnlineMapsMarkerManager.CountItems + 1);
+        string label = "Marker " + markerName.text;//(OnlineMapsMarkerManager.CountItems + 1);
+        markerName.text = label;
+        Debug.Log("On Map Click "+label);
+        //markerName.text = label;
+        
         //float maxLng = OnlineMapsUtils.DistanceBetweenPoints(locationService.position.y,lng);
         // Create a new marker.
-        OnlineMapsMarkerManager.CreateItem(lng, lat, label);
+        OnlineMapsMarkerManager.CreateItem(lng, lat, markerName.text);
         OnlineMaps.instance.zoomRange = new OnlineMapsRange(10, 20);
         OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(locationService.position.y,locationService.position.x,(float)lat,(float)lng, OnlineMapsPositionRangeType.center);
         OnlineMaps.instance.Redraw();
-        SaveNewMarkersAndArea();//save the marker player had placed
+        //save the marker player had placed
+        blackScreen.SetActive(true);
+        blackText.text = "Do you want to save the location?";
+        btnSave.gameObject.SetActive(true);
+        btnSave.onClick.AddListener(() => SaveState());
+        //PlayerPrefs.SetString("markers", markerName.text);
         //Instantiate(markerIns, new Vector2((float)lng, (float)lat), Quaternion.identity);//instantiate marker as gameObject and not the one on top of map.
         //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(),Color.red,3)); //draw a line between markers and restrict an area according to those markers
     }
 
     //when user enters markers on map, save on new area restrict and walk around
-    void SaveNewMarkersAndArea()
-    {
-        OnlineMapsXML xml = new OnlineMapsXML("Markers");
-
-        foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
-        {
-            // Create marker node
-            OnlineMapsXML markerNode = xml.Create("Marker");
-            markerNode.Create("Position", marker.position);
-            markerNode.Create("Label", marker.label);
-        }
-
-        // Save xml string
-        PlayerPrefs.SetString(prefsKey, xml.outerXml);
-        PlayerPrefs.Save();
-    }
-    public static void SaveMarkers(string prefsKey, List<OnlineMapsMarker> listMarkers)
-    {
-        // Create XMLDocument and first child
-        OnlineMapsXML xml = new OnlineMapsXML("Markers");
-
-        // Save markers data
-        foreach (OnlineMapsMarker marker in listMarkers)
-        {
-            // Create marker node
-            OnlineMapsXML markerNode = xml.Create("Marker");
-            markerNode.Create("Position", marker.position);
-            markerNode.Create("Label", prefsKey + "_" + marker.label);
-        }
-
-        // Save xml string
-        PlayerPrefs.SetString(prefsKey, xml.outerXml);
-        PlayerPrefs.Save();
-    }
-    //load markers in a menu so user can find easily places that have already visit
-    private void TryLoadMarkers()
-    {
-        
-        // If the key does not exist, returns.
-        if (!PlayerPrefs.HasKey(prefsKey)) return;
-
-        // Load xml string from PlayerPrefs
-        string xmlData = PlayerPrefs.GetString(prefsKey);
-       
-        // Load xml document
-        OnlineMapsXML xml = OnlineMapsXML.Load(xmlData);
-
-        // Load markers
-        foreach (OnlineMapsXML node in xml)
-        {
-            // Gets coordinates and label
-            Vector2 position = node.Get<Vector2>("Position");
-            string label = node.Get<string>("Label");
-
-            // Create marker
-            OnlineMapsMarkerManager.CreateItem(position, label);
-        }
-    }
-
-    public static void TryLoadMarkers(string prefsKey, out List<OnlineMapsMarker> listMarkers)
-    {
-        listMarkers = new List<OnlineMapsMarker>();
-
-        // If the key does not exist, returns.
-        if (!PlayerPrefs.HasKey(prefsKey))
-        {
-            return;
-        }
-
-        // Load xml string from PlayerPrefs
-        string xmlData = PlayerPrefs.GetString(prefsKey);
-
-        // Load xml document
-        OnlineMapsXML xml = OnlineMapsXML.Load(xmlData);
-
-        // Load markers
-        foreach (OnlineMapsXML node in xml)
-        {
-            OnlineMapsMarker marker = new OnlineMapsMarker();
-
-            // Gets coordinates and label
-            Vector2 position = node.Get<Vector2>("Position");
-            string label = node.Get<string>("Label");
-
-            marker.position = position;
-            marker.label = label;
-
-            listMarkers.Add(marker);
-
-            // Create marker
-            OnlineMapsMarkerManager.CreateItem(position, label);
-        }
-    }
+   
         void OpenCloseMenu()
     {
         if (!hasPlayed)
@@ -443,4 +367,48 @@ public class MainManager : MonoBehaviour
         }
        
     }
+    #region Save-Load
+    private void SaveState()
+    {
+        OnlineMaps map = OnlineMaps.instance;
+
+        OnlineMapsXML prefs = new OnlineMapsXML("Map");
+        SaveLoad.SaveNewMarkersAndArea(prefsKey);
+        
+        
+        // Save position and zoom
+        OnlineMapsXML generalSettings = prefs.Create("General");
+        generalSettings.Create("Coordinates", map.position);
+        generalSettings.Create("Zoom", map.zoom);
+        generalSettings.Create("ID", map.mapType);
+
+        // Save 2D markers
+        map.SaveMarkers(prefs);
+
+        // Save 3D markers
+        //OnlineMapsControlBase3D.instance.SaveMarkers3D(prefs);
+
+        // Save settings to PlayerPrefs
+        PlayerPrefs.SetString(prefsKey, prefs.outerXml);
+        blackScreen.SetActive(false);
+
+        //PlayerPrefs.SetString("mapTypeName", mapTypeName);
+    }
+    /*private void LoadState()
+    {
+        if (!PlayerPrefs.HasKey(prefsKey)) return;
+
+        OnlineMaps map = OnlineMaps.instance;
+
+        OnlineMapsXML prefs = OnlineMapsXML.Load(PlayerPrefs.GetString(prefsKey));
+
+        OnlineMapsXML generalSettings = prefs["General"];
+        map.position = generalSettings.Get<Vector2>("Coordinates");
+        map.zoom = generalSettings.Get<int>("Zoom");
+
+        List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
+
+        map.markers = markers.ToArray();
+    }*/
+    #endregion
 }

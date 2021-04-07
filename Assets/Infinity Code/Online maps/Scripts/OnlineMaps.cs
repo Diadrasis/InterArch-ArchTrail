@@ -170,6 +170,7 @@ public class OnlineMaps : MonoBehaviour, ISerializationCallbackReceiver, IOnline
     /// </summary>
     public Texture2D defaultTileTexture;
 
+    public OnlineMapsMarker[] markers;
     /// <summary>
     /// Specifies whether to dispatch the event.
     /// </summary>
@@ -266,6 +267,11 @@ public class OnlineMaps : MonoBehaviour, ISerializationCallbackReceiver, IOnline
     /// <strong>To change this value, use OnlineMaps.SetTexture.</strong>
     /// </summary>
     public Texture2D texture;
+
+    /// <summary>
+    /// Specifies where the map should be drawn (Texture or Tileset).
+    /// </summary>
+    public OnlineMapsTarget target = OnlineMapsTarget.texture;
 
     /// <summary>
     /// Reference to tile manager
@@ -1238,6 +1244,28 @@ public class OnlineMaps : MonoBehaviour, ISerializationCallbackReceiver, IOnline
         else StartBuffer();
 
         Redraw();
+    }
+    /// <summary>
+    /// This method is for the editor. \n
+    /// Please do not use it.
+    /// </summary>
+    public void Save()
+    {
+        if (target == OnlineMapsTarget.texture) defaultColors = texture.GetPixels();
+        else Debug.LogWarning("OnlineMaps.Save() only works with texture maps.  Current map is: " + target);
+    }
+
+    /// <summary>
+    /// This method is for the editor. \n
+    /// Please do not use it.
+    /// </summary>
+    /// <param name="parent">Parent XML Element</param>
+    public void SaveMarkers(OnlineMapsXML parent)
+    {
+        if (markers == null || markers.Length == 0) return;
+
+        OnlineMapsXML element = parent.Create("Markers");
+        foreach (OnlineMapsMarker marker in markers) marker.Save(element);
     }
 
     private OnlineMapsJSONItem SaveSettings()

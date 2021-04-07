@@ -363,6 +363,16 @@ public class OnlineMapsMarkerBase: IOnlineMapsInteractiveElement
     {
         map.control.dragMarker = this;
     }
+    public virtual OnlineMapsXML Save(OnlineMapsXML parent)
+    {
+        OnlineMapsXML element = parent.Create("Marker");
+        element.Create("Longitude", longitude);
+        element.Create("Latitude", latitude);
+        element.Create("Range", range);
+        element.Create("Label", label);
+        element.Create("Scale", scale);
+        return element;
+    }
 
     /// <summary>
     /// Set location of marker
