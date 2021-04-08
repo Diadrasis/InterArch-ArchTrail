@@ -8,7 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Diadrasis/Emma/_Scenes/Splash.unity
     guid: 56f01e379359b6f40a206ccac0f7e487
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/NewScene.unity
+    guid: fb185bf40be94bf458b82c9134774c5f
   m_configObjects: {}
