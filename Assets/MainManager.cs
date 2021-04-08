@@ -11,7 +11,8 @@ using TMPro;
 public class MainManager : MonoBehaviour
 {
     private OnlineMapsMarker playerMarker;
-    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec, btnMainHolder, btnSave;//btnRec to record the path and save it
+    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec, btnMainHolder, btnSave, btnDefault, btnBack, btnLoad;//btnRec to record the path and save it
+    [Space]
     public TextMeshProUGUI infoText, blackText;
     public float time = 3;
     private float angle;
@@ -23,7 +24,8 @@ public class MainManager : MonoBehaviour
     private double fromTileX, fromTileY, toTileX, toTileY;
     private int moveZoom;
     OnlineMapsLocationService locationService;
-    public GameObject blackScreen, settingsScreen, /*markerIns,*/ menuAnim;
+    [Space]
+    public GameObject blackScreen, settingsScreen, /*markerIns,*/ menuAnim, buttonPanel;
     private static string prefsKey = "markers";
     private OnlineMapsVector2d[] points;
     string currentPath;
@@ -34,6 +36,7 @@ public class MainManager : MonoBehaviour
         Application.runInBackground = true;
         blackScreen.SetActive(false);
         settingsScreen.SetActive(false);
+        buttonPanel.SetActive(false);
         //btnClose.gameObject.SetActive(false);
         //OpenCloseCanvas(false);
     }
@@ -46,15 +49,20 @@ public class MainManager : MonoBehaviour
         btnResetMap.onClick.AddListener(() => BeOnNewPlace());
         btnOriginalMap.onClick.AddListener(() => MessiniLocation());
         btnMainHolder.onClick.AddListener(() => OpenCloseMenu());
+        btnSave.onClick.AddListener(() => SaveState());
         btnSave.gameObject.SetActive(false);
+        btnDefault.gameObject.SetActive(false);
+        btnBack.gameObject.SetActive(false);
+        btnBack.onClick.AddListener(() => CloseCanvas());
+        markerName.onEndEdit.AddListener((b)=>SaveName(markerName));
         InitLocation();
         toPosition = new Vector2(21.91794f, 37.17928f); //correct position for app
         toPositionTest = new Vector2(23.72402f, 37.97994f); //for testing purposes
         locationService.OnLocationChanged += CheckAppLocation;
         //markerName.text = PlayerPrefs.GetString("markers");
         markerName.gameObject.SetActive(false);
-        settingsScreen.SetActive(false);
-        SaveLoad.TryLoadMarkers(prefsKey);
+        //settingsScreen.SetActive(false);
+        SaveLoad.TryLoadMarkers(OnlineMaps.instance.labels.ToString());
     }
 
     void InitLocation()
@@ -145,7 +153,6 @@ public class MainManager : MonoBehaviour
 
     void Update()
     {
-       //OnLocationChanged(new Vector2(23.8f, 38.1f));
         //isAndroidBuild();//on final build uncomment
         if (!isMovement) return;
 
@@ -159,12 +166,6 @@ public class MainManager : MonoBehaviour
             angle = 1;
         }
 
-        // Set new position
-        //OnlineMaps.instance.zoomRange = 18f;
-        //double px = (toTileX - fromTileX) * angle + fromTileX;
-        //double py = (toTileY - fromTileY) * angle + fromTileY;
-        //OnlineMaps.instance.projection.TileToCoordinates(px, py, moveZoom, out px, out py);
-        //OnlineMaps.instance.SetPosition(px, py);
         infoText.text = "Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp;
     }
    
@@ -313,12 +314,25 @@ public class MainManager : MonoBehaviour
     void OpenSettings()
     {
         settingsScreen.SetActive(true);
-        //TryLoadMarkers(); //load the saved markers and show them in a list of buttons
-        //infoText.text = "Enter the new location you want to explore ";
+        blackScreen.SetActive(false);
+        btnBack.gameObject.SetActive(true);
+        LoadState();
     }
     void CloseCanvas()
     {
+        if(blackScreen.activeSelf && !settingsScreen.activeSelf)
         blackScreen.SetActive(false);
+        else if(settingsScreen.activeSelf && !blackScreen.activeSelf)
+        settingsScreen.SetActive(false);
+    }
+    string label;
+
+    private void SaveName(TMP_InputField tmp)
+    {
+        if (tmp.text.Length > 0)
+        {
+            Debug.Log(tmp.text);
+        }
     }
     //create new marker and restrict location in map
     private void OnMapClick()
@@ -328,16 +342,9 @@ public class MainManager : MonoBehaviour
         double lng, lat;
         OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
         markerName.gameObject.SetActive(true);
-        markerName.onEndEdit.AddListener((b)=>SaveLoad.SaveNewMarkersAndArea(prefsKey));
-        // Create a label for the marker.
-        string label = "Marker " + markerName.text;//(OnlineMapsMarkerManager.CountItems + 1);
-        markerName.text = label;
-        Debug.Log("On Map Click "+label);
-        //markerName.text = label;
         
-        //float maxLng = OnlineMapsUtils.DistanceBetweenPoints(locationService.position.y,lng);
         // Create a new marker.
-        OnlineMapsMarkerManager.CreateItem(lng, lat, markerName.text);
+        OnlineMapsMarkerManager.CreateItem(lng, lat);
         OnlineMaps.instance.zoomRange = new OnlineMapsRange(10, 20);
         OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(locationService.position.y,locationService.position.x,(float)lat,(float)lng, OnlineMapsPositionRangeType.center);
         OnlineMaps.instance.Redraw();
@@ -345,15 +352,13 @@ public class MainManager : MonoBehaviour
         blackScreen.SetActive(true);
         blackText.text = "Do you want to save the location?";
         btnSave.gameObject.SetActive(true);
-        btnSave.onClick.AddListener(() => SaveState());
-        //PlayerPrefs.SetString("markers", markerName.text);
+        
         //Instantiate(markerIns, new Vector2((float)lng, (float)lat), Quaternion.identity);//instantiate marker as gameObject and not the one on top of map.
         //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(),Color.red,3)); //draw a line between markers and restrict an area according to those markers
     }
 
-    //when user enters markers on map, save on new area restrict and walk around
    
-        void OpenCloseMenu()
+    void OpenCloseMenu()
     {
         if (!hasPlayed)
         {
@@ -373,9 +378,10 @@ public class MainManager : MonoBehaviour
         OnlineMaps map = OnlineMaps.instance;
 
         OnlineMapsXML prefs = new OnlineMapsXML("Map");
-        SaveLoad.SaveNewMarkersAndArea(prefsKey);
-        
-        
+        label = markerName.text;
+        //SaveLoad.SaveNewMarkersAndArea(prefsKey);
+        Debug.Log("SaveState " + label);
+
         // Save position and zoom
         OnlineMapsXML generalSettings = prefs.Create("General");
         generalSettings.Create("Coordinates", map.position);
@@ -394,7 +400,7 @@ public class MainManager : MonoBehaviour
 
         //PlayerPrefs.SetString("mapTypeName", mapTypeName);
     }
-    /*private void LoadState()
+    private void LoadState()
     {
         if (!PlayerPrefs.HasKey(prefsKey)) return;
 
@@ -405,10 +411,21 @@ public class MainManager : MonoBehaviour
         OnlineMapsXML generalSettings = prefs["General"];
         map.position = generalSettings.Get<Vector2>("Coordinates");
         map.zoom = generalSettings.Get<int>("Zoom");
-
+        CreateListOfButtons(btnDefault,label);
         List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
 
         map.markers = markers.ToArray();
-    }*/
+    }
     #endregion
+
+    Button CreateListOfButtons(Button temp, string label)
+    {
+        buttonPanel.SetActive(true);
+        temp = Instantiate(btnDefault);
+        temp.transform.SetParent(buttonPanel.transform, false);
+        btnDefault.gameObject.SetActive(true);
+        btnDefault.GetComponentInChildren<TextMeshProUGUI>().text = label;
+        btnLoad.onClick.AddListener(() => SaveLoad.TryLoadMarkers(label));
+        return temp;
+    }
 }

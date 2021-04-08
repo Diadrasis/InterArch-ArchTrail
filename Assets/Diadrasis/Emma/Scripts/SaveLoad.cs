@@ -8,7 +8,7 @@ public class SaveLoad : MonoBehaviour
     public static void SaveNewMarkersAndArea(string prefsKey)
     {
         OnlineMapsXML xml = new OnlineMapsXML("Markers");
-
+        
         foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
         {
             // Create marker node
@@ -96,6 +96,7 @@ public class SaveLoad : MonoBehaviour
             listMarkers.Add(marker);
 
             // Create marker
+            FindObjectOfType<MainManager>().settingsScreen.SetActive(false);
             OnlineMapsMarkerManager.CreateItem(position, label);
         }
     }
