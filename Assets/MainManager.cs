@@ -11,7 +11,7 @@ using TMPro;
 public class MainManager : MonoBehaviour
 {
     private OnlineMapsMarker playerMarker;
-    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec, btnMainHolder, btnSave, btnDefault, btnBack, btnLoad, btnCancel;//btnRec to record the path and save it
+    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec, btnMainHolder, btnSave, btnDefault, btnBack, btnLoad, btnCancel, btnNewMarker;//btnRec to record the path and save it
     [Space]
     public TextMeshProUGUI infoText, blackText;
     public float time = 3;
@@ -60,6 +60,7 @@ public class MainManager : MonoBehaviour
         btnSave.gameObject.SetActive(false);
         btnCancel.gameObject.SetActive(false);
         btnDefault.gameObject.SetActive(false);
+        btnNewMarker.onClick.AddListener(() => BeOnNewPlace());
         btnBack.gameObject.SetActive(false);
         btnBack.onClick.AddListener(() => CloseCanvas());
         markerName.onEndEdit.AddListener((b)=>SaveName(markerName));
@@ -328,7 +329,7 @@ public class MainManager : MonoBehaviour
         blackScreen.SetActive(false);
         btnBack.gameObject.SetActive(true);
         CreateListOfButtons(btnDefault, label);
-        //LoadState();
+        LoadState();
     }
     void CloseCanvas()
     {
