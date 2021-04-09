@@ -11,7 +11,7 @@ using TMPro;
 public class MainManager : MonoBehaviour
 {
     private OnlineMapsMarker playerMarker;
-    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec, btnMainHolder, btnSave, btnDefault, btnBack, btnLoad;//btnRec to record the path and save it
+    public Button /*btnLayer,*/ btnCurrentLoc, btnGPS, btnClose, btnSettings,btnResetMap,btnOriginalMap, btnRec, btnMainHolder, btnSave, btnDefault, btnBack, btnLoad, btnCancel;//btnRec to record the path and save it
     [Space]
     public TextMeshProUGUI infoText, blackText;
     public float time = 3;
@@ -30,7 +30,12 @@ public class MainManager : MonoBehaviour
     private OnlineMapsVector2d[] points;
     string currentPath;
     List<string> pathNamesSavedList = new List<string>();
+    private static MainManager _instance;
 
+    public static MainManager instance
+    {
+        get { return _instance; }
+    }
     private void Awake()
     {
         Application.runInBackground = true;
@@ -45,12 +50,15 @@ public class MainManager : MonoBehaviour
         locationService = OnlineMapsLocationService.instance;
         btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
         btnClose.onClick.AddListener(() => CloseCanvas());
+        btnCancel.onClick.AddListener(() => RemoveMarker());
         btnSettings.onClick.AddListener(() => OpenSettings());
         btnResetMap.onClick.AddListener(() => BeOnNewPlace());
         btnOriginalMap.onClick.AddListener(() => MessiniLocation());
+        btnLoad.onClick.AddListener(() => LoadState());
         btnMainHolder.onClick.AddListener(() => OpenCloseMenu());
         btnSave.onClick.AddListener(() => SaveState());
         btnSave.gameObject.SetActive(false);
+        btnCancel.gameObject.SetActive(false);
         btnDefault.gameObject.SetActive(false);
         btnBack.gameObject.SetActive(false);
         btnBack.onClick.AddListener(() => CloseCanvas());
@@ -319,7 +327,8 @@ public class MainManager : MonoBehaviour
         settingsScreen.SetActive(true);
         blackScreen.SetActive(false);
         btnBack.gameObject.SetActive(true);
-        LoadState();
+        CreateListOfButtons(btnDefault, label);
+        //LoadState();
     }
     void CloseCanvas()
     {
@@ -327,16 +336,20 @@ public class MainManager : MonoBehaviour
         blackScreen.SetActive(false);
         else if(settingsScreen.activeSelf && !blackScreen.activeSelf)
         settingsScreen.SetActive(false);
-
+    }
+    void RemoveMarker()
+    {
         if (blackScreen.activeSelf && isMarkerCreated)
         {
             blackScreen.SetActive(false);
             OnlineMapsMarkerManager.RemoveAllItems();
+            OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(-90, -180, 90, 180, OnlineMapsPositionRangeType.center);
+            OnlineMaps.instance.Redraw();
         }
     }
     string label;
 
-    private void SaveName(TMP_InputField tmp)
+    public void SaveName(TMP_InputField tmp)
     {
         if (tmp.text.Length > 0)
         {
@@ -348,27 +361,36 @@ public class MainManager : MonoBehaviour
     {
         isNewAreaSet = true;
         isMarkerCreated = true;
-        // Get the coordinates under the cursor.
-        double lng, lat;
-        OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
-        markerName.gameObject.SetActive(true);
+        if (isMarkerCreated)
+        {
+            // Get the coordinates under the cursor.
+            double lng, lat;
+            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
+            markerName.gameObject.SetActive(true);
+            blackScreen.SetActive(true);
+            foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
+            {
+                SaveName(markerName);
+                label = markerName.GetComponentInChildren<TextMeshProUGUI>().text;
+                marker.label = label;
+                btnDefault.gameObject.SetActive(true);
+                btnDefault.GetComponentInChildren<TextMeshProUGUI>().text = label;
+                SaveLoad.SaveNewMarkersAndArea(label);
+                //btnLoad.onClick.AddListener(() => SaveLoad.TryLoadMarkers(label));
+            }
 
-        btnDefault.gameObject.SetActive(true);
-        btnDefault.GetComponentInChildren<TextMeshProUGUI>().text = label;
-        //btnLoad.onClick.AddListener(() => SaveLoad.TryLoadMarkers(label));
-        blackScreen.SetActive(true);
+            // Create a new marker.
+            OnlineMapsMarkerManager.CreateItem(lng, lat, label);
+            OnlineMaps.instance.zoomRange = new OnlineMapsRange(10, 20);
+            OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(locationService.position.y, locationService.position.x, (float)lat, (float)lng, OnlineMapsPositionRangeType.center);
+            OnlineMaps.instance.Redraw();
 
 
-        // Create a new marker.
-        OnlineMapsMarkerManager.CreateItem(lng, lat, label);
-        OnlineMaps.instance.zoomRange = new OnlineMapsRange(10, 20);
-        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(locationService.position.y, locationService.position.x, (float)lat, (float)lng, OnlineMapsPositionRangeType.center);
-        OnlineMaps.instance.Redraw();
-
-
-        blackText.text = "Do you want to save the location?";
-        btnSave.gameObject.SetActive(true);
-        SaveLoad.SaveNewMarkersAndArea(label);
+            blackText.text = "Do you want to save the location?";
+            btnSave.gameObject.SetActive(true);
+            btnCancel.gameObject.SetActive(true);
+            
+        }
         //Instantiate(markerIns, new Vector2((float)lng, (float)lat), Quaternion.identity);//instantiate marker as gameObject and not the one on top of map.
         //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(),Color.red,3)); //draw a line between markers and restrict an area according to those markers
     }
@@ -427,10 +449,11 @@ public class MainManager : MonoBehaviour
         OnlineMapsXML generalSettings = prefs["General"];
         map.position = generalSettings.Get<Vector2>("Coordinates");
         map.zoom = generalSettings.Get<int>("Zoom");
-        CreateListOfButtons(btnDefault,label);
+        
         List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
-
-        map.markers = markers.ToArray();
+        OnlineMapsMarkerManager.SetItems(markers);
+        settingsScreen.SetActive(false);
+        //map.markers = markers.ToArray();
     }
     #endregion
 
@@ -438,6 +461,7 @@ public class MainManager : MonoBehaviour
     {
         buttonPanel.SetActive(true);
         temp = Instantiate(btnDefault);
+        temp.GetComponentInChildren<TextMeshProUGUI>().text = label;
         temp.transform.SetParent(buttonPanel.transform, false);
         
         return temp;
@@ -450,7 +474,9 @@ public class MainManager : MonoBehaviour
         if (locationService.allowUpdatePosition)
         {
             OnlineMapsMarkerManager.CreateItem(locationService.position.y,locationService.position.x);
-            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+            OnlineMapsDrawingLine line = new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.items.Select(m => m.position).ToArray(), Color.red, 5);
+            line.followRelief = true;
+            OnlineMapsDrawingElementManager.AddItem(line);
         }
         yield return new WaitForSeconds(5f);
         

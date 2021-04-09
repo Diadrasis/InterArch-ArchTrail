@@ -14,7 +14,8 @@ public class SaveLoad : MonoBehaviour
             // Create marker node
             OnlineMapsXML markerNode = xml.Create("Marker");
             markerNode.Create("Position", marker.position);
-            markerNode.Create("Label", marker.label);
+            //MainManager.instance.markerName.text = marker.label;
+            markerNode.Create("Label", MainManager.instance.markerName.text = marker.label);
             Debug.Log("Save New "+marker.label);
         }
 
