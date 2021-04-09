@@ -74,6 +74,7 @@ public class MainManager : MonoBehaviour
         SaveLoad.TryLoadMarkers(OnlineMaps.instance.labels.ToString());
         CreateListOfButtons(btnDefault, label);
         //LoadState();
+        //CheckMyLocation();
     }
 
     void InitLocation()
@@ -431,7 +432,7 @@ public class MainManager : MonoBehaviour
         // Save settings to PlayerPrefs
         PlayerPrefs.SetString(prefsKey, prefs.outerXml);
         blackScreen.SetActive(false);
-        //SaveLoad.SaveNewMarkersAndArea(map.name);
+        SaveLoad.SaveNewMarkersAndArea(prefsKey);
         //PlayerPrefs.SetString("mapTypeName", mapTypeName);
     }
     private void LoadState()
@@ -447,15 +448,16 @@ public class MainManager : MonoBehaviour
         map.zoom = generalSettings.Get<int>("Zoom");
 
         List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
+
         OnlineMapsMarkerManager.SetItems(markers);
+
         settingsScreen.SetActive(false);
-        OnlineMaps.instance.zoomRange = new OnlineMapsRange(10, 20);
-        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(map.position.y, map.position.x,
-            map.position.y / locationService.desiredAccuracy, map.position.x / locationService.desiredAccuracy,
-            OnlineMapsPositionRangeType.center);
-        OnlineMaps.instance.Redraw();
+       //zoomConstraint and position was here if everything wokrs, remove the comment
+        
+        //OnlineMaps.instance.RedrawImmediately();
 
         map.markers = markers.ToArray();
+        SaveLoad.TryLoadMarkers(prefsKey);
     }
     #endregion
 
