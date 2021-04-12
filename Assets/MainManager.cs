@@ -82,7 +82,7 @@ public class MainManager : MonoBehaviour
     {
         isNewAreaSet = false;
         isMessiniPlace = false;
-        isMarkerCreated = false;
+        
         locationService = OnlineMapsLocationService.instance;
         //playerMarker = locationService.marker2DTexture.LoadImage();
         settingsScreen.SetActive(false);
@@ -179,7 +179,7 @@ public class MainManager : MonoBehaviour
         }
         else
         {
-            blackScreen.SetActive(false);
+           //blackScreen.SetActive(false);
             locationService.StartLocationService();
             infoText.text = "Sto android Build sto else";
         }
@@ -187,7 +187,7 @@ public class MainManager : MonoBehaviour
 
     void Update()
     {
-        IsAndroidBuild();//on final build uncomment
+        //IsAndroidBuild();//on final build uncomment
         if (!isMovement) return;
 
         // update relative position
@@ -446,27 +446,7 @@ public class MainManager : MonoBehaviour
     }
     private void LoadState()
     {
-        /* if (!PlayerPrefs.HasKey(prefsKey)) return;
-
-         OnlineMaps map = OnlineMaps.instance;
-
-         OnlineMapsXML prefs = OnlineMapsXML.Load(PlayerPrefs.GetString(prefsKey));
-
-         OnlineMapsXML generalSettings = prefs["General"];
-         map.position = generalSettings.Get<Vector2>("Coordinates");
-         map.zoom = generalSettings.Get<int>("Zoom");
-
-         List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
-
-         OnlineMapsMarkerManager.SetItems(markers);
-
-
-         //zoomConstraint and position was here if everything wokrs, remove the comment
-         OnlineMaps.instance.zoomRange = new OnlineMapsRange(10,20);
-
-         OnlineMaps.instance.Redraw();
-
-         map.markers = markers.ToArray();*/
+        
         OnlineMapsControlBase.instance.GetInputPosition();
         SaveLoad.TryLoadMarkers(prefsKey);
         settingsScreen.SetActive(false);
