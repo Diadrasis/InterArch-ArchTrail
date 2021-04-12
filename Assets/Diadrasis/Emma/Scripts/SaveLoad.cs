@@ -60,9 +60,15 @@ public class SaveLoad : MonoBehaviour
             // Gets coordinates and label
             Vector2 position = node.Get<Vector2>("Position");
             string label = node.Get<string>("Label");
-
+            //OnlineMaps.instance.zoomRange = new OnlineMapsRange(10, 20);
+            
+            //OnlineMapsControlBase.instance.GetPosition(position);
+            
+            Debug.Log("Try Load State: " + position);
             // Create marker
             OnlineMapsMarkerManager.CreateItem(position, label);
+            OnlineMapsControlBase.instance.GetPosition(position);
+
         }
     }
 

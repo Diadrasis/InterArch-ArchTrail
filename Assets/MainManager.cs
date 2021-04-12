@@ -18,9 +18,9 @@ public class MainManager : MonoBehaviour
     private float angle;
     public TMP_InputField markerName;
 
-    private bool isMovement, isAutoMarkerEnabled, isNewAreaSet, hasPlayed, isRecPath, isMarkerCreated;
-    private Vector2 fromPosition, toPosition;
-    private Vector2 toPositionTest;
+    private bool isMovement, isAutoMarkerEnabled, isNewAreaSet, hasPlayed, isRecPath, isMarkerCreated, isMessiniPlace;
+    private Vector2 fromPosition, toPosition, toPositionFinal, toPositionTest;
+    
     private double fromTileX, fromTileY, toTileX, toTileY;
     private int moveZoom;
     OnlineMapsLocationService locationService;
@@ -40,7 +40,7 @@ public class MainManager : MonoBehaviour
     {
         Application.runInBackground = true;
         blackScreen.SetActive(false);
-        settingsScreen.SetActive(false);
+        //settingsScreen.SetActive(true);
         buttonPanel.SetActive(false);
         //btnClose.gameObject.SetActive(false);
         //OpenCloseCanvas(false);
@@ -53,10 +53,12 @@ public class MainManager : MonoBehaviour
         btnCancel.onClick.AddListener(() => RemoveMarker());
         btnSettings.onClick.AddListener(() => OpenSettings());
         btnResetMap.onClick.AddListener(() => BeOnNewPlace());
-        btnOriginalMap.onClick.AddListener(() => MessiniLocation());
+        btnOriginalMap.onClick.AddListener(() => MessiniLocation(locationService.position));
         btnLoad.onClick.AddListener(() => LoadState());
         btnMainHolder.onClick.AddListener(() => OpenCloseMenu());
         btnSave.onClick.AddListener(() => SaveState());
+        btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
+        
         btnSave.gameObject.SetActive(false);
         btnCancel.gameObject.SetActive(false);
         btnDefault.gameObject.SetActive(false);
@@ -64,13 +66,12 @@ public class MainManager : MonoBehaviour
         btnBack.gameObject.SetActive(false);
         btnBack.onClick.AddListener(() => CloseCanvas());
         markerName.onEndEdit.AddListener((b) => SaveName(markerName));
-        InitLocation();
+        if(!isMessiniPlace)InitLocation();
         toPosition = new Vector2(21.91794f, 37.17928f); //correct position for app
         toPositionTest = new Vector2(23.72402f, 37.97994f); //for testing purposes
-        locationService.OnLocationChanged += CheckAppLocation;
-        //markerName.text = PlayerPrefs.GetString("markers");
+
         markerName.gameObject.SetActive(false);
-        //settingsScreen.SetActive(false);
+        settingsScreen.SetActive(true);
         SaveLoad.TryLoadMarkers(OnlineMaps.instance.labels.ToString());
         CreateListOfButtons(btnDefault, label);
         //LoadState();
@@ -80,13 +81,14 @@ public class MainManager : MonoBehaviour
     void InitLocation()
     {
         isNewAreaSet = false;
+        isMessiniPlace = false;
         isMarkerCreated = false;
         locationService = OnlineMapsLocationService.instance;
         //playerMarker = locationService.marker2DTexture.LoadImage();
-        playerMarker = OnlineMapsMarkerManager.CreateItem(toPosition, null, "Player");
+        settingsScreen.SetActive(false);
+        playerMarker = OnlineMapsMarkerManager.CreateItem(locationService.position, null, "Player");
         OnlineMaps.instance.mapType = "google.satellite";
-        OnlineMaps.instance.zoomRange = new OnlineMapsRange(15, 20);//constrain zoom
-        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(37.17f, 21.91f, 37.18f, 21.923f);//constraint to messini area
+       
         if (locationService == null)
         {
             Debug.LogError(
@@ -96,22 +98,40 @@ public class MainManager : MonoBehaviour
 
         // Subscribe to the change location event.
         locationService.OnLocationChanged += OnLocationChanged;
-        OnlineMapsControlBase.instance.OnMapClick -= OnMapClick;
+        OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
+
         if (CheckForLocationServices()) return;
     }
     //if we move out of messini in order to go back in the original place and constraints
-    void MessiniLocation()
+    void MessiniLocation(Vector2 pos)
     {
-        settingsScreen.SetActive(false);
-        OnLocationChanged(toPosition);
-        //CheckMyLocation();
-        OnlineMaps.instance.position = toPosition;
-        OnlineMaps.instance.Redraw();
-        //playerMarker = OnlineMapsMarkerManager.CreateItem(toPosition, null, "Player");
-        OnlineMaps.instance.zoomRange = new OnlineMapsRange(15, 20);//constrain zoom
-        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(37.17f, 21.90f, 37.18f, 21.92f);//constraint to messini area
+        pos = locationService.position; //my position from gps
+        float distance = OnlineMapsUtils.DistanceBetweenPoints(toPositionTest, pos).sqrMagnitude;
+        isMessiniPlace = true;
+        if (isMessiniPlace && distance <= locationService.desiredAccuracy)
+        {
+            settingsScreen.SetActive(false);
+            infoText.text = "You are in the correct area " + pos + " with set position " + toPositionTest;//testing
+            blackText.text = "Press the red button to record your route from main menu icon.";
+            blackScreen.SetActive(true);
+           
+            OnlineMaps.instance.position = toPosition;
+            OnlineMaps.instance.Redraw();
+            playerMarker = OnlineMapsMarkerManager.CreateItem(locationService.position, null, "Player");
+            OnlineMaps.instance.zoomRange = new OnlineMapsRange(15, 20);//constrain zoom
+            OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(37.17f, 21.91f, 37.2f, 21.93f);//constraint to messini area
+            OnlineMapsControlBase.instance.OnMapClick -= OnMapClick;
+        }
+        else
+        {
+            settingsScreen.SetActive(true);
+            //blackText.text = "Please go near the area. Your location is: "+pos+" and the marker is: "+ toPosition; //for final build
+            blackText.text = "Please go near the area. Your location is: " + pos + " and the marker is: " + toPositionTest; //testing
+           
+        }
 
     }
+    //location services to check if gps is running on android
     private bool CheckForLocationServices()
     {
         if (locationService == null) return false;
@@ -122,8 +142,8 @@ public class MainManager : MonoBehaviour
             {
                 Debug.Log(locationService);
                 infoText.text = "Checking location";
-                //CheckAppLocation(toPosition);
-                CheckAppLocation(toPositionTest);
+                locationService.OnLocationChanged += OnLocationChanged;
+                //CheckMyLocation();
                 return true;
             }
             else
@@ -132,7 +152,7 @@ public class MainManager : MonoBehaviour
                 blackScreen.SetActive(true);
                 //btnClose.gameObject.SetActive(true); //on build we can remove it
                 blackText.text = "Press the gps button";
-                //StartCoroutine(CheckAppLocation());
+                
                 return true;
             }
 
@@ -154,19 +174,20 @@ public class MainManager : MonoBehaviour
         {
             blackScreen.SetActive(true);
             blackText.text = "Press the gps button to grant the location permission of your mobile";
+            
             //locationService.StopLocationService();
         }
         else
         {
-            //CheckAppLocation(toPosition);
+            blackScreen.SetActive(false);
+            locationService.StartLocationService();
             infoText.text = "Sto android Build sto else";
-            CheckAppLocation(OnlineMaps.instance.position);
         }
     }
 
     void Update()
     {
-        //isAndroidBuild();//on final build uncomment
+        IsAndroidBuild();//on final build uncomment
         if (!isMovement) return;
 
         // update relative position
@@ -185,11 +206,13 @@ public class MainManager : MonoBehaviour
     void CheckMyLocation()
     {
         fromPosition = OnlineMaps.instance.position;
-
+        toPositionFinal = locationService.position;
+        locationService.OnLocationChanged += OnLocationChanged;
+        playerMarker = OnlineMapsMarkerManager.CreateItem(locationService.position, null, "Player");
         // calculates tile positions
         moveZoom = OnlineMaps.instance.zoom;
         OnlineMaps.instance.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
-        OnlineMaps.instance.projection.CoordinatesToTile(toPositionTest.x, toPositionTest.y, moveZoom, out toTileX, out toTileY);
+        OnlineMaps.instance.projection.CoordinatesToTile(toPositionFinal.x, toPositionFinal.y, moveZoom, out toTileX, out toTileY);
         //OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
 
         // if tile offset < 4, then start smooth movement
@@ -233,33 +256,10 @@ public class MainManager : MonoBehaviour
         playerMarker.position = position;
     }
 
-    void CheckAppLocation(Vector2 loc)
+    /*void CheckAppLocation(Vector2 loc)
     {
-        loc = toPositionTest;//OnlineMaps.instance.position;//new Vector2(23.8f, 38.1f);
-        //float distance = OnlineMapsUtils.DistanceBetweenPoints(toPosition, loc).sqrMagnitude;//correct for final build
-        float distance = OnlineMapsUtils.DistanceBetweenPoints(toPositionTest, loc).sqrMagnitude;//testing
-        if (distance <= locationService.desiredAccuracy)
-        {
-            //infoText.text = "You are in the correct area "+loc+" with set position "+ toPosition; //correct for final build
-            infoText.text = "You are in the correct area " + loc + " with set position " + toPositionTest;//testing
-            blackText.text = "Press the red button to record your route from main menu icon.";
-            btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
-            blackScreen.SetActive(true);
-            //btnRec.onClick.AddListener(() => RecMyPath());
-            //OpenCloseCanvas(false);
-            //btnLayer.onClick.AddListener(() => CheckLayer());
-
-        }
-        else
-        {
-            blackScreen.SetActive(true);
-            btnClose.gameObject.SetActive(true);
-            //blackText.text = "Please go near the area. Your location is: "+loc+" and the marker is: "+ toPosition; //for final build
-            blackText.text = "Please go near the area. Your location is: " + loc + " and the marker is: " + toPositionTest; //testing
-            btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
-            //btnLayer.onClick.AddListener(() => CheckLayer());
-        }
-    }
+        
+    }*/
     //to screencapture the path
     /*void RecMyPath()
     {
@@ -310,13 +310,15 @@ public class MainManager : MonoBehaviour
 
     void BeOnNewPlace()
     {
+        locationService.OnLocationChanged += OnLocationChanged;
+        CheckMyLocation();
         OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
         settingsScreen.SetActive(false);
-        OnLocationChanged(locationService.position);
-        CheckMyLocation();
+        if (playerMarker == null)
+            OnlineMapsMarkerManager.RemoveAllItems(m => m != playerMarker);
         OnlineMapsMarkerManager.RemoveAllItems();
         //btnLayer.onClick.AddListener(() => CheckLayer());
-        btnCurrentLoc.onClick.AddListener(() => CheckMyLocation());
+        
         OnlineMaps.instance.zoomRange = new OnlineMapsRange(5, 20);
         OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(-90, -180, 90, 180, OnlineMapsPositionRangeType.center);
         OnlineMaps.instance.Redraw();
@@ -344,11 +346,17 @@ public class MainManager : MonoBehaviour
         if (blackScreen.activeSelf && isMarkerCreated)
         {
             blackScreen.SetActive(false);
-            OnlineMapsMarkerManager.RemoveAllItems();
+            OnlineMapsMarkerManager.RemoveAllItems(m => m != playerMarker);
+            OnlineMaps.instance.zoomRange = new OnlineMapsRange(5, 20);
             OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(-90, -180, 90, 180, OnlineMapsPositionRangeType.center);
             OnlineMaps.instance.Redraw();
         }
     }
+    //create a marker as gameobject so we can remove on long press
+    /*private void OnMarkerLongPress(OnlineMapsMarker marker)
+    {
+        OnlineMapsMarkerManager.RemoveItem(marker);
+    }*/
     string label;
 
     public void SaveName(TMP_InputField tmp)
@@ -374,7 +382,7 @@ public class MainManager : MonoBehaviour
             btnDefault.gameObject.SetActive(true);
             btnDefault.GetComponentInChildren<TextMeshProUGUI>().text = label;
             SaveLoad.SaveNewMarkersAndArea(label);
-            btnLoad.onClick.AddListener(() => SaveLoad.TryLoadMarkers(label));
+            
 
             // Create a new marker.
             OnlineMapsMarkerManager.CreateItem(lng, lat, label);
@@ -391,7 +399,8 @@ public class MainManager : MonoBehaviour
         //Instantiate(markerIns, new Vector2((float)lng, (float)lat), Quaternion.identity);//instantiate marker as gameObject and not the one on top of map.
         //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(),Color.red,3)); //draw a line between markers and restrict an area according to those markers
     }
-    //in order to show the marker after saving it and show it's label, create a new method where you can save the info and show marker after save button is pressed
+
+    
 
     void OpenCloseMenu()
     {
@@ -437,27 +446,30 @@ public class MainManager : MonoBehaviour
     }
     private void LoadState()
     {
-        if (!PlayerPrefs.HasKey(prefsKey)) return;
+        /* if (!PlayerPrefs.HasKey(prefsKey)) return;
 
-        OnlineMaps map = OnlineMaps.instance;
+         OnlineMaps map = OnlineMaps.instance;
 
-        OnlineMapsXML prefs = OnlineMapsXML.Load(PlayerPrefs.GetString(prefsKey));
+         OnlineMapsXML prefs = OnlineMapsXML.Load(PlayerPrefs.GetString(prefsKey));
 
-        OnlineMapsXML generalSettings = prefs["General"];
-        map.position = generalSettings.Get<Vector2>("Coordinates");
-        map.zoom = generalSettings.Get<int>("Zoom");
+         OnlineMapsXML generalSettings = prefs["General"];
+         map.position = generalSettings.Get<Vector2>("Coordinates");
+         map.zoom = generalSettings.Get<int>("Zoom");
 
-        List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
+         List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
 
-        OnlineMapsMarkerManager.SetItems(markers);
+         OnlineMapsMarkerManager.SetItems(markers);
 
-        settingsScreen.SetActive(false);
-       //zoomConstraint and position was here if everything wokrs, remove the comment
-        
-        //OnlineMaps.instance.RedrawImmediately();
 
-        map.markers = markers.ToArray();
+         //zoomConstraint and position was here if everything wokrs, remove the comment
+         OnlineMaps.instance.zoomRange = new OnlineMapsRange(10,20);
+
+         OnlineMaps.instance.Redraw();
+
+         map.markers = markers.ToArray();*/
+        OnlineMapsControlBase.instance.GetInputPosition();
         SaveLoad.TryLoadMarkers(prefsKey);
+        settingsScreen.SetActive(false);
     }
     #endregion
 

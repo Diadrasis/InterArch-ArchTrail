@@ -4410,7 +4410,7 @@ MonoBehaviour:
   updatePosition: 1
   useCompassForMarker: 0
   useGPSEmulator: 1
-  desiredAccuracy: 1000
+  desiredAccuracy: 500
   requestPermissionRuntime: 1
   updateDistance: 10
 --- !u!114 &1874735302
