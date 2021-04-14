@@ -664,7 +664,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &284174840
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2668,7 +2668,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &911275917
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3221,7 +3221,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1035755652
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3339,7 +3339,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1037881414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4738,7 +4738,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1649755444
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5410,7 +5410,7 @@ MonoBehaviour:
   trueHeading: 0
   updatePosition: 1
   useCompassForMarker: 0
-  useGPSEmulator: 1
+  useGPSEmulator: 0
   desiredAccuracy: 500
   requestPermissionRuntime: 1
   updateDistance: 10
@@ -5575,7 +5575,7 @@ MonoBehaviour:
   _activeTypeSettings: 12Tile version1513865
   _zoom: 2
   latitude: 0
-  longitude: 22.26156250000001
+  longitude: 23.31625000000001
 --- !u!1 &1920292830
 GameObject:
   m_ObjectHideFlags: 0
@@ -6535,7 +6535,7 @@ PrefabInstance:
     - target: {fileID: 5718443490325556335, guid: d8485201277b07d46931a55b7221664f,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5718443490325556335, guid: d8485201277b07d46931a55b7221664f,
         type: 3}
@@ -6545,7 +6545,7 @@ PrefabInstance:
     - target: {fileID: 5718443490325556335, guid: d8485201277b07d46931a55b7221664f,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5718443490325556335, guid: d8485201277b07d46931a55b7221664f,
         type: 3}
@@ -6595,7 +6595,7 @@ PrefabInstance:
     - target: {fileID: 5718443490325556335, guid: d8485201277b07d46931a55b7221664f,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 5718443490325556335, guid: d8485201277b07d46931a55b7221664f,
         type: 3}
@@ -6665,7 +6665,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2144862136
 RectTransform:
   m_ObjectHideFlags: 0
