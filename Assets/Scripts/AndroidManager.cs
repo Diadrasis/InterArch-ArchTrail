@@ -5,7 +5,7 @@ using UnityEngine.Android;
 #endif
 using Stathis.Android;
 
-public class AppManager : MonoBehaviour
+public class AndroidManager : MonoBehaviour
 {
     private OnlineMapsLocationService locationService;
     public MainManager mm;
