@@ -1121,6 +1121,7 @@ MonoBehaviour:
   mapScreen: {fileID: 1021204756}
   selectAreaPrefab: {fileID: 5354931925219617175, guid: 54cc73a73d1feb34790384c4effc180e,
     type: 3}
+  availableAreasPanel: {fileID: 1080319227}
 --- !u!1 &1796424459
 GameObject:
   m_ObjectHideFlags: 0

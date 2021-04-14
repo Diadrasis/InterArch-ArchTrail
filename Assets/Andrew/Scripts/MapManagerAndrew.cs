@@ -22,7 +22,7 @@ public class MapManagerAndrew : MonoBehaviour
         List<cArea> areasFromDatabase = new List<cArea>()
         {
             new cArea("Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector4(21.9160667457503f, 37.1700252387224f , 21.9227518498302f, 37.178659594564f)),
-            new cArea("", new Vector2(), 4, new Vector4())
+            new cArea("Αθήνα", new Vector2(0f, 0f), 17, new Vector4(0f, 0f, 0f, 0f))
         };
 
         return areasFromDatabase;
@@ -46,7 +46,5 @@ public class MapManagerAndrew : MonoBehaviour
         Debug.Log("maxLongitude = " + areas[_index].constraints.z);
         Debug.Log("maxLatitude = " + areas[_index].constraints.w);
     }
-
-    //public 
     #endregion
 }
