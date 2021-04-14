@@ -2,23 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class cRoute : MonoBehaviour
+public class cRoute
 {
-    public static cRoute instance { get; private set; }
-    string titleRoute;
-    List<cRoutePoints> rPoints = new List<cRoutePoints>();
+    string title;
+    List<cRoutePoints> routePoints = new List<cRoutePoints>();
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
     //create a route
     public void Create()
     {

@@ -42,10 +42,8 @@ public class MainManager : MonoBehaviour
     }
     void Start()
     {
-        /*#if PLATFORM_ANDROID
-                IsAndroidBuild();
-        #endif*/
-       
+        
+        ShowPlaceOnMap(40.626801887711856f, 22.948335921548995f, 15);
         locationService = OnlineMapsLocationService.instance;
         btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
         btnClose.onClick.AddListener(() => CloseCanvas());
@@ -65,14 +63,14 @@ public class MainManager : MonoBehaviour
         btnBack.gameObject.SetActive(false);
         btnBack.onClick.AddListener(() => CloseCanvas());
         markerName.onEndEdit.AddListener((b) => SaveName(markerName.text));
-        if(!isMessiniPlace)InitLocation();
+        //if(!isMessiniPlace)InitLocation();
         toPosition = new Vector2(21.91794f, 37.17928f); //correct position for app
         toPositionTest = new Vector2(23.72402f, 37.97994f); //for testing purposes
 
         markerName.gameObject.SetActive(false);
         
-        SaveLoad.TryLoadMarkers(OnlineMaps.instance.labels.ToString());
-        CreateListOfButtons(btnPrefabToLoad, label);
+       //SaveLoad.TryLoadMarkers(OnlineMaps.instance.labels.ToString());
+        //CreateListOfButtons(btnPrefabToLoad, label);
         //LoadState();
         //CheckMyLocation();
     }
@@ -265,7 +263,7 @@ public class MainManager : MonoBehaviour
     public void OnLocationChanged(Vector2 position)
     {
         position = locationService.position;
-        playerMarker.position = position;
+        //playerMarker.position = position;
     }
 
     /*void CheckAppLocation(Vector2 loc)
@@ -487,11 +485,14 @@ public class MainManager : MonoBehaviour
         blackText.text = textNew;
     }
 
-    void ShowPlaceOnMap(double posLat, double posLng, int zoomSave)
+    void ShowPlaceOnMap(double posLat, double posLng, int zoom)
     {
-        isMessiniPlace = false;
-        OnlineMaps.instance.GetTilePosition(out posLng,out posLat, zoomSave);
-        OnlineMaps.instance.SetTilePosition(posLng, posLat, zoomSave);
-        OnlineMaps.instance.Redraw();
+        OnlineMaps.instance.SetPositionAndZoom(posLng, posLat, zoom);
+        //OnlineMaps.instance.Redraw();
+    }
+
+    void ShowPlaceOnMapVector(Vector2 pos, int zoom)
+    {
+
     }
 }

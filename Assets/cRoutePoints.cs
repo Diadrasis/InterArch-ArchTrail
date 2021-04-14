@@ -2,33 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class cRoutePoints : MonoBehaviour
+public class cRoutePoints 
 {
-    Vector2 pos;
+    Vector2 position;
     float time;
 
-    // Start is called before the first frame update
-    void Start()
+    public cRoutePoints(Vector2 _position, float _time)
     {
-        
+        position = _position;
+        time = _time;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     //create route points when position or time is updated
-    void Create()
+    /*void Create()
     {
 
-    }
+    }*/
 
     //save each point in a route
-    void Save()
+    /*void Save()
     {
 
-    }
+    }*/
 
     //delete a route point
     void Delete()
