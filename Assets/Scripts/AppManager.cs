@@ -34,7 +34,6 @@ public class AppManager : MonoBehaviour
 #if PLATFORM_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
-            
             Debug.Log("Please grant your gps location");
             Permission.RequestUserPermission(Permission.FineLocation);
             mm.settingsScreen.SetActive(true);

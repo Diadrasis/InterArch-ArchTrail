@@ -45,7 +45,7 @@ public class MainManager : MonoBehaviour
         
         ShowPlaceOnMap(40.626801887711856f, 22.948335921548995f, 15);
         locationService = OnlineMapsLocationService.instance;
-        btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
+        
         btnClose.onClick.AddListener(() => CloseCanvas());
         btnCancel.onClick.AddListener(() => RemoveMarker());
         btnSettings.onClick.AddListener(() => OpenSettings());
@@ -97,7 +97,7 @@ public class MainManager : MonoBehaviour
         /*locationService.OnLocationChanged += OnLocationChanged;
         OnlineMapsControlBase.instance.OnMapClick += OnMapClick;*/
 
-        if (CheckForLocationServices()) return;
+        //if (CheckForLocationServices()) return;
     }
     //if we move out of messini in order to go back in the original place and constraints
     void MessiniLocation(Vector2 pos)
@@ -138,7 +138,7 @@ public class MainManager : MonoBehaviour
         isMessiniPlace = false;
     }
     //location services to check if gps is running on android
-    private bool CheckForLocationServices()
+    /*private bool CheckForLocationServices()
     {
         if (locationService == null) return false;
 
@@ -167,8 +167,8 @@ public class MainManager : MonoBehaviour
 
         }
         return false;
-    }
-    void IsAndroidBuild()
+    }*/
+/*    void IsAndroidBuild()
     {
         infoText.text = "Android prin na dei pws eimai se android";
 #if PLATFORM_ANDROID
@@ -193,7 +193,7 @@ public class MainManager : MonoBehaviour
             locationService.StartLocationService();
             infoText.text = "Sto android Build sto else";
         }
-    }
+    }*/
 
     void Update()
     {
@@ -308,15 +308,15 @@ public class MainManager : MonoBehaviour
 
         yield break;
     }*/
-    void OpenNativeAndroidSettings()
+    /*void OpenNativeAndroidSettings()
     {
         AndroidBridge.OpenIntent(IntentNames.GPS_SETTINGS);
-    }
+    }*/
 
-    void OnApplicationQuit()
+    /*void OnApplicationQuit()
     {
         locationService.StopLocationService();
-    }
+    }*/
 
     void BeOnNewPlace()
     {
