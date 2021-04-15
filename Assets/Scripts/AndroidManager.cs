@@ -95,5 +95,10 @@ public class AndroidManager : MonoBehaviour
     public void TestAndrew()
     {
         // This is a second test
+	}
+	
+    void TestEmma()
+    {
+        //test for Emma
     }
 }
