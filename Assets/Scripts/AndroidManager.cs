@@ -37,10 +37,10 @@ public class AndroidManager : MonoBehaviour
             Debug.Log("Please grant your gps location");
             Permission.RequestUserPermission(Permission.FineLocation);
             mm.settingsScreen.SetActive(true);
-            mm.settingsText.text = "Press the gps button to grant the access permission";
-            mm.btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
+            mm.txtSettings.text = "Press the gps button to grant the access permission";
+            mm.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
             mm.btnMessiniMap.gameObject.SetActive(false);
-            mm.btnNewMap.gameObject.SetActive(false);
+            mm.btnNewAreaOnMap.gameObject.SetActive(false);
             //infotext to inform user whty to give access on gps
         }
 #endif
@@ -70,10 +70,10 @@ public class AndroidManager : MonoBehaviour
                 //these lines can uncomment on build or make suer to use the gpsEmulator from Map gameObject when UI manager is finished change the objects(texts,btns etc)
                 IsAndroidBuild();
                 mm.settingsScreen.SetActive(true);
-                mm.settingsText.text = "Press the gps button to grant the access permission";
-                mm.btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
+                mm.txtSettings.text = "Press the gps button to grant the access permission";
+                mm.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
                 mm.btnMessiniMap.gameObject.SetActive(false);
-                mm.btnNewMap.gameObject.SetActive(false);
+                mm.btnNewAreaOnMap.gameObject.SetActive(false);
                 Debug.Log("Please grant your gps location");
                 return true;
             }
