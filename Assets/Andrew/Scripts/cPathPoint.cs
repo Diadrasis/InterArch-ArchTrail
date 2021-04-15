@@ -2,36 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class cRoutePointAndrew
+public class cPathPoint
 {
     Vector2 position;
     float time;
 
-    public cRoutePointAndrew(Vector2 _position, float _time)
+    public cPathPoint(Vector2 _position, float _time)
     {
         position = _position;
         time = _time;
     }
 
-    //create route points when position or time is updated
+    //create path points when position or time is updated
     /*void Create()
     {
 
     }*/
 
-    //save each point in a route
+    //save each point in a path
     /*void Save()
     {
 
     }*/
 
-    //delete a route point
+    //delete a path point
     void Delete()
     {
 
     }
 
-    //show/load route points in a route. Probable will be associated with cRoute
+    //show/load path points in a path. Probable will be associated with cPath
     void Show()
     {
 

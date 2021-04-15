@@ -246,7 +246,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &434395631
 Transform:
   m_ObjectHideFlags: 0
@@ -565,9 +565,9 @@ RectTransform:
   m_Father: {fileID: 1070892675}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 540, y: -230}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 420, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &809091556
@@ -693,9 +693,9 @@ RectTransform:
   m_Father: {fileID: 1070892675}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 540, y: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 150}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &939935126
@@ -811,7 +811,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1021204757
 RectTransform:
   m_ObjectHideFlags: 0
@@ -921,7 +921,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1792453, g: 0.16148986, b: 0.16148986, a: 1}
+  m_Color: {r: 0.1792453, g: 0.16148986, b: 0.16148986, a: 0.49019608}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1082,9 +1082,9 @@ RectTransform:
   m_Father: {fileID: 1070892675}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 540, y: -310}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1080319229
@@ -2804,9 +2804,9 @@ RectTransform:
   m_Father: {fileID: 718220961421040558}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 120, y: 0}
   m_SizeDelta: {x: 240, y: 80}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &718220960673498922
@@ -3140,30 +3140,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c5ed341b97098e48aecb2e9d48672c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  btnCurrentLoc: {fileID: 718220960975860755}
-  btnGPS: {fileID: 718220961726902973}
-  btnClose: {fileID: 718220961646043480}
-  btnSettings: {fileID: 718220960721901325}
-  btnNewMap: {fileID: 718220962394640408}
+  btnLayer: {fileID: 0}
+  btnCurrentLocation: {fileID: 0}
+  btnGPSPermission: {fileID: 0}
+  btnCloseWarningScreen: {fileID: 0}
+  btnOpenSettingsScreen: {fileID: 0}
+  btnNewAreaOnMap: {fileID: 0}
   btnMessiniMap: {fileID: 718220960606916059}
-  btnRec: {fileID: 718220960509254534}
+  btnRecord: {fileID: 0}
   btnMainMenuHolder: {fileID: 718220961144605427}
   btnSave: {fileID: 718220960801744023}
   btnPrefabToLoad: {fileID: 718220960673498923}
-  btnBack: {fileID: 718220962126620924}
+  btnBackFromSettingsScreen: {fileID: 0}
   btnLoad: {fileID: 5092546597721063697}
-  btnCancel: {fileID: 718220960529504960}
+  btnCancelMarker: {fileID: 0}
   btnNewMarker: {fileID: 718220962543968814}
-  infoText: {fileID: 718220962041232322}
-  blackText: {fileID: 718220962074751100}
-  settingsText: {fileID: 718220962007521977}
-  time: 3
-  markerName: {fileID: 718220961992361756}
-  blackScreen: {fileID: 718220960680062351}
+  txtInfo: {fileID: 0}
+  txtBlack: {fileID: 0}
+  txtSettings: {fileID: 0}
+  txtRoutesPanel: {fileID: 0}
+  warningScreen: {fileID: 0}
   settingsScreen: {fileID: 718220961720566397}
   menuAnim: {fileID: 718220961594484148}
-  buttonPanel: {fileID: 718220961421040557}
+  pnlButtonPrefabs: {fileID: 0}
   holderOnBlackScreen: {fileID: 718220961065999757}
+  pnlRoute: {fileID: 0}
 --- !u!4 &718220960726163318
 Transform:
   m_ObjectHideFlags: 0
@@ -8294,7 +8295,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1647171927674139152
 MonoBehaviour:
   m_ObjectHideFlags: 0

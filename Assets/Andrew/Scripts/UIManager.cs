@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 
-public class UIManagerAndrew : MonoBehaviour
+public class UIManager : MonoBehaviour
 {
     #region Variables
     public GameObject availableAreasScreen;
@@ -62,7 +62,7 @@ public class UIManagerAndrew : MonoBehaviour
         {
             availableAreasScreen.SetActive(false);
             mapScreen.SetActive(true);
-            AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
+            AppManager.Instance.mapManager.SetMapView(selectedArea);
         }
     }
 

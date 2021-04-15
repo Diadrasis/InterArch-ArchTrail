@@ -5,7 +5,7 @@ using UnityEngine;
 public class AppManager : Singleton<AppManager>
 {
     #region Variables
-    public MapManagerAndrew mapManager;
+    public MapManager mapManager;
     #endregion
 
     #region Unity Functions

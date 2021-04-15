@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapManagerAndrew : MonoBehaviour
+public class MapManager : MonoBehaviour
 {
     #region Variables
     [HideInInspector]
@@ -51,7 +51,7 @@ public class MapManagerAndrew : MonoBehaviour
         Debug.Log("maxLatitude = " + areas[_index].constraints.w);
     }
 
-    public void SetMapViewToArea(cArea _areaToView)
+    public void SetMapView(cArea _areaToView)
     {
         //if (_areaToView.constraints != null)
         OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(_areaToView.constraints.y, _areaToView.constraints.x, _areaToView.constraints.w, _areaToView.constraints.z);

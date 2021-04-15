@@ -10,7 +10,7 @@ public class cArea
     public Vector2 position; // longitude, latitude (x, y)
     public int zoom;
     public Vector4 constraints; // minLongitude, minLatitude, maxLongitude, maxLatitude (x, y, z, w)
-    public List<cRouteAndrew> routes = new List<cRouteAndrew>();
+    public List<cPath> paths = new List<cPath>();
     #endregion
 
     #region Methods
