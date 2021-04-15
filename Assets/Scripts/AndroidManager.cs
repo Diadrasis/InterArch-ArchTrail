@@ -91,4 +91,9 @@ public class AndroidManager : MonoBehaviour
     {
         locationService.StopLocationService();
     }
+
+    public void TestAndrew()
+    {
+        // This is a second test
+    }
 }
