@@ -487,7 +487,7 @@ public class MainManager : MonoBehaviour
 
     void ShowPlaceOnMap(double posLat, double posLng, int zoom)
     {
-        OnlineMaps.instance.SetPositionAndZoom(posLng, posLat, zoom);
+        //OnlineMaps.instance.SetPositionAndZoom(posLng, posLat, zoom);
         //OnlineMaps.instance.Redraw();
     }
 

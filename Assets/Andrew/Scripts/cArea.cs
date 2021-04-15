@@ -5,6 +5,7 @@ using UnityEngine;
 public class cArea
 {
     #region Variables
+    // We probably need to add an id to find areas with because the user might use the same name for two areas
     public string title;
     public Vector2 position; // longitude, latitude (x, y)
     public int zoom;

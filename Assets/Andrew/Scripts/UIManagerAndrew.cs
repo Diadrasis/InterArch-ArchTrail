@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public class UIManagerAndrew : MonoBehaviour
 {
@@ -43,11 +44,26 @@ public class UIManagerAndrew : MonoBehaviour
             TMP_Text selectAreaText = newSelectArea.GetComponentInChildren<TMP_Text>();
             selectAreaText.text = area.title;
             Button button = newSelectArea.GetComponentInChildren<Button>();
-            //button.onClick.AddListener(AppManager.Instance.experimentManager.uIExperimentManager.OnStatementSelected);
+            button.onClick.AddListener(OnAreaSelected);
             newSelectAreaObjects.Add(newSelectArea);
         }
 
         return newSelectAreaObjects;
+    }
+
+    public void OnAreaSelected()
+    {
+        GameObject selectAreaObject = EventSystem.current.currentSelectedGameObject;
+        TMP_Text selectAreaText = selectAreaObject.GetComponentInChildren<TMP_Text>();
+
+        cArea selectedArea = AppManager.Instance.mapManager.GetAreaByTitle(selectAreaText.text);
+
+        if (selectedArea != null)
+        {
+            availableAreasScreen.SetActive(false);
+            mapScreen.SetActive(true);
+            AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
+        }
     }
 
     private void ResetSelectAreaObjects(List<GameObject> _selectAreaObjects)
@@ -70,6 +86,22 @@ public class UIManagerAndrew : MonoBehaviour
         yield return new WaitForSeconds(interval);
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(_layoutGameObject.GetComponent<RectTransform>());
+    }
+
+    public void BackToAreasScreen()
+    {
+        availableAreasScreen.SetActive(true);
+        mapScreen.SetActive(false);
+    }
+
+    public void NewAreaSelected()
+    {
+        availableAreasScreen.SetActive(false);
+        mapScreen.SetActive(true);
+
+        // Activates Add Area menu
+        // receives input from user and saves a new area
+        // Sets the map view at my location
     }
     #endregion
 }
