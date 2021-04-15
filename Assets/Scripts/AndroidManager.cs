@@ -5,6 +5,9 @@ using UnityEngine.Android;
 #endif
 using Stathis.Android;
 
+/*
+ Before Build, change all the UI elements with UIManager!!
+ */
 public class AndroidManager : MonoBehaviour
 {
     private OnlineMapsLocationService locationService;
@@ -13,73 +16,96 @@ public class AndroidManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        mm.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
+        Init();
+    }
+    void Init()
+    {
         locationService = OnlineMapsLocationService.instance;
 #if PLATFORM_ANDROID
-        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation) && locationService.TryStartLocationService())
         {
 
             Debug.Log("Please grant your gps location");
             Permission.RequestUserPermission(Permission.FineLocation);
-
+            
             //infotext to inform user whty to give access on gps
         }
 #endif
         if (CheckForLocationServices()) return;
     }
-
-    //if on android prompt to get location permission on device
-    private void IsAndroidBuild()
+    private void Update()
     {
-        Debug.Log("OnGUI before Android");
+
+        //InAndroidBuild();// on final build uncomments.Is commented in order to work with gps emulator
+
+    }
+    //if on android prompt to get location permission on device
+    void InAndroidBuild()
+    {
 #if PLATFORM_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
-            Debug.Log("Please grant your gps location");
+
             Permission.RequestUserPermission(Permission.FineLocation);
-            mm.settingsScreen.SetActive(true);
-            mm.settingsText.text = "Press the gps button to grant the access permission";
-            mm.btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
-            mm.btnMessiniMap.gameObject.SetActive(false);
-            mm.btnNewMap.gameObject.SetActive(false);
-            //infotext to inform user whty to give access on gps
         }
 #endif
         if (!locationService.TryStartLocationService())
         {
-            locationService.StartLocationService();
+            mm.settingsScreen.SetActive(true);
+            mm.txtSettings.text = "Press the gps button to grant the location permission of your mobile";
+            mm.btnNewAreaOnMap.gameObject.SetActive(false);
+            mm.btnMessiniMap.gameObject.SetActive(false);
+            Debug.Log("Access the gps permissions");
             //locationService.StopLocationService();
         }
-
+        else if (locationService.useGPSEmulator)
+        {
+            
+            //locationService.StartLocationService();
+            Debug.Log("Emulator is On");
+        }
+        else
+        {
+            mm.txtSettings.text = "We can start with our app";
+            mm.btnGPSPermission.gameObject.SetActive(false);
+            //also open mainScreen here when build like on useGpasEmulator
+            //locationService.StartLocationService();
+        }
     }
 
     //check if location services are active either with gpsemulator or on android
-    public bool CheckForLocationServices()
+    private bool CheckForLocationServices()
     {
         if (locationService == null) return false;
-        
+
+
         if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
         {
             if (locationService.useGPSEmulator)
             {
-                Debug.Log("Use the GPSEmulator");
+                //mm.btnMessiniMap.onClick.AddListener(() => mm.MessiniLocation(locationService.position));
+                mm.settingsScreen.SetActive(true);
+                mm.txtSettings.text = "Επιλέξτε μια περιοχή";
+                mm.btnNewAreaOnMap.gameObject.SetActive(true);
+                mm.btnMessiniMap.gameObject.SetActive(true);
+                mm.btnGPSPermission.gameObject.SetActive(false);
                 Debug.Log(locationService);
+                
+                locationService.OnLocationChanged += mm.OnLocationChanged;
+                //CheckMyLocation();
                 return true;
             }
             else
             {
-                //these lines can uncomment on build or make suer to use the gpsEmulator from Map gameObject when UI manager is finished change the objects(texts,btns etc)
-                IsAndroidBuild();
+                InAndroidBuild();
                 mm.settingsScreen.SetActive(true);
-                mm.settingsText.text = "Press the gps button to grant the access permission";
-                mm.btnGPS.onClick.AddListener(() => OpenNativeAndroidSettings());
-                mm.btnMessiniMap.gameObject.SetActive(false);
-                mm.btnNewMap.gameObject.SetActive(false);
-                Debug.Log("Please grant your gps location");
+                mm.txtSettings.text = "Open gps";
+                //btnClose.gameObject.SetActive(true); //on build we can remove it
                 return true;
             }
 
         }
-        
         return false;
     }
     //open the grant permissions on android devices
