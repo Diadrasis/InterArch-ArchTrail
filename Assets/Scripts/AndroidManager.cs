@@ -91,4 +91,9 @@ public class AndroidManager : MonoBehaviour
     {
         locationService.StopLocationService();
     }
+
+    void TestEmma()
+    {
+        //test for Emma
+    }
 }
