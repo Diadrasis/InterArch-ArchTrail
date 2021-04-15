@@ -17,7 +17,7 @@ public class MainManager : MonoBehaviour
     private float time = 3;
     private float angle;
 
-    private bool isMovement, isAutoMarkerEnabled, isNewAreaSet, hasPlayed, isRecPath, isMarkerCreated, isMessiniPlace, hasSavedRoutes;
+    private bool isMovement, isNewAreaSet, hasPlayed, isRecPath, isMarkerCreated, isMessiniPlace, hasSavedRoutes;
     private Vector2 fromPosition, toPosition, toPositionFinal, toPositionTest;
     
     private double fromTileX, fromTileY, toTileX, toTileY;
