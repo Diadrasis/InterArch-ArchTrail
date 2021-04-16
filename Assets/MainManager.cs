@@ -11,21 +11,25 @@ using TMPro;
 public class MainManager : MonoBehaviour
 {
     private OnlineMapsMarker playerMarker;
-    public Button btnLayer, btnCurrentLocation, btnGPSPermission, btnCloseWarningScreen, btnOpenSettingsScreen, btnNewAreaOnMap, btnMessiniMap, btnRecord, btnMainMenuHolder, btnSave, btnPrefabToLoad, btnBackFromSettingsScreen, btnLoad, btnCancelMarker, btnNewMarker;//btnRec to record the path and save it
+    public Button btnLayer, btnCurrentLocation, btnGPSPermission, btnCloseWarningScreen, btnOpenSettingsScreen, 
+                btnNewAreaOnMap, btnMessiniMap, btnRecord, btnMainMenuHolder, btnSave, btnPrefabToLoad, btnBackFromSettingsScreen, 
+                btnLoad, btnCancelMarker, btnNewMarker, btnNewRoute, btnSaveRoute, btnCancelRoute;//btnRec to record the path and save it, don't forget to move it to UIManager too
     [Space]
-    public TextMeshProUGUI txtInfo, txtBlack, txtSettings, txtRoutesPanel;
+    public Toggle tglDrawLine, tglAutoSavePoint, tglGPSOn, tpgManualMode;
+    [Space]
+    public TextMeshProUGUI txtInfo, txtBlack, txtSettings;
     private float time = 3;
     private float angle;
 
-    private bool isMovement, isNewAreaSet, hasPlayed, isRecPath, isMarkerCreated, isMessiniPlace, hasSavedRoutes;
+    private bool isMovement, isNewAreaSet, hasPlayed, isRecPath, isMarkerCreated, isMessiniPlace, hasSavedRoutes, isDrawingLine, isAutoSave, isGPSOn, isManualMode, isCancelPressed;
     private Vector2 fromPosition, toPosition, toPositionFinal, toPositionTest;
 
     private double fromTileX, fromTileY, toTileX, toTileY;
     private int moveZoom;
 
     [Space]
-    public GameObject warningScreen, settingsScreen, menuAnim, pnlButtonPrefabs, holderOnBlackScreen, pnlRoute;
-
+    public GameObject warningScreen, settingsScreen, menuAnim, pnlButtonPrefabs, holderOnBlackScreen, routeScreen, pnlNewRouteSave;
+    public Sprite sprSaveRoute, sprAddRoute;
     private void Awake()
     {
         Application.runInBackground = true;
@@ -51,26 +55,34 @@ public class MainManager : MonoBehaviour
         btnBackFromSettingsScreen.gameObject.SetActive(false);
         btnBackFromSettingsScreen.onClick.AddListener(() => CloseScreenPanels());
 
+        btnCancelRoute.onClick.AddListener(() => CloseScreenPanels());
+        btnSaveRoute.onClick.AddListener(() => SaveUIButton());
 
+        btnNewRoute.onClick.AddListener(() => AddNewRoute());
+
+        routeScreen.SetActive(false);
+        pnlNewRouteSave.SetActive(false);
+
+        tglDrawLine.isOn = false;
+        tglAutoSavePoint.isOn = false;
+        tglGPSOn.isOn = false;
+        tpgManualMode.isOn = false;
+
+        tglAutoSavePoint.onValueChanged.AddListener((b) => SetToggle(tglAutoSavePoint));
+        tglDrawLine.onValueChanged.AddListener((b) => SetToggle(tglDrawLine));
+        tglGPSOn.onValueChanged.AddListener((b) => SetToggle(tglGPSOn));
+        tpgManualMode.onValueChanged.AddListener((b) => SetToggle(tpgManualMode));
+
+        //the below variables can be deleted after finishing with the app
         toPosition = new Vector2(21.91794f, 37.17928f); //correct position for app
         toPositionTest = new Vector2(23.72402f, 37.97994f); //for testing purposes
 
-        pnlRoute.SetActive(false);
-
+        
         OnlineMapsLocationService.instance.OnLocationChanged += OnLocationChanged;
-
-        //for testing purposes, when there are routes in an area, when button is pressed it opens the routes panel. If not, opes the main map.
-        if (hasSavedRoutes)
-        {
-            btnMessiniMap.onClick.AddListener(() => OpenNewRoutesPanel("Υπάρχουν αποθηκευμένες διαδρομές."));
-        }
-        else
-        {
-            btnMessiniMap.onClick.AddListener(() => MessiniLocation());
-        }
+        btnMessiniMap.onClick.AddListener(() => MessiniLocation());
     }
 
-    #region AREASFORNOW
+    #region AREASFORTESTINGPURPOSES
     //if we move out of messini in order to go back in the original place and constraints
     void MessiniLocation()
     {
@@ -98,7 +110,7 @@ public class MainManager : MonoBehaviour
             //playerMarker = OnlineMapsMarkerManager.CreateItem(locationService.position, null, "Player");
             OnlineMaps.instance.zoomRange = new OnlineMapsRange(15, 20);//constrain zoom
             OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(37.17f, 21.91f, 37.2f, 21.93f);//constraint to messini area
-
+            OpenNewRoutesScreen();
         }
         else
         {
@@ -199,51 +211,52 @@ public class MainManager : MonoBehaviour
         }
 
     }
-    #endregion
+    
+#endregion
 
-    #region Screencapture the path
-    /*void RecMyPath()
+#region Screencapture the path
+/*void RecMyPath()
+{
+    if (isRecPath)
     {
-        if (isRecPath)
-        {
-        if (Input.GetMouseButtonDown(0))
-        {
-            ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + System.DateTime.Now.ToString("yy'-'MM'-'dd'-'hh'-'mm") + ".png");
-            Debug.Log(Application.persistentDataPath + "/" + System.DateTime.Now.ToString("yy'-'MM'-'dd'-'hh'-'mm") + ".png");
-            //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
-        }
+    if (Input.GetMouseButtonDown(0))
+    {
+        ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + System.DateTime.Now.ToString("yy'-'MM'-'dd'-'hh'-'mm") + ".png");
+        Debug.Log(Application.persistentDataPath + "/" + System.DateTime.Now.ToString("yy'-'MM'-'dd'-'hh'-'mm") + ".png");
+        //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+    }
 
-        //StartCoroutine(TakeScreenShot(currentPath));
-
-        }
+    //StartCoroutine(TakeScreenShot(currentPath));
 
     }
-    IEnumerator TakeScreenShot(string pathname)
-    {
-        if (!serverManager.useScreenShots) { yield break; }
-        MarkersManager.CenterZoomOnMarkers();
 
-        yield return new WaitForEndOfFrame();
-        int width = Screen.width;
-        int height = Screen.height;
-        Texture2D tex = new Texture2D(width, height, TextureFormat.RGB24, false);
-        tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-        tex.Apply();
+}
+IEnumerator TakeScreenShot(string pathname)
+{
+    if (!serverManager.useScreenShots) { yield break; }
+    MarkersManager.CenterZoomOnMarkers();
 
-        byte[] bytes = tex.EncodeToJPG(); //Can also encode to jpg, just make sure to change the file extensions down below
-        Destroy(tex);
-        OnLocationChanged(locationService.position);
-        yield return new WaitForEndOfFrame();
+    yield return new WaitForEndOfFrame();
+    int width = Screen.width;
+    int height = Screen.height;
+    Texture2D tex = new Texture2D(width, height, TextureFormat.RGB24, false);
+    tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+    tex.Apply();
 
-        //Stathis.File_Manager.saveImage(bytes, pathname, Stathis.File_Manager.Ext.JPG);
+    byte[] bytes = tex.EncodeToJPG(); //Can also encode to jpg, just make sure to change the file extensions down below
+    Destroy(tex);
+    OnLocationChanged(locationService.position);
+    yield return new WaitForEndOfFrame();
 
-        yield break;
-    }*/
-    #endregion
+    //Stathis.File_Manager.saveImage(bytes, pathname, Stathis.File_Manager.Ext.JPG);
 
-    #region MenuButtonFunction
-    //is used on settings button to open the specific panel
-    void OpenSettingsScreen()
+    yield break;
+}*/
+#endregion
+//this region should be on the UIManager on final build
+#region MenuButtonFunction
+//is used on settings button to open the specific panel
+void OpenSettingsScreen()
     {
         settingsScreen.SetActive(true);
         warningScreen.SetActive(false);
@@ -255,10 +268,17 @@ public class MainManager : MonoBehaviour
     //is called when x button is pressed
     void CloseScreenPanels()
     {
-        if (warningScreen.activeSelf && !settingsScreen.activeSelf)
+        if (warningScreen.activeSelf && !settingsScreen.activeSelf && routeScreen.activeSelf && !pnlNewRouteSave.activeSelf)
             warningScreen.SetActive(false);
-        else if (settingsScreen.activeSelf && !warningScreen.activeSelf)
+        else if (settingsScreen.activeSelf && !warningScreen.activeSelf && !routeScreen.activeSelf && !pnlNewRouteSave.activeSelf)
             settingsScreen.SetActive(false);
+        else if (routeScreen.activeSelf && !settingsScreen.activeSelf && !warningScreen.activeSelf && !pnlNewRouteSave.activeSelf)
+            routeScreen.SetActive(false);
+        else if (pnlNewRouteSave.activeSelf && !settingsScreen.activeSelf && !warningScreen.activeSelf && routeScreen.activeSelf)
+        {
+            pnlNewRouteSave.SetActive(false);
+            btnNewRoute.GetComponent<Image>().sprite = sprAddRoute;
+        }
     }
 
     //method to play the animation for main menu button, bottom right
@@ -278,11 +298,66 @@ public class MainManager : MonoBehaviour
     }
 
     //to open the routesPanel and show the buttons with the saved routes.
-    void OpenNewRoutesPanel(string textNew)
+    void OpenNewRoutesScreen()
     {
-        pnlRoute.SetActive(true);
-        settingsScreen.SetActive(false);
-        txtRoutesPanel.text = textNew;
+        routeScreen.SetActive(true);
+        //settingsScreen.SetActive(false);
+        
+    }
+    //when pressing plus icon, pnlNewRoute is activated and plus icon changes to save icon.
+    void AddNewRoute()
+    {
+        btnNewRoute.GetComponent<Image>().sprite = sprSaveRoute;
+        pnlNewRouteSave.SetActive(true);
+        //open panel with info for new route. Save name, and selections for new route
+    }
+    //for now change the icon from plus to save
+    void SaveUIButton()
+    {
+        pnlNewRouteSave.SetActive(false);
+        btnNewRoute.GetComponent<Image>().sprite = sprSaveRoute;
+        btnNewRoute.onClick.AddListener(() => SaveRoute());
+        Debug.Log("Save UI method");
+    }
+
+    void SaveRoute()
+    {
+        pnlNewRouteSave.SetActive(false);
+        btnNewRoute.GetComponent<Image>().sprite = sprAddRoute;
+        btnNewRoute.onClick.AddListener(() => AddNewRoute());
+        Debug.Log("Save route method");
+    }
+    //For Toggles on New Route panel isDrawingLine, isAutoSave, isGPSOn, isManualMode
+    void SetToggle(Toggle toggle)
+    {
+        bool val = toggle.isOn;
+
+        if (toggle == tglGPSOn)
+        {
+            isGPSOn = val;
+            isManualMode = !val;
+            tpgManualMode.isOn = !val;
+        }
+        else
+        if (toggle == tpgManualMode)
+        {
+            isGPSOn = !val;
+            isManualMode = val;
+            tglGPSOn.isOn = !val;
+        }
+        else
+        if (toggle == tglDrawLine)
+        {
+            isDrawingLine = val;
+        }
+        else
+        if (toggle == tglAutoSavePoint)
+        {
+            isAutoSave = val;
+        }
+
+        Image tImg = toggle.transform.Find("Background").GetComponent<Image>();
+        if (toggle.isOn) { tImg.color = Color.green; } else { tImg.color = Color.white; }
     }
     #endregion
 

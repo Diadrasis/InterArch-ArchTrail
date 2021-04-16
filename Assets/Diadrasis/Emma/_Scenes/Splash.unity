@@ -443,7 +443,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animAppLogo: {fileID: 1780364224}
-  animEspaLogo: {fileID: 1900422216}
   animDiadrasisLogo: {fileID: 1499223922}
   animPanel: {fileID: 739146494}
 --- !u!1 &926404445
@@ -480,7 +479,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 11.4, y: -0}
+  m_AnchoredPosition: {x: -0.000024796, y: 163}
   m_SizeDelta: {x: 1156.6166, y: 600}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &926404447
@@ -680,7 +679,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AspectMode: 3
-  m_AspectRatio: 4.6
+  m_AspectRatio: 3.2
 --- !u!1 &1607023406
 GameObject:
   m_ObjectHideFlags: 0
