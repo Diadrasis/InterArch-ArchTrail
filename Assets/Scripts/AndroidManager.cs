@@ -8,7 +8,7 @@ using Stathis.Android;
 public class AndroidManager : MonoBehaviour
 {
     private OnlineMapsLocationService locationService;
-    public MainManager mm;
+    //public MainManager mm;
 
     // Start is called before the first frame update
     void Start()
@@ -36,17 +36,16 @@ public class AndroidManager : MonoBehaviour
         {
             Debug.Log("Please grant your gps location");
             Permission.RequestUserPermission(Permission.FineLocation);
-            mm.settingsScreen.SetActive(true);
-            mm.txtSettings.text = "Press the gps button to grant the access permission";
-            mm.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
-            mm.btnMessiniMap.gameObject.SetActive(false);
-            mm.btnNewAreaOnMap.gameObject.SetActive(false);
+            AppManager.Instance.uIManager.pnlGPSScreen.SetActive(true);
+            AppManager.Instance.uIManager.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
+           
             //infotext to inform user whty to give access on gps
         }
 #endif
         if (!locationService.TryStartLocationService())
         {
             locationService.StartLocationService();
+            AppManager.Instance.uIManager.pnlGPSScreen.SetActive(false);
             //locationService.StopLocationService();
         }
 
@@ -61,6 +60,7 @@ public class AndroidManager : MonoBehaviour
         {
             if (locationService.useGPSEmulator)
             {
+                AppManager.Instance.uIManager.pnlGPSScreen.SetActive(false);
                 Debug.Log("Use the GPSEmulator");
                 Debug.Log(locationService);
                 return true;
@@ -69,12 +69,13 @@ public class AndroidManager : MonoBehaviour
             {
                 //these lines can uncomment on build or make suer to use the gpsEmulator from Map gameObject when UI manager is finished change the objects(texts,btns etc)
                 IsAndroidBuild();
-                mm.settingsScreen.SetActive(true);
-                mm.txtSettings.text = "Press the gps button to grant the access permission";
+                AppManager.Instance.uIManager.pnlGPSScreen.SetActive(true);
+                AppManager.Instance.uIManager.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
+                /*mm.txtSettings.text = "Press the gps button to grant the access permission";
                 mm.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
                 mm.btnMessiniMap.gameObject.SetActive(false);
                 mm.btnNewAreaOnMap.gameObject.SetActive(false);
-                Debug.Log("Please grant your gps location");
+                Debug.Log("Please grant your gps location");*/
                 return true;
             }
 
@@ -92,6 +93,10 @@ public class AndroidManager : MonoBehaviour
         locationService.StopLocationService();
     }
 
+    /*private void Update()
+    {
+        IsAndroidBuild();
+    }*/
     public void TestAndrew()
     {
         // This is a second test

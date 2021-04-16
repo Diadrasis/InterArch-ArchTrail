@@ -27,6 +27,10 @@ public class UIManager : MonoBehaviour
     private float interval = 0.001f;
 
     private bool createArea = false;
+
+    //GPS Screen
+    public GameObject pnlGPSScreen;
+    public Button btnGPSPermission;
     #endregion
 
     #region Unity Functions
@@ -51,6 +55,8 @@ public class UIManager : MonoBehaviour
         // inptFldCreateArea.onValidateInput.//AddListener(() => EnableScreen(pnlCreateArea, true));
         btnCreateAreaSave.onClick.AddListener(() => SaveArea());
         btnCreateAreaCancel.onClick.AddListener(() => EnableScreen(pnlCreateArea, false));
+
+        
     }
 
     private void DisplayAreasScreen()

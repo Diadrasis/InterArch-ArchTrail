@@ -107,7 +107,7 @@ public class SaveLoad : MonoBehaviour
             listMarkers.Add(marker);
 
             // Create marker
-            FindObjectOfType<MainManager>().settingsScreen.SetActive(false);
+            //FindObjectOfType<MainManager>().SetActive(false);
             OnlineMapsMarkerManager.CreateItem(position, label);
         }
     }
