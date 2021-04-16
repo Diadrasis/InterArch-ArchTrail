@@ -6,6 +6,7 @@ public class AppManager : Singleton<AppManager>
 {
     #region Variables
     public MapManager mapManager;
+    public UIManager uIManager;
     #endregion
 
     #region Unity Functions

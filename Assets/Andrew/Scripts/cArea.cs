@@ -22,6 +22,15 @@ public class cArea
         constraints = _constraints;
     }
 
+    // FOR TESTING, WILL BE REMOVED
+    public cArea(string _title, Vector2 _position)
+    {
+        title = _title;
+        position = _position;
+        zoom = MapManager.DEFAULTZOOM;
+        constraints = new Vector4(_position.x - MapManager.DEFAULTPOSITIONOFFSET, _position.y - MapManager.DEFAULTPOSITIONOFFSET, _position.x + MapManager.DEFAULTPOSITIONOFFSET, _position.y + MapManager.DEFAULTPOSITIONOFFSET);
+    }
+
     void Create()
     {
 

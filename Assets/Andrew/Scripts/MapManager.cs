@@ -10,12 +10,16 @@ public class MapManager : MonoBehaviour
     [HideInInspector]
     public cArea currentArea;
 
+    public static readonly int DEFAULTZOOM = 19;
+    public static readonly float DEFAULTPOSITIONOFFSET = 0.00414180675f;
     #endregion
 
     #region Unity Functions
     private void Start()
     {
         areas = LoadAreas();
+
+        SubscribeToEvents();
         //DisplayAreaDebug(0);
     }
     #endregion
@@ -51,7 +55,20 @@ public class MapManager : MonoBehaviour
         Debug.Log("maxLatitude = " + areas[_index].constraints.w);
     }
 
-    public void SetMapView(cArea _areaToView)
+    public void SetMapViewToPoint(Vector2 _positionToView)
+    {
+        OnlineMaps.instance.SetPositionAndZoom(_positionToView.x, _positionToView.y, DEFAULTZOOM);
+    }
+
+    public void SetMapViewToLocation()
+    {
+        ResetMapConstraints();
+        Vector2 locationPoint = OnlineMapsLocationService.instance.position; // 23.72413215765034, 37.98021913845082
+        SetMapViewToPoint(locationPoint);
+        //OnlineMapsLocationService.instance.updatePosition = true; // MUST BE UNCOMMENTED
+    }
+
+    public void SetMapViewToArea(cArea _areaToView)
     {
         //if (_areaToView.constraints != null)
         OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(_areaToView.constraints.y, _areaToView.constraints.x, _areaToView.constraints.w, _areaToView.constraints.z);
@@ -68,6 +85,28 @@ public class MapManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    public void AddArea(cArea _areaToAdd)
+    {
+        if (!areas.Contains(_areaToAdd))
+            areas.Add(_areaToAdd);
+    }
+
+    private void ResetMapConstraints()
+    {
+        OnlineMaps.instance.positionRange = null;
+        OnlineMaps.instance.zoomRange = null;
+        OnlineMaps.instance.Redraw();
+    }
+
+    private void SubscribeToEvents()
+    {
+        // GPS Events
+        OnlineMapsLocationService.instance.OnLocationInited += SetMapViewToLocation;
+
+        // Input Events
+        OnlineMapsControlBase.instance.OnMapClick += AppManager.Instance.uIManager.OnMapClick;
     }
     #endregion
 }

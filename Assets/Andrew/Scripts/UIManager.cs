@@ -8,38 +8,81 @@ using UnityEngine.EventSystems;
 public class UIManager : MonoBehaviour
 {
     #region Variables
-    public GameObject availableAreasScreen;
     public GameObject mapScreen;
+    public Button btnBackToAreasScreen;
+    
+    // Areas Screen
+    public GameObject pnlAreasScreen;
+    public GameObject pnlLoadedAreas;
     public GameObject selectAreaPrefab;
-    public GameObject availableAreasPanel;
+    public Button btnCreateArea;
+
+    // Create Area Screen
+    public GameObject pnlCreateArea;
+    public TMP_InputField inptFldCreateArea;
+    public Button btnCreateAreaSave;
+    public Button btnCreateAreaCancel;
 
     private List<GameObject> selectAreaObjects;
     private float interval = 0.001f;
+
+    private bool createArea = false;
     #endregion
 
     #region Unity Functions
     public void Start()
     {
-        ResetSelectAreaObjects(selectAreaObjects);
-        selectAreaObjects = InstantiateAvailableAreas();
-        StartCoroutine(ReloadLayout(availableAreasPanel));
+        SubscribeButtons();
+
+        DisplayAreasScreen();
     }
     #endregion
 
     #region Methods
-    public void Escape()
+    private void SubscribeButtons()
+    {
+        // Map Screen
+        btnBackToAreasScreen.onClick.AddListener(() => BackToAreasScreen());
+
+        // Areas Screen
+        btnCreateArea.onClick.AddListener(() => CreateNewAreaSelected());
+
+        // CreateAreaScreen
+        // inptFldCreateArea.onValidateInput.//AddListener(() => EnableScreen(pnlCreateArea, true));
+        btnCreateAreaSave.onClick.AddListener(() => SaveArea());
+        btnCreateAreaCancel.onClick.AddListener(() => EnableScreen(pnlCreateArea, false));
+    }
+
+    private void DisplayAreasScreen()
+    {
+        pnlAreasScreen.SetActive(true);
+        ResetSelectAreaObjects(selectAreaObjects);
+        selectAreaObjects = InstantiateAvailableAreas();
+        StartCoroutine(ReloadLayout(pnlLoadedAreas));
+        createArea = false;
+    }
+
+    private void EnableScreen(GameObject _screenToEnable, bool _valid) // NOT NEEDED
+    {
+        if (_valid)
+            _screenToEnable.SetActive(true);
+        else
+            _screenToEnable.SetActive(false);
+    }
+
+    private void Escape()
     {
         Application.Quit();
     }
 
-    public List<GameObject> InstantiateAvailableAreas()
+    private List<GameObject> InstantiateAvailableAreas()
     {
         List<GameObject> newSelectAreaObjects = new List<GameObject>();
         List<cArea> areas = AppManager.Instance.mapManager.areas;
 
         foreach (cArea area in areas)
         {
-            GameObject newSelectArea = Instantiate(selectAreaPrefab, Vector3.zero, Quaternion.identity, availableAreasPanel.GetComponent<RectTransform>());
+            GameObject newSelectArea = Instantiate(selectAreaPrefab, Vector3.zero, Quaternion.identity, pnlLoadedAreas.GetComponent<RectTransform>());
             //newSelectArea.transform.SetAsFirstSibling();
             TMP_Text selectAreaText = newSelectArea.GetComponentInChildren<TMP_Text>();
             selectAreaText.text = area.title;
@@ -51,7 +94,7 @@ public class UIManager : MonoBehaviour
         return newSelectAreaObjects;
     }
 
-    public void OnAreaSelected()
+    private void OnAreaSelected()
     {
         GameObject selectAreaObject = EventSystem.current.currentSelectedGameObject;
         TMP_Text selectAreaText = selectAreaObject.GetComponentInChildren<TMP_Text>();
@@ -60,9 +103,8 @@ public class UIManager : MonoBehaviour
 
         if (selectedArea != null)
         {
-            availableAreasScreen.SetActive(false);
-            mapScreen.SetActive(true);
-            AppManager.Instance.mapManager.SetMapView(selectedArea);
+            pnlAreasScreen.SetActive(false);
+            AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
     }
 
@@ -88,20 +130,121 @@ public class UIManager : MonoBehaviour
         LayoutRebuilder.ForceRebuildLayoutImmediate(_layoutGameObject.GetComponent<RectTransform>());
     }
 
-    public void BackToAreasScreen()
+    private void BackToAreasScreen()
     {
-        availableAreasScreen.SetActive(true);
-        mapScreen.SetActive(false);
+        DisplayAreasScreen();
+        //mapScreen.SetActive(false);
     }
 
-    public void NewAreaSelected()
+    private void CreateNewAreaSelected()
     {
-        availableAreasScreen.SetActive(false);
-        mapScreen.SetActive(true);
+        pnlAreasScreen.SetActive(false);
+        createArea = true;
+        //mapScreen.SetActive(true);
 
-        // Activates Add Area menu
-        // receives input from user and saves a new area
-        // Sets the map view at my location
+        AppManager.Instance.mapManager.SetMapViewToLocation();
+        // Resets the map view at my location, DONE
+    }
+
+    private void SaveArea() // MUST BE UPDATED
+    {
+        string newAreaTitle = inptFldCreateArea.text;
+        AppManager.Instance.mapManager.AddArea(new cArea(newAreaTitle, OnlineMaps.instance.position));
+
+        pnlCreateArea.SetActive(false);
+    }
+
+    public void OnMapClick()
+    {
+        if (createArea)
+        {
+            pnlCreateArea.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("Map Click!");
+        }
+
+        // EMMA
+        /*
+        isNewAreaSet = true;
+        isMarkerCreated = true;
+        isMessiniPlace = false;// used this variable so when inside an area to not reconstraint the area. Messini is used as a prototype
+        string label;
+        if (isMarkerCreated && !isMessiniPlace)
+        {
+            // Get the coordinates under the cursor.
+            double lng, lat;
+            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
+            //markerName.gameObject.SetActive(true);
+            warningScreen.SetActive(true);
+
+            label = "Marker " + +(OnlineMapsMarkerManager.CountItems + 1);
+            // Create a new marker.
+            OnlineMapsMarkerManager.CreateItem(lng, lat, label);
+
+            //below are the constraints that were used when marker was created
+            /*OnlineMaps.instance.zoomRange = new OnlineMapsRange(10, 20);
+            OnlineMaps.instance.positionRange = new OnlineMapsPositionRange((float)lat, (float)lng, 
+            (float)lat*locationService.desiredAccuracy, (float)lng, OnlineMapsPositionRangeType.center);
+            OnlineMaps.instance.Redraw();*/
+
+        /*
+            txtBlack.text = "Do you want to save the location?";
+            btnSave.gameObject.SetActive(true);
+            btnCancelMarker.gameObject.SetActive(true);
+            holderOnBlackScreen.SetActive(true);
+        }*/
+
+        // STATHIS
+        /*if (isManualAddMarkerEnabled)
+        {
+            // Get the coordinates under the cursor.
+            double lng, lat;
+            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
+
+            Vector2 position = new Vector2((float)lng, (float)lat);
+
+            // Calculate the distance in km between locations.
+            float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
+
+            //Debug.LogWarning("dist = " + distance);
+            // Debug.LogWarning("minDistanceToPutNewMarker = " + minDistanceToPutNewMarker);
+
+            if (distance < minDistanceToPutNewMarker)
+            {
+                return;
+            }
+            else
+            {
+                previousPosition = position;
+            }
+
+            // Create a label for the marker.
+            string label = "Marker " + (OnlineMaps.instance.markers.Length + 1);
+
+            OnlineMapsMarker marker = new OnlineMapsMarker();
+
+            marker.label = label;
+            marker.SetPosition(lng, lat);
+
+            // Create a new marker.
+            OnlineMaps.instance.AddMarker(lng, lat, label);
+
+            markerListCurrPath.Add(marker);
+
+            if (isDrawLineOnEveryPoint)
+            {
+                OnlineMaps.instance.RemoveMarker(marker);
+                MarkersManager.CreateLineFromList(markerListCurrPath, Color.red, 3f);
+                OnlineMaps.instance.CheckRedrawType();//.Redraw();
+            }
+
+            if (isSavePathOnEveryPoint)
+            {
+                MarkersManager.SaveMarkers(currPathName, markerListCurrPath);
+            }
+        }*/
     }
     #endregion
 }
