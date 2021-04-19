@@ -31,6 +31,19 @@ public class UIManager : MonoBehaviour
     //GPS Screen
     public GameObject pnlGPSScreen;
     public Button btnGPSPermission;
+
+    //RouteScreen
+    public GameObject pnlSelectedAreaScreen;
+    public Button btnAddNewRoute;
+    public Sprite sprAddNewRoute, sprSaveIcon;
+
+    //WarningScreen if user is near area
+    public GameObject pnlWarningScreen;
+    public Button btnCancel;
+
+    //WarningScreen when user is about to save the route
+    public GameObject pnlWarningSaveRouteScreen;
+    public Button btnSave, btnSaveCancel;
     #endregion
 
     #region Unity Functions
@@ -41,7 +54,11 @@ public class UIManager : MonoBehaviour
         SubscribeButtons();
 
         DisplayAreasScreen();
+
+        pnlWarningScreen.SetActive(false);
+        pnlWarningSaveRouteScreen.SetActive(false);
     }
+
     #endregion
 
     #region Methods
@@ -58,7 +75,19 @@ public class UIManager : MonoBehaviour
         btnCreateAreaSave.onClick.AddListener(() => SaveArea());
         btnCreateAreaCancel.onClick.AddListener(() => EnableScreen(pnlCreateArea, false));
 
-        
+        //btn GPS
+        btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeAndroidSettings());
+
+        //btn Route
+        btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
+
+        //btn warning on area
+        btnCancel.onClick.AddListener(() => CloseScreenPanels());
+
+        //btn warning panel for save or cancel a route
+        btnSave.onClick.AddListener(() =>SaveArea());
+        btnSaveCancel.onClick.AddListener(() => CancelSaveRoute());
+
     }
 
     public void DisplayAreasScreen()
@@ -68,6 +97,7 @@ public class UIManager : MonoBehaviour
         selectAreaObjects = InstantiateSelectAreaObjects();
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
         createArea = false;
+        
     }
 
     private void EnableScreen(GameObject _screenToEnable, bool _valid) // NOT NEEDED
@@ -252,5 +282,53 @@ public class UIManager : MonoBehaviour
             }
         }*/
     }
+
+    #region RoutePanel
+    void AddNewRoute()
+    {
+        btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
+        btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
+    }
+    //for now change the icon from plus to save
+    void SaveUIButton()
+    {
+        btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
+        btnAddNewRoute.onClick.AddListener(() => SaveRoute());
+        Debug.Log("Save UI method");
+    }
+
+    void SaveRoute()
+    {
+        pnlWarningSaveRouteScreen.SetActive(true);
+        btnAddNewRoute.GetComponent<Image>().sprite = sprAddNewRoute;
+        btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
+        Debug.Log("Save route method");
+    }
     #endregion
+
+
+    #region Warnings
+    //to close main warning screen for area check
+    void CloseScreenPanels()
+    {
+        if (pnlWarningScreen.activeSelf)
+            pnlWarningScreen.SetActive(false);
+    }
+
+    //to close route save plus and remove everything from the map
+    void CancelSaveRoute()
+    {
+        if (pnlWarningSaveRouteScreen.activeSelf)
+        {
+            pnlWarningSaveRouteScreen.SetActive(false);
+            OnlineMapsDrawingElementManager.RemoveAllItems();
+            OnlineMaps.instance.Redraw();
+        }
+    }
+    #endregion
+
+
+    #endregion
+
+
 }
