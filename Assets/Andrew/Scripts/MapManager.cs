@@ -5,31 +5,41 @@ using UnityEngine;
 public class MapManager : MonoBehaviour
 {
     #region Variables
+    private List<cArea> areasToTestSave = new List<cArea>(); // TEST
+
     [HideInInspector]
     public List<cArea> areas = new List<cArea>();
     [HideInInspector]
     public cArea currentArea;
 
-    public static readonly int DEFAULTZOOM = 19;
-    public static readonly float DEFAULTPOSITIONOFFSET = 0.00414180675f;
+    public static readonly int DEFAULT_ZOOM = 19;
+    public static readonly float DEFAULT_POSITION_OFFSET = 0.00414180675f;
     #endregion
 
     #region Unity Functions
     private void Awake()
     {
-        areas = LoadAreas();
+        areasToTestSave = GetTestAreas();
+        cArea.SaveAreas(areasToTestSave);
+
+        areas = cArea.LoadAreas();
     }
 
     private void Start()
     {
         SubscribeToEvents();
     }
+
+    private void OnDestroy()
+    {
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+    }
     #endregion
 
     #region Methods
-    private List<cArea> LoadAreas()
+    private List<cArea> GetTestAreas()
     {
-        List<cArea> areasFromDatabase = new List<cArea>() // TODO: Load areas from PlayerPrefs
+        List<cArea> areasFromDatabase = new List<cArea>()
         {
             new cArea("Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector4(21.9160667457503f, 37.1700252387224f , 21.9227518498302f, 37.178659594564f)),
             new cArea("Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector4(25.1616718900387f, 35.2958874528396f , 25.1645352578472f, 35.3000733065711f))
@@ -62,7 +72,7 @@ public class MapManager : MonoBehaviour
 
     public void SetMapViewToPoint(Vector2 _positionToView)
     {
-        OnlineMaps.instance.SetPositionAndZoom(_positionToView.x, _positionToView.y, DEFAULTZOOM);
+        OnlineMaps.instance.SetPositionAndZoom(_positionToView.x, _positionToView.y, DEFAULT_ZOOM);
     }
 
     public void SetMapViewToLocation()
