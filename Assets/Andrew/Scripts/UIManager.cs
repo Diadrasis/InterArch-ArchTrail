@@ -36,6 +36,8 @@ public class UIManager : MonoBehaviour
     #region Unity Functions
     public void Start()
     {
+        selectAreaObjects = new List<GameObject>();
+
         SubscribeButtons();
 
         DisplayAreasScreen();
@@ -59,11 +61,11 @@ public class UIManager : MonoBehaviour
         
     }
 
-    private void DisplayAreasScreen()
+    public void DisplayAreasScreen()
     {
         pnlAreasScreen.SetActive(true);
-        ResetSelectAreaObjects(selectAreaObjects);
-        selectAreaObjects = InstantiateAvailableAreas();
+        DestroySelectAreaObjects(selectAreaObjects);
+        selectAreaObjects = InstantiateSelectAreaObjects();
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
         createArea = false;
     }
@@ -81,7 +83,7 @@ public class UIManager : MonoBehaviour
         Application.Quit();
     }
 
-    private List<GameObject> InstantiateAvailableAreas()
+    private List<GameObject> InstantiateSelectAreaObjects()
     {
         List<GameObject> newSelectAreaObjects = new List<GameObject>();
         List<cArea> areas = AppManager.Instance.mapManager.areas;
@@ -114,7 +116,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void ResetSelectAreaObjects(List<GameObject> _selectAreaObjects)
+    private void DestroySelectAreaObjects(List<GameObject> _selectAreaObjects)
     {
         if (_selectAreaObjects != null)
         {
@@ -125,8 +127,6 @@ public class UIManager : MonoBehaviour
 
             _selectAreaObjects.Clear();
         }
-
-        _selectAreaObjects = new List<GameObject>();
     }
 
     IEnumerator ReloadLayout(GameObject _layoutGameObject)

@@ -15,23 +15,28 @@ public class MapManager : MonoBehaviour
     #endregion
 
     #region Unity Functions
-    private void Start()
+    private void Awake()
     {
         areas = LoadAreas();
+    }
 
+    private void Start()
+    {
         SubscribeToEvents();
-        //DisplayAreaDebug(0);
     }
     #endregion
 
     #region Methods
     private List<cArea> LoadAreas()
     {
-        List<cArea> areasFromDatabase = new List<cArea>()
+        List<cArea> areasFromDatabase = new List<cArea>() // TODO: Load areas from PlayerPrefs
         {
             new cArea("Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector4(21.9160667457503f, 37.1700252387224f , 21.9227518498302f, 37.178659594564f)),
             new cArea("Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector4(25.1616718900387f, 35.2958874528396f , 25.1645352578472f, 35.3000733065711f))
         };
+
+        //DisplayAreaDebug(0);
+        //DisplayAreaDebug(1);
 
         return areasFromDatabase;
     }
