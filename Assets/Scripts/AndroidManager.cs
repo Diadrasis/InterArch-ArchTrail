@@ -14,14 +14,14 @@ public class AndroidManager : MonoBehaviour
     void Start()
     {
         locationService = OnlineMapsLocationService.instance;
+        AppManager.Instance.uIManager.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
 #if PLATFORM_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
 
             Debug.Log("Please grant your gps location");
             Permission.RequestUserPermission(Permission.FineLocation);
-
-            //infotext to inform user whty to give access on gps
+            
         }
 #endif
         if (CheckForLocationServices()) return;
@@ -30,23 +30,24 @@ public class AndroidManager : MonoBehaviour
     //if on android prompt to get location permission on device
     private void IsAndroidBuild()
     {
-        Debug.Log("OnGUI before Android");
 #if PLATFORM_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Debug.Log("Please grant your gps location");
             Permission.RequestUserPermission(Permission.FineLocation);
-            AppManager.Instance.uIManager.pnlGPSScreen.SetActive(true);
-            AppManager.Instance.uIManager.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
-           
-            //infotext to inform user whty to give access on gps
         }
+        
 #endif
         if (!locationService.TryStartLocationService())
         {
+            AppManager.Instance.uIManager.pnlGPSScreen.SetActive(true);
+            //locationService.StopLocationService();
+        }
+        else
+        {
             locationService.StartLocationService();
             AppManager.Instance.uIManager.pnlGPSScreen.SetActive(false);
-            //locationService.StopLocationService();
+            AppManager.Instance.uIManager.DisplayAreasScreen();
         }
 
     }
@@ -61,16 +62,18 @@ public class AndroidManager : MonoBehaviour
             if (locationService.useGPSEmulator)
             {
                 AppManager.Instance.uIManager.pnlGPSScreen.SetActive(false);
+                AppManager.Instance.uIManager.DisplayAreasScreen();
                 Debug.Log("Use the GPSEmulator");
                 Debug.Log(locationService);
                 return true;
             }
             else
             {
-                //these lines can uncomment on build or make suer to use the gpsEmulator from Map gameObject when UI manager is finished change the objects(texts,btns etc)
-                IsAndroidBuild();
-                AppManager.Instance.uIManager.pnlGPSScreen.SetActive(true);
-                AppManager.Instance.uIManager.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
+                //these lines can uncomment on build or make sure to use the gpsEmulator from Map gameObject when UI manager is finished change the objects(texts,btns etc)
+                AppManager.Instance.uIManager.DisplayAreasScreen();
+                
+                /*AppManager.Instance.uIManager.pnlGPSScreen.SetActive(true);
+                AppManager.Instance.uIManager.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());*/
                 /*mm.txtSettings.text = "Press the gps button to grant the access permission";
                 mm.btnGPSPermission.onClick.AddListener(() => OpenNativeAndroidSettings());
                 mm.btnMessiniMap.gameObject.SetActive(false);
@@ -93,17 +96,9 @@ public class AndroidManager : MonoBehaviour
         locationService.StopLocationService();
     }
 
-    /*private void Update()
+    private void Update()
     {
         IsAndroidBuild();
-    }*/
-    public void TestAndrew()
-    {
-        // This is a second test
-	}
-	
-    void TestEmma()
-    {
-        //test for Emma
     }
+
 }
