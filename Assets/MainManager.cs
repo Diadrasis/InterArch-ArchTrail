@@ -63,7 +63,7 @@ public class MainManager : MonoBehaviour
         routeScreen.SetActive(false);
         pnlNewRouteSave.SetActive(false);
 
-        tglDrawLine.isOn = false;
+        /*tglDrawLine.isOn = false;
         tglAutoSavePoint.isOn = false;
         tglGPSOn.isOn = false;
         tpgManualMode.isOn = false;
@@ -71,7 +71,7 @@ public class MainManager : MonoBehaviour
         tglAutoSavePoint.onValueChanged.AddListener((b) => SetToggle(tglAutoSavePoint));
         tglDrawLine.onValueChanged.AddListener((b) => SetToggle(tglDrawLine));
         tglGPSOn.onValueChanged.AddListener((b) => SetToggle(tglGPSOn));
-        tpgManualMode.onValueChanged.AddListener((b) => SetToggle(tpgManualMode));
+        tpgManualMode.onValueChanged.AddListener((b) => SetToggle(tpgManualMode));*/
 
         //the below variables can be deleted after finishing with the app
         toPosition = new Vector2(21.91794f, 37.17928f); //correct position for app
@@ -328,7 +328,7 @@ void OpenSettingsScreen()
         Debug.Log("Save route method");
     }
     //For Toggles on New Route panel isDrawingLine, isAutoSave, isGPSOn, isManualMode
-    void SetToggle(Toggle toggle)
+    /*void SetToggle(Toggle toggle)
     {
         bool val = toggle.isOn;
 
@@ -358,7 +358,7 @@ void OpenSettingsScreen()
 
         Image tImg = toggle.transform.Find("Background").GetComponent<Image>();
         if (toggle.isOn) { tImg.color = Color.green; } else { tImg.color = Color.white; }
-    }
+    }*/
     #endregion
 
     #region Markers

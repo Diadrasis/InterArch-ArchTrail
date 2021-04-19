@@ -59,7 +59,7 @@ public class UIManager : MonoBehaviour
         
     }
 
-    private void DisplayAreasScreen()
+    public void DisplayAreasScreen()
     {
         pnlAreasScreen.SetActive(true);
         ResetSelectAreaObjects(selectAreaObjects);
