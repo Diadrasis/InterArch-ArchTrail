@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MapManager : MonoBehaviour
@@ -14,6 +15,20 @@ public class MapManager : MonoBehaviour
 
     public static readonly int DEFAULT_ZOOM = 19;
     public static readonly float DEFAULT_POSITION_OFFSET = 0.00414180675f;
+
+    private Vector2 previousPosition = Vector2.zero;
+    private Vector2 fromPosition, toPosition;
+    private float minDistanceToPutNewMarker = 100f / 1000f;
+    [HideInInspector]
+    public bool isDrawLineOnEveryPoint;
+    List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
+
+    //createMarker on user position and on the path after specific meters
+    OnlineMapsMarker marker = new OnlineMapsMarker();
+    private float angle = 0.5f;
+    public float time = 10;
+    // Move direction
+    private int direction = 1;
     #endregion
 
     #region Unity Functions
@@ -23,14 +38,33 @@ public class MapManager : MonoBehaviour
         cArea.SaveAreas(areasToTestSave);
 
         areas = cArea.LoadAreas();
+        
     }
 
     private void Start()
     {
         SubscribeToEvents();
-       
+        OnlineMaps map = OnlineMaps.instance;
+        marker = OnlineMapsMarkerManager.CreateItem(map.position);
+        fromPosition = OnlineMaps.instance.position;
+        toPosition = OnlineMapsLocationService.instance.position;
     }
+    private void Update()
+    {
+        angle += Time.deltaTime / time * direction;
+        if (angle > 1)
+        {
+            angle = 2 - angle;
+            direction = -1;
+        }
+        else if (angle < 0)
+        {
+            angle *= -1;
+            direction = 1;
+        }
 
+        marker.position = Vector2.Lerp(fromPosition, toPosition, angle);
+    }
     private void OnDestroy()
     {
         PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
@@ -141,9 +175,11 @@ public class MapManager : MonoBehaviour
             if (!IsWithinConstraints())
             {
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+                
             }
             else
             {
+                
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             }
         }
@@ -169,7 +205,33 @@ public class MapManager : MonoBehaviour
         Vector3 pos = OnlineMapsTileSetControl.instance.GetWorldPosition(position);
         OnlineMapsLocationService.instance.position = pos;
         //playerMarker.position = position;
+        
+        float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
+        if(distance < minDistanceToPutNewMarker)
+        {
+            OnlineMaps.instance.Redraw();
+            return;
+        }
+        else
+        {
+            previousPosition = position;
+        }
+
+        
+        marker.position = position;
+        OnlineMapsMarkerManager.AddItem(marker);
+
+        markerListCurrPath.Add(marker);
+
+        if (isDrawLineOnEveryPoint)
+        {
+            OnlineMapsMarkerManager.RemoveItem(marker);
+            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+            OnlineMaps.instance.Redraw();
+        }
     }
+
+    #region Screencapture the path
     /*void RecMyPath()
     {
         if (isRecPath)
@@ -207,5 +269,8 @@ public class MapManager : MonoBehaviour
 
         yield break;
     }*/
+    #endregion
+
+    
     #endregion
 }
