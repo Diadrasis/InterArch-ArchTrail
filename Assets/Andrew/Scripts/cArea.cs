@@ -6,7 +6,7 @@ using UnityEngine;
 public class cArea
 {
     #region Variables
-    //private int id; // We probably need to add an id to find areas with because the user might use the same name for two areas
+    private int id;
     public string title;
     public Vector2 position; // longitude, latitude (x, y)
     public int zoom;
@@ -43,11 +43,6 @@ public class cArea
 
     }
 
-    void Delete()
-    {
-
-    }
-
     void Show()
     {
 
@@ -72,7 +67,7 @@ public class cArea
     public static void Save(cArea _areaToSave)
     {
         int availableAreaIndex = GetAvailableAreaIndex();
-        Debug.Log(availableAreaIndex);
+        Debug.Log("available area index = " + availableAreaIndex); // TODO: Remove!!!
         if (availableAreaIndex == -1)
         {
             Debug.Log("GetAvailableAreaIndex method has run out of available indexes");
@@ -93,19 +88,23 @@ public class cArea
         }
     }
 
-    public static cArea Load(string _areaKey)
+    private static cArea Load(int _areaId)
     {
-        if (!PlayerPrefs.HasKey(_areaKey))
+        string areaKey = AREA_KEY + _areaId.ToString();
+
+        if (!PlayerPrefs.HasKey(areaKey))
         {
             return null;
         }
 
-        string title = PlayerPrefs.GetString(_areaKey);
+        string title = PlayerPrefs.GetString(areaKey);
         Vector2 position = PlayerPrefsX.GetVector2(title + POSITION_KEY, Vector2.zero);
         int zoom = PlayerPrefs.GetInt(title + ZOOM_KEY);
         Vector4 constraints = PlayerPrefsX.GetVector4(title + CONSTRAINTS_KEY);
 
         cArea loadedArea = new cArea(title, position, zoom, constraints);
+        loadedArea.id = _areaId;
+
         return loadedArea;
     }
 
@@ -117,7 +116,7 @@ public class cArea
 
         do
         {
-            loadedArea = Load(AREA_KEY + index.ToString());
+            loadedArea = Load(index);
             if (loadedArea != null)
                 loadedAreas.Add(loadedArea);
             else
@@ -127,6 +126,42 @@ public class cArea
         while (index < 1000000);
 
         return loadedAreas;
+    }
+
+    private static cArea GetAreaByTitle(string _areaTitle)
+    {
+        cArea loadedArea = null;
+        int index = 0;
+
+        do
+        {
+            loadedArea = Load(index);
+            if (loadedArea != null && loadedArea.title.Equals(_areaTitle))
+            {
+                loadedArea.id = index;
+                break;
+            }
+                
+            index++;
+        }
+        while (index < 1000000);
+
+        return loadedArea;
+    }
+
+    private static void Delete(cArea _areaToDelete)
+    {
+        PlayerPrefs.DeleteKey(AREA_KEY + _areaToDelete.id); // Deletes title
+        PlayerPrefs.DeleteKey(_areaToDelete.title + POSITION_KEY); // Deletes position
+        PlayerPrefs.DeleteKey(_areaToDelete.title + ZOOM_KEY); // Deletes zoom
+        PlayerPrefs.DeleteKey(_areaToDelete.title + CONSTRAINTS_KEY); // Deletes constraints
+    }
+
+    // Deletes all keys related to this area. Paths, Points etc.
+    public static void Delete(string _areaTitle)
+    {
+        Delete(GetAreaByTitle(_areaTitle));
+        //cPath.Delete(_areaTitle);
     }
     #endregion
 }

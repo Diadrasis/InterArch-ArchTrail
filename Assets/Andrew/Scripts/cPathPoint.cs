@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class cPathPoint
 {
+    //private string title;
     Vector2 position;
     float time;
 
