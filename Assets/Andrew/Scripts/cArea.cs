@@ -82,6 +82,7 @@ public class cArea
         PlayerPrefs.SetString(AREA_KEY + availableAreaIndex, _areaToSave.title); // area_0, Mεσσήνη
         PlayerPrefs.SetInt(_areaToSave.title + ZOOM_KEY, _areaToSave.zoom); // Mεσσήνη_zoom, 19
         PlayerPrefsX.SetVector2(_areaToSave.title + POSITION_KEY, _areaToSave.position); // Mεσσήνη_position, Vector2
+        PlayerPrefsX.SetVector4(_areaToSave.title + CONSTRAINTS_KEY, _areaToSave.constraints);
     }
 
     public static void SaveAreas(List<cArea> _areasToSave)
@@ -101,9 +102,10 @@ public class cArea
 
         string title = PlayerPrefs.GetString(_areaKey);
         Vector2 position = PlayerPrefsX.GetVector2(title + POSITION_KEY, Vector2.zero);
-        //int zoom = PlayerPrefs.GetInt(title + "_zoom");
+        int zoom = PlayerPrefs.GetInt(title + ZOOM_KEY);
+        Vector4 constraints = PlayerPrefsX.GetVector4(title + CONSTRAINTS_KEY);
 
-        cArea loadedArea = new cArea(title, position);
+        cArea loadedArea = new cArea(title, position, zoom, constraints);
         return loadedArea;
     }
 

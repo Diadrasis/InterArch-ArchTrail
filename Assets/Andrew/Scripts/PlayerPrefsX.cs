@@ -124,6 +124,30 @@ public class PlayerPrefsX
 		return defaultValue;
 	}
 
+	public static bool SetVector4(String key, Vector4 vector)
+	{
+		return SetFloatArray(key, new float[] { vector.x, vector.y, vector.z, vector.w });
+	}
+
+	public static Vector4 GetVector4(String key)
+	{
+		var floatArray = GetFloatArray(key);
+		if (floatArray.Length < 4)
+		{
+			return Vector4.zero;
+		}
+		return new Vector4(floatArray[0], floatArray[1], floatArray[2], floatArray[3]);
+	}
+
+	public static Vector4 GetVector4(String key, Vector4 defaultValue)
+	{
+		if (PlayerPrefs.HasKey(key))
+		{
+			return GetVector4(key);
+		}
+		return defaultValue;
+	}
+
 	public static bool SetQuaternion(String key, Quaternion vector)
 	{
 		return SetFloatArray(key, new float[] { vector.x, vector.y, vector.z, vector.w });
