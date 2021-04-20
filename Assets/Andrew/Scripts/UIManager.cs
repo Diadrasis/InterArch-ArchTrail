@@ -9,14 +9,22 @@ public class UIManager : MonoBehaviour
 {
     #region Variables
     public GameObject mapScreen;
+
+    [Space]
+    [Header("Top Screen")]
     public Button btnBackToAreasScreen;
-    
+    public Image imgRecord;
+
+    [Space]
+    [Header("Areas Screen")]
     // Areas Screen
     public GameObject pnlAreasScreen;
     public GameObject pnlLoadedAreas;
     public GameObject selectAreaPrefab;
     public Button btnCreateArea;
 
+    [Space]
+    [Header("Create Area Screen")]
     // Create Area Screen
     public GameObject pnlCreateArea;
     public TMP_InputField inptFldCreateArea;
@@ -28,19 +36,27 @@ public class UIManager : MonoBehaviour
 
     private bool createArea = false;
 
+    [Space]
+    [Header("GPS Screen")]
     //GPS Screen
     public GameObject pnlGPSScreen;
     public Button btnGPSPermission;
 
+    [Space]
+    [Header("Route Screen")]
     //RouteScreen
     public GameObject pnlSelectedAreaScreen;
     public Button btnAddNewRoute;
     public Sprite sprAddNewRoute, sprSaveIcon;
 
+    [Space]
+    [Header("Warning Area Screen")]
     //WarningScreen if user is near area
     public GameObject pnlWarningScreen;
     public Button btnCancel;
 
+    [Space]
+    [Header("Warning Save Route Screen")]
     //WarningScreen when user is about to save the route
     public GameObject pnlWarningSaveRouteScreen;
     public Button btnSave, btnSaveCancel;
@@ -57,6 +73,8 @@ public class UIManager : MonoBehaviour
 
         pnlWarningScreen.SetActive(false);
         pnlWarningSaveRouteScreen.SetActive(false);
+        imgRecord.canvasRenderer.SetAlpha(0.0f);
+        
     }
 
     #endregion
@@ -85,7 +103,7 @@ public class UIManager : MonoBehaviour
         btnCancel.onClick.AddListener(() => CloseScreenPanels());
 
         //btn warning panel for save or cancel a route
-        btnSave.onClick.AddListener(() =>SaveArea());
+        btnSave.onClick.AddListener(() =>SaveRoute());
         btnSaveCancel.onClick.AddListener(() => CancelSaveRoute());
 
     }
@@ -97,10 +115,10 @@ public class UIManager : MonoBehaviour
         selectAreaObjects = InstantiateSelectAreaObjects();
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
         createArea = false;
-        
+        EnableScreen(pnlSelectedAreaScreen, false);
     }
 
-    private void EnableScreen(GameObject _screenToEnable, bool _valid) // NOT NEEDED
+    private void EnableScreen(GameObject _screenToEnable, bool _valid) // CURRENTLY IN USE
     {
         if (_valid)
             _screenToEnable.SetActive(true);
@@ -144,6 +162,7 @@ public class UIManager : MonoBehaviour
             pnlAreasScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
+        EnableScreen(pnlSelectedAreaScreen, true);
     }
 
     private void DestroySelectAreaObjects(List<GameObject> _selectAreaObjects)
@@ -172,6 +191,14 @@ public class UIManager : MonoBehaviour
         //mapScreen.SetActive(false);
     }
 
+    IEnumerator FlashRecordImage()
+    {
+
+        imgRecord.CrossFadeAlpha(0f, 0.5f, false);
+        yield return new WaitForSeconds(0.05f);
+        imgRecord.CrossFadeAlpha(1.0f, 0.5f, false);
+        yield return new WaitForSeconds(0.05f);
+    }
     private void CreateNewAreaSelected()
     {
         pnlAreasScreen.SetActive(false);
@@ -284,24 +311,30 @@ public class UIManager : MonoBehaviour
     }
 
     #region RoutePanel
+    //changes icon from plus to save icon, listener changes to next method for saving route, here also have the drawing?
     void AddNewRoute()
     {
         btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
+        StartCoroutine(FlashRecordImage());
         btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
+        Debug.Log("Add New Route");
     }
-    //for now change the icon from plus to save
+
+    //change the icon from plus to save, opens warning screen for saving or cancel route
     void SaveUIButton()
     {
+        EnableScreen(pnlWarningSaveRouteScreen, true);
         btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
         btnAddNewRoute.onClick.AddListener(() => SaveRoute());
         Debug.Log("Save UI method");
     }
 
+    //when save button is pressed on warning screen, the save icon changes back to plus icon. Warning screen is deactivated and listener goes to original method
     void SaveRoute()
     {
-        pnlWarningSaveRouteScreen.SetActive(true);
         btnAddNewRoute.GetComponent<Image>().sprite = sprAddNewRoute;
         btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
+        EnableScreen(pnlWarningSaveRouteScreen, false);
         Debug.Log("Save route method");
     }
     #endregion
@@ -315,12 +348,12 @@ public class UIManager : MonoBehaviour
             pnlWarningScreen.SetActive(false);
     }
 
-    //to close route save plus and remove everything from the map
+    //to close route save plus remove everything from the map
     void CancelSaveRoute()
     {
         if (pnlWarningSaveRouteScreen.activeSelf)
         {
-            pnlWarningSaveRouteScreen.SetActive(false);
+            SaveRoute();
             OnlineMapsDrawingElementManager.RemoveAllItems();
             OnlineMaps.instance.Redraw();
         }
