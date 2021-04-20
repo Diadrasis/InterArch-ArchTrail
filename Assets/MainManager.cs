@@ -214,7 +214,7 @@ public class MainManager : MonoBehaviour
     
 #endregion
 
-#region Screencapture the path
+    #region Screencapture the path
 /*void RecMyPath()
 {
     if (isRecPath)
@@ -254,7 +254,7 @@ IEnumerator TakeScreenShot(string pathname)
 }*/
 #endregion
 //this region should be on the UIManager on final build
-#region MenuButtonFunction
+    #region MenuButtonFunction
 //is used on settings button to open the specific panel
 void OpenSettingsScreen()
     {

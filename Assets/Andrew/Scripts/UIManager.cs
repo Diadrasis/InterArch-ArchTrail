@@ -13,7 +13,7 @@ public class UIManager : MonoBehaviour
     [Space]
     [Header("Top Screen")]
     public Button btnBackToAreasScreen;
-    public Image imgRecord;
+    public Animator imgRecord;
 
     [Space]
     [Header("Areas Screen")]
@@ -73,8 +73,8 @@ public class UIManager : MonoBehaviour
 
         pnlWarningScreen.SetActive(false);
         pnlWarningSaveRouteScreen.SetActive(false);
-        imgRecord.canvasRenderer.SetAlpha(0.0f);
-        
+
+        //imgRecord = GetComponent<Animator>();
     }
 
     #endregion
@@ -116,6 +116,7 @@ public class UIManager : MonoBehaviour
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
         createArea = false;
         EnableScreen(pnlSelectedAreaScreen, false);
+        imgRecord.gameObject.SetActive(false);
     }
 
     private void EnableScreen(GameObject _screenToEnable, bool _valid) // CURRENTLY IN USE
@@ -156,6 +157,7 @@ public class UIManager : MonoBehaviour
         TMP_Text selectAreaText = selectAreaObject.GetComponentInChildren<TMP_Text>();
 
         cArea selectedArea = AppManager.Instance.mapManager.GetAreaByTitle(selectAreaText.text);
+        AppManager.Instance.mapManager.currentArea = selectedArea;
 
         if (selectedArea != null)
         {
@@ -163,6 +165,9 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
         EnableScreen(pnlSelectedAreaScreen, true);
+        imgRecord.gameObject.SetActive(true);
+
+        AppManager.Instance.mapManager.CheckUserPosition();
     }
 
     private void DestroySelectAreaObjects(List<GameObject> _selectAreaObjects)
@@ -188,17 +193,15 @@ public class UIManager : MonoBehaviour
     private void BackToAreasScreen()
     {
         DisplayAreasScreen();
+        pnlWarningScreen.SetActive(false);
         //mapScreen.SetActive(false);
     }
 
-    IEnumerator FlashRecordImage()
+    void IsRecording(bool val)
     {
-
-        imgRecord.CrossFadeAlpha(0f, 0.5f, false);
-        yield return new WaitForSeconds(0.05f);
-        imgRecord.CrossFadeAlpha(1.0f, 0.5f, false);
-        yield return new WaitForSeconds(0.05f);
+        imgRecord.SetBool("isPlaying", val);
     }
+    
     private void CreateNewAreaSelected()
     {
         pnlAreasScreen.SetActive(false);
@@ -315,7 +318,7 @@ public class UIManager : MonoBehaviour
     void AddNewRoute()
     {
         btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
-        StartCoroutine(FlashRecordImage());
+        IsRecording(true);
         btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
         Debug.Log("Add New Route");
     }
@@ -324,6 +327,7 @@ public class UIManager : MonoBehaviour
     void SaveUIButton()
     {
         EnableScreen(pnlWarningSaveRouteScreen, true);
+        IsRecording(false);
         btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
         btnAddNewRoute.onClick.AddListener(() => SaveRoute());
         Debug.Log("Save UI method");
@@ -335,6 +339,7 @@ public class UIManager : MonoBehaviour
         btnAddNewRoute.GetComponent<Image>().sprite = sprAddNewRoute;
         btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
         EnableScreen(pnlWarningSaveRouteScreen, false);
+        IsRecording(false);
         Debug.Log("Save route method");
     }
     #endregion

@@ -28,6 +28,7 @@ public class MapManager : MonoBehaviour
     private void Start()
     {
         SubscribeToEvents();
+       
     }
 
     private void OnDestroy()
@@ -42,7 +43,9 @@ public class MapManager : MonoBehaviour
         List<cArea> areasFromDatabase = new List<cArea>()
         {
             new cArea("Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector4(21.9160667457503f, 37.1700252387224f , 21.9227518498302f, 37.178659594564f)),
-            new cArea("Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector4(25.1616718900387f, 35.2958874528396f , 25.1645352578472f, 35.3000733065711f))
+            new cArea("Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector4(25.1616718900387f, 35.2958874528396f , 25.1645352578472f, 35.3000733065711f)),
+            //new cArea("Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f),19, new Vector4(23.724021164280998f - 1, 37.97881236959543f , 23.725090676541246f, 37.9802439464203f))
+            new cArea("Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f),19, new Vector4(23.72385281512933f, 37.97881236959543f , 23.725090676541246f, 37.9802439464203f))
         };
 
         //DisplayAreaDebug(0);
@@ -81,6 +84,7 @@ public class MapManager : MonoBehaviour
         Vector2 locationPoint = OnlineMapsLocationService.instance.position; // 23.72413215765034, 37.98021913845082
         SetMapViewToPoint(locationPoint);
         //OnlineMapsLocationService.instance.updatePosition = true; // MUST BE UNCOMMENTED
+        
     }
 
     public void SetMapViewToArea(cArea _areaToView)
@@ -125,6 +129,83 @@ public class MapManager : MonoBehaviour
 
         // Input Events
         OnlineMapsControlBase.instance.OnMapClick += AppManager.Instance.uIManager.OnMapClick;
+
+        //Changed Location Event
+        OnlineMapsLocationService.instance.OnLocationChanged += OnLocationChanged;
     }
+
+    public void CheckUserPosition()
+    {
+        if(currentArea != null)
+        {
+            if (!IsWithinConstraints())
+            {
+                AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            }
+            else
+            {
+                AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+            }
+        }
+    }
+
+    private bool IsWithinConstraints()
+    {
+        if ((currentArea.constraints.x < OnlineMapsLocationService.instance.position.x) && (OnlineMapsLocationService.instance.position.x < currentArea.constraints.z)
+            && (currentArea.constraints.y < OnlineMapsLocationService.instance.position.y) && (OnlineMapsLocationService.instance.position.y < currentArea.constraints.w))
+        {
+
+            Debug.Log("true");
+            return true;
+
+        }
+        Debug.Log("false");
+        return false;
+    }
+
+    public void OnLocationChanged(Vector2 position)
+    {
+        //position = OnlineMapsLocationService.instance.position;
+        Vector3 pos = OnlineMapsTileSetControl.instance.GetWorldPosition(position);
+        OnlineMapsLocationService.instance.position = pos;
+        //playerMarker.position = position;
+    }
+    /*void RecMyPath()
+    {
+        if (isRecPath)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + System.DateTime.Now.ToString("yy'-'MM'-'dd'-'hh'-'mm") + ".png");
+                Debug.Log(Application.persistentDataPath + "/" + System.DateTime.Now.ToString("yy'-'MM'-'dd'-'hh'-'mm") + ".png");
+                //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+            }
+
+            StartCoroutine(TakeScreenShot(currentPath));
+
+        }
+
+    }
+    IEnumerator TakeScreenShot(string pathname)
+    {
+        *//*if (!serverManager.useScreenShots) { yield break; }
+        MarkersManager.CenterZoomOnMarkers();*//*
+
+        yield return new WaitForEndOfFrame();
+        int width = Screen.width;
+        int height = Screen.height;
+        Texture2D tex = new Texture2D(width, height, TextureFormat.RGB24, false);
+        tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        tex.Apply();
+
+        byte[] bytes = tex.EncodeToJPG(); //Can also encode to jpg, just make sure to change the file extensions down below
+        Destroy(tex);
+        OnLocationChanged(OnlineMapsLocationService.instance.position);
+        yield return new WaitForEndOfFrame();
+
+        //Stathis.File_Manager.saveImage(bytes, pathname, Stathis.File_Manager.Ext.JPG);
+
+        yield break;
+    }*/
     #endregion
 }
