@@ -102,10 +102,13 @@ public class MapManager : MonoBehaviour
         return null;
     }
 
-    public void AddArea(cArea _areaToAdd)
+    public void SaveArea(cArea _areaToSave)
     {
-        if (!areas.Contains(_areaToAdd))
-            areas.Add(_areaToAdd);
+        if (!areas.Contains(_areaToSave))
+        {
+            cArea.Save(_areaToSave);
+            areas = cArea.LoadAreas();
+        }
     }
 
     private void ResetMapConstraints()
