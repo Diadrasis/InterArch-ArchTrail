@@ -160,6 +160,7 @@ public class cArea
     // Deletes all keys related to this area. Paths, Points etc.
     public static void Delete(string _areaTitle)
     {
+        //Debug.Log(GetAreaByTitle(_areaTitle).title);
         Delete(GetAreaByTitle(_areaTitle));
         //cPath.Delete(_areaTitle);
     }

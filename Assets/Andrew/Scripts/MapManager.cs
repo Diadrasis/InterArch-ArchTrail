@@ -115,6 +115,15 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    public void DeleteArea(string _areaTitle)
+    {
+        //if (!areas.Contains(_areaToDelete))
+        {
+            cArea.Delete(_areaTitle);
+            areas = cArea.LoadAreas();
+        }
+    }
+
     private void ResetMapConstraints()
     {
         OnlineMaps.instance.positionRange = null;

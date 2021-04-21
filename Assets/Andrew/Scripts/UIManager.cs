@@ -143,15 +143,33 @@ public class UIManager : MonoBehaviour
             //newSelectArea.transform.SetAsFirstSibling();
             TMP_Text selectAreaText = newSelectArea.GetComponentInChildren<TMP_Text>();
             selectAreaText.text = area.title;
-            Button button = newSelectArea.GetComponentInChildren<Button>();
-            button.onClick.AddListener(OnAreaSelected);
+
+            Button btnSelectArea;
+            Button btnDeleteArea;
+            foreach (Transform child in newSelectArea.transform)
+            {
+                if (child.name.Equals("pnlSelectArea"))
+                {
+                    btnSelectArea = child.GetComponentInChildren<Button>();
+                    btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
+                }
+
+                if (child.name.Equals("btnDeleteArea"))
+                {
+                    btnDeleteArea = child.GetComponent<Button>();
+                    btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
+                }
+            }
+
+            //Button btnSelectArea = newSelectArea.GetComponentInChildren<Button>();
+            //btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
             newSelectAreaObjects.Add(newSelectArea);
         }
 
         return newSelectAreaObjects;
     }
 
-    private void OnAreaSelected()
+    private void OnAreaSelectPressed()
     {
         GameObject selectAreaObject = EventSystem.current.currentSelectedGameObject;
         TMP_Text selectAreaText = selectAreaObject.GetComponentInChildren<TMP_Text>();
@@ -168,6 +186,26 @@ public class UIManager : MonoBehaviour
         imgRecord.gameObject.SetActive(true);
 
         AppManager.Instance.mapManager.CheckUserPosition();
+    }
+
+    private void OnAreaDeletePressed()
+    {
+        GameObject btnDeleteArea = EventSystem.current.currentSelectedGameObject;
+        string areaTitle = string.Empty;
+        Transform pnlSelectArea = btnDeleteArea.transform.parent;
+        //Debug.Log(pnlSelectArea.name);
+        foreach (Transform child in pnlSelectArea)
+        {
+            if (child.name.Equals("pnlSelectArea"))
+            {
+                TMP_Text btnSelectAreaText = child.GetComponentInChildren<TMP_Text>();
+                areaTitle = btnSelectAreaText.text;
+            }
+        }
+        
+        //Debug.Log(areaTitle);
+        AppManager.Instance.mapManager.DeleteArea(areaTitle);
+        DisplayAreasScreen();
     }
 
     private void DestroySelectAreaObjects(List<GameObject> _selectAreaObjects)
