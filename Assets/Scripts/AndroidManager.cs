@@ -32,7 +32,7 @@ public class AndroidManager : MonoBehaviour
             
         }
 #endif
-        locationService.OnLocationChanged += AppManager.Instance.mapManager.OnLocationChanged;
+        //locationService.OnLocationChanged += AppManager.Instance.mapManager.OnLocationChanged;
         if (CheckForLocationServices()) return;
     }
 
@@ -91,12 +91,12 @@ public class AndroidManager : MonoBehaviour
         locationService.StopLocationService();
     }
     //uncomment on final build!!!!
-    /*private void Update()
+    private void Update()
     {
         if (CheckForLocationServices()) return;
 
-    }*/
-    /*private void OnApplicationPause(bool pause)
+    }
+    private void OnApplicationPause(bool pause)
     {
         if (!pause)
         {
@@ -123,5 +123,5 @@ public class AndroidManager : MonoBehaviour
             Debug.LogWarning("OnApplicationFocus = true");
             if (CheckForLocationServices()) { return; }
         }
-    }*/
+    }
 }
