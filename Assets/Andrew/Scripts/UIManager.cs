@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 public class UIManager : MonoBehaviour
 {
@@ -349,6 +350,52 @@ public class UIManager : MonoBehaviour
                 MarkersManager.SaveMarkers(currPathName, markerListCurrPath);
             }
         }*/
+
+        //manual path creation after pressing the plus button!
+        if (AppManager.Instance.mapManager.isDrawLineOnEveryPoint)
+        {
+            // Get the coordinates under the cursor.
+            double lng, lat;
+            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
+
+            Vector2 position = new Vector2((float)lng, (float)lat);
+
+            // Calculate the distance in km between locations.
+            float distance = OnlineMapsUtils.DistanceBetweenPoints(position, AppManager.Instance.mapManager.previousPosition).magnitude;
+
+            //Debug.LogWarning("dist = " + distance);
+            // Debug.LogWarning("minDistanceToPutNewMarker = " + minDistanceToPutNewMarker);
+
+            if (distance < AppManager.Instance.mapManager.minDistanceToPutNewMarker)
+            {
+                return;
+            }
+            else
+            {
+                AppManager.Instance.mapManager.previousPosition = position;
+            }
+
+            // Create a label for the marker.
+            string label = "Marker " + (OnlineMaps.instance.markers.Length + 1);
+
+            OnlineMapsMarker marker = new OnlineMapsMarker();
+
+            marker.label = label;
+            marker.SetPosition(lng, lat);
+
+            // Create a new marker.
+            OnlineMapsMarkerManager.CreateItem(lng, lat, label);
+
+            AppManager.Instance.mapManager.markerListCurrPath.Add(marker);
+
+
+            OnlineMapsMarkerManager.instance.Remove(marker);
+            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+            //OnlineMapsDrawingElementManager.AddItem(route);
+            OnlineMaps.instance.Redraw();
+
+
+        }
     }
 
     #region RoutePanel
@@ -368,7 +415,6 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.isDrawLineOnEveryPoint = true;
             //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
             btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
-            Debug.Log("Add New Route");
         }
         
     }
@@ -381,7 +427,6 @@ public class UIManager : MonoBehaviour
         AppManager.Instance.mapManager.isDrawLineOnEveryPoint = false;
         btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
         btnAddNewRoute.onClick.AddListener(() => SaveRoute());
-        Debug.Log("Save UI method");
     }
 
     //when save button is pressed on warning screen, the save icon changes back to plus icon. Warning screen is deactivated and listener goes to original method
@@ -392,7 +437,6 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlWarningSaveRouteScreen, false);
         IsRecording(false);
         AppManager.Instance.mapManager.isDrawLineOnEveryPoint = false;
-        Debug.Log("Save route method");
     }
     #endregion
 
@@ -412,6 +456,7 @@ public class UIManager : MonoBehaviour
         {
             SaveRoute();
             OnlineMapsDrawingElementManager.RemoveAllItems();
+            OnlineMapsMarkerManager.RemoveAllItems();
             OnlineMaps.instance.Redraw();
         }
     }

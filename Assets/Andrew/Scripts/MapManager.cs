@@ -15,20 +15,27 @@ public class MapManager : MonoBehaviour
 
     public static readonly int DEFAULT_ZOOM = 19;
     public static readonly float DEFAULT_POSITION_OFFSET = 0.00414180675f;
-
-    private Vector2 previousPosition = Vector2.zero;
-    private Vector2 fromPosition, toPosition;
-    private float minDistanceToPutNewMarker = 100f / 1000f;
     [HideInInspector]
-    public bool isDrawLineOnEveryPoint;
-    List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
+    public Vector2 previousPosition = Vector2.zero;
+    
+    [HideInInspector]
+    public float minDistanceToPutNewMarker = 10f / 1000f;
+    [HideInInspector]
+    public bool isDrawLineOnEveryPoint, isMovement;
+    [HideInInspector]
+    public List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
 
     //createMarker on user position and on the path after specific meters
     OnlineMapsMarker marker = new OnlineMapsMarker();
     private float angle = 0.5f;
     public float time = 10;
     // Move direction
-    private int direction = 1;
+    private int direction = 1, moveZoom;
+
+
+    //maybe can be deleted later, for now testing purposes
+    private Vector2 fromPosition, toPosition;
+    private double fromTileX, fromTileY, toTileX, toTileY;
     #endregion
 
     #region Unity Functions
@@ -44,26 +51,26 @@ public class MapManager : MonoBehaviour
     private void Start()
     {
         SubscribeToEvents();
-        OnlineMaps map = OnlineMaps.instance;
-        marker = OnlineMapsMarkerManager.CreateItem(map.position);
         fromPosition = OnlineMaps.instance.position;
         toPosition = OnlineMapsLocationService.instance.position;
+        isDrawLineOnEveryPoint = false;
     }
     private void Update()
     {
-        angle += Time.deltaTime / time * direction;
+        if (!isMovement) return;
+
+        angle += Time.deltaTime / time;
+
         if (angle > 1)
         {
-            angle = 2 - angle;
-            direction = -1;
+            // stop movement
+            isMovement = false;
+            angle = 1;
         }
-        else if (angle < 0)
-        {
-            angle *= -1;
-            direction = 1;
-        }
-
-        marker.position = Vector2.Lerp(fromPosition, toPosition, angle);
+        double px = (toTileX - fromTileX) * angle + fromTileX;
+        double py = (toTileY - fromTileY) * angle + fromTileY;
+        OnlineMaps.instance.projection.TileToCoordinates(px, py, moveZoom, out px, out py);
+        OnlineMaps.instance.SetPosition(px, py);
     }
     private void OnDestroy()
     {
@@ -117,6 +124,7 @@ public class MapManager : MonoBehaviour
         ResetMapConstraints();
         Vector2 locationPoint = OnlineMapsLocationService.instance.position; // 23.72413215765034, 37.98021913845082
         SetMapViewToPoint(locationPoint);
+        marker.position = locationPoint;
         //OnlineMapsLocationService.instance.updatePosition = true; // MUST BE UNCOMMENTED
         
     }
@@ -207,14 +215,41 @@ public class MapManager : MonoBehaviour
         Debug.Log("false");
         return false;
     }
+    //can be removed?
+    public void CheckMyLocation()
+    {
+        Debug.Log("CheckMyLocation");
+        fromPosition = OnlineMaps.instance.position;
+        toPosition = OnlineMapsLocationService.instance.position;
+
+        // calculates tile positions
+        moveZoom = OnlineMaps.instance.zoom;
+        OnlineMaps.instance.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
+        OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
+
+        // if tile offset < 4, then start smooth movement
+        if (OnlineMapsUtils.Magnitude(fromTileX, fromTileY, toTileX, toTileY) < 4)
+        {
+            // set relative position 0
+            angle = 0;
+
+            // start movement
+            isMovement = true;
+        }
+        else // too far
+        {
+            OnlineMaps.instance.position = toPosition;
+        }
+    }
 
     public void OnLocationChanged(Vector2 position)
     {
+        Debug.Log("On Location Changed");
         //position = OnlineMapsLocationService.instance.position;
         Vector3 pos = OnlineMapsTileSetControl.instance.GetWorldPosition(position);
         OnlineMapsLocationService.instance.position = pos;
-        //playerMarker.position = position;
-        
+        marker.position = position;
+        CheckMyLocation();
         float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
         if(distance < minDistanceToPutNewMarker)
         {
@@ -232,12 +267,47 @@ public class MapManager : MonoBehaviour
 
         markerListCurrPath.Add(marker);
 
-        if (isDrawLineOnEveryPoint)
+        if (isDrawLineOnEveryPoint && AppManager.Instance.uIManager.imgRecord.GetBool("isPlaying"))
         {
-            OnlineMapsMarkerManager.RemoveItem(marker);
+
+            double lng, lat;
+            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
+
+            position = new Vector2((float)lng, (float)lat);
+
+            // Calculate the distance in km between locations.
+            
+
+            string label = "Marker " + (OnlineMaps.instance.markers.Length + 1);
+
+
+            marker.label = label;
+            marker.SetPosition(lng, lat);
+
+
+            OnlineMapsMarkerManager.CreateItem(lng, lat, label);
+            AppManager.Instance.mapManager.markerListCurrPath.Add(marker);
+
+
+            /*OnlineMapsMarkerManager.RemoveItem(marker);
+            //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+            OnlineMapsDrawingLine route = new OnlineMapsDrawingLine(markerListCurrPath, Color.red, 3);
+            OnlineMapsDrawingElementManager.AddItem(route);*/
+            Debug.Log(marker.label);
+            OnlineMapsMarkerManager.instance.Remove(marker);
             OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
             OnlineMaps.instance.Redraw();
         }
+        /*if (minDistanceToPutNewMarker < 0.005f)
+        {
+            minDistanceToPutNewMarker = 5f / 1000f;  //5 meters to km
+        }*/
+        
+        // Create a new marker.
+       
+
+        
+
     }
 
     #region Screencapture the path

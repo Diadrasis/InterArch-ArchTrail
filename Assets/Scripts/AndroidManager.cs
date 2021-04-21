@@ -94,9 +94,9 @@ public class AndroidManager : MonoBehaviour
     /*private void Update()
     {
         if (CheckForLocationServices()) return;
-        
+
     }*/
-    private void OnApplicationPause(bool pause)
+    /*private void OnApplicationPause(bool pause)
     {
         if (!pause)
         {
@@ -123,5 +123,5 @@ public class AndroidManager : MonoBehaviour
             Debug.LogWarning("OnApplicationFocus = true");
             if (CheckForLocationServices()) { return; }
         }
-    }
+    }*/
 }
