@@ -32,6 +32,7 @@ public class AndroidManager : MonoBehaviour
             
         }
 #endif
+        locationService.OnLocationChanged += AppManager.Instance.mapManager.OnLocationChanged;
         if (CheckForLocationServices()) return;
     }
 

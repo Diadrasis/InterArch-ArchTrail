@@ -353,31 +353,45 @@ public class UIManager : MonoBehaviour
 
     #region RoutePanel
     //changes icon from plus to save icon, listener changes to next method for saving route, here also have the drawing?
-    void AddNewRoute()
+    private void AddNewRoute()
     {
-        btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
-        IsRecording(true);
-        btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
-        Debug.Log("Add New Route");
+        if (!AppManager.Instance.androidManager.CheckForLocationServices() && AppManager.Instance.mapManager.isDrawLineOnEveryPoint)
+        {
+
+            EnableScreen(pnlGPSScreen, true);
+            return;
+        }
+        else
+        {
+            btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
+            IsRecording(true);
+            AppManager.Instance.mapManager.isDrawLineOnEveryPoint = true;
+            //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+            btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
+            Debug.Log("Add New Route");
+        }
+        
     }
 
     //change the icon from plus to save, opens warning screen for saving or cancel route
-    void SaveUIButton()
+    private void SaveUIButton()
     {
         EnableScreen(pnlWarningSaveRouteScreen, true);
         IsRecording(false);
+        AppManager.Instance.mapManager.isDrawLineOnEveryPoint = false;
         btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
         btnAddNewRoute.onClick.AddListener(() => SaveRoute());
         Debug.Log("Save UI method");
     }
 
     //when save button is pressed on warning screen, the save icon changes back to plus icon. Warning screen is deactivated and listener goes to original method
-    void SaveRoute()
+    private void SaveRoute()
     {
         btnAddNewRoute.GetComponent<Image>().sprite = sprAddNewRoute;
         btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
         EnableScreen(pnlWarningSaveRouteScreen, false);
         IsRecording(false);
+        AppManager.Instance.mapManager.isDrawLineOnEveryPoint = false;
         Debug.Log("Save route method");
     }
     #endregion
@@ -385,14 +399,14 @@ public class UIManager : MonoBehaviour
 
     #region Warnings
     //to close main warning screen for area check
-    void CloseScreenPanels()
+    private void CloseScreenPanels()
     {
         if (pnlWarningScreen.activeSelf)
             pnlWarningScreen.SetActive(false);
     }
 
     //to close route save plus remove everything from the map
-    void CancelSaveRoute()
+    private void CancelSaveRoute()
     {
         if (pnlWarningSaveRouteScreen.activeSelf)
         {

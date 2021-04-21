@@ -151,6 +151,7 @@ public class MainManager : MonoBehaviour
     public void OnLocationChanged(Vector2 position)
     {
         position = OnlineMapsLocationService.instance.position;
+        
         //playerMarker.position = position;
     }
 
