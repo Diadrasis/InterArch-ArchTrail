@@ -200,11 +200,11 @@ public class MapManager : MonoBehaviour
             && (currentArea.constraints.y < OnlineMapsLocationService.instance.position.y) && (OnlineMapsLocationService.instance.position.y < currentArea.constraints.w))
         {
 
-            Debug.Log("true");
+            //Debug.Log("true");
             return true;
 
         }
-        Debug.Log("false");
+        //Debug.Log("false");
         return false;
     }
 
