@@ -61,6 +61,10 @@ public class UIManager : MonoBehaviour
     //WarningScreen when user is about to save the route
     public GameObject pnlWarningSaveRouteScreen;
     public Button btnSave, btnSaveCancel;
+
+    [Space]
+    [Header("Testing Purposes")]
+    public TextMeshProUGUI infoText;
     #endregion
 
     #region Unity Functions
@@ -231,8 +235,16 @@ public class UIManager : MonoBehaviour
 
     private void BackToAreasScreen()
     {
-        DisplayAreasScreen();
-        pnlWarningScreen.SetActive(false);
+        if (!AppManager.Instance.mapManager.isDrawLineOnEveryPoint)
+        {
+            DisplayAreasScreen();
+            pnlWarningSaveRouteScreen.SetActive(false);
+        }
+        else
+        {
+            SaveUIButton();
+        }
+        
         //mapScreen.SetActive(false);
     }
 
@@ -404,19 +416,18 @@ public class UIManager : MonoBehaviour
     {
         if (!AppManager.Instance.androidManager.CheckForLocationServices() && AppManager.Instance.mapManager.isDrawLineOnEveryPoint)
         {
-
             EnableScreen(pnlGPSScreen, true);
             return;
         }
-        else
-        {
-            btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
-            IsRecording(true);
-            AppManager.Instance.mapManager.isDrawLineOnEveryPoint = true;
-            //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
-            btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
-        }
-        
+
+        btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
+        IsRecording(true);
+        AppManager.Instance.mapManager.isDrawLineOnEveryPoint = true;
+        AppManager.Instance.mapManager.previousPosition = OnlineMapsLocationService.instance.position;
+        OnlineMapsMarkerManager.CreateItem(AppManager.Instance.mapManager.previousPosition, "Player");
+        //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+        btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
+        Debug.Log("here");
     }
 
     //change the icon from plus to save, opens warning screen for saving or cancel route
@@ -437,6 +448,7 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlWarningSaveRouteScreen, false);
         IsRecording(false);
         AppManager.Instance.mapManager.isDrawLineOnEveryPoint = false;
+        Debug.Log("SaveRoute");
     }
     #endregion
 
