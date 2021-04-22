@@ -3672,7 +3672,7 @@ MonoBehaviour:
   infoText: {fileID: 284174842}
   btnPanelSaved: {fileID: 409052186}
   btnCancelShow: {fileID: 1184887168}
-  pnlSavedPaths: {fileID: 543476938}
+  pnlSavedPaths: {fileID: 171761353}
   btnShowPath: {fileID: 3162033636582294716, guid: 8a99c9811a725534cb51db4c90f59921,
     type: 3}
 --- !u!1 &1031194544
