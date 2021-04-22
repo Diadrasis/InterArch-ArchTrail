@@ -6,8 +6,6 @@ using UnityEngine;
 public class MapManager : MonoBehaviour
 {
     #region Variables
-    private List<cArea> areasToTestSave = new List<cArea>(); // TEST
-
     [HideInInspector]
     public List<cArea> areas = new List<cArea>();
     [HideInInspector]
@@ -32,7 +30,6 @@ public class MapManager : MonoBehaviour
     // Move direction
     private int direction = 1, moveZoom;
 
-
     //maybe can be deleted later, for now testing purposes
     private Vector2 fromPosition, toPosition;
     private double fromTileX, fromTileY, toTileX, toTileY;
@@ -41,11 +38,18 @@ public class MapManager : MonoBehaviour
     #region Unity Functions
     private void Awake()
     {
-        //areasToTestSave = GetTestAreas();
+        //List<cArea> areasToTestSave = GetTestAreas();
         //cArea.SaveAreas(areasToTestSave);
 
         areas = cArea.LoadAreas();
-        
+
+        /*List<cPath> pathsToTest = GetTestPaths();
+        cPath.SavePaths(pathsToTest);
+
+        foreach (string pathInstanceKey in cPath.LoadAllPaths())
+        {
+            Debug.Log(pathInstanceKey);
+        }*/
     }
 
     private void Start()
@@ -93,6 +97,18 @@ public class MapManager : MonoBehaviour
         //DisplayAreaDebug(1);
 
         return areasFromDatabase;
+    }
+
+    private List<cPath> GetTestPaths()
+    {
+        List<cPath> pathsToTest = new List<cPath>()
+        {
+            new cPath("Μεσσήνη", "path_0"),
+            new cPath("Μεσσήνη", "path_1"),
+            new cPath("Κνωσός", "path_0")
+        };
+
+        return pathsToTest;
     }
 
     private void DisplayAreaDebug(int _index)
