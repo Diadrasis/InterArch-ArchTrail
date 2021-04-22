@@ -10,7 +10,8 @@ public class cPath
     public string title;
     //List<cPathPoint> pathPoints = new List<cPathPoint>();
 
-    private static readonly string PATH_KEY = "_path_";
+    //private static readonly string PATH_KEY = "_path_";
+    private static readonly string PATH_KEY = "path";
     #endregion
 
     #region Methods
@@ -61,7 +62,7 @@ public class cPath
         return (index < 1000000) ? index : -1;
     }
 
-    public static void Save(cPath _pathToSave)
+    /*public static void Save(cPath _pathToSave)
     {
         int availablePathIndex = GetAvailablePathIndex(_pathToSave.areaTitle);
         Debug.Log("available path index = " + availablePathIndex); // TODO: Remove!!!
@@ -72,6 +73,12 @@ public class cPath
         }
 
         PlayerPrefs.SetString(_pathToSave.areaTitle + PATH_KEY + availablePathIndex, _pathToSave.title);
+    }*/
+    public static void Save(cPath _pathToSave)
+    {
+        string pathInstanceKey = _pathToSave.areaTitle + _pathToSave.title;
+        PlayerPrefs.SetString(PATH_KEY, pathInstanceKey);
+        PlayerPrefs.SetString(pathInstanceKey, _pathToSave.title);
     }
 
     public static void SavePaths(List<cPath> _pathsToSave)
@@ -82,7 +89,7 @@ public class cPath
         }
     }
 
-    public static cPath Load(string _areaTitle, int _pathIndex)
+    /*public static cPath Load(string _areaTitle, int _pathIndex)
     {
         string pathKey = _areaTitle + PATH_KEY + _pathIndex;
         if (!PlayerPrefs.HasKey(pathKey))
@@ -95,9 +102,9 @@ public class cPath
 
         cPath loadedPath = new cPath(_areaTitle, title); //, loadedPathPoints
         return loadedPath;
-    }
+    }*/
 
-    public static List<cPath> LoadPaths(string _areaTitle)
+    /*public static List<cPath> LoadPaths(string _areaTitle)
     {
         List<cPath> loadedPaths = new List<cPath>();
         cPath loadedPath = null;
@@ -115,6 +122,26 @@ public class cPath
         while (index < 1000000);
 
         return loadedPaths;
+    }*/
+
+    public static string[] LoadAreaPaths(string _areaTitle)
+    {
+        if (PlayerPrefs.HasKey(_areaTitle))
+        {
+            return PlayerPrefsX.GetStringArray(_areaTitle);
+        }
+
+        return null;
+    }
+
+    public static string[] LoadAllPaths()
+    {
+        if (PlayerPrefs.HasKey(PATH_KEY))
+        {
+            return PlayerPrefsX.GetStringArray(PATH_KEY);
+        }
+
+        return null;
     }
     #endregion
 }
