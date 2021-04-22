@@ -26,7 +26,7 @@ public class MapManager : MonoBehaviour
     public List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
 
     //createMarker on user position and on the path after specific meters
-    OnlineMapsMarker marker = new OnlineMapsMarker();
+    //OnlineMapsMarker marker = new OnlineMapsMarker();
     private float angle = 0.5f;
     public float time = 10;
     // Move direction
@@ -241,64 +241,41 @@ public class MapManager : MonoBehaviour
 
     public void OnLocationChanged(Vector2 position)
     {
-        Debug.Log("On Location Changed "+position);
-        //position = OnlineMapsLocationService.instance.position;
-        //Vector2 pos = OnlineMapsLocationService.instance.createMarkerInUserPosition;
-        /* Vector2 pos = OnlineMapsTileSetControl.instance.GetWorldPosition(position);
-         marker.position = pos;*/
-
         //AppManager.Instance.uIManager.infoText.text = "Location changed to: " + position;
 
-        //marker.position = position;
-
         //CheckMyLocation();
-       
-        if(isDrawLineOnEveryPoint && AppManager.Instance.uIManager.imgRecord.GetBool("isPlaying"))
+
+        if (isDrawLineOnEveryPoint && AppManager.Instance.uIManager.imgRecord.GetBool("isPlaying")) // IsRecordingPath
         {
+            //AppManager.Instance.uIManager.infoText.text = "Distance changed to: " + distance;
+            OnlineMapsLocationService.instance.UpdatePosition();
 
             float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
-
-            Debug.Log("Distance: " + distance);
-
-            AppManager.Instance.uIManager.infoText.text = "Distance changed to: " + distance;
-
+            Debug.Log("Distance from previous marker: " + distance);
             if (distance < OnlineMapsLocationService.instance.updateDistance/1000f)
             {
-                OnlineMaps.instance.Redraw();
+                //OnlineMaps.instance.Redraw();
                 return;
             }
             else
             {
-                
-                string label = "Marker " + (OnlineMaps.instance.markers.Length + 1);
+                // Creates a new marker
+                string label = "Marker " + (OnlineMapsMarkerManager.instance.Count + 1);
+                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
 
-                OnlineMapsMarkerManager.CreateItem(position, label);
+                //marker.label = label;
+                //marker.position = position;
+                //OnlineMapsMarkerManager.AddItem(marker);
 
-                marker.label = label;
-                marker.position = position;
-
-                OnlineMapsMarkerManager.AddItem(marker);
-
-                markerListCurrPath.Add(marker);
-                Debug.Log(marker.label);
-                //OnlineMapsMarkerManager.instance.Remove(marker);
+                markerListCurrPath.Add(marker); // TODO: 
                 OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
 
-                OnlineMaps.instance.Redraw();
                 previousPosition = position;
-
+                OnlineMaps.instance.Redraw();
             }
-
-            
         }
+
         //marker.OnPositionChanged += OnMarkerPositionChange;
-
-        /*OnlineMapsMarkerManager.RemoveItem(marker);
-        //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
-        OnlineMapsDrawingLine route = new OnlineMapsDrawingLine(markerListCurrPath, Color.red, 3);
-        OnlineMapsDrawingElementManager.AddItem(route);*/
-        OnlineMaps.instance.Redraw();
-
     }
 
     #region Marker

@@ -424,7 +424,7 @@ public class UIManager : MonoBehaviour
         IsRecording(true);
         AppManager.Instance.mapManager.isDrawLineOnEveryPoint = true;
         AppManager.Instance.mapManager.previousPosition = OnlineMapsLocationService.instance.position;
-        OnlineMapsMarkerManager.CreateItem(AppManager.Instance.mapManager.previousPosition, "Player");
+        OnlineMapsMarkerManager.CreateItem(AppManager.Instance.mapManager.previousPosition, "Player"); // Path 0
         //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
         btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
         Debug.Log("here");
