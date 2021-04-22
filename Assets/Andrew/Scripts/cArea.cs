@@ -119,11 +119,20 @@ public class cArea
             loadedArea = Load(index);
             if (loadedArea != null)
                 loadedAreas.Add(loadedArea);
+            index++;
+        }
+        while (index < 100); // TODO: This value means that the user can only save 100 areas, we must make a new system to save and load.
+
+        /*do
+        {
+            loadedArea = Load(index);
+            if (loadedArea != null)
+                loadedAreas.Add(loadedArea);
             else
                 break;
             index++;
         }
-        while (index < 1000000);
+        while (index < 1000000); */
 
         return loadedAreas;
     }
@@ -144,7 +153,7 @@ public class cArea
                 
             index++;
         }
-        while (index < 1000000);
+        while (index < 100); // TODO: This value means that the user can only save 100 areas, we must make a new system to save and load.
 
         return loadedArea;
     }
@@ -155,6 +164,7 @@ public class cArea
         PlayerPrefs.DeleteKey(_areaToDelete.title + POSITION_KEY); // Deletes position
         PlayerPrefs.DeleteKey(_areaToDelete.title + ZOOM_KEY); // Deletes zoom
         PlayerPrefs.DeleteKey(_areaToDelete.title + CONSTRAINTS_KEY); // Deletes constraints
+        //Debug.Log("HasKey = " + PlayerPrefs.HasKey(_areaToDelete.title + POSITION_KEY)); // check if it is deleted.
     }
 
     // Deletes all keys related to this area. Paths, Points etc.

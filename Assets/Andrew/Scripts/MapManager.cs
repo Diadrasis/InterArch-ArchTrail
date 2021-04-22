@@ -41,8 +41,8 @@ public class MapManager : MonoBehaviour
     #region Unity Functions
     private void Awake()
     {
-        areasToTestSave = GetTestAreas();
-        cArea.SaveAreas(areasToTestSave);
+        //areasToTestSave = GetTestAreas();
+        //cArea.SaveAreas(areasToTestSave);
 
         areas = cArea.LoadAreas();
         
@@ -74,7 +74,7 @@ public class MapManager : MonoBehaviour
     }
     private void OnDestroy()
     {
-        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     #endregion
 
@@ -163,6 +163,7 @@ public class MapManager : MonoBehaviour
         {
             cArea.Delete(_areaTitle);
             areas = cArea.LoadAreas();
+            Debug.Log(areas.Count);
         }
     }
 

@@ -7406,7 +7406,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ea59b90bc99c894594d5a0a1143cc4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  previousPosition: {x: 0, y: 0}
+  minDistanceToPutNewMarker: 0.1
   isDrawLineOnEveryPoint: 0
+  isMovement: 0
+  markerListCurrPath: []
   time: 10
 --- !u!222 &6710081423120059520
 CanvasRenderer:
@@ -8842,7 +8846,7 @@ MonoBehaviour:
   showMarkerTooltip: 0
   source: 0
   stopPlayingWhenScriptsCompile: 1
-  texture: {fileID: 2800000, guid: 2accdb18f81ec9546ac6479bc58ea339, type: 3}
+  texture: {fileID: 0}
   target: 0
   tooltipBackgroundTexture: {fileID: 2800000, guid: a8d1734e646100c4e83635fecf978e15,
     type: 3}
@@ -8853,9 +8857,9 @@ MonoBehaviour:
   useSoftwareJPEGDecoder: 0
   width: 1024
   _activeTypeSettings: 12Tile version1513865
-  _zoom: 2
-  latitude: 0
-  longitude: 0
+  _zoom: 19
+  latitude: 37.1789749651649
+  longitude: 21.9215393284267
 --- !u!114 &6710081424181877710
 MonoBehaviour:
   m_ObjectHideFlags: 0
