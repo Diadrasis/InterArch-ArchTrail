@@ -65,6 +65,9 @@ public class UIManager : MonoBehaviour
     [Space]
     [Header("Testing Purposes")]
     public TextMeshProUGUI infoText;
+    public Button btnPanelSaved, btnCancelShow;
+    public GameObject pnlSavedPaths, btnShowPath;
+    private List<GameObject> selectPathObjects;
     #endregion
 
     #region Unity Functions
@@ -72,6 +75,7 @@ public class UIManager : MonoBehaviour
     {
         selectAreaObjects = new List<GameObject>();
 
+        selectPathObjects = new List<GameObject>();
         SubscribeButtons();
 
         DisplayAreasScreen();
@@ -109,8 +113,11 @@ public class UIManager : MonoBehaviour
 
         //btn warning panel for save or cancel a route
         btnSave.onClick.AddListener(() =>SaveRoute());
-        btnSaveCancel.onClick.AddListener(() => CancelSaveRoute());
+        btnSaveCancel.onClick.AddListener(() => CancelInGeneral());
 
+        //for testing the saving of routes is happening smoothly
+        btnPanelSaved.onClick.AddListener(() => LoadPaths());
+        btnCancelShow.onClick.AddListener(() => CancelInGeneral());
     }
 
     public void DisplayAreasScreen()
@@ -122,6 +129,7 @@ public class UIManager : MonoBehaviour
         createArea = false;
         EnableScreen(pnlSelectedAreaScreen, false);
         imgRecord.gameObject.SetActive(false);
+        EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
     }
 
     private void EnableScreen(GameObject _screenToEnable, bool _valid) // CURRENTLY IN USE
@@ -189,6 +197,7 @@ public class UIManager : MonoBehaviour
         }
         EnableScreen(pnlSelectedAreaScreen, true);
         imgRecord.gameObject.SetActive(true);
+        EnableScreen(pnlSavedPaths,false);//the panel for saved paths can be removed afterwards, for testing purposes
 
         AppManager.Instance.mapManager.CheckUserPosition();
     }
@@ -235,10 +244,11 @@ public class UIManager : MonoBehaviour
 
     private void BackToAreasScreen()
     {
-        if (!AppManager.Instance.mapManager.isDrawLineOnEveryPoint)
+        if (!AppManager.Instance.mapManager.isRecording)
         {
             DisplayAreasScreen();
             pnlWarningSaveRouteScreen.SetActive(false);
+            pnlWarningScreen.SetActive(false);
         }
         else
         {
@@ -248,7 +258,7 @@ public class UIManager : MonoBehaviour
         //mapScreen.SetActive(false);
     }
 
-    void IsRecording(bool val)
+    void IsInRecordingPath(bool val)
     {
         imgRecord.SetBool("isPlaying", val);
     }
@@ -364,7 +374,7 @@ public class UIManager : MonoBehaviour
         }*/
 
         //manual path creation after pressing the plus button!
-        if (AppManager.Instance.mapManager.isDrawLineOnEveryPoint)
+        if (AppManager.Instance.mapManager.isRecording)
         {
             // Get the coordinates under the cursor.
             double lng, lat;
@@ -414,18 +424,16 @@ public class UIManager : MonoBehaviour
     //changes icon from plus to save icon, listener changes to next method for saving route, here also have the drawing?
     private void AddNewRoute()
     {
-        if (!AppManager.Instance.androidManager.CheckForLocationServices() && AppManager.Instance.mapManager.isDrawLineOnEveryPoint)
+        if (!AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
             return;
         }
-
-        btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
-        IsRecording(true);
-        AppManager.Instance.mapManager.isDrawLineOnEveryPoint = true;
+        btnAddNewRoute.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
+        IsInRecordingPath(true);
+        AppManager.Instance.mapManager.isRecording = true;
         AppManager.Instance.mapManager.previousPosition = OnlineMapsLocationService.instance.position;
         OnlineMapsMarkerManager.CreateItem(AppManager.Instance.mapManager.previousPosition, "Player"); // Path 0
-        //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
         btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
         Debug.Log("here");
     }
@@ -434,21 +442,28 @@ public class UIManager : MonoBehaviour
     private void SaveUIButton()
     {
         EnableScreen(pnlWarningSaveRouteScreen, true);
-        IsRecording(false);
-        AppManager.Instance.mapManager.isDrawLineOnEveryPoint = false;
-        btnAddNewRoute.GetComponent<Image>().sprite = sprSaveIcon;
+        IsInRecordingPath(false);
+        AppManager.Instance.mapManager.isRecording = false;
+        btnAddNewRoute.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
         btnAddNewRoute.onClick.AddListener(() => SaveRoute());
     }
 
     //when save button is pressed on warning screen, the save icon changes back to plus icon. Warning screen is deactivated and listener goes to original method
     private void SaveRoute()
     {
-        btnAddNewRoute.GetComponent<Image>().sprite = sprAddNewRoute;
+        btnAddNewRoute.GetComponentInChildren<Text>().text = "Add";// sprAddNewRoute;
         btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
         EnableScreen(pnlWarningSaveRouteScreen, false);
-        IsRecording(false);
-        AppManager.Instance.mapManager.isDrawLineOnEveryPoint = false;
+        IsInRecordingPath(false);
+        AppManager.Instance.mapManager.isRecording = false;
         Debug.Log("SaveRoute");
+    }
+    //the panel for saved paths can be removed afterwards, for testing purposes
+    void LoadPaths()
+    {
+        pnlSavedPaths.SetActive(true);
+        //selectPathObjects = InstantiateSelectPathObjects();
+        StartCoroutine(ReloadLayout(pnlSavedPaths));
     }
     #endregion
 
@@ -462,7 +477,7 @@ public class UIManager : MonoBehaviour
     }
 
     //to close route save plus remove everything from the map
-    private void CancelSaveRoute()
+    private void CancelInGeneral()
     {
         if (pnlWarningSaveRouteScreen.activeSelf)
         {
@@ -471,7 +486,57 @@ public class UIManager : MonoBehaviour
             OnlineMapsMarkerManager.RemoveAllItems();
             OnlineMaps.instance.Redraw();
         }
+        //the panel for saved paths can be removed afterwards, for testing purposes
+        if (pnlSavedPaths.activeInHierarchy)
+        {
+            pnlSavedPaths.SetActive(false);
+        }
     }
+
+    //instantiating routes
+    /*private List<GameObject> InstantiateSelectPathObjects()
+    {
+        Debug.Log("Instantiate Paths");
+        List<GameObject> newPathPrefab = new List<GameObject>();
+        Debug.Log("on Instantiate Paths, prefab: "+ newPathPrefab.ToString());
+        List<cPath> paths = AppManager.Instance.mapManager.paths;
+        Debug.Log("on Instantiate Paths, paths"+ paths.ToString());
+        
+
+        foreach (cPath path in paths)
+        {
+            Debug.Log("insta 1st foreach");
+            GameObject newSelectPath = Instantiate(btnShowPath, Vector3.zero, Quaternion.identity, pnlSavedPaths.GetComponent<RectTransform>());
+            //newSelectPath.transform.SetAsFirstSibling();
+            TMP_Text selectPathText = newSelectPath.GetComponentInChildren<TMP_Text>();
+            selectPathText.text = path.title;
+
+            Button btnSelectPath;
+            //Button btnDeleteArea;
+            foreach (Transform child in newSelectPath.transform)
+            {
+                if (child.name.Equals("pnlScrollSavedPaths"))
+                {
+                    btnSelectPath = child.GetComponentInChildren<Button>();
+                    Debug.Log("insta button");
+                    //btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
+                }
+
+               *//* if (child.name.Equals("btnDeleteArea"))
+                {
+                    btnDeleteArea = child.GetComponent<Button>();
+                    btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
+                }*//*
+            }
+
+            //Button btnSelectArea = newSelectArea.GetComponentInChildren<Button>();
+            //btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
+            newPathPrefab.Add(newSelectPath);
+        }
+
+        return newPathPrefab;
+
+    }*/
     #endregion
 
 
