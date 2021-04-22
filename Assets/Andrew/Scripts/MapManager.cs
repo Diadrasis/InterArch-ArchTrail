@@ -19,7 +19,7 @@ public class MapManager : MonoBehaviour
     [HideInInspector]
     public float minDistanceToPutNewMarker = 10f / 1000f;
     [HideInInspector]
-    public bool isDrawLineOnEveryPoint, isMovement;
+    public bool isRecording, isMovement;
     [HideInInspector]
     public List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
 
@@ -57,7 +57,7 @@ public class MapManager : MonoBehaviour
         SubscribeToEvents();
         fromPosition = OnlineMaps.instance.position;
         toPosition = OnlineMapsLocationService.instance.position;
-        isDrawLineOnEveryPoint = false;
+        isRecording = false;
     }
     private void Update()
     {
@@ -261,7 +261,7 @@ public class MapManager : MonoBehaviour
 
         //CheckMyLocation();
 
-        if (isDrawLineOnEveryPoint && AppManager.Instance.uIManager.imgRecord.GetBool("isPlaying")) // IsRecordingPath
+        if (isRecording && AppManager.Instance.uIManager.imgRecord.GetBool("isPlaying")) // IsRecordingPath
         {
             //AppManager.Instance.uIManager.infoText.text = "Distance changed to: " + distance;
             OnlineMapsLocationService.instance.UpdatePosition();
