@@ -33,6 +33,9 @@ public class MapManager : MonoBehaviour
     //maybe can be deleted later, for now testing purposes
     private Vector2 fromPosition, toPosition;
     private double fromTileX, fromTileY, toTileX, toTileY;
+
+    [HideInInspector]
+    public List<cPath> pathsToTest = new List<cPath>();
     #endregion
 
     #region Unity Functions
@@ -43,10 +46,10 @@ public class MapManager : MonoBehaviour
 
         areas = cArea.LoadAreas();
 
-        /*List<cPath> pathsToTest = GetTestPaths();
-        cPath.SavePaths(pathsToTest);
+        pathsToTest = GetTestPaths();
+       // cPath.SavePaths(pathsToTest);
 
-        foreach (string pathInstanceKey in cPath.LoadAllPaths())
+       /* foreach (string pathInstanceKey in cPath.LoadAllPaths())
         {
             Debug.Log(pathInstanceKey);
         }*/
