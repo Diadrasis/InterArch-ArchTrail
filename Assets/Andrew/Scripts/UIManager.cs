@@ -66,7 +66,7 @@ public class UIManager : MonoBehaviour
     [Header("Testing Purposes")]
     public TextMeshProUGUI infoText;
     public Button btnPanelSaved, btnCancelShow;
-    public GameObject pnlSavedPaths, btnShowPath;
+    public GameObject pnlSavedPaths, btnShowPath, pnlScrollViewPaths;
     private List<GameObject> selectPathObjects;
     #endregion
 
@@ -462,8 +462,9 @@ public class UIManager : MonoBehaviour
     void LoadPaths()
     {
         pnlSavedPaths.SetActive(true);
-        //selectPathObjects = InstantiateSelectPathObjects();
+        selectPathObjects = InstantiateSelectPathObjects();
         StartCoroutine(ReloadLayout(pnlSavedPaths));
+        pnlScrollViewPaths.SetActive(true);
     }
     #endregion
 
@@ -494,19 +495,18 @@ public class UIManager : MonoBehaviour
     }
 
     //instantiating routes
-    /*private List<GameObject> InstantiateSelectPathObjects()
+    private List<GameObject> InstantiateSelectPathObjects()
     {
         Debug.Log("Instantiate Paths");
         List<GameObject> newPathPrefab = new List<GameObject>();
-        Debug.Log("on Instantiate Paths, prefab: "+ newPathPrefab.ToString());
-        List<cPath> paths = AppManager.Instance.mapManager.paths;
-        Debug.Log("on Instantiate Paths, paths"+ paths.ToString());
-        
+        Debug.Log("on Instantiate Paths, prefab: " + newPathPrefab.ToString());
+        List<cPath> paths = AppManager.Instance.mapManager.pathsToTest;
+        Debug.Log("on Instantiate Paths, paths" + paths.ToString());
 
         foreach (cPath path in paths)
         {
             Debug.Log("insta 1st foreach");
-            GameObject newSelectPath = Instantiate(btnShowPath, Vector3.zero, Quaternion.identity, pnlSavedPaths.GetComponent<RectTransform>());
+            GameObject newSelectPath = Instantiate(btnShowPath, Vector3.zero, Quaternion.identity, pnlScrollViewPaths.GetComponent<RectTransform>());
             //newSelectPath.transform.SetAsFirstSibling();
             TMP_Text selectPathText = newSelectPath.GetComponentInChildren<TMP_Text>();
             selectPathText.text = path.title;
@@ -522,11 +522,11 @@ public class UIManager : MonoBehaviour
                     //btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
                 }
 
-               *//* if (child.name.Equals("btnDeleteArea"))
-                {
-                    btnDeleteArea = child.GetComponent<Button>();
-                    btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
-                }*//*
+                /* if (child.name.Equals("btnDeleteArea"))
+                 {
+                     btnDeleteArea = child.GetComponent<Button>();
+                     btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
+                 }*/
             }
 
             //Button btnSelectArea = newSelectArea.GetComponentInChildren<Button>();
@@ -536,7 +536,7 @@ public class UIManager : MonoBehaviour
 
         return newPathPrefab;
 
-    }*/
+    }
     #endregion
 
 
