@@ -38,17 +38,27 @@ public class MapManager : MonoBehaviour
     #region Unity Functions
     private void Awake()
     {
-        //List<cArea> areasToTestSave = GetTestAreas();
-        //cArea.SaveAreas(areasToTestSave);
+        List<cArea> areasToTestSave = GetTestAreas();
+        cArea.SaveAreas(areasToTestSave);
 
         areas = cArea.LoadAreas();
 
-        /*List<cPath> pathsToTest = GetTestPaths();
-        cPath.SavePaths(pathsToTest);
+        Debug.Log(cArea.GetInfoFromXML("/areas/Μεσσήνη/title"));
 
-        foreach (string pathInstanceKey in cPath.LoadAllPaths())
+        /*List<cPath> pathsToTest = GetTestPaths();
+        //cPath.SavePaths(pathsToTest);
+
+        foreach (cPath path in pathsToTest)
         {
-            Debug.Log(pathInstanceKey);
+            cPath.Save(path);
+        }
+
+        cPath.Delete(new cPath("Μεσσήνη", "path_0"));
+
+        foreach (cPath path in cPath.LoadPaths())
+        {
+            Debug.Log(path.areaTitle);
+            Debug.Log(path.title);
         }*/
     }
 
@@ -78,7 +88,7 @@ public class MapManager : MonoBehaviour
     }
     private void OnDestroy()
     {
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     #endregion
 
@@ -109,6 +119,18 @@ public class MapManager : MonoBehaviour
         };
 
         return pathsToTest;
+    }
+
+    private List<cPathPoint> GetTestPathPoints()
+    {
+        List<cPathPoint> pathPointsToTest = new List<cPathPoint>()
+        {
+            //new cPathPoint("path_0", ),
+            //new cPathPoint("Μεσσήνη", "path_1"),
+            //new cPathPoint("Κνωσός", "path_0")
+        };
+
+        return pathPointsToTest;
     }
 
     private void DisplayAreaDebug(int _index)
@@ -178,7 +200,7 @@ public class MapManager : MonoBehaviour
         {
             cArea.Delete(_areaTitle);
             areas = cArea.LoadAreas();
-            Debug.Log(areas.Count);
+            //Debug.Log(areas.Count);
         }
     }
 
