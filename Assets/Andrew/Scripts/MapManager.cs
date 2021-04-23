@@ -211,12 +211,13 @@ public class MapManager : MonoBehaviour
             if (!IsWithinConstraints())
             {
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+                AppManager.Instance.uIManager.btnAddNewRoute.interactable = false;
                 
             }
             else
-            {
-                
+            {   
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+                AppManager.Instance.uIManager.btnAddNewRoute.interactable = true;
             }
         }
     }
