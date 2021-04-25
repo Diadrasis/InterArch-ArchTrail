@@ -7,36 +7,47 @@ using UnityEngine;
 public class cArea
 {
     #region Variables
-    //private int id;
+    public int Id { get; private set; }
     public string title;
     public Vector2 position; // longitude, latitude (x, y)
     public int zoom;
     public Vector4 constraints; // minLongitude, minLatitude, maxLongitude, maxLatitude (x, y, z, w)
     //public List<cPath> paths = new List<cPath>();
 
-    private static readonly string PREFS_AREAS_KEY = "areas";
-    private static readonly string AREAS = "areas";
+    public static readonly string PREFS_KEY = "areas";
+    public static readonly string AREAS = "areas";
 
-    private static readonly string AREA = "area";
-    private static readonly string TITLE = "title";
-    private static readonly string POSITION = "position";
-    private static readonly string ZOOM = "zoom";
-    private static readonly string CONSTRAINTS_MIN = "constraintsMin";
-    private static readonly string CONSTRAINTS_MAX = "constraintsMax";
+    public static readonly string AREA = "area";
+    public static readonly string ID = "id";
+    public static readonly string TITLE = "title";
+    public static readonly string POSITION = "position";
+    public static readonly string ZOOM = "zoom";
+    public static readonly string CONSTRAINTS_MIN = "constraintsMin";
+    public static readonly string CONSTRAINTS_MAX = "constraintsMax";
+    public static readonly string PATHS = "paths";
     #endregion
 
     #region Methods
+    public cArea(int _id, string _title, Vector2 _position, int _zoom, Vector4 _constraints) // TODO: Make private when testing is finished
+    {
+        Id = _id;
+        title = _title;
+        position = _position;
+        zoom = _zoom;
+        constraints = _constraints;
+    }
     public cArea(string _title, Vector2 _position, int _zoom, Vector4 _constraints)
     {
+        Id = GetAvailableAreaID();
         title = _title;
         position = _position;
         zoom = _zoom;
         constraints = _constraints;
     }
 
-    // FOR TESTING, WILL BE REMOVED
-    public cArea(string _title, Vector2 _position)
+    public cArea(string _title, Vector2 _position) // FOR TESTING, WILL BE REMOVED
     {
+        Id = GetAvailableAreaID();
         title = _title;
         position = _position;
         zoom = MapManager.DEFAULT_ZOOM;
@@ -53,21 +64,71 @@ public class cArea
 
     }
 
-    public static void Delete(string _areaTitleToDelete)
+    private static int GetAvailableAreaID()
+    {
+        // Load xml string from PlayerPrefs
+        string xmlData = PlayerPrefs.GetString(PREFS_KEY);
+
+        // Load xml document, if null create new
+        OnlineMapsXML xml = OnlineMapsXML.Load(xmlData);
+
+        if (xml.isNull)
+            return 0;
+
+        // get all area ids
+        HashSet<int> areaIDs = new HashSet<int>();
+        
+        OnlineMapsXMLList areaIDNodes = xml.FindAll("/"+ AREAS + "/" + AREA + "/" + ID);
+
+        foreach (OnlineMapsXML node in areaIDNodes)
+        {
+            int nodeId = node.Get<int>(node.element);
+            //Debug.Log("nodeId = " + nodeId);
+            areaIDs.Add(nodeId);
+        }
+        
+        int index = 0;
+
+        do
+        {
+            if (!areaIDs.Contains(index))
+                break;
+            index++;
+        }
+        while (true);
+        //Debug.Log("index = " + index);
+        return index;
+    }
+
+    public static void PrintData(string _xpath)
     {
         OnlineMapsXML xml = GetXML();
 
-        if (xml.HasChild(_areaTitleToDelete))
-            xml.Remove(_areaTitleToDelete);
+        OnlineMapsXMLList nodes = xml.FindAll(_xpath);
+        Debug.Log("Nodes count = " + nodes.count);
+        foreach (OnlineMapsXML node in nodes)
+        {
+            Debug.Log("Node name = " + node.name);
+            Debug.Log("Node Value = " + node.outerXml);
+        }
+    }
 
-        PlayerPrefs.SetString(PREFS_AREAS_KEY, xml.outerXml);
+    public static void Delete(int _areaId)
+    {
+        OnlineMapsXML xml = GetXML();
+
+        OnlineMapsXML areaToDelete = xml.Find("/" + AREAS + "/" + AREA + "[" + ID + "=" + _areaId + "]");
+        if (!areaToDelete.isNull)
+            areaToDelete.Remove();
+
+        PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
     }
 
-    private static OnlineMapsXML GetXML()
+    public static OnlineMapsXML GetXML()
     {
         // Load xml string from PlayerPrefs
-        string xmlData = PlayerPrefs.GetString(PREFS_AREAS_KEY);
+        string xmlData = PlayerPrefs.GetString(PREFS_KEY);
 
         // Load xml document, if null create new
         OnlineMapsXML xml = OnlineMapsXML.Load(xmlData);
@@ -86,15 +147,20 @@ public class cArea
         OnlineMapsXML xml = GetXML();
 
         // Create a new path
-        OnlineMapsXML areaNode = xml.Create(_areaToSave.title);
+        OnlineMapsXML areaNode = xml.Create(AREA);
+        areaNode.Create(ID, _areaToSave.Id);
         areaNode.Create(TITLE, _areaToSave.title);
         areaNode.Create(POSITION, _areaToSave.position);
         areaNode.Create(ZOOM, _areaToSave.zoom);
         areaNode.Create(CONSTRAINTS_MIN, new Vector2(_areaToSave.constraints.x, _areaToSave.constraints.y));
         areaNode.Create(CONSTRAINTS_MAX, new Vector2(_areaToSave.constraints.z, _areaToSave.constraints.w));
+        OnlineMapsXML pathsNode = areaNode.Create(PATHS);
 
+        //OnlineMapsXML pathNode = pathsNode.Create("path");
+        //pathNode.Create("title", "path_0");
+        
         // Save xml string to PlayerPrefs
-        PlayerPrefs.SetString(PREFS_AREAS_KEY, xml.outerXml);
+        PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
     }
 
@@ -106,24 +172,38 @@ public class cArea
         }
     }
 
-    public static string GetInfoFromXML(string _xpath)
+    /*public static string GetInfoFromXML(string _xpath)
     {
         OnlineMapsXML xml = GetXML();
         XmlNode node = xml.document.SelectSingleNode(_xpath);
         return node.InnerText;
+    }*/
+
+    private static cArea Load(OnlineMapsXML _areaNode)
+    {
+        int id = _areaNode.Get<int>(ID);
+        string title = _areaNode.Get<string>(TITLE);
+        Vector2 position = _areaNode.Get<Vector2>(POSITION);
+        int zoom = _areaNode.Get<int>(ZOOM);
+        Vector2 constraints_min = _areaNode.Get<Vector2>(CONSTRAINTS_MIN);
+        Vector2 constraints_max = _areaNode.Get<Vector2>(CONSTRAINTS_MAX);
+
+        // Create cArea and add it to loadedAreas list
+        cArea loadedArea = new cArea(id, title, position, zoom, new Vector4(constraints_min.x, constraints_min.y, constraints_max.x, constraints_max.y));
+        return loadedArea;
     }
 
     public static List<cArea> LoadAreas()
     {
         // If the key does not exist, returns.
-        if (!PlayerPrefs.HasKey(PREFS_AREAS_KEY))
+        if (!PlayerPrefs.HasKey(PREFS_KEY))
             return null;
 
         // Init list of cArea to add paths to
         List<cArea> loadedAreas = new List<cArea>();
 
         // Load xml string from PlayerPrefs
-        string xmlData = PlayerPrefs.GetString(PREFS_AREAS_KEY);
+        string xmlData = PlayerPrefs.GetString(PREFS_KEY);
 
         // Load xml document
         OnlineMapsXML xml = OnlineMapsXML.Load(xmlData);
@@ -131,17 +211,9 @@ public class cArea
         // Load areas
         foreach (OnlineMapsXML node in xml)
         {
-            string title = node.Get<string>(TITLE);
-            Vector2 position = node.Get<Vector2>(POSITION);
-            int zoom = node.Get<int>(ZOOM);
-            Vector2 constraints_min = node.Get<Vector2>(CONSTRAINTS_MIN);
-            Vector2 constraints_max = node.Get<Vector2>(CONSTRAINTS_MAX);
-
-            // Create cArea and add it to loadedAreas list
-            cArea loadedArea = new cArea(title, position, zoom, new Vector4(constraints_min.x, constraints_min.y, constraints_max.x, constraints_max.y));
-            loadedAreas.Add(loadedArea);
+            loadedAreas.Add(Load(node));
         }
-        Debug.Log(xml.outerXml);
+        //Debug.Log(xml.outerXml);
         return loadedAreas;
     }
     #endregion

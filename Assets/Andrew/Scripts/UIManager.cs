@@ -208,17 +208,17 @@ public class UIManager : MonoBehaviour
         string areaTitle = string.Empty;
         Transform pnlSelectArea = btnDeleteArea.transform.parent;
         //Debug.Log(pnlSelectArea.name);
-        foreach (Transform child in pnlSelectArea)
+        /*foreach (Transform child in pnlSelectArea)
         {
             if (child.name.Equals("pnlSelectArea"))
             {
                 TMP_Text btnSelectAreaText = child.GetComponentInChildren<TMP_Text>();
                 areaTitle = btnSelectAreaText.text;
             }
-        }
+        }*/
         
         //Debug.Log(areaTitle);
-        AppManager.Instance.mapManager.DeleteArea(areaTitle);
+        AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlSelectArea.gameObject)); // areaTitle
         DisplayAreasScreen();
     }
 

@@ -6,24 +6,41 @@ using UnityEngine;
 public class cPath
 {
     #region Variables
-    public string areaTitle;
+    public int areaId;
+    public int Id { get; private set; }
     public string title;
-    //List<cPathPoint> pathPoints = new List<cPathPoint>();
+    public List<cPathPoint> pathPoints;
 
-    private static readonly string PREFS_PATHS_KEY = "paths";
-    private static readonly string PATHS = "Paths";
-
-    //private static readonly string PATH = "Path";
-    private static readonly string AREA_TITLE = "AreaTitle";
-    private static readonly string TITLE = "Title";
+    public static readonly string PATH = "path";
+    public static readonly string AREA_ID = "areaId";
+    public static readonly string ID = "id";
+    public static readonly string TITLE = "title";
+    public static readonly string PATH_POINTS = "pathPoints";
     #endregion
 
     #region Methods
-    public cPath(string _areaTitle, string _title) //, List<cPathPoint> _pathPoints
+    public cPath( int _areaId, int _id, List<cPathPoint> _pathPoints) // TODO: REMOVE WHEN TESTING IS FINISHED
     {
-        areaTitle = _areaTitle;
+        areaId = _areaId;
+        Id = _id;
+        title = "path_" + Id;
+        pathPoints = _pathPoints;
+    }
+
+    public cPath(int _areaId) // For Creating
+    {
+        areaId = _areaId;
+        Id = GetAvailablePathID();
+        title = "path_" + Id; 
+        pathPoints = new List<cPathPoint>();
+    }
+
+    private cPath(int _areaId, int _id, string _title, List<cPathPoint> _pathPoints) // For Load
+    {
+        areaId = _areaId;
+        Id = _id;
         title = _title;
-        //pathPoints = _pathPoints;
+        pathPoints = _pathPoints;
     }
 
     //create a path
@@ -33,10 +50,15 @@ public class cPath
     }
 
     //add a path point which will happen associated with cRoutePoints.cs
-    public void AddPathPoint()
+    /*public void AddPathPoint(cPathPoint _pathPointToAdd)
     {
-
+        pathPoints.Add(_pathPointToAdd);
     }
+
+    public void RemovePathPoint(cPathPoint _pathPointToRemove)
+    {
+        pathPoints.Remove(_pathPointToRemove);
+    }*/
 
     //Show/load the path in our scene
     public void Show()
@@ -44,16 +66,52 @@ public class cPath
 
     }
 
+    private static int GetAvailablePathID()
+    {
+        // Load xml document, if null create new
+        OnlineMapsXML xml = cArea.GetXML();
+
+        if (xml.isNull)
+            return 0;
+
+        // get all area ids
+        HashSet<int> pathIDs = new HashSet<int>();
+
+        OnlineMapsXMLList pathIDNodes = xml.FindAll("/areas/area/paths/path/id");
+
+        foreach (OnlineMapsXML node in pathIDNodes)
+        {
+            int nodeId = node.Get<int>(node.element);
+            //Debug.Log("nodeId = " + nodeId);
+            pathIDs.Add(nodeId);
+        }
+
+        int index = 0;
+
+        do
+        {
+            if (!pathIDs.Contains(index))
+                break;
+            index++;
+        }
+        while (true);
+        //Debug.Log("index = " + index);
+        return index;
+    }
+
     public static void Delete(cPath _pathToDelete)
     {
-        OnlineMapsXML xml = GetXML();
-        xml.Remove(_pathToDelete.areaTitle + _pathToDelete.title);
+        OnlineMapsXML xml = cArea.GetXML();
+        //xml.Remove(_pathToDelete.areaTitle + _pathToDelete.title);
+        OnlineMapsXML pathToDelete = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.ID + "=" + _pathToDelete.areaId + "]/" + cArea.PATHS + "/" + PATH + "[" + ID + "=" + _pathToDelete.Id + "]"); // /areas/area[id=0]/paths/path[id=0]
+        if (!pathToDelete.isNull)
+            pathToDelete.Remove();
 
-        PlayerPrefs.SetString(PREFS_PATHS_KEY, xml.outerXml);
+        PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
     }
 
-    private static OnlineMapsXML GetXML()
+    /*private static OnlineMapsXML GetXML()
     {
         // Load xml string from PlayerPrefs
         string xmlData = PlayerPrefs.GetString(PREFS_PATHS_KEY);
@@ -67,20 +125,23 @@ public class cPath
         }
 
         return xml;
-    }
+    }*/
 
     public static void Save(cPath _pathToSave)
     {
         // Load xml document, if null create new
-        OnlineMapsXML xml = GetXML();
+        OnlineMapsXML xml = cArea.GetXML();
 
         // Create a new path
-        OnlineMapsXML pathNode = xml.Create(_pathToSave.areaTitle + _pathToSave.title); // PATH
-        pathNode.Create(AREA_TITLE, _pathToSave.areaTitle);
+        OnlineMapsXML pathsNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.ID + "=" + _pathToSave.areaId + "]/" + cArea.PATHS);
+        OnlineMapsXML pathNode = pathsNode.Create(PATH);
+        pathNode.Create(AREA_ID, _pathToSave.areaId);
         pathNode.Create(TITLE, _pathToSave.title);
+        pathNode.Create(ID, _pathToSave.Id);
+        cPathPoint.SavePathPoints(pathNode.Create(PATH_POINTS), _pathToSave.pathPoints);
 
         // Save xml string to PlayerPrefs
-        PlayerPrefs.SetString(PREFS_PATHS_KEY, xml.outerXml);
+        PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
     }
 
@@ -92,39 +153,55 @@ public class cPath
         }
     }
 
-    public static List<cPath> LoadPathsOfArea(string _areaTitle)
+    private static cPath Load(OnlineMapsXML _pathNode)
     {
-        List<cPath> loadedPaths = LoadPaths(); // TODO: Optimize
+        int areaId = _pathNode.Get<int>(AREA_ID);
+        int id = _pathNode.Get<int>(ID);
+        string title = _pathNode.Get<string>(TITLE);
+        List<cPathPoint> pathPoints = cPathPoint.LoadPathPointsOfPath(_pathNode[PATH_POINTS]);
+
+        // Create cArea and add it to loadedAreas list
+        cPath loadedPath = new cPath(areaId, id, title, pathPoints);
+        return loadedPath;
+    }
+
+    public static List<cPath> LoadPathsOfArea(int _areaId)
+    {
+        // If the key does not exist, returns.
+        if (!PlayerPrefs.HasKey(cArea.PREFS_KEY))
+            return null;
+
+        // Load xml document
+        OnlineMapsXML xml = cArea.GetXML();
+
+        OnlineMapsXML pathsNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.ID + "=" + _areaId + "]/" + cArea.PATHS);
+
         List<cPath> areaPaths = new List<cPath>();
 
-        foreach (cPath path in loadedPaths)
+        foreach (OnlineMapsXML pathNode in pathsNode)
         {
-            if (path.areaTitle.Equals(_areaTitle))
-                areaPaths.Add(path);
+            areaPaths.Add(Load(pathNode));
         }
 
         return areaPaths;
     }
 
-    public static List<cPath> LoadPaths()
+    /*public static List<cPath> LoadPaths()
     {
         // If the key does not exist, returns.
-        if (!PlayerPrefs.HasKey(PREFS_PATHS_KEY))
+        if (!PlayerPrefs.HasKey(cArea.PREFS_KEY))
             return null;
+
+        // Load xml document
+        OnlineMapsXML xml = cArea.GetXML();
 
         // Init list of cPath to add paths to
         List<cPath> loadedPaths = new List<cPath>();
 
-        // Load xml string from PlayerPrefs
-        string xmlData = PlayerPrefs.GetString(PREFS_PATHS_KEY);
-
-        // Load xml document
-        OnlineMapsXML xml = OnlineMapsXML.Load(xmlData);
-
         // Load paths
         foreach (OnlineMapsXML node in xml)
         {
-            string areaTitle = node.Get<string>(AREA_TITLE);
+            string areaTitle = node.Get<string>(AREA_ID);
             string title = node.Get<string>(TITLE);
 
             // Create cPath and add it to loadedPaths list
@@ -133,9 +210,17 @@ public class cPath
         }
 
         return loadedPaths;
-    }
+    }*/
     #endregion
 }
+
+
+
+
+
+
+
+
 /*
 private static int GetAvailablePathIndex(string _areaTitle)
 {

@@ -46,29 +46,14 @@ public class MapManager : MonoBehaviour
 
         areas = cArea.LoadAreas();
 
+        //cArea.PrintData("/areas/area/id"); // /areas/area[title='Sarri']
 
-        Debug.Log(cArea.GetInfoFromXML("/areas/Μεσσήνη/title"));
+        //Debug.Log(cArea.GetInfoFromXML("/areas/Μεσσήνη/title"));
 
-        /*List<cPath> pathsToTest = GetTestPaths();
-        //cPath.SavePaths(pathsToTest);
+        List<cPath> pathsToTest = GetTestPaths();
+        cPath.SavePaths(pathsToTest);
 
-        /*foreach (cPath path in pathsToTest)
-        {
-            cPath.Save(path);
-        }
-
-        //cPath.Delete(new cPath("Μεσσήνη", "path_0"));
-
-        foreach (cPath path in cPath.LoadPaths())*/
-
-       // pathsToTest = GetTestPaths();
-       // cPath.SavePaths(pathsToTest);
-
-       /* foreach (string pathInstanceKey in cPath.LoadAllPaths())
-        {
-            Debug.Log(path.areaTitle);
-            Debug.Log(path.title);
-        }*/
+        //cPath.Delete(new cPath(1, 0));
     }
 
     private void Start()
@@ -106,25 +91,43 @@ public class MapManager : MonoBehaviour
     {
         List<cArea> areasFromDatabase = new List<cArea>()
         {
-            new cArea("Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector4(21.9160667457503f, 37.1700252387224f , 21.9227518498302f, 37.178659594564f)),
-            new cArea("Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector4(25.1616718900387f, 35.2958874528396f , 25.1645352578472f, 35.3000733065711f)),
-            //new cArea("Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f),19, new Vector4(23.724021164280998f - 1, 37.97881236959543f , 23.725090676541246f, 37.9802439464203f))
-            new cArea("Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f),19, new Vector4(23.72385281512933f, 37.97881236959543f , 23.725090676541246f, 37.9802439464203f))
+            new cArea(0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector4(21.9160667457503f, 37.1700252387224f , 21.9227518498302f, 37.178659594564f)),
+            new cArea(1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector4(25.1616718900387f, 35.2958874528396f , 25.1645352578472f, 35.3000733065711f)),
+            new cArea(2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f),19, new Vector4(23.72385281512933f, 37.97881236959543f , 23.725090676541246f, 37.9802439464203f))
         };
 
-        //DisplayAreaDebug(0);
-        //DisplayAreaDebug(1);
+        //DisplayAreaDebug(areasFromDatabase[0]);
+        //DisplayAreaDebug(areasFromDatabase[1]);
+        //DisplayAreaDebug(areasFromDatabase[2]);
 
         return areasFromDatabase;
     }
 
     private List<cPath> GetTestPaths()
     {
-        List<cPath> pathsToTest = new List<cPath>()
+        List<cPathPoint> pathPointsToTest0 = new List<cPathPoint>()
         {
-            new cPath("Μεσσήνη", "path_0"),
-            new cPath("Μεσσήνη", "path_1"),
-            new cPath("Κνωσός", "path_0")
+            new cPathPoint(0, 0, Vector2.zero, Time.time),
+            new cPathPoint(0, 1, Vector2.zero, Time.time),
+            new cPathPoint(0, 2, Vector2.zero, Time.time)
+        };
+
+        List<cPathPoint> pathPointsToTest1 = new List<cPathPoint>()
+        {
+            new cPathPoint(1, 0, Vector2.zero, Time.time)
+        };
+
+        List<cPathPoint> pathPointsToTest2 = new List<cPathPoint>()
+        {
+            new cPathPoint(2, 0, Vector2.zero, Time.time),
+            new cPathPoint(2, 1, Vector2.zero, Time.time)
+        };
+
+        List <cPath> pathsToTest = new List<cPath>()
+        {
+            new cPath(0, 0, pathPointsToTest0),
+            new cPath(0, 1, pathPointsToTest1),
+            new cPath(1, 0, pathPointsToTest2)
         };
 
         return pathsToTest;
@@ -142,23 +145,25 @@ public class MapManager : MonoBehaviour
         return pathPointsToTest;
     }
 
-    private void DisplayAreaDebug(int _index)
+    private void DisplayAreaDebug(cArea _area)
     {
+        // ID
+        Debug.Log("Id = " + _area.Id);
         // Title
-        Debug.Log("Title = " + areas[_index].title);
+        Debug.Log("Title = " + _area.title);
 
         // Position
-        Debug.Log("Longitude = " + areas[_index].position.x);
-        Debug.Log("Latitude = " + areas[_index].position.y);
+        Debug.Log("Longitude = " + _area.position.x);
+        Debug.Log("Latitude = " + _area.position.y);
 
         // Zoom
-        Debug.Log("Zoom = " + areas[_index].zoom);
+        Debug.Log("Zoom = " + _area.zoom);
 
         // Constraints
-        Debug.Log("minLongitude = " + areas[_index].constraints.x);
-        Debug.Log("minLatitude = " + areas[_index].constraints.y);
-        Debug.Log("maxLongitude = " + areas[_index].constraints.z);
-        Debug.Log("maxLatitude = " + areas[_index].constraints.w);
+        Debug.Log("minLongitude = " + _area.constraints.x);
+        Debug.Log("minLatitude = " + _area.constraints.y);
+        Debug.Log("maxLongitude = " + _area.constraints.z);
+        Debug.Log("maxLatitude = " + _area.constraints.w);
     }
 
     public void SetMapViewToPoint(Vector2 _positionToView)
@@ -203,14 +208,12 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public void DeleteArea(string _areaTitle)
+    public void DeleteArea(int _selectAreaObjectIndex)
     {
-        //if (!areas.Contains(_areaToDelete))
-        {
-            cArea.Delete(_areaTitle);
-            areas = cArea.LoadAreas();
-            //Debug.Log(areas.Count);
-        }
+        cArea areaSelected = areas[_selectAreaObjectIndex];
+        cArea.Delete(areaSelected.Id);
+        areas = cArea.LoadAreas();
+        //Debug.Log(areas.Count);
     }
 
     private void ResetMapConstraints()
