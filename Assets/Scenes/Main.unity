@@ -2208,10 +2208,10 @@ RectTransform:
   m_Father: {fileID: 1667973454}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -8.5, y: -75}
-  m_SizeDelta: {x: -17, y: 150}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -8.5, y: 0}
+  m_SizeDelta: {x: -17, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &543476940
 MonoBehaviour:
@@ -2240,7 +2240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 900
+    m_Left: 750
     m_Right: 0
     m_Top: 150
     m_Bottom: 0
@@ -2649,7 +2649,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3714,7 +3714,7 @@ MonoBehaviour:
   btnPanelSaved: {fileID: 409052186}
   btnCancelShow: {fileID: 1184887168}
   pnlSavedPaths: {fileID: 171761353}
-  btnShowPath: {fileID: 3162033636582294716, guid: 8a99c9811a725534cb51db4c90f59921,
+  btnShowPath: {fileID: 7517780204913349207, guid: f7b0a66e497576f4094fc07e7e57d5f9,
     type: 3}
   pnlScrollViewPaths: {fileID: 543476938}
 --- !u!1 &1031194544
@@ -5894,7 +5894,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1563276632
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6225,7 +6225,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -17, y: 150}
+  m_SizeDelta: {x: -17, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1667973455
 MonoBehaviour:
@@ -7250,7 +7250,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Add
+  m_Text: New
 --- !u!222 &1978352883
 CanvasRenderer:
   m_ObjectHideFlags: 0
