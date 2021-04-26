@@ -255,7 +255,8 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            //SaveUIButton();
+            //if we press back button whilst "recording" path, to get pnlWarningSave enabled.
+            SaveUIButton();
         }
         
         //mapScreen.SetActive(false);
@@ -425,11 +426,13 @@ public class UIManager : MonoBehaviour
     //changes icon from plus to save icon, listener changes to next method for saving route, here also have the drawing?
     private void AddNewRoute()
     {
-        /*if (!AppManager.Instance.androidManager.CheckForLocationServices())
+        //check if user or app for some reason location services are off, enable appropriate panel
+        if (AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
+            //infoText.text = "Add New Route on location Services";//testing
             return;
-        }*/
+        }
 
         OnlineMapsDrawingElementManager.RemoveAllItems();
         OnlineMapsMarkerManager.RemoveAllItems();
@@ -530,7 +533,7 @@ public class UIManager : MonoBehaviour
             selectPathText.text = path.title;
 
             Button btnSelectPath;
-            //Button btnDeleteArea;
+            Button btnDeletePath;
             foreach (Transform child in newSelectPath.transform)
             {
                 if (child.name.Equals("pnlScrollSavedPaths"))
@@ -540,11 +543,11 @@ public class UIManager : MonoBehaviour
                     //btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
                 }
 
-                /* if (child.name.Equals("btnDeleteArea"))
-                 {
-                     btnDeleteArea = child.GetComponent<Button>();
-                     btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
-                 }*/
+                if (child.name.Equals("btnDeleteArea"))
+                {
+                    btnDeletePath = child.GetComponent<Button>();
+                    //btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
+                }
             }
 
             //Button btnSelectArea = newSelectArea.GetComponentInChildren<Button>();

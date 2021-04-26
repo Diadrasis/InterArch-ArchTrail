@@ -46,12 +46,14 @@ public class AndroidManager : MonoBehaviour
         {
             if (locationService.useGPSEmulator)
             {
+                //AppManager.Instance.uIManager.infoText.text = "Location on emulator";//testing
                 AppManager.Instance.uIManager.pnlGPSScreen.SetActive(false);
                 //Debug.Log("Use the GPSEmulator");
                 return true;
             }
             else
             {
+                //AppManager.Instance.uIManager.infoText.text = "Location on else app on editor";//testing
                 AppManager.Instance.uIManager.pnlGPSScreen.SetActive(true);
             }
             return false;
@@ -67,6 +69,7 @@ public class AndroidManager : MonoBehaviour
             }
             else
             {
+                //AppManager.Instance.uIManager.infoText.text = "Location is running";//testing
                 AppManager.Instance.uIManager.pnlGPSScreen.SetActive(false);
                 return false;
             }
@@ -75,8 +78,8 @@ public class AndroidManager : MonoBehaviour
         else
         {
             AppManager.Instance.uIManager.pnlGPSScreen.SetActive(false);
-            Debug.Log("Please grant your gps location");
-            //locationService.StopLocationService();// in case we want to chech if the user has closed the gps remove the comment
+            //Debug.Log("Please grant your gps location");
+            locationService.StopLocationService();// in case we want to chech if the user has closed the gps remove the comment, if not commnet this and uncomment UPDATE!!
             return false;
         }
         
@@ -91,10 +94,10 @@ public class AndroidManager : MonoBehaviour
     {
         locationService.StopLocationService();
     }
-    //uncomment on final build!!!!
+    
     private void Update()
     {
-        if (CheckForLocationServices()) return;
+        //if (CheckForLocationServices()) return;//if we remove this line, we shouldn't leave the StopLocationService on the method ON!!!
 
     }
     private void OnApplicationPause(bool pause)
@@ -106,7 +109,7 @@ public class AndroidManager : MonoBehaviour
         else
         {
             locationService.StopLocationService();
-            //ShowErrorMessage(false, null);
+            
         }
     }
 
