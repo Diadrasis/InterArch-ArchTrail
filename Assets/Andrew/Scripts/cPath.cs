@@ -31,7 +31,7 @@ public class cPath
     {
         areaId = _areaId;
         Id = GetAvailablePathID();
-        title = "path_" + Id; 
+        title = "path_" + Id; // It should get it's name from the current area's path count
         pathPoints = new List<cPathPoint>();
     }
 
@@ -136,8 +136,8 @@ public class cPath
         OnlineMapsXML pathsNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.ID + "=" + _pathToSave.areaId + "]/" + cArea.PATHS);
         OnlineMapsXML pathNode = pathsNode.Create(PATH);
         pathNode.Create(AREA_ID, _pathToSave.areaId);
-        pathNode.Create(TITLE, _pathToSave.title);
         pathNode.Create(ID, _pathToSave.Id);
+        pathNode.Create(TITLE, _pathToSave.title);
         cPathPoint.SavePathPoints(pathNode.Create(PATH_POINTS), _pathToSave.pathPoints);
 
         // Save xml string to PlayerPrefs

@@ -12,6 +12,7 @@ public class AndroidManager : MonoBehaviour
     {
         Init();
     }
+
     void Init()
     {
         locationService = OnlineMapsLocationService.instance;

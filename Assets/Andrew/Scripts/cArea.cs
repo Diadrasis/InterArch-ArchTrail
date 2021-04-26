@@ -135,7 +135,7 @@ public class cArea
         if (xml.isNull)
         {
             xml = new OnlineMapsXML(AREAS);
-            Debug.Log("New PATHS XML");
+            //Debug.Log("New PATHS XML");
         }
 
         return xml;
@@ -213,7 +213,7 @@ public class cArea
         {
             loadedAreas.Add(Load(node));
         }
-        //Debug.Log(xml.outerXml);
+        Debug.Log(xml.outerXml);
         return loadedAreas;
     }
     #endregion

@@ -116,7 +116,7 @@ public class UIManager : MonoBehaviour
         btnSaveCancel.onClick.AddListener(() => CancelInGeneral());
 
         //for testing the saving of routes is happening smoothly
-        btnPanelSaved.onClick.AddListener(() => LoadPaths());
+        btnPanelSaved.onClick.AddListener(() => DisplayPathsScreen());
         btnCancelShow.onClick.AddListener(() => CancelInGeneral());
     }
 
@@ -150,33 +150,36 @@ public class UIManager : MonoBehaviour
         List<GameObject> newSelectAreaObjects = new List<GameObject>();
         List<cArea> areas = AppManager.Instance.mapManager.areas;
 
-        foreach (cArea area in areas)
+        if (areas != null && areas.Count > 0)
         {
-            GameObject newSelectArea = Instantiate(selectAreaPrefab, Vector3.zero, Quaternion.identity, pnlLoadedAreas.GetComponent<RectTransform>());
-            //newSelectArea.transform.SetAsFirstSibling();
-            TMP_Text selectAreaText = newSelectArea.GetComponentInChildren<TMP_Text>();
-            selectAreaText.text = area.title;
-
-            Button btnSelectArea;
-            Button btnDeleteArea;
-            foreach (Transform child in newSelectArea.transform)
+            foreach (cArea area in areas)
             {
-                if (child.name.Equals("pnlSelectArea"))
+                GameObject newSelectArea = Instantiate(selectAreaPrefab, Vector3.zero, Quaternion.identity, pnlLoadedAreas.GetComponent<RectTransform>());
+                //newSelectArea.transform.SetAsFirstSibling();
+                TMP_Text selectAreaText = newSelectArea.GetComponentInChildren<TMP_Text>();
+                selectAreaText.text = area.title;
+
+                Button btnSelectArea;
+                Button btnDeleteArea;
+                foreach (Transform child in newSelectArea.transform)
                 {
-                    btnSelectArea = child.GetComponentInChildren<Button>();
-                    btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
+                    if (child.name.Equals("pnlSelectArea"))
+                    {
+                        btnSelectArea = child.GetComponentInChildren<Button>();
+                        btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
+                    }
+
+                    if (child.name.Equals("btnDeleteArea"))
+                    {
+                        btnDeleteArea = child.GetComponent<Button>();
+                        btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
+                    }
                 }
 
-                if (child.name.Equals("btnDeleteArea"))
-                {
-                    btnDeleteArea = child.GetComponent<Button>();
-                    btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
-                }
+                //Button btnSelectArea = newSelectArea.GetComponentInChildren<Button>();
+                //btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
+                newSelectAreaObjects.Add(newSelectArea);
             }
-
-            //Button btnSelectArea = newSelectArea.GetComponentInChildren<Button>();
-            //btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
-            newSelectAreaObjects.Add(newSelectArea);
         }
 
         return newSelectAreaObjects;
@@ -222,16 +225,16 @@ public class UIManager : MonoBehaviour
         DisplayAreasScreen();
     }
 
-    private void DestroySelectAreaObjects(List<GameObject> _selectAreaObjects)
+    private void DestroySelectAreaObjects(List<GameObject> _selectObjects)
     {
-        if (_selectAreaObjects != null)
+        if (_selectObjects != null)
         {
-            foreach (GameObject selectArea in _selectAreaObjects)
+            foreach (GameObject selectArea in _selectObjects)
             {
                 Destroy(selectArea);
             }
 
-            _selectAreaObjects.Clear();
+            _selectObjects.Clear();
         }
     }
 
@@ -244,7 +247,7 @@ public class UIManager : MonoBehaviour
 
     private void BackToAreasScreen()
     {
-        if (!AppManager.Instance.mapManager.isRecording)
+        if (!AppManager.Instance.mapManager.isRecordingPath)
         {
             DisplayAreasScreen();
             pnlWarningSaveRouteScreen.SetActive(false);
@@ -252,7 +255,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            SaveUIButton();
+            //SaveUIButton();
         }
         
         //mapScreen.SetActive(false);
@@ -374,7 +377,7 @@ public class UIManager : MonoBehaviour
         }*/
 
         //manual path creation after pressing the plus button!
-        if (AppManager.Instance.mapManager.isRecording)
+        if (AppManager.Instance.mapManager.isRecordingPath)
         {
             // Get the coordinates under the cursor.
             double lng, lat;
@@ -415,8 +418,6 @@ public class UIManager : MonoBehaviour
             OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
             //OnlineMapsDrawingElementManager.AddItem(route);
             OnlineMaps.instance.Redraw();
-
-
         }
     }
 
@@ -424,18 +425,23 @@ public class UIManager : MonoBehaviour
     //changes icon from plus to save icon, listener changes to next method for saving route, here also have the drawing?
     private void AddNewRoute()
     {
-        if (!AppManager.Instance.androidManager.CheckForLocationServices())
+        /*if (!AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
             return;
-        }
-        btnAddNewRoute.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
+        }*/
+
+        OnlineMapsDrawingElementManager.RemoveAllItems();
+        OnlineMapsMarkerManager.RemoveAllItems();
+        OnlineMaps.instance.Redraw();
+
+        btnAddNewRoute.GetComponentInChildren<Text>().text = "Save"; // sprSaveIcon;
         IsInRecordingPath(true);
-        AppManager.Instance.mapManager.isRecording = true;
-        AppManager.Instance.mapManager.previousPosition = OnlineMapsLocationService.instance.position;
-        OnlineMapsMarkerManager.CreateItem(AppManager.Instance.mapManager.previousPosition, "Player"); // Path 0
+
+        btnAddNewRoute.onClick.RemoveAllListeners();
         btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
-        Debug.Log("here");
+
+        AppManager.Instance.mapManager.StartRecordingPath();
     }
 
     //change the icon from plus to save, opens warning screen for saving or cancel route
@@ -443,25 +449,30 @@ public class UIManager : MonoBehaviour
     {
         EnableScreen(pnlWarningSaveRouteScreen, true);
         IsInRecordingPath(false);
-        AppManager.Instance.mapManager.isRecording = false;
-        btnAddNewRoute.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
-        btnAddNewRoute.onClick.AddListener(() => SaveRoute());
+        AppManager.Instance.mapManager.StopRecordingPath();
+        //btnAddNewRoute.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
+        //btnAddNewRoute.onClick.AddListener(() => SaveRoute());
     }
 
     //when save button is pressed on warning screen, the save icon changes back to plus icon. Warning screen is deactivated and listener goes to original method
     private void SaveRoute()
     {
-        btnAddNewRoute.GetComponentInChildren<Text>().text = "Add";// sprAddNewRoute;
+        AppManager.Instance.mapManager.SavePath();
+        btnAddNewRoute.GetComponentInChildren<Text>().text = "Add"; // sprAddNewRoute;
+
+        btnAddNewRoute.onClick.RemoveAllListeners();
         btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
+
         EnableScreen(pnlWarningSaveRouteScreen, false);
-        IsInRecordingPath(false);
-        AppManager.Instance.mapManager.isRecording = false;
-        Debug.Log("SaveRoute");
+        //IsInRecordingPath(false);
+        //AppManager.Instance.mapManager.isRecordingPath = false;
+        //Debug.Log("SaveRoute");
     }
     //the panel for saved paths can be removed afterwards, for testing purposes
-    void LoadPaths()
+    void DisplayPathsScreen()
     {
         pnlSavedPaths.SetActive(true);
+        DestroySelectAreaObjects(selectPathObjects);
         selectPathObjects = InstantiateSelectPathObjects();
         StartCoroutine(ReloadLayout(pnlSavedPaths));
         pnlScrollViewPaths.SetActive(true);
@@ -482,11 +493,18 @@ public class UIManager : MonoBehaviour
     {
         if (pnlWarningSaveRouteScreen.activeSelf)
         {
-            SaveRoute();
+            btnAddNewRoute.GetComponentInChildren<Text>().text = "Add";// sprAddNewRoute;
+
+            btnAddNewRoute.onClick.RemoveAllListeners();
+            btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
+
             OnlineMapsDrawingElementManager.RemoveAllItems();
             OnlineMapsMarkerManager.RemoveAllItems();
             OnlineMaps.instance.Redraw();
+
+            EnableScreen(pnlWarningSaveRouteScreen, false);
         }
+
         //the panel for saved paths can be removed afterwards, for testing purposes
         if (pnlSavedPaths.activeInHierarchy)
         {
@@ -500,7 +518,7 @@ public class UIManager : MonoBehaviour
         Debug.Log("Instantiate Paths");
         List<GameObject> newPathPrefab = new List<GameObject>();
         Debug.Log("on Instantiate Paths, prefab: " + newPathPrefab.ToString());
-        List<cPath> paths = AppManager.Instance.mapManager.pathsToTest;
+        List<cPath> paths = AppManager.Instance.mapManager.GetPaths();
         Debug.Log("on Instantiate Paths, paths" + paths.ToString());
 
         foreach (cPath path in paths)
