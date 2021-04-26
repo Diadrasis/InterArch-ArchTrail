@@ -581,7 +581,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &284174840
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8976,7 +8976,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   previousPosition: {x: 0, y: 0}
   minDistanceToPutNewMarker: 0.1
-  isRecording: 0
+  isRecordingPath: 0
   isMovement: 0
   markerListCurrPath: []
   time: 10

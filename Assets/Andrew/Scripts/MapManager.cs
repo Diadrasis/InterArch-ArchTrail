@@ -8,8 +8,11 @@ public class MapManager : MonoBehaviour
     #region Variables
     [HideInInspector]
     public List<cArea> areas = new List<cArea>();
+    //[HideInInspector]
+    //public List<cPath> paths = new List<cPath>();
     [HideInInspector]
     public cArea currentArea;
+    public cPath currentPath;
 
     public static readonly int DEFAULT_ZOOM = 19;
     public static readonly float DEFAULT_POSITION_OFFSET = 0.00414180675f;
@@ -19,7 +22,7 @@ public class MapManager : MonoBehaviour
     [HideInInspector]
     public float minDistanceToPutNewMarker = 10f / 1000f;
     [HideInInspector]
-    public bool isRecording, isMovement;
+    public bool isRecordingPath, isMovement;
     [HideInInspector]
     public List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
 
@@ -33,25 +36,22 @@ public class MapManager : MonoBehaviour
     //maybe can be deleted later, for now testing purposes
     private Vector2 fromPosition, toPosition;
     private double fromTileX, fromTileY, toTileX, toTileY;
-
-    [HideInInspector]
-    public List<cPath> pathsToTest = new List<cPath>();
     #endregion
 
     #region Unity Functions
     private void Awake()
     {
-        List<cArea> areasToTestSave = GetTestAreas();
-        cArea.SaveAreas(areasToTestSave);
-
+        //List<cArea> areasToTestSave = GetTestAreas();
+        //cArea.SaveAreas(areasToTestSave);
+        areas = new List<cArea>();
         areas = cArea.LoadAreas();
 
         //cArea.PrintData("/areas/area/id"); // /areas/area[title='Sarri']
 
         //Debug.Log(cArea.GetInfoFromXML("/areas/Μεσσήνη/title"));
 
-        List<cPath> pathsToTest = GetTestPaths();
-        cPath.SavePaths(pathsToTest);
+        //List<cPath> pathsToTest = GetTestPaths();
+        //cPath.SavePaths(pathsToTest);
 
         //cPath.Delete(new cPath(1, 0));
     }
@@ -61,7 +61,7 @@ public class MapManager : MonoBehaviour
         SubscribeToEvents();
         fromPosition = OnlineMaps.instance.position;
         toPosition = OnlineMapsLocationService.instance.position;
-        isRecording = false;
+        isRecordingPath = false;
     }
     private void Update()
     {
@@ -82,7 +82,7 @@ public class MapManager : MonoBehaviour
     }
     private void OnDestroy()
     {
-        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     #endregion
 
@@ -107,27 +107,27 @@ public class MapManager : MonoBehaviour
     {
         List<cPathPoint> pathPointsToTest0 = new List<cPathPoint>()
         {
-            new cPathPoint(0, 0, Vector2.zero, Time.time),
-            new cPathPoint(0, 1, Vector2.zero, Time.time),
-            new cPathPoint(0, 2, Vector2.zero, Time.time)
+            new cPathPoint(0, 0, Vector2.zero, 0f),
+            new cPathPoint(0, 1, Vector2.zero, 0f),
+            new cPathPoint(0, 2, Vector2.zero, 0f)
         };
 
         List<cPathPoint> pathPointsToTest1 = new List<cPathPoint>()
         {
-            new cPathPoint(1, 0, Vector2.zero, Time.time)
+            new cPathPoint(1, 0, Vector2.zero, 0f)
         };
 
         List<cPathPoint> pathPointsToTest2 = new List<cPathPoint>()
         {
-            new cPathPoint(2, 0, Vector2.zero, Time.time),
-            new cPathPoint(2, 1, Vector2.zero, Time.time)
+            new cPathPoint(2, 0, Vector2.zero, 0f),
+            new cPathPoint(2, 1, Vector2.zero, 0f)
         };
 
         List <cPath> pathsToTest = new List<cPath>()
         {
             new cPath(0, 0, pathPointsToTest0),
             new cPath(0, 1, pathPointsToTest1),
-            new cPath(1, 0, pathPointsToTest2)
+            new cPath(1, 2, pathPointsToTest2)
         };
 
         return pathsToTest;
@@ -201,7 +201,7 @@ public class MapManager : MonoBehaviour
 
     public void SaveArea(cArea _areaToSave)
     {
-        if (!areas.Contains(_areaToSave))
+        //if (areas != null && !areas.Contains(_areaToSave))
         {
             cArea.Save(_areaToSave);
             areas = cArea.LoadAreas();
@@ -296,7 +296,7 @@ public class MapManager : MonoBehaviour
 
         //CheckMyLocation();
 
-        if (isRecording && AppManager.Instance.uIManager.imgRecord.GetBool("isPlaying")) // IsRecordingPath
+        if (isRecordingPath)
         {
             //AppManager.Instance.uIManager.infoText.text = "Distance changed to: " + distance;
             OnlineMapsLocationService.instance.UpdatePosition();
@@ -314,11 +314,15 @@ public class MapManager : MonoBehaviour
                 string label = "Marker " + (OnlineMapsMarkerManager.instance.Count + 1);
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
 
+                // Creates and Adds a new PathPoint
+                currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, position, 0f)); // TODO: DateTime.Now
+
                 //marker.label = label;
                 //marker.position = position;
                 //OnlineMapsMarkerManager.AddItem(marker);
 
-                markerListCurrPath.Add(marker); // TODO: 
+                // Creates a line
+                markerListCurrPath.Add(marker);
                 OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
 
                 previousPosition = position;
@@ -327,6 +331,43 @@ public class MapManager : MonoBehaviour
         }
 
         //marker.OnPositionChanged += OnMarkerPositionChange;
+    }
+
+    public void StartRecordingPath()
+    {
+        isRecordingPath = true;
+        previousPosition = OnlineMapsLocationService.instance.position;
+
+        // Center View 
+        OnlineMapsLocationService.instance.UpdatePosition();
+
+        // Create a new marker at the starting position
+        OnlineMapsMarkerManager.CreateItem(previousPosition, "New Path");
+
+        currentPath = new cPath(currentArea.Id);
+        currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, previousPosition, 0f)); // DateTime.Now
+        //Debug.Log("current time = " + System.DateTime.Now.TimeOfDay);
+        //Debug.Log("Start Recording");
+    }
+
+    public void StopRecordingPath()
+    {
+        isRecordingPath = false;
+    }
+
+    public void SavePath()
+    {
+        /*Debug.Log("currentPath areaId = " + currentPath.areaId);
+        Debug.Log("currentPath Id = " + currentPath.Id);
+        Debug.Log("currentPath title = " + currentPath.title);
+        Debug.Log("currentPath pathPoints.Count = " + currentPath.pathPoints.Count);*/
+        cPath.Save(currentPath);
+        currentPath = null;
+    }
+
+    public List<cPath> GetPaths()
+    {
+        return cPath.LoadPathsOfArea(currentArea.Id);
     }
 
     #region Marker
