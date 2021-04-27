@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class cPathPoint
     public int pathId;
     public int index;
     public Vector2 position; // longitude, latitude (x, y)
-    public float time;
+    public TimeSpan time;
 
     private static readonly string PATHPOINT = "pathPoint";
     private static readonly string PATH_ID = "pathId";
@@ -18,7 +19,7 @@ public class cPathPoint
     #endregion
 
     #region Methods
-    public cPathPoint(int _pathId, int _index, Vector2 _position, float _time)
+    public cPathPoint(int _pathId, int _index, Vector2 _position, TimeSpan _time)
     {
         pathId = _pathId;
         index = _index;
@@ -64,7 +65,7 @@ public class cPathPoint
         pathPointNode.Create(PATH_ID, _pathPointToSave.pathId);
         pathPointNode.Create(INDEX, _pathPointToSave.index);
         pathPointNode.Create(POSITION, _pathPointToSave.position);
-        pathPointNode.Create(TIME, _pathPointToSave.time);
+        pathPointNode.Create(TIME, _pathPointToSave.time.ToString());
 
         // Save xml string to PlayerPrefs
         //PlayerPrefs.SetString(PREFS_PATHPOINTS_KEY, xml.outerXml);
@@ -84,7 +85,8 @@ public class cPathPoint
         int pathId = _pathPointNode.Get<int>(PATH_ID);
         int index = _pathPointNode.Get<int>(INDEX);
         Vector2 position = _pathPointNode.Get<Vector2>(POSITION);
-        float time = _pathPointNode.Get<float>(TIME);
+        string timeString = _pathPointNode.Get<string>(TIME);
+        TimeSpan time = TimeSpan.Parse(timeString);
 
         // Create cArea and add it to loadedAreas list
         cPathPoint loadedPathPoint = new cPathPoint(pathId, index, position, time);

@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
@@ -50,8 +52,7 @@ public class MapManager : MonoBehaviour
 
         //Debug.Log(cArea.GetInfoFromXML("/areas/Μεσσήνη/title"));
 
-        //List<cPath> pathsToTest = GetTestPaths();
-        //cPath.SavePaths(pathsToTest);
+        
 
         //cPath.Delete(new cPath(1, 0));
     }
@@ -62,6 +63,10 @@ public class MapManager : MonoBehaviour
         fromPosition = OnlineMaps.instance.position;
         toPosition = OnlineMapsLocationService.instance.position;
         isRecordingPath = false;
+
+        // Test
+        //List<cPath> pathsToTest = GetTestPaths();
+        //DisplayPath(pathsToTest[0]);
     }
     private void Update()
     {
@@ -107,20 +112,20 @@ public class MapManager : MonoBehaviour
     {
         List<cPathPoint> pathPointsToTest0 = new List<cPathPoint>()
         {
-            new cPathPoint(0, 0, Vector2.zero, 0f),
-            new cPathPoint(0, 1, Vector2.zero, 0f),
-            new cPathPoint(0, 2, Vector2.zero, 0f)
+            new cPathPoint(0, 0, new Vector2(23.724021164280998f, 37.979955135461715f), DateTime.Now.TimeOfDay),
+            new cPathPoint(0, 1, new Vector2(23.7242f, 37.979955135461715f), DateTime.Now.TimeOfDay),
+            new cPathPoint(0, 2, new Vector2(23.7244f, 37.9801f), DateTime.Now.TimeOfDay)
         };
 
         List<cPathPoint> pathPointsToTest1 = new List<cPathPoint>()
         {
-            new cPathPoint(1, 0, Vector2.zero, 0f)
+            new cPathPoint(1, 0, Vector2.zero, DateTime.Now.TimeOfDay)
         };
 
         List<cPathPoint> pathPointsToTest2 = new List<cPathPoint>()
         {
-            new cPathPoint(2, 0, Vector2.zero, 0f),
-            new cPathPoint(2, 1, Vector2.zero, 0f)
+            new cPathPoint(2, 0, Vector2.zero, DateTime.Now.TimeOfDay),
+            new cPathPoint(2, 1, Vector2.zero, DateTime.Now.TimeOfDay)
         };
 
         List <cPath> pathsToTest = new List<cPath>()
@@ -194,6 +199,17 @@ public class MapManager : MonoBehaviour
         {
             if (area.title.Equals(_areaTitle))
                 return area;
+        }
+
+        return null;
+    }
+
+    public cPath GetPathByTitle(string _pathTitle)
+    {
+        foreach (cPath path in currentArea.paths)
+        {
+            if (path.title.Equals(_pathTitle))
+                return path;
         }
 
         return null;
@@ -315,7 +331,7 @@ public class MapManager : MonoBehaviour
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
 
                 // Creates and Adds a new PathPoint
-                currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, position, 0f)); // TODO: DateTime.Now
+                currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, position, DateTime.Now.TimeOfDay));
 
                 //marker.label = label;
                 //marker.position = position;
@@ -345,9 +361,16 @@ public class MapManager : MonoBehaviour
         OnlineMapsMarkerManager.CreateItem(previousPosition, "New Path");
 
         currentPath = new cPath(currentArea.Id);
-        currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, previousPosition, 0f)); // DateTime.Now
-        //Debug.Log("current time = " + System.DateTime.Now.TimeOfDay);
-        //Debug.Log("Start Recording");
+        currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, previousPosition, DateTime.Now.TimeOfDay));
+        /* TIMESPAN TESTING
+        TimeSpan time = DateTime.Now.TimeOfDay;
+        Debug.Log("Time of day = " + time);
+        string timeString = time.ToString();
+        Debug.Log("timeString = " + time);
+        //Debug.Log("Hours = " + time.Hours);
+        //Debug.Log("Hours = " + time.Hours);
+        TimeSpan dateTime = TimeSpan.Parse(timeString);
+        Debug.Log("Parsed string = " + dateTime);*/
     }
 
     public void StopRecordingPath()
@@ -365,9 +388,31 @@ public class MapManager : MonoBehaviour
         currentPath = null;
     }
 
+    public void DisplayPath(cPath _pathToDisplay)
+    {
+        // Sort points by index
+        List<cPathPoint> sortedList = _pathToDisplay.pathPoints.OrderBy(point => point.index).ToList();
+
+        foreach (cPathPoint pathPoint in sortedList)
+        {
+            Debug.Log("Point " + pathPoint.index); // 0 -
+            
+            // Create Marker
+            string label = "Path_" + _pathToDisplay.Id + "_Point_" + pathPoint.index;
+            OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
+
+            // Creates a line
+            markerListCurrPath.Add(marker);
+            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+        }
+
+        OnlineMaps.instance.Redraw();
+    }
+
     public List<cPath> GetPaths()
     {
-        return cPath.LoadPathsOfArea(currentArea.Id);
+        currentArea.paths = cPath.LoadPathsOfArea(currentArea.Id);
+        return currentArea.paths;
     }
 
     #region Marker

@@ -225,6 +225,42 @@ public class UIManager : MonoBehaviour
         DisplayAreasScreen();
     }
 
+    private void OnPathSelectPressed()
+    {
+        Debug.Log("Path selected");
+        /*GameObject selectPathObject = EventSystem.current.currentSelectedGameObject;
+        TMP_Text selectPathText = selectPathObject.GetComponentInChildren<TMP_Text>();
+        Debug.Log("OnPathSelectPressed");
+        cPath selectedPath = AppManager.Instance.mapManager.GetPathByTitle(selectPathText.text);
+        //AppManager.Instance.mapManager.currentPath = selectedPath;
+
+        if (selectedPath != null)
+        {
+            pnlScrollViewPaths.SetActive(false);
+            AppManager.Instance.mapManager.DisplayPath(selectedPath);
+        }*/
+
+
+
+
+        //EnableScreen(pnlSelectedAreaScreen, true);
+        //imgRecord.gameObject.SetActive(true);
+        //EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
+
+        //AppManager.Instance.mapManager.CheckUserPosition();
+    }
+
+    private void OnPathDeletePressed()
+    {
+        GameObject btnDeleteArea = EventSystem.current.currentSelectedGameObject;
+        string areaTitle = string.Empty;
+        Transform pnlSelectArea = btnDeleteArea.transform.parent;
+
+        //Debug.Log(areaTitle);
+        AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlSelectArea.gameObject)); // areaTitle
+        DisplayAreasScreen();
+    }
+
     private void DestroySelectAreaObjects(List<GameObject> _selectObjects)
     {
         if (_selectObjects != null)
@@ -401,7 +437,7 @@ public class UIManager : MonoBehaviour
             }
 
             // Create a label for the marker.
-            string label = "Marker " + (OnlineMaps.instance.markers.Length + 1);
+            string label = "New Path " + (OnlineMaps.instance.markers.Length + 1);
 
             OnlineMapsMarker marker = new OnlineMapsMarker();
 
@@ -515,15 +551,15 @@ public class UIManager : MonoBehaviour
     //instantiating routes
     private List<GameObject> InstantiateSelectPathObjects()
     {
-        Debug.Log("Instantiate Paths");
+        //Debug.Log("Instantiate Paths");
         List<GameObject> newPathPrefab = new List<GameObject>();
-        Debug.Log("on Instantiate Paths, prefab: " + newPathPrefab.ToString());
+        //Debug.Log("on Instantiate Paths, prefab: " + newPathPrefab.ToString());
         List<cPath> paths = AppManager.Instance.mapManager.GetPaths();
-        Debug.Log("on Instantiate Paths, paths" + paths.ToString());
+        //Debug.Log("on Instantiate Paths, paths" + paths.ToString());
 
         foreach (cPath path in paths)
         {
-            Debug.Log("insta 1st foreach");
+            //Debug.Log("insta 1st foreach");
             GameObject newSelectPath = Instantiate(btnShowPath, Vector3.zero, Quaternion.identity, pnlScrollViewPaths.GetComponent<RectTransform>());
             //newSelectPath.transform.SetAsFirstSibling();
             TMP_Text selectPathText = newSelectPath.GetComponentInChildren<TMP_Text>();
@@ -531,24 +567,22 @@ public class UIManager : MonoBehaviour
 
             Button btnSelectPath;
             //Button btnDeleteArea;
-            foreach (Transform child in newSelectPath.transform)
+            foreach (Transform child in newSelectPath.transform) // Fix Menu
             {
-                if (child.name.Equals("pnlScrollSavedPaths"))
+                if (child.name.Equals("pnlSelectArea"))
                 {
                     btnSelectPath = child.GetComponentInChildren<Button>();
-                    Debug.Log("insta button");
-                    //btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
+                    //Debug.Log("insta button");
+                    btnSelectPath.onClick.AddListener(OnPathSelectPressed);
                 }
 
-                /* if (child.name.Equals("btnDeleteArea"))
-                 {
-                     btnDeleteArea = child.GetComponent<Button>();
-                     btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
-                 }*/
+                /*if (child.name.Equals("btnDeleteArea"))
+                {
+                    btnDeleteArea = child.GetComponent<Button>();
+                    btnDeleteArea.onClick.AddListener(OnPathDeletePressed);
+                }*/
             }
 
-            //Button btnSelectArea = newSelectArea.GetComponentInChildren<Button>();
-            //btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
             newPathPrefab.Add(newSelectPath);
         }
 

@@ -12,7 +12,7 @@ public class cArea
     public Vector2 position; // longitude, latitude (x, y)
     public int zoom;
     public Vector4 constraints; // minLongitude, minLatitude, maxLongitude, maxLatitude (x, y, z, w)
-    //public List<cPath> paths = new List<cPath>();
+    public List<cPath> paths = new List<cPath>();
 
     public static readonly string PREFS_KEY = "areas";
     public static readonly string AREAS = "areas";
@@ -213,7 +213,7 @@ public class cArea
         {
             loadedAreas.Add(Load(node));
         }
-        Debug.Log(xml.outerXml);
+        //Debug.Log(xml.outerXml);
         return loadedAreas;
     }
     #endregion
