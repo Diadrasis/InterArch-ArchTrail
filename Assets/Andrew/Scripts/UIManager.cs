@@ -254,12 +254,11 @@ public class UIManager : MonoBehaviour
     private void OnPathDeletePressed()
     {
         GameObject btnDeleteArea = EventSystem.current.currentSelectedGameObject;
-        string areaTitle = string.Empty;
+
         Transform pnlSelectArea = btnDeleteArea.transform.parent;
 
-        //Debug.Log(areaTitle);
-        AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlSelectArea.gameObject)); // areaTitle
-        DisplayAreasScreen();
+        AppManager.Instance.mapManager.DeletePath(selectPathObjects.IndexOf(pnlSelectArea.gameObject));
+        DisplayPathsScreen();
     }
 
     private void DestroySelectAreaObjects(List<GameObject> _selectObjects)

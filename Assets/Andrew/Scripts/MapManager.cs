@@ -229,7 +229,13 @@ public class MapManager : MonoBehaviour
         cArea areaSelected = areas[_selectAreaObjectIndex];
         cArea.Delete(areaSelected.Id);
         areas = cArea.LoadAreas();
-        //Debug.Log(areas.Count);
+    }
+
+    public void DeletePath(int _selectPathObjectIndex)
+    {
+        cPath pathSelected = currentArea.paths[_selectPathObjectIndex];
+        Debug.Log(pathSelected.title);
+        cPath.Delete(pathSelected);
     }
 
     private void ResetMapConstraints()
@@ -352,11 +358,17 @@ public class MapManager : MonoBehaviour
                 previousPosition = position;
                 OnlineMaps.instance.Redraw();
             }
+
+            /*
             if((position.x < currentArea.constraints.x+DEFAULT_POSITION_OFFSET) || (position.x > currentArea.constraints.z+DEFAULT_POSITION_OFFSET) 
                 ||(position.y < currentArea.constraints.y + DEFAULT_POSITION_OFFSET) ||(position.y > currentArea.constraints.w + DEFAULT_POSITION_OFFSET))
             {
                 AppManager.Instance.uIManager.pnlWarningSaveRouteScreen.SetActive(true);
-                
+            }*/
+
+            if (!IsWithinConstraints())
+            {
+                AppManager.Instance.uIManager.pnlWarningSaveRouteScreen.SetActive(true);
             }
         }
 
