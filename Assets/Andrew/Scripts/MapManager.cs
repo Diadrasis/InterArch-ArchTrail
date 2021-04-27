@@ -229,7 +229,13 @@ public class MapManager : MonoBehaviour
         cArea areaSelected = areas[_selectAreaObjectIndex];
         cArea.Delete(areaSelected.Id);
         areas = cArea.LoadAreas();
-        //Debug.Log(areas.Count);
+    }
+
+    public void DeletePath(int _selectPathObjectIndex)
+    {
+        cPath pathSelected = currentArea.paths[_selectPathObjectIndex];
+        Debug.Log(pathSelected.title);
+        cPath.Delete(pathSelected);
     }
 
     private void ResetMapConstraints()
@@ -333,7 +339,7 @@ public class MapManager : MonoBehaviour
             {
                 //AppManager.Instance.uIManager.pnlWarningSaveRouteScreen.SetActive(false);
                 // Creates a new marker
-                string label = "Marker " + (OnlineMapsMarkerManager.instance.Count + 1);
+                string label = "Point_" + currentPath.pathPoints.Count + "_" + DateTime.Now.TimeOfDay;
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
 
                 // Creates and Adds a new PathPoint
@@ -350,6 +356,7 @@ public class MapManager : MonoBehaviour
                 previousPosition = position;
                 OnlineMaps.instance.Redraw();
             }
+
 
         }
         else if (isRecordingPath && !IsWithinConstraints())
@@ -378,7 +385,7 @@ public class MapManager : MonoBehaviour
         OnlineMapsLocationService.instance.UpdatePosition();
 
         // Create a new marker at the starting position
-        OnlineMapsMarkerManager.CreateItem(previousPosition, "New Path");
+        OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
 
         currentPath = new cPath(currentArea.Id);
         currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, previousPosition, DateTime.Now.TimeOfDay));
@@ -418,7 +425,7 @@ public class MapManager : MonoBehaviour
             Debug.Log("Point " + pathPoint.index); // 0 -
             
             // Create Marker
-            string label = "Path_" + _pathToDisplay.Id + "_Point_" + pathPoint.index;
+            string label = "Path_" + _pathToDisplay.Id + "_Point_" + pathPoint.index + "_" + pathPoint.time.ToString();
             OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
 
             // Creates a line
