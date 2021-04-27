@@ -291,7 +291,8 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            //SaveUIButton();
+            //if we press back button whilst "recording" path, to get pnlWarningSave enabled.
+            SaveUIButton();
         }
         
         //mapScreen.SetActive(false);
@@ -461,11 +462,13 @@ public class UIManager : MonoBehaviour
     //changes icon from plus to save icon, listener changes to next method for saving route, here also have the drawing?
     private void AddNewRoute()
     {
-        /*if (!AppManager.Instance.androidManager.CheckForLocationServices())
+        //check if user or app for some reason location services are off, enable appropriate panel
+        if (AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
+            //infoText.text = "Add New Route on location Services";//testing
             return;
-        }*/
+        }
 
         OnlineMapsDrawingElementManager.RemoveAllItems();
         OnlineMapsMarkerManager.RemoveAllItems();
@@ -576,11 +579,11 @@ public class UIManager : MonoBehaviour
                     btnSelectPath.onClick.AddListener(OnPathSelectPressed);
                 }
 
-                /*if (child.name.Equals("btnDeleteArea"))
+                if (child.name.Equals("btnDeleteArea"))
                 {
-                    btnDeleteArea = child.GetComponent<Button>();
-                    btnDeleteArea.onClick.AddListener(OnPathDeletePressed);
-                }*/
+                    btnDeletePath = child.GetComponent<Button>();
+                    //btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
+                }
             }
 
             newPathPrefab.Add(newSelectPath);
