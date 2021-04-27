@@ -16,7 +16,7 @@ public class AndroidManager : MonoBehaviour
     void Init()
     {
         locationService = OnlineMapsLocationService.instance;
-
+        
         if (locationService == null)
         {
             Debug.LogError(
