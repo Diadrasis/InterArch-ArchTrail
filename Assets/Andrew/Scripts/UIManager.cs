@@ -406,7 +406,6 @@ public class UIManager : MonoBehaviour
     private void SaveUIButton()
     {
         EnableScreen(pnlWarningSaveRouteScreen, true);
-        IsInRecordingPath(false);
         AppManager.Instance.mapManager.StopRecordingPath();
         //btnAddNewRoute.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
         //btnAddNewRoute.onClick.AddListener(() => SaveRoute());
@@ -422,7 +421,8 @@ public class UIManager : MonoBehaviour
         btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
 
         EnableScreen(pnlWarningSaveRouteScreen, false);
-        //IsInRecordingPath(false);
+        IsInRecordingPath(false);
+       
         //AppManager.Instance.mapManager.isRecordingPath = false;
         //Debug.Log("SaveRoute");
     }
@@ -457,11 +457,10 @@ public class UIManager : MonoBehaviour
             btnAddNewRoute.onClick.RemoveAllListeners();
             btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
 
-            OnlineMapsDrawingElementManager.RemoveAllItems();
-            OnlineMapsMarkerManager.RemoveAllItems();
-            OnlineMaps.instance.Redraw();
+            AppManager.Instance.mapManager.RemoveMarkersAndLine();
 
             EnableScreen(pnlWarningSaveRouteScreen, false);
+            IsInRecordingPath(false);
         }
 
         //the panel for saved paths can be removed afterwards, for testing purposes
@@ -502,7 +501,7 @@ public class UIManager : MonoBehaviour
                 if (child.name.Equals("btnDeleteArea"))
                 {
                     btnDeletePath = child.GetComponent<Button>();
-                    //btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
+                    btnDeletePath.onClick.AddListener(OnPathDeletePressed);
                 }
             }
 

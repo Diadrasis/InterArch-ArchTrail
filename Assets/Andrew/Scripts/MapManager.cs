@@ -266,9 +266,10 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
                 AppManager.Instance.uIManager.btnAddNewRoute.interactable = true;
             }
+            
         }
     }
-
+    
     private bool IsWithinConstraints()
     {
         if ((currentArea.constraints.x < OnlineMapsLocationService.instance.position.x) && (OnlineMapsLocationService.instance.position.x < currentArea.constraints.z)
@@ -279,6 +280,8 @@ public class MapManager : MonoBehaviour
         }
         return false;
     }
+
+    
     //can be removed?
     public void CheckMyLocation()
     {
@@ -321,11 +324,16 @@ public class MapManager : MonoBehaviour
             Debug.Log("Distance from previous marker: " + distance);
             if (distance < OnlineMapsLocationService.instance.updateDistance/1000f)
             {
+                Debug.Log("Minimum distnace needed to create marker");
+
+                //
+                
                 //OnlineMaps.instance.Redraw();
                 return;
             }
             else
             {
+                //AppManager.Instance.uIManager.pnlWarningSaveRouteScreen.SetActive(false);
                 // Creates a new marker
                 string label = "Marker " + (OnlineMapsMarkerManager.instance.Count + 1);
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
@@ -343,6 +351,12 @@ public class MapManager : MonoBehaviour
 
                 previousPosition = position;
                 OnlineMaps.instance.Redraw();
+            }
+            if((position.x < currentArea.constraints.x+DEFAULT_POSITION_OFFSET) || (position.x > currentArea.constraints.z+DEFAULT_POSITION_OFFSET) 
+                ||(position.y < currentArea.constraints.y + DEFAULT_POSITION_OFFSET) ||(position.y > currentArea.constraints.w + DEFAULT_POSITION_OFFSET))
+            {
+                AppManager.Instance.uIManager.pnlWarningSaveRouteScreen.SetActive(true);
+                
             }
         }
 
