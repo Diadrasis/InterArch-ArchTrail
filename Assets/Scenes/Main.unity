@@ -1777,7 +1777,7 @@ GameObject:
   - component: {fileID: 439406443}
   - component: {fileID: 439406442}
   m_Layer: 5
-  m_Name: pnlWarningsSaveRouteScreen
+  m_Name: pnlWarningsSavePathScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3857,7 +3857,7 @@ MonoBehaviour:
   sprSaveIcon: {fileID: 21300000, guid: 107c97d36064d014d815cd5ccd5cab96, type: 3}
   pnlWarningScreen: {fileID: 892694329}
   btnCancel: {fileID: 962736992}
-  pnlWarningSaveRouteScreen: {fileID: 439406440}
+  pnlWarningSavePathScreen: {fileID: 439406440}
   btnSave: {fileID: 1031194548}
   btnSaveCancel: {fileID: 936150304}
   infoText: {fileID: 284174842}

@@ -283,7 +283,7 @@ public class MapManager : MonoBehaviour
 
     
     //can be removed?
-    public void CheckMyLocation()
+    /*public void CheckMyLocation()
     {
         Debug.Log("CheckMyLocation");
         fromPosition = OnlineMaps.instance.position;
@@ -307,27 +307,25 @@ public class MapManager : MonoBehaviour
         {
             OnlineMaps.instance.position = toPosition;
         }
-    }
+    }*/
 
     public void OnLocationChanged(Vector2 position)
     {
         //AppManager.Instance.uIManager.infoText.text = "Location changed to: " + position;
 
         //CheckMyLocation();
+        CheckUserPosition();
 
-        if (isRecordingPath)
+        if (isRecordingPath && IsWithinConstraints())
         {
             //AppManager.Instance.uIManager.infoText.text = "Distance changed to: " + distance;
             OnlineMapsLocationService.instance.UpdatePosition();
 
             float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
             Debug.Log("Distance from previous marker: " + distance);
-            if (distance < OnlineMapsLocationService.instance.updateDistance/1000f)
+            if (distance < OnlineMapsLocationService.instance.updateDistance / 1000f)
             {
-                Debug.Log("Minimum distnace needed to create marker");
-
-                //
-                
+                //Debug.Log("Minimum distance needed to create marker");
                 //OnlineMaps.instance.Redraw();
                 return;
             }
@@ -352,14 +350,22 @@ public class MapManager : MonoBehaviour
                 previousPosition = position;
                 OnlineMaps.instance.Redraw();
             }
-            if((position.x < currentArea.constraints.x+DEFAULT_POSITION_OFFSET) || (position.x > currentArea.constraints.z+DEFAULT_POSITION_OFFSET) 
-                ||(position.y < currentArea.constraints.y + DEFAULT_POSITION_OFFSET) ||(position.y > currentArea.constraints.w + DEFAULT_POSITION_OFFSET))
-            {
-                AppManager.Instance.uIManager.pnlWarningSaveRouteScreen.SetActive(true);
-                
-            }
-        }
 
+        }
+        else if (isRecordingPath && !IsWithinConstraints())
+        {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+            AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
+        }
+        else if(!isRecordingPath && IsWithinConstraints())
+        {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+            AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(false);
+        }
+        else
+        {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+        }
         //marker.OnPositionChanged += OnMarkerPositionChange;
     }
 

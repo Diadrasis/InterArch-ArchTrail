@@ -59,7 +59,7 @@ public class UIManager : MonoBehaviour
     [Space]
     [Header("Warning Save Route Screen")]
     //WarningScreen when user is about to save the route
-    public GameObject pnlWarningSaveRouteScreen;
+    public GameObject pnlWarningSavePathScreen;
     public Button btnSave, btnSaveCancel;
 
     [Space]
@@ -81,7 +81,7 @@ public class UIManager : MonoBehaviour
         DisplayAreasScreen();
 
         pnlWarningScreen.SetActive(false);
-        pnlWarningSaveRouteScreen.SetActive(false);
+        pnlWarningSavePathScreen.SetActive(false);
 
         //imgRecord = GetComponent<Animator>();
     }
@@ -106,13 +106,13 @@ public class UIManager : MonoBehaviour
         btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeAndroidSettings());
 
         //btn Route
-        btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
+        btnAddNewRoute.onClick.AddListener(() => AddNewPath());
 
         //btn warning on area
         btnCancel.onClick.AddListener(() => CloseScreenPanels());
 
         //btn warning panel for save or cancel a route
-        btnSave.onClick.AddListener(() =>SaveRoute());
+        btnSave.onClick.AddListener(() =>SavePath());
         btnSaveCancel.onClick.AddListener(() => CancelInGeneral());
 
         //for testing the saving of routes is happening smoothly
@@ -202,7 +202,7 @@ public class UIManager : MonoBehaviour
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths,false);//the panel for saved paths can be removed afterwards, for testing purposes
 
-        AppManager.Instance.mapManager.CheckUserPosition();
+        //AppManager.Instance.mapManager.CheckUserPosition();
     }
 
     private void OnAreaDeletePressed()
@@ -240,10 +240,6 @@ public class UIManager : MonoBehaviour
             pnlSavedPaths.SetActive(false);
             AppManager.Instance.mapManager.DisplayPath(selectedPath);
         }
-
-
-
-
         //EnableScreen(pnlSelectedAreaScreen, true);
         //imgRecord.gameObject.SetActive(true);
         //EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
@@ -287,7 +283,7 @@ public class UIManager : MonoBehaviour
         if (!AppManager.Instance.mapManager.isRecordingPath)
         {
             DisplayAreasScreen();
-            pnlWarningSaveRouteScreen.SetActive(false);
+            pnlWarningSavePathScreen.SetActive(false);
             pnlWarningScreen.SetActive(false);
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
@@ -381,7 +377,7 @@ public class UIManager : MonoBehaviour
 
     #region RoutePanel
     //changes icon from plus to save icon, listener changes to next method for saving route, here also have the drawing?
-    private void AddNewRoute()
+    private void AddNewPath()
     {
         //check if user or app for some reason location services are off, enable appropriate panel(when build remove comments)
         /*if (AppManager.Instance.androidManager.CheckForLocationServices())
@@ -405,26 +401,25 @@ public class UIManager : MonoBehaviour
     //change the icon from plus to save, opens warning screen for saving or cancel route
     private void SaveUIButton()
     {
-        EnableScreen(pnlWarningSaveRouteScreen, true);
+        EnableScreen(pnlWarningSavePathScreen, true);
         AppManager.Instance.mapManager.StopRecordingPath();
         //btnAddNewRoute.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
         //btnAddNewRoute.onClick.AddListener(() => SaveRoute());
     }
 
     //when save button is pressed on warning screen, the save icon changes back to plus icon. Warning screen is deactivated and listener goes to original method
-    private void SaveRoute()
+    private void SavePath()
     {
         AppManager.Instance.mapManager.SavePath();
         btnAddNewRoute.GetComponentInChildren<Text>().text = "Add"; // sprAddNewRoute;
 
         btnAddNewRoute.onClick.RemoveAllListeners();
-        btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
+        btnAddNewRoute.onClick.AddListener(() => AddNewPath());
 
-        EnableScreen(pnlWarningSaveRouteScreen, false);
+        EnableScreen(pnlWarningSavePathScreen, false);
         IsInRecordingPath(false);
        
         //AppManager.Instance.mapManager.isRecordingPath = false;
-        //Debug.Log("SaveRoute");
     }
     //the panel for saved paths can be removed afterwards, for testing purposes
     void DisplayPathsScreen()
@@ -450,16 +445,16 @@ public class UIManager : MonoBehaviour
     //to close route save plus remove everything from the map
     private void CancelInGeneral()
     {
-        if (pnlWarningSaveRouteScreen.activeSelf)
+        if (pnlWarningSavePathScreen.activeSelf)
         {
             btnAddNewRoute.GetComponentInChildren<Text>().text = "Add";// sprAddNewRoute;
 
             btnAddNewRoute.onClick.RemoveAllListeners();
-            btnAddNewRoute.onClick.AddListener(() => AddNewRoute());
+            btnAddNewRoute.onClick.AddListener(() => AddNewPath());
 
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
 
-            EnableScreen(pnlWarningSaveRouteScreen, false);
+            EnableScreen(pnlWarningSavePathScreen, false);
             IsInRecordingPath(false);
         }
 
