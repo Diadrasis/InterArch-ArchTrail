@@ -46,7 +46,7 @@ public class UIManager : MonoBehaviour
     [Space]
     [Header("Route Screen")]
     //RouteScreen
-    public GameObject pnlSelectedAreaScreen;
+    public GameObject pnlPathScreen;
     public Button btnAddNewRoute;
     public Sprite sprAddNewRoute, sprSaveIcon;
 
@@ -127,7 +127,7 @@ public class UIManager : MonoBehaviour
         selectAreaObjects = InstantiateSelectAreaObjects();
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
         createArea = false;
-        EnableScreen(pnlSelectedAreaScreen, false);
+        EnableScreen(pnlPathScreen, false);
         imgRecord.gameObject.SetActive(false);
         EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
     }
@@ -198,7 +198,7 @@ public class UIManager : MonoBehaviour
             pnlAreasScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
-        EnableScreen(pnlSelectedAreaScreen, true);
+        EnableScreen(pnlPathScreen, true);
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths,false);//the panel for saved paths can be removed afterwards, for testing purposes
 
@@ -228,17 +228,18 @@ public class UIManager : MonoBehaviour
     private void OnPathSelectPressed()
     {
         Debug.Log("Path selected");
-        /*GameObject selectPathObject = EventSystem.current.currentSelectedGameObject;
+        GameObject selectPathObject = EventSystem.current.currentSelectedGameObject;
         TMP_Text selectPathText = selectPathObject.GetComponentInChildren<TMP_Text>();
         Debug.Log("OnPathSelectPressed");
         cPath selectedPath = AppManager.Instance.mapManager.GetPathByTitle(selectPathText.text);
         //AppManager.Instance.mapManager.currentPath = selectedPath;
-
+        
         if (selectedPath != null)
         {
             pnlScrollViewPaths.SetActive(false);
+            pnlSavedPaths.SetActive(false);
             AppManager.Instance.mapManager.DisplayPath(selectedPath);
-        }*/
+        }
 
 
 
@@ -288,6 +289,7 @@ public class UIManager : MonoBehaviour
             DisplayAreasScreen();
             pnlWarningSaveRouteScreen.SetActive(false);
             pnlWarningScreen.SetActive(false);
+            AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
         else
         {
@@ -330,149 +332,66 @@ public class UIManager : MonoBehaviour
         else
         {
             Debug.Log("Map Click!");
+            //manual path creation after pressing the plus button!(for testing purposes mostly)
+            /*if (AppManager.Instance.mapManager.isRecordingPath)
+            {
+                // Get the coordinates under the cursor.
+                double lng, lat;
+                OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
+
+                Vector2 position = new Vector2((float)lng, (float)lat);
+
+                // Calculate the distance in km between locations.
+                float distance = OnlineMapsUtils.DistanceBetweenPoints(position, AppManager.Instance.mapManager.previousPosition).magnitude;
+
+                //Debug.LogWarning("dist = " + distance);
+                // Debug.LogWarning("minDistanceToPutNewMarker = " + minDistanceToPutNewMarker);
+
+                if (distance < AppManager.Instance.mapManager.minDistanceToPutNewMarker)
+                {
+                    return;
+                }
+                else
+                {
+                    AppManager.Instance.mapManager.previousPosition = position;
+                }
+
+                // Create a label for the marker.
+                string label = "New Path " + (OnlineMaps.instance.markers.Length + 1);
+
+                OnlineMapsMarker marker = new OnlineMapsMarker();
+
+                marker.label = label;
+                marker.SetPosition(lng, lat);
+
+                // Create a new marker.
+                OnlineMapsMarkerManager.CreateItem(lng, lat, label);
+
+                AppManager.Instance.mapManager.markerListCurrPath.Add(marker);
+
+
+                OnlineMapsMarkerManager.instance.Remove(marker);
+                OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+                //OnlineMapsDrawingElementManager.AddItem(route);
+                OnlineMaps.instance.Redraw();
+            }*/
         }
 
-        // EMMA
-        /*
-        isNewAreaSet = true;
-        isMarkerCreated = true;
-        isMessiniPlace = false;// used this variable so when inside an area to not reconstraint the area. Messini is used as a prototype
-        string label;
-        if (isMarkerCreated && !isMessiniPlace)
-        {
-            // Get the coordinates under the cursor.
-            double lng, lat;
-            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
-            //markerName.gameObject.SetActive(true);
-            warningScreen.SetActive(true);
-
-            label = "Marker " + +(OnlineMapsMarkerManager.CountItems + 1);
-            // Create a new marker.
-            OnlineMapsMarkerManager.CreateItem(lng, lat, label);
-
-            //below are the constraints that were used when marker was created
-            /*OnlineMaps.instance.zoomRange = new OnlineMapsRange(10, 20);
-            OnlineMaps.instance.positionRange = new OnlineMapsPositionRange((float)lat, (float)lng, 
-            (float)lat*locationService.desiredAccuracy, (float)lng, OnlineMapsPositionRangeType.center);
-            OnlineMaps.instance.Redraw();*/
-
-        /*
-            txtBlack.text = "Do you want to save the location?";
-            btnSave.gameObject.SetActive(true);
-            btnCancelMarker.gameObject.SetActive(true);
-            holderOnBlackScreen.SetActive(true);
-        }*/
-
-        // STATHIS
-        /*if (isManualAddMarkerEnabled)
-        {
-            // Get the coordinates under the cursor.
-            double lng, lat;
-            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
-
-            Vector2 position = new Vector2((float)lng, (float)lat);
-
-            // Calculate the distance in km between locations.
-            float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
-
-            //Debug.LogWarning("dist = " + distance);
-            // Debug.LogWarning("minDistanceToPutNewMarker = " + minDistanceToPutNewMarker);
-
-            if (distance < minDistanceToPutNewMarker)
-            {
-                return;
-            }
-            else
-            {
-                previousPosition = position;
-            }
-
-            // Create a label for the marker.
-            string label = "Marker " + (OnlineMaps.instance.markers.Length + 1);
-
-            OnlineMapsMarker marker = new OnlineMapsMarker();
-
-            marker.label = label;
-            marker.SetPosition(lng, lat);
-
-            // Create a new marker.
-            OnlineMaps.instance.AddMarker(lng, lat, label);
-
-            markerListCurrPath.Add(marker);
-
-            if (isDrawLineOnEveryPoint)
-            {
-                OnlineMaps.instance.RemoveMarker(marker);
-                MarkersManager.CreateLineFromList(markerListCurrPath, Color.red, 3f);
-                OnlineMaps.instance.CheckRedrawType();//.Redraw();
-            }
-
-            if (isSavePathOnEveryPoint)
-            {
-                MarkersManager.SaveMarkers(currPathName, markerListCurrPath);
-            }
-        }*/
-
-        //manual path creation after pressing the plus button!
-        if (AppManager.Instance.mapManager.isRecordingPath)
-        {
-            // Get the coordinates under the cursor.
-            double lng, lat;
-            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
-
-            Vector2 position = new Vector2((float)lng, (float)lat);
-
-            // Calculate the distance in km between locations.
-            float distance = OnlineMapsUtils.DistanceBetweenPoints(position, AppManager.Instance.mapManager.previousPosition).magnitude;
-
-            //Debug.LogWarning("dist = " + distance);
-            // Debug.LogWarning("minDistanceToPutNewMarker = " + minDistanceToPutNewMarker);
-
-            if (distance < AppManager.Instance.mapManager.minDistanceToPutNewMarker)
-            {
-                return;
-            }
-            else
-            {
-                AppManager.Instance.mapManager.previousPosition = position;
-            }
-
-            // Create a label for the marker.
-            string label = "New Path " + (OnlineMaps.instance.markers.Length + 1);
-
-            OnlineMapsMarker marker = new OnlineMapsMarker();
-
-            marker.label = label;
-            marker.SetPosition(lng, lat);
-
-            // Create a new marker.
-            OnlineMapsMarkerManager.CreateItem(lng, lat, label);
-
-            AppManager.Instance.mapManager.markerListCurrPath.Add(marker);
-
-
-            OnlineMapsMarkerManager.instance.Remove(marker);
-            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
-            //OnlineMapsDrawingElementManager.AddItem(route);
-            OnlineMaps.instance.Redraw();
-        }
     }
 
     #region RoutePanel
     //changes icon from plus to save icon, listener changes to next method for saving route, here also have the drawing?
     private void AddNewRoute()
     {
-        //check if user or app for some reason location services are off, enable appropriate panel
-        if (AppManager.Instance.androidManager.CheckForLocationServices())
+        //check if user or app for some reason location services are off, enable appropriate panel(when build remove comments)
+        /*if (AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
             //infoText.text = "Add New Route on location Services";//testing
             return;
-        }
+        }*/
 
-        OnlineMapsDrawingElementManager.RemoveAllItems();
-        OnlineMapsMarkerManager.RemoveAllItems();
-        OnlineMaps.instance.Redraw();
+        AppManager.Instance.mapManager.RemoveMarkersAndLine();
 
         btnAddNewRoute.GetComponentInChildren<Text>().text = "Save"; // sprSaveIcon;
         IsInRecordingPath(true);
@@ -515,6 +434,7 @@ public class UIManager : MonoBehaviour
         selectPathObjects = InstantiateSelectPathObjects();
         StartCoroutine(ReloadLayout(pnlSavedPaths));
         pnlScrollViewPaths.SetActive(true);
+        AppManager.Instance.mapManager.RemoveMarkersAndLine();
     }
     #endregion
 
@@ -569,7 +489,7 @@ public class UIManager : MonoBehaviour
             selectPathText.text = path.title;
 
             Button btnSelectPath;
-            //Button btnDeleteArea;
+            Button btnDeletePath;
             foreach (Transform child in newSelectPath.transform) // Fix Menu
             {
                 if (child.name.Equals("pnlSelectArea"))
@@ -591,6 +511,11 @@ public class UIManager : MonoBehaviour
 
         return newPathPrefab;
 
+    }
+
+    void DebugButton()
+    {
+        Debug.Log("button pressed");
     }
     #endregion
 

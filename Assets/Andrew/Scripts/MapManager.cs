@@ -17,7 +17,7 @@ public class MapManager : MonoBehaviour
     public cPath currentPath;
 
     public static readonly int DEFAULT_ZOOM = 19;
-    public static readonly float DEFAULT_POSITION_OFFSET = 0.00414180675f;
+    public static readonly float DEFAULT_POSITION_OFFSET = 0.00114180675f;//0.00414180675f; //the commented number is the correct one when build the app
     [HideInInspector]
     public Vector2 previousPosition = Vector2.zero;
     
@@ -423,6 +423,15 @@ public class MapManager : MonoBehaviour
         OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
         //MarkersManager.CreateLineFromList(OnlineMaps.instance.markers.ToList(), Color.red, 3f);
         OnlineMaps.instance.Redraw();
+    }
+
+    public void RemoveMarkersAndLine()
+    {
+        OnlineMapsMarkerManager.instance.RemoveAll();
+        OnlineMapsDrawingElementManager.RemoveAllItems();
+        OnlineMaps.instance.Redraw();
+
+
     }
     #endregion
 
