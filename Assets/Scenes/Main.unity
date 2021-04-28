@@ -848,7 +848,7 @@ GameObject:
   - component: {fileID: 315828203}
   - component: {fileID: 315828202}
   m_Layer: 5
-  m_Name: inpNameRoute
+  m_Name: inpNamePath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2595,7 +2595,7 @@ GameObject:
   - component: {fileID: 609638906}
   - component: {fileID: 609638905}
   m_Layer: 5
-  m_Name: pnlWarningSaveRoute
+  m_Name: pnlWarningSavePath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2673,7 +2673,7 @@ GameObject:
   - component: {fileID: 691685869}
   - component: {fileID: 691685868}
   m_Layer: 5
-  m_Name: btnCancelRoute
+  m_Name: btnCancelPath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3406,7 +3406,7 @@ GameObject:
   - component: {fileID: 936150305}
   - component: {fileID: 936150304}
   m_Layer: 5
-  m_Name: btnCancelRoute
+  m_Name: btnCancelPath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3851,8 +3851,8 @@ MonoBehaviour:
   pnlGPSScreen: {fileID: 1037881413}
   btnGPSPermission: {fileID: 1035755653}
   pnlPathScreen: {fileID: 1563276631}
-  btnAddNewRoute: {fileID: 2036377748}
-  sprAddNewRoute: {fileID: 21300000, guid: 801e2d420e0e3dc45a55f3ea229c2342, type: 3}
+  btnAddNewPath: {fileID: 2036377748}
+  sprAddNewPath: {fileID: 21300000, guid: 107c97d36064d014d815cd5ccd5cab96, type: 3}
   sprSaveIcon: {fileID: 21300000, guid: 107c97d36064d014d815cd5ccd5cab96, type: 3}
   pnlWarningScreen: {fileID: 892694329}
   btnCancel: {fileID: 962736992}
@@ -3880,7 +3880,7 @@ GameObject:
   - component: {fileID: 1031194546}
   - component: {fileID: 1031194548}
   m_Layer: 5
-  m_Name: btnSaveRoute
+  m_Name: btnSavePath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5336,7 +5336,7 @@ GameObject:
   - component: {fileID: 1391930243}
   - component: {fileID: 1391930242}
   m_Layer: 5
-  m_Name: txtNewRoute
+  m_Name: txtNewPath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6621,7 +6621,7 @@ GameObject:
   - component: {fileID: 1884124540}
   - component: {fileID: 1884124539}
   m_Layer: 5
-  m_Name: btnSaveRoute
+  m_Name: btnSavePath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10042,7 +10042,7 @@ MonoBehaviour:
   dispatchEvents: 1
   emptyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   height: 1024
-  labels: 1
+  labels: 0
   language: en
   lockRedraw: 0
   needRedraw: 1

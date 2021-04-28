@@ -44,11 +44,11 @@ public class UIManager : MonoBehaviour
     public Button btnGPSPermission;
 
     [Space]
-    [Header("Route Screen")]
-    //RouteScreen
+    [Header("Path Screen")]
+    //PathScreen
     public GameObject pnlPathScreen;
-    public Button btnAddNewRoute;
-    public Sprite sprAddNewRoute, sprSaveIcon;
+    public Button btnAddNewPath;
+    public Sprite sprAddNewPath, sprSaveIcon;
 
     [Space]
     [Header("Warning Area Screen")]
@@ -57,8 +57,8 @@ public class UIManager : MonoBehaviour
     public Button btnCancel;
 
     [Space]
-    [Header("Warning Save Route Screen")]
-    //WarningScreen when user is about to save the route
+    [Header("Warning Save Path Screen")]
+    //WarningScreen when user is about to save the path
     public GameObject pnlWarningSavePathScreen;
     public Button btnSave, btnSaveCancel;
 
@@ -105,17 +105,17 @@ public class UIManager : MonoBehaviour
         //btn GPS
         btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeAndroidSettings());
 
-        //btn Route
-        btnAddNewRoute.onClick.AddListener(() => AddNewPath());
+        //btn Path
+        btnAddNewPath.onClick.AddListener(() => AddNewPath());
 
         //btn warning on area
         btnCancel.onClick.AddListener(() => CloseScreenPanels());
 
-        //btn warning panel for save or cancel a route
+        //btn warning panel for save or cancel a path
         btnSave.onClick.AddListener(() =>SavePath());
         btnSaveCancel.onClick.AddListener(() => CancelInGeneral());
 
-        //for testing the saving of routes is happening smoothly
+        //for testing the saving of paths is happening smoothly
         btnPaths.onClick.AddListener(() => DisplayPathsScreen());
         btnCancelShow.onClick.AddListener(() => CancelInGeneral());
 
@@ -370,55 +370,55 @@ public class UIManager : MonoBehaviour
 
                 OnlineMapsMarkerManager.instance.Remove(marker);
                 OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
-                //OnlineMapsDrawingElementManager.AddItem(route);
+                //OnlineMapsDrawingElementManager.AddItem(path);
                 OnlineMaps.instance.Redraw();
             }*/
         }
 
     }
 
-    #region RoutePanel
-    //changes icon from plus to save icon, listener changes to next method for saving route, here also have the drawing?
+    #region PathPanel
+    //changes icon from plus to save icon, listener changes to next method for saving path, here also have the drawing?
     private void AddNewPath()
     {
         //check if user or app for some reason location services are off, enable appropriate panel(when build remove comments)
         /*if (AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
-            //infoText.text = "Add New Route on location Services";//testing
+            //infoText.text = "Add New Path on location Services";//testing
             return;
         }*/
-
+        
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
 
-        btnAddNewRoute.GetComponentInChildren<Text>().text = "Save"; // sprSaveIcon;
+        btnAddNewPath.GetComponentInChildren<Text>().text = "Save"; // sprSaveIcon;
         IsInRecordingPath(true);
 
-        btnAddNewRoute.onClick.RemoveAllListeners();
-        btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
+        btnAddNewPath.onClick.RemoveAllListeners();
+        btnAddNewPath.onClick.AddListener(() => SaveUIButton());
 
         AppManager.Instance.mapManager.StartRecordingPath();
         btnPaths.interactable = false;
     }
 
-    //change the icon from plus to save, opens warning screen for saving or cancel route
+    //change the icon from plus to save, opens warning screen for saving or cancel path
     private void SaveUIButton()
     {
         EnableScreen(pnlWarningSavePathScreen, true);
         AppManager.Instance.mapManager.StopRecordingPath();
         btnPaths.interactable = true;
-        //btnAddNewRoute.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
-        //btnAddNewRoute.onClick.AddListener(() => SaveRoute());
+        //btnAddNewPath.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
+        //btnAddNewPath.onClick.AddListener(() => SavePath());
     }
 
     //when save button is pressed on warning screen, the save icon changes back to plus icon. Warning screen is deactivated and listener goes to original method
     private void SavePath()
     {
         AppManager.Instance.mapManager.SavePath();
-        btnAddNewRoute.GetComponentInChildren<Text>().text = "Add"; // sprAddNewRoute;
+        btnAddNewPath.GetComponentInChildren<Text>().text = "Add"; // sprAddNewPath;
 
-        btnAddNewRoute.onClick.RemoveAllListeners();
-        btnAddNewRoute.onClick.AddListener(() => AddNewPath());
+        btnAddNewPath.onClick.RemoveAllListeners();
+        btnAddNewPath.onClick.AddListener(() => AddNewPath());
 
         EnableScreen(pnlWarningSavePathScreen, false);
         IsInRecordingPath(false);
@@ -446,15 +446,15 @@ public class UIManager : MonoBehaviour
             pnlWarningScreen.SetActive(false);
     }
 
-    //to close route save plus remove everything from the map
+    //to close path save plus remove everything from the map
     private void CancelInGeneral()
     {
         if (pnlWarningSavePathScreen.activeSelf)
         {
-            btnAddNewRoute.GetComponentInChildren<Text>().text = "Add";// sprAddNewRoute;
+            btnAddNewPath.GetComponentInChildren<Text>().text = "Add";// sprAddNewPath;
 
-            btnAddNewRoute.onClick.RemoveAllListeners();
-            btnAddNewRoute.onClick.AddListener(() => AddNewPath());
+            btnAddNewPath.onClick.RemoveAllListeners();
+            btnAddNewPath.onClick.AddListener(() => AddNewPath());
 
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
 
@@ -469,7 +469,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    //instantiating routes
+    //instantiating paths
     private List<GameObject> InstantiateSelectPathObjects()
     {
         //Debug.Log("Instantiate Paths");

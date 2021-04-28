@@ -65,7 +65,7 @@ public class MapManager : MonoBehaviour
         toPosition = OnlineMapsLocationService.instance.position;
         isRecordingPath = false;
 
-        
+        userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), AppManager.Instance.uIManager.userMarker, "Player");
         // Test
         //List<cPath> pathsToTest = GetTestPaths();
         //DisplayPath(pathsToTest[0]);
@@ -267,13 +267,13 @@ public class MapManager : MonoBehaviour
             if (!IsWithinConstraints())
             {
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-                AppManager.Instance.uIManager.btnAddNewRoute.interactable = false;
+                AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
                 
             }
             else
             {   
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
-                AppManager.Instance.uIManager.btnAddNewRoute.interactable = true;
+                AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
             }
             
         }
@@ -323,10 +323,7 @@ public class MapManager : MonoBehaviour
     {
         //AppManager.Instance.uIManager.infoText.text = "Location changed to: " + position;
 
-        //CheckMyLocation();
-        //CreateMarkerOnUserPosition();
-        /*userMarker = OnlineMapsMarkerManager.CreateItem(position, AppManager.Instance.uIManager.userMarker, "User");
-        userMarker.position = position;*/
+        CreateMarkerOnUserPosition(position);
         CheckUserPosition();
         
         if (isRecordingPath && IsWithinConstraints())
@@ -344,7 +341,6 @@ public class MapManager : MonoBehaviour
             }
             else
             {
-                //AppManager.Instance.uIManager.pnlWarningSaveRouteScreen.SetActive(false);
                 // Creates a new marker
                 string label = "Point_" + currentPath.pathPoints.Count + "_" + DateTime.Now.TimeOfDay;
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
@@ -371,7 +367,7 @@ public class MapManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             isRecordingPath = false;
-            Debug.Log("is recording and not in constraints");
+            //Debug.Log("is recording and not in constraints");
         }
         else if(!isRecordingPath && IsWithinConstraints())
         {
@@ -381,7 +377,7 @@ public class MapManager : MonoBehaviour
         else
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-            Debug.Log("is not recording and not in constraints");
+            //Debug.Log("is not recording and not in constraints");
         }
         //marker.OnPositionChanged += OnMarkerPositionChange;
     }
@@ -472,12 +468,13 @@ public class MapManager : MonoBehaviour
 
     }
 
-   /* private void CreateMarkerOnUserPosition()
+    private void CreateMarkerOnUserPosition(Vector2 position)
     {
         //CheckMyLocation();
-        userMarker = OnlineMapsMarkerManager.CreateItem(OnlineMapsLocationService.instance.position, AppManager.Instance.uIManager.userMarker, "User");
-        
-    }*/
+        userMarker.position = position;
+        OnlineMaps.instance.Redraw();
+
+    }
     #endregion
 
     #region Screencapture the path
