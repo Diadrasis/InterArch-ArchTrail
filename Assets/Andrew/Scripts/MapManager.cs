@@ -348,7 +348,8 @@ public class MapManager : MonoBehaviour
                 // Creates a new marker
                 string label = "Point_" + currentPath.pathPoints.Count + "_" + DateTime.Now.TimeOfDay;
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
-                
+                marker.SetDraggable(false);
+
                 // Creates and Adds a new PathPoint
                 currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, position, DateTime.Now.TimeOfDay));
 
@@ -437,6 +438,7 @@ public class MapManager : MonoBehaviour
             // Create Marker
             string label = "Path_" + _pathToDisplay.Id + "_Point_" + pathPoint.index + "_" + pathPoint.time.ToString();
             OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
+            marker.SetDraggable(false);
 
             // Creates a line
             markerListCurrPath.Add(marker);
