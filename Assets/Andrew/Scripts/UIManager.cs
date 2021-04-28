@@ -64,8 +64,9 @@ public class UIManager : MonoBehaviour
 
     [Space]
     [Header("Testing Purposes")]
+    public Texture2D userMarker;
     public TextMeshProUGUI infoText;
-    public Button btnPanelSaved, btnCancelShow;
+    public Button btnPaths, btnCancelShow;
     public GameObject pnlSavedPaths, btnShowPath, pnlScrollViewPaths;
     private List<GameObject> selectPathObjects;
     #endregion
@@ -82,7 +83,6 @@ public class UIManager : MonoBehaviour
 
         pnlWarningScreen.SetActive(false);
         pnlWarningSavePathScreen.SetActive(false);
-
         //imgRecord = GetComponent<Animator>();
     }
 
@@ -116,8 +116,10 @@ public class UIManager : MonoBehaviour
         btnSaveCancel.onClick.AddListener(() => CancelInGeneral());
 
         //for testing the saving of routes is happening smoothly
-        btnPanelSaved.onClick.AddListener(() => DisplayPathsScreen());
+        btnPaths.onClick.AddListener(() => DisplayPathsScreen());
         btnCancelShow.onClick.AddListener(() => CancelInGeneral());
+
+        
     }
 
     public void DisplayAreasScreen()
@@ -130,6 +132,7 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, false);
         imgRecord.gameObject.SetActive(false);
         EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
+        
     }
 
     private void EnableScreen(GameObject _screenToEnable, bool _valid) // CURRENTLY IN USE
@@ -201,7 +204,6 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, true);
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths,false);//the panel for saved paths can be removed afterwards, for testing purposes
-
         //AppManager.Instance.mapManager.CheckUserPosition();
     }
 
@@ -308,6 +310,7 @@ public class UIManager : MonoBehaviour
 
         AppManager.Instance.mapManager.SetMapViewToLocation();
         // Resets the map view at my location, DONE
+       
     }
 
     private void SaveArea() // MUST BE UPDATED
@@ -395,6 +398,7 @@ public class UIManager : MonoBehaviour
         btnAddNewRoute.onClick.AddListener(() => SaveUIButton());
 
         AppManager.Instance.mapManager.StartRecordingPath();
+        btnPaths.interactable = false;
     }
 
     //change the icon from plus to save, opens warning screen for saving or cancel route
@@ -402,6 +406,7 @@ public class UIManager : MonoBehaviour
     {
         EnableScreen(pnlWarningSavePathScreen, true);
         AppManager.Instance.mapManager.StopRecordingPath();
+        btnPaths.interactable = true;
         //btnAddNewRoute.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
         //btnAddNewRoute.onClick.AddListener(() => SaveRoute());
     }
@@ -417,7 +422,7 @@ public class UIManager : MonoBehaviour
 
         EnableScreen(pnlWarningSavePathScreen, false);
         IsInRecordingPath(false);
-       
+        btnPaths.interactable = true;
         //AppManager.Instance.mapManager.isRecordingPath = false;
     }
     //the panel for saved paths can be removed afterwards, for testing purposes
