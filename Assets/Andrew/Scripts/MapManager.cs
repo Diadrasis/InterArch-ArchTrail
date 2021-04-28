@@ -25,6 +25,8 @@ public class MapManager : MonoBehaviour
     public float minDistanceToPutNewMarker = 10f / 1000f;
     [HideInInspector]
     public bool isRecordingPath, isMovement;
+
+    // Create a list of markers to draw the path lines
     [HideInInspector]
     public List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
 
@@ -357,7 +359,8 @@ public class MapManager : MonoBehaviour
 
                 // Creates a line
                 markerListCurrPath.Add(marker);
-                OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+                OnlineMapsDrawingElementManager.RemoveAllItems();
+                OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListCurrPath.Select(m => m.position).ToArray(), Color.red, 3)); //OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3)
 
                 previousPosition = position;
                 OnlineMaps.instance.Redraw();
@@ -394,7 +397,11 @@ public class MapManager : MonoBehaviour
         OnlineMapsLocationService.instance.UpdatePosition();
 
         // Create a new marker at the starting position
-        OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
+        OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
+
+        // Clear and Add new marker to markerListCurrPath
+        markerListCurrPath.Clear();
+        markerListCurrPath.Add(marker);
 
         currentPath = new cPath(currentArea.Id);
         currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, previousPosition, DateTime.Now.TimeOfDay));
@@ -430,20 +437,34 @@ public class MapManager : MonoBehaviour
         // Sort points by index
         List<cPathPoint> sortedList = _pathToDisplay.pathPoints.OrderBy(point => point.index).ToList();
 
-        foreach (cPathPoint pathPoint in sortedList)
+        // Create a list of markers to draw the path lines
+        List<OnlineMapsMarker> markerListOfCurrentPath = new List<OnlineMapsMarker>();
+
+        for (int i = 0; i < sortedList.Count; i++)
         {
-            //Debug.Log("Point " + pathPoint.index);
-            
-            // Create Marker
+            // Get cPathPoint
+            cPathPoint pathPoint = sortedList[i];
+
+            // Create marker
             string label = "Path_" + _pathToDisplay.Id + "_Point_" + pathPoint.index + "_" + pathPoint.time.ToString();
             OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
             marker.SetDraggable(false);
 
-            // Creates a line
-            markerListCurrPath.Add(marker);
-            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+            // Add marker to current path marker list
+            markerListOfCurrentPath.Add(marker);
+
+            // Set marker scale
+            if (pathPoint.index != 0)
+            {
+                cPathPoint previousPathPoint = sortedList[i - 1];
+                TimeSpan timeDuration= (pathPoint.time - previousPathPoint.time);
+                marker.scale = 1f + 2f * Mathf.Clamp((float)timeDuration.TotalSeconds/600f, 0f, 1f); // 3 will be max value (timeDuration >= 600 sec(10min)), 1 is min value/default (timeDuration <= 7 sec)
+                Debug.Log("Scale = " + marker.scale);
+            }
         }
 
+        // Draw lines
+        OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListOfCurrentPath.Select(m => m.position).ToArray(), Color.red, 3));
         OnlineMaps.instance.Redraw();
     }
 
