@@ -65,7 +65,9 @@ public class MapManager : MonoBehaviour
         toPosition = OnlineMapsLocationService.instance.position;
         isRecordingPath = false;
 
-        userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), AppManager.Instance.uIManager.userMarker, "Player");
+        userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), AppManager.Instance.uIManager.userMarker, "User");
+        userMarker.SetDraggable(false);
+
         // Test
         //List<cPath> pathsToTest = GetTestPaths();
         //DisplayPath(pathsToTest[0]);
@@ -396,6 +398,7 @@ public class MapManager : MonoBehaviour
 
         currentPath = new cPath(currentArea.Id);
         currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, previousPosition, DateTime.Now.TimeOfDay));
+        
         /* TIMESPAN TESTING
         TimeSpan time = DateTime.Now.TimeOfDay;
         Debug.Log("Time of day = " + time);
@@ -450,6 +453,7 @@ public class MapManager : MonoBehaviour
         return currentArea.paths;
     }
 
+
     #region Marker
     private void OnMarkerPositionChange(OnlineMapsMarkerBase marker)
     {
@@ -475,8 +479,12 @@ public class MapManager : MonoBehaviour
         //CheckMyLocation();
         userMarker.position = position;
         OnlineMaps.instance.Redraw();
+        SetMapViewToLocation();
+        userMarker.scale = 2;
 
     }
+    
+
     #endregion
 
     #region Screencapture the path
