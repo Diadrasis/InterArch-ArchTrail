@@ -204,7 +204,7 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, true);
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths,false);//the panel for saved paths can be removed afterwards, for testing purposes
-        //AppManager.Instance.mapManager.CheckUserPosition();
+        AppManager.Instance.mapManager.CheckUserPosition();
     }
 
     private void OnAreaDeletePressed()
