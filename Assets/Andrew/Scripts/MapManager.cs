@@ -437,15 +437,6 @@ public class MapManager : MonoBehaviour
         // Create a list of markers to draw the path lines
         List<OnlineMapsMarker> markerListOfCurrentPath = new List<OnlineMapsMarker>();
 
-        /*foreach (cPathPoint pathPoint in sortedList)
-        {
-            // Create Marker
-            string label = "Path_" + _pathToDisplay.Id + "_Point_" + pathPoint.index + "_" + pathPoint.time.ToString();
-            OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
-            marker.SetDraggable(false);
-            markerListOfCurrentPath.Add(marker);
-        }*/
-
         for (int i = 0; i < sortedList.Count; i++)
         {
             // Get cPathPoint
