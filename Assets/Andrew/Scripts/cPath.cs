@@ -9,12 +9,14 @@ public class cPath
     public int areaId;
     public int Id { get; private set; }
     public string title;
+    public DateTime date;
     public List<cPathPoint> pathPoints;
 
     public static readonly string PATH = "path";
     public static readonly string AREA_ID = "areaId";
     public static readonly string ID = "id";
     public static readonly string TITLE = "title";
+    public static readonly string DATE = "date";
     public static readonly string PATH_POINTS = "pathPoints";
     #endregion
 
@@ -31,23 +33,25 @@ public class cPath
     {
         areaId = _areaId;
         Id = GetAvailablePathID();
-        title = "path_" + Id; // It should get it's name from the current area's path count
+        date = DateTime.Now; //DateTime.Today.Date;
+        title = "path_" + Id + "_" + date.ToString("yyyy-MM-dd");
         pathPoints = new List<cPathPoint>();
     }
 
-    private cPath(int _areaId, int _id, string _title, List<cPathPoint> _pathPoints) // For Load
+    private cPath(int _areaId, int _id, string _title, DateTime _date, List<cPathPoint> _pathPoints) // For Load
     {
         areaId = _areaId;
         Id = _id;
         title = _title;
+        date = _date;
         pathPoints = _pathPoints;
     }
 
     //create a path
-    public void Create()
+    /*public void Create()
     {
 
-    }
+    }*/
 
     //add a path point which will happen associated with cRoutePoints.cs
     /*public void AddPathPoint(cPathPoint _pathPointToAdd)
@@ -61,10 +65,10 @@ public class cPath
     }*/
 
     //Show/load the path in our scene
-    public void Show()
+    /*public void Show()
     {
 
-    }
+    }*/
 
     private static int GetAvailablePathID()
     {
@@ -77,7 +81,7 @@ public class cPath
         // get all area ids
         HashSet<int> pathIDs = new HashSet<int>();
 
-        OnlineMapsXMLList pathIDNodes = xml.FindAll("/areas/area/paths/path/id");
+        OnlineMapsXMLList pathIDNodes = xml.FindAll("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + PATH + "/" + ID); //"/areas/area/paths/path/id"
 
         foreach (OnlineMapsXML node in pathIDNodes)
         {
@@ -111,22 +115,6 @@ public class cPath
         PlayerPrefs.Save();
     }
 
-    /*private static OnlineMapsXML GetXML()
-    {
-        // Load xml string from PlayerPrefs
-        string xmlData = PlayerPrefs.GetString(PREFS_PATHS_KEY);
-
-        // Load xml document, if null create new
-        OnlineMapsXML xml = OnlineMapsXML.Load(xmlData);
-        if (xml.isNull)
-        {
-            xml = new OnlineMapsXML(PATHS);
-            //Debug.Log("New PATHS XML");
-        }
-
-        return xml;
-    }*/
-
     public static void Save(cPath _pathToSave)
     {
         // Load xml document, if null create new
@@ -138,6 +126,7 @@ public class cPath
         pathNode.Create(AREA_ID, _pathToSave.areaId);
         pathNode.Create(ID, _pathToSave.Id);
         pathNode.Create(TITLE, _pathToSave.title);
+        pathNode.Create(DATE, _pathToSave.date.ToString());
         cPathPoint.SavePathPoints(pathNode.Create(PATH_POINTS), _pathToSave.pathPoints);
 
         // Save xml string to PlayerPrefs
@@ -158,10 +147,12 @@ public class cPath
         int areaId = _pathNode.Get<int>(AREA_ID);
         int id = _pathNode.Get<int>(ID);
         string title = _pathNode.Get<string>(TITLE);
+        string dateString = _pathNode.Get<string>(DATE);
+        DateTime date = DateTime.Parse(dateString);
         List<cPathPoint> pathPoints = cPathPoint.LoadPathPointsOfPath(_pathNode[PATH_POINTS]);
 
         // Create cArea and add it to loadedAreas list
-        cPath loadedPath = new cPath(areaId, id, title, pathPoints);
+        cPath loadedPath = new cPath(areaId, id, title, date, pathPoints);
         return loadedPath;
     }
 
@@ -185,138 +176,5 @@ public class cPath
 
         return areaPaths;
     }
-
-    /*public static List<cPath> LoadPaths()
-    {
-        // If the key does not exist, returns.
-        if (!PlayerPrefs.HasKey(cArea.PREFS_KEY))
-            return null;
-
-        // Load xml document
-        OnlineMapsXML xml = cArea.GetXML();
-
-        // Init list of cPath to add paths to
-        List<cPath> loadedPaths = new List<cPath>();
-
-        // Load paths
-        foreach (OnlineMapsXML node in xml)
-        {
-            string areaTitle = node.Get<string>(AREA_ID);
-            string title = node.Get<string>(TITLE);
-
-            // Create cPath and add it to loadedPaths list
-            cPath loadedPath = new cPath(areaTitle, title);
-            loadedPaths.Add(loadedPath);
-        }
-
-        return loadedPaths;
-    }*/
     #endregion
 }
-
-
-
-
-
-
-
-
-/*
-private static int GetAvailablePathIndex(string _areaTitle)
-{
-    int index = 0;
-
-    do
-    {
-        string pathTitle = PlayerPrefs.GetString(_areaTitle + PATH_KEY + index.ToString());
-        if (String.IsNullOrEmpty(pathTitle))
-            break;
-        index++;
-    }
-    while (index < 1000000);
-
-    return (index < 1000000) ? index : -1;
-}
-
-/*public static void Save(cPath _pathToSave)
-{
-    int availablePathIndex = GetAvailablePathIndex(_pathToSave.areaTitle);
-    Debug.Log("available path index = " + availablePathIndex); // TODO: Remove!!!
-    if (availablePathIndex == -1)
-    {
-        Debug.Log("GetAvailablePathIndex method has run out of available indexes");
-        return;
-    }
-
-    PlayerPrefs.SetString(_pathToSave.areaTitle + PATH_KEY + availablePathIndex, _pathToSave.title);
-}*/
-/*
-public static void Save(cPath _pathToSave)
-{
-    string pathInstanceKey = _pathToSave.areaTitle + _pathToSave.title;
-    PlayerPrefs.SetString(PATH_KEY, pathInstanceKey);
-    PlayerPrefs.SetString(pathInstanceKey, _pathToSave.title);
-}
-
-public static void SavePaths(List<cPath> _pathsToSave)
-{
-    foreach (cPath pathToSave in _pathsToSave)
-    {
-        Save(pathToSave);
-    }
-}*/
-
-/*public static cPath Load(string _areaTitle, int _pathIndex)
-{
-    string pathKey = _areaTitle + PATH_KEY + _pathIndex;
-    if (!PlayerPrefs.HasKey(pathKey))
-    {
-        return null;
-    }
-
-    string title = PlayerPrefs.GetString(pathKey);
-    //List<cPathPoint> loadedPathPoints = new List<cPathPoint>(); // TODO: Load Path Points?
-
-    cPath loadedPath = new cPath(_areaTitle, title); //, loadedPathPoints
-    return loadedPath;
-}*/
-
-/*public static List<cPath> LoadPaths(string _areaTitle)
-{
-    List<cPath> loadedPaths = new List<cPath>();
-    cPath loadedPath = null;
-    int index = 0;
-
-    do
-    {
-        loadedPath = Load(_areaTitle, index);
-        if (loadedPath != null)
-            loadedPaths.Add(loadedPath);
-        else
-            break;
-        index++;
-    }
-    while (index < 1000000);
-
-    return loadedPaths;
-}*/
-/*
-public static string[] LoadAreaPaths(string _areaTitle)
-{
-    if (PlayerPrefs.HasKey(_areaTitle))
-    {
-        return PlayerPrefsX.GetStringArray(_areaTitle);
-    }
-
-    return null;
-}
-
-public static string[] LoadAllPaths()
-{
-    if (PlayerPrefs.HasKey(PATH_KEY))
-    {
-        return PlayerPrefsX.GetStringArray(PATH_KEY);
-    }
-
-    return null;
-}*/

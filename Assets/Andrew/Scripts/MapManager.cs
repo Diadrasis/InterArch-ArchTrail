@@ -182,7 +182,6 @@ public class MapManager : MonoBehaviour
         Vector2 locationPoint = OnlineMapsLocationService.instance.position; // 23.72413215765034, 37.98021913845082
         SetMapViewToPoint(locationPoint);
         //OnlineMapsLocationService.instance.updatePosition = true; // MUST BE UNCOMMENTED
-        
     }
 
     public void SetMapViewToArea(cArea _areaToView)
@@ -341,7 +340,7 @@ public class MapManager : MonoBehaviour
                 // Creates a new marker
                 string label = "Point_" + currentPath.pathPoints.Count + "_" + DateTime.Now.TimeOfDay;
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
-
+                
                 // Creates and Adds a new PathPoint
                 currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, position, DateTime.Now.TimeOfDay));
 
@@ -422,7 +421,7 @@ public class MapManager : MonoBehaviour
 
         foreach (cPathPoint pathPoint in sortedList)
         {
-            Debug.Log("Point " + pathPoint.index); // 0 -
+            //Debug.Log("Point " + pathPoint.index);
             
             // Create Marker
             string label = "Path_" + _pathToDisplay.Id + "_Point_" + pathPoint.index + "_" + pathPoint.time.ToString();
