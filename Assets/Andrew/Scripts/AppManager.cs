@@ -8,6 +8,7 @@ public class AppManager : Singleton<AppManager>
     public MapManager mapManager;
     public UIManager uIManager;
     public AndroidManager androidManager;
+    public ServerManager serverManager;
     #endregion
 
     #region Unity Functions
