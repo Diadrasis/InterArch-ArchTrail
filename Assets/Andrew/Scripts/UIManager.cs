@@ -316,7 +316,7 @@ public class UIManager : MonoBehaviour
     private void SaveArea() // MUST BE UPDATED
     {
         string newAreaTitle = inptFldCreateArea.text;
-        AppManager.Instance.mapManager.SaveArea(new cArea(newAreaTitle, OnlineMaps.instance.position));
+        AppManager.Instance.mapManager.SaveArea(new cArea(newAreaTitle)); //new cArea(newAreaTitle, OnlineMaps.instance.position
 
         pnlCreateArea.SetActive(false);
     }

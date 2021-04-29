@@ -17,7 +17,7 @@ public class MapManager : MonoBehaviour
     public cPath currentPath;
 
     public static readonly int DEFAULT_ZOOM = 19;
-    public static readonly float DEFAULT_POSITION_OFFSET = 0.00114180675f;//0.00414180675f; //the commented number is the correct one when build the app
+    public static readonly float DEFAULT_POSITION_OFFSET = 0.00114180675f; //0.00414180675f; //the commented number is the correct one when build the app
     [HideInInspector]
     public Vector2 previousPosition = Vector2.zero;
     
@@ -74,6 +74,7 @@ public class MapManager : MonoBehaviour
         //List<cPath> pathsToTest = GetTestPaths();
         //DisplayPath(pathsToTest[0]);
     }
+
     private void Update()
     {
         if (!isMovement) return;
@@ -86,6 +87,7 @@ public class MapManager : MonoBehaviour
             isMovement = false;
             angle = 1;
         }
+
         double px = (toTileX - fromTileX) * angle + fromTileX;
         double py = (toTileY - fromTileY) * angle + fromTileY;
 
@@ -93,6 +95,7 @@ public class MapManager : MonoBehaviour
         OnlineMaps.instance.projection.TileToCoordinates(px, py, moveZoom, out px, out py);
         OnlineMaps.instance.SetPosition(px, py);
     }
+
     private void OnDestroy()
     {
         //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
@@ -104,9 +107,9 @@ public class MapManager : MonoBehaviour
     {
         List<cArea> areasFromDatabase = new List<cArea>()
         {
-            new cArea(0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector4(21.9160667457503f, 37.1700252387224f , 21.9227518498302f, 37.178659594564f)),
-            new cArea(1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector4(25.1616718900387f, 35.2958874528396f , 25.1645352578472f, 35.3000733065711f)),
-            new cArea(2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f),19, new Vector4(23.72385281512933f, 37.97881236959543f , 23.725090676541246f, 37.9802439464203f))
+            new cArea(0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f)),
+            new cArea(1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f)),
+            new cArea(2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f),19, new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f))
         };
 
         //DisplayAreaDebug(areasFromDatabase[0]);
@@ -162,6 +165,7 @@ public class MapManager : MonoBehaviour
     {
         // ID
         Debug.Log("Id = " + _area.Id);
+
         // Title
         Debug.Log("Title = " + _area.title);
 
@@ -173,10 +177,10 @@ public class MapManager : MonoBehaviour
         Debug.Log("Zoom = " + _area.zoom);
 
         // Constraints
-        Debug.Log("minLongitude = " + _area.constraints.x);
-        Debug.Log("minLatitude = " + _area.constraints.y);
-        Debug.Log("maxLongitude = " + _area.constraints.z);
-        Debug.Log("maxLatitude = " + _area.constraints.w);
+        Debug.Log("minLongitude = " + _area.constraintsMin.x);
+        Debug.Log("minLatitude = " + _area.constraintsMin.y);
+        Debug.Log("maxLongitude = " + _area.constraintsMax.x);
+        Debug.Log("maxLatitude = " + _area.constraintsMax.y);
     }
 
     public void SetMapViewToPoint(Vector2 _positionToView)
@@ -195,7 +199,7 @@ public class MapManager : MonoBehaviour
     public void SetMapViewToArea(cArea _areaToView)
     {
         //if (_areaToView.constraints != null)
-        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(_areaToView.constraints.y, _areaToView.constraints.x, _areaToView.constraints.w, _areaToView.constraints.z);
+        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(_areaToView.constraintsMin.y, _areaToView.constraintsMin.x, _areaToView.constraintsMax.y, _areaToView.constraintsMax.x);
         OnlineMaps.instance.zoomRange = new OnlineMapsRange(_areaToView.zoom, OnlineMaps.MAXZOOM);
         OnlineMaps.instance.SetPositionAndZoom(_areaToView.position.x, _areaToView.position.y, _areaToView.zoom);
     }
@@ -279,21 +283,19 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
             }
-            
         }
     }
     
     private bool IsWithinConstraints()
     {
-        if ((currentArea.constraints.x < OnlineMapsLocationService.instance.position.x) && (OnlineMapsLocationService.instance.position.x < currentArea.constraints.z)
-            && (currentArea.constraints.y < OnlineMapsLocationService.instance.position.y) && (OnlineMapsLocationService.instance.position.y < currentArea.constraints.w))
+        if ((currentArea.constraintsMin.x < OnlineMapsLocationService.instance.position.x) && (OnlineMapsLocationService.instance.position.x < currentArea.constraintsMax.x)
+            && (currentArea.constraintsMin.y < OnlineMapsLocationService.instance.position.y) && (OnlineMapsLocationService.instance.position.y < currentArea.constraintsMax.y))
         {
             return true;
 
         }
         return false;
     }
-
 
     //can be removed?
    /* public void CheckMyLocation()
@@ -360,13 +362,11 @@ public class MapManager : MonoBehaviour
                 // Creates a line
                 markerListCurrPath.Add(marker);
                 OnlineMapsDrawingElementManager.RemoveAllItems();
-                OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListCurrPath.Select(m => m.position).ToArray(), Color.red, 3)); //OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3)
+                OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListCurrPath.Select(m => m.position).ToArray(), Color.red, 3)); //OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3) // Average human walk speed is 1.4m/s
 
                 previousPosition = position;
                 OnlineMaps.instance.Redraw();
             }
-
-
         }
         else if (isRecordingPath && !IsWithinConstraints())
         {
@@ -474,7 +474,6 @@ public class MapManager : MonoBehaviour
         return currentArea.paths;
     }
 
-
     #region Marker
     private void OnMarkerPositionChange(OnlineMapsMarkerBase marker)
     {
@@ -491,8 +490,6 @@ public class MapManager : MonoBehaviour
         OnlineMapsMarkerManager.RemoveAllItems(m => m != userMarker);
         OnlineMapsDrawingElementManager.RemoveAllItems();
         OnlineMaps.instance.Redraw();
-
-
     }
 
     private void CreateMarkerOnUserPosition(Vector2 position)
@@ -502,10 +499,7 @@ public class MapManager : MonoBehaviour
         OnlineMaps.instance.Redraw();
         SetMapViewToLocation();
         userMarker.scale = 2;
-
     }
-    
-
     #endregion
 
     #region Screencapture the path
@@ -547,7 +541,5 @@ public class MapManager : MonoBehaviour
         yield break;
     }*/
     #endregion
-
-
     #endregion
 }
