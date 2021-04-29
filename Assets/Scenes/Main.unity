@@ -8623,6 +8623,9 @@ MonoBehaviour:
     _rotation: 0
     _texture: {fileID: 0}
   time: 10
+  markerCreateAreaTexture: {fileID: 2800000, guid: ea7eb0aa8eaab054a91d4219f9719f63,
+    type: 3}
+  borderWidth: 1
 --- !u!222 &6710081423120059520
 CanvasRenderer:
   m_ObjectHideFlags: 0

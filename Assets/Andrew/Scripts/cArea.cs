@@ -24,8 +24,10 @@ public class cArea
     public static readonly string TITLE = "title";
     public static readonly string POSITION = "position";
     public static readonly string ZOOM = "zoom";
-    public static readonly string CONSTRAINTS_MIN = "constraintsMin";
-    public static readonly string CONSTRAINTS_MAX = "constraintsMax";
+    public static readonly string CONSTRAINTS_MIN = "constraintsMin"; // "areaConstraintsMin";
+    public static readonly string CONSTRAINTS_MAX = "constraintsMax"; // "areaConstraintsMax";
+    // public static readonly string VIEW_CONSTRAINTS_MIN = "viewConstraintsMin";
+    // public static readonly string VIEW_CONSTRAINTS_MAX = "viewConstraintsMax";
     public static readonly string PATHS = "paths";
     #endregion
 

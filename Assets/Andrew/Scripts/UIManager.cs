@@ -360,7 +360,12 @@ public class UIManager : MonoBehaviour
         pnlCreateArea.SetActive(false);
     }
 
-    public void OnMapClick()
+    public void EnableSaveAreaScreen()
+    {
+        pnlCreateArea.SetActive(true);
+    }
+
+    /*public void OnMapClick()
     {
         if (createArea)
         {
@@ -368,7 +373,8 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Map Click!");
+            //Debug.Log("Map Click!");
+
             //manual path creation after pressing the plus button!(for testing purposes mostly)
             /*if (AppManager.Instance.mapManager.isRecordingPath)
             {
@@ -411,10 +417,14 @@ public class UIManager : MonoBehaviour
                 OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
                 //OnlineMapsDrawingElementManager.AddItem(path);
                 OnlineMaps.instance.Redraw();
-            }*/
+            }*//*
         }
+    }*/
 
-    }
+    /*private void OnMapRelease()
+    {
+
+    }*/
 
     #region PathPanel
     //changes icon from plus to save icon, listener changes to next method for saving path, here also have the drawing?
@@ -560,6 +570,4 @@ public class UIManager : MonoBehaviour
 
 
     #endregion
-
-
 }
