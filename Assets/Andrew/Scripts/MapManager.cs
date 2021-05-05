@@ -49,7 +49,6 @@ public class MapManager : MonoBehaviour
     OnlineMapsMarker[] markersCreateArea = new OnlineMapsMarker[2];
     Vector2[] positionsCreateArea = new Vector2[4];
     private OnlineMapsDrawingPoly polygon;
-    private bool changed = false;
     #endregion
 
     #region Unity Functions
@@ -86,11 +85,9 @@ public class MapManager : MonoBehaviour
 
     private void Update()
     {
-        // Check the position of the markers.
-        CheckMarkerCreateAreaPositions(); // TODO: Should be called from event
-
-        // Polygon
-        CreatePolygon(); // TODO: Should be called from event
+        // Checks the position of the markers.
+        if (createArea && polygon != null)
+            CheckMarkerPositions();
 
         if (!isMovement) return;
 
@@ -122,9 +119,9 @@ public class MapManager : MonoBehaviour
     {
         List<cArea> areasFromDatabase = new List<cArea>()
         {
-            new cArea(0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f)),
-            new cArea(1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f)),
-            new cArea(2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f),19, new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f))
+            new cArea(0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f), new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f)),
+            new cArea(1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f), new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f)),
+            new cArea(2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f), 19, new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f), new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f))
         };
 
         //DisplayAreaDebug(areasFromDatabase[0]);
@@ -192,10 +189,10 @@ public class MapManager : MonoBehaviour
         Debug.Log("Zoom = " + _area.zoom);
 
         // Constraints
-        Debug.Log("minLongitude = " + _area.constraintsMin.x);
-        Debug.Log("minLatitude = " + _area.constraintsMin.y);
-        Debug.Log("maxLongitude = " + _area.constraintsMax.x);
-        Debug.Log("maxLatitude = " + _area.constraintsMax.y);
+        Debug.Log("minLongitude = " + _area.areaConstraintsMin.x);
+        Debug.Log("minLatitude = " + _area.areaConstraintsMin.y);
+        Debug.Log("maxLongitude = " + _area.areaConstraintsMax.x);
+        Debug.Log("maxLatitude = " + _area.areaConstraintsMax.y);
     }
 
     public void SetMapViewToPoint(Vector2 _positionToView)
@@ -214,9 +211,10 @@ public class MapManager : MonoBehaviour
     public void SetMapViewToArea(cArea _areaToView)
     {
         //if (_areaToView.constraints != null)
-        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(_areaToView.constraintsMin.y, _areaToView.constraintsMin.x, _areaToView.constraintsMax.y, _areaToView.constraintsMax.x);
+        OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(_areaToView.viewConstraintsMin.y, _areaToView.viewConstraintsMin.x, _areaToView.viewConstraintsMax.y, _areaToView.viewConstraintsMax.x);
         OnlineMaps.instance.zoomRange = new OnlineMapsRange(_areaToView.zoom, OnlineMaps.MAXZOOM);
         OnlineMaps.instance.SetPositionAndZoom(_areaToView.position.x, _areaToView.position.y, _areaToView.zoom);
+        DisplayArea(_areaToView);
     }
 
     public cArea GetAreaByTitle(string _areaTitle)
@@ -241,11 +239,17 @@ public class MapManager : MonoBehaviour
         return null;
     }
 
-    public void SaveArea(cArea _areaToSave)
+    public void SaveArea(string _areaTitle)
     {
+        // Get center point
+        OnlineMapsUtils.GetCenterPointAndZoom(markersCreateArea, out Vector2 center, out int zoom);
+
+        // Create a new cArea
+        cArea areaToSave = new cArea(_areaTitle, center, markersCreateArea[0].position, markersCreateArea[1].position);
+
         //if (areas != null && !areas.Contains(_areaToSave))
         {
-            cArea.Save(_areaToSave);
+            cArea.Save(areaToSave);
             areas = cArea.LoadAreas();
         }
     }
@@ -287,39 +291,85 @@ public class MapManager : MonoBehaviour
     private void OnMapClick()
     {
         //AppManager.Instance.uIManager.EnableSaveAreaPanel(); // On button pressed
-        createArea = true; // TODO: set to true when selecting to create a new area
-        // Get the geographical coordinates of the cursor.
+
+        // Create a new area
         if (createArea)
         {
-            Vector2 centerPosition = OnlineMaps.instance.position; //OnlineMaps.instance.control.GetCoords(); //OnlineMaps.instance.position;
+            // if there is no polygon
+            if (polygon == null)
+            {
+                Vector2 centerPosition = OnlineMaps.instance.position; //OnlineMaps.instance.control.GetCoords(); //OnlineMaps.instance.position;
 
-            // Calculate marker positions and the two remaining positions
-            Vector2 bottomLeftPosition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2); 
-            Vector2 topLeftposition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
-            Vector2 topRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
-            Vector2 bottomRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
+                // Calculate polygon positions
+                Vector2 bottomLeftPosition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
+                Vector2 topLeftposition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
+                Vector2 topRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
+                Vector2 bottomRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
 
-            // Create two new markers adjacent to the specified coordinates.
-            OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTexture, "Marker Min");
-            markerMin.scale = 2;
-            //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
-            OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTexture, "Marker Max");
-            markerMax.scale = 2;
-            //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
+                // Create two markers on the specified coordinates.
+                OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTexture, "Marker Min");
+                markerMin.scale = 2;
+                markerMin.isDraggable = true;
+                //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
+                OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTexture, "Marker Max");
+                markerMax.scale = 2;
+                markerMax.isDraggable = true;
+                //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
 
-            // Save markers and coordinates.
-            markersCreateArea[0] = markerMin;
-            markersCreateArea[1] = markerMax;
-            positionsCreateArea[0] = bottomLeftPosition; // markerMin position
-            positionsCreateArea[1] = topLeftposition; 
-            positionsCreateArea[2] = topRightPosition; // markerMax position
-            positionsCreateArea[3] = bottomRightPosition;
+                // Set markers and positions.
+                markersCreateArea[0] = markerMin;
+                markersCreateArea[1] = markerMax;
+                positionsCreateArea[0] = bottomLeftPosition; // markerMin position
+                positionsCreateArea[1] = topLeftposition;
+                positionsCreateArea[2] = topRightPosition; // markerMax position
+                positionsCreateArea[3] = bottomRightPosition;
 
-            // Mark that markers changed.
-            changed = true;
+                // Create polygon
+                polygon = CreatePolygon(positionsCreateArea);
 
-            // Cannot create another area before this one is saved or canceled
-            createArea = false;
+                // Redraw Map
+                OnlineMaps.instance.Redraw();
+
+                // Activate button
+                AppManager.Instance.uIManager.btnSaveArea.interactable = true;
+            }
+        }
+    }
+
+    public void CreateNewAreaInitialize()
+    {
+        SetMapViewToLocation();
+        createArea = true;
+        polygon = null;
+    }
+
+    public void CreateNewAreaFinalize()
+    {
+        RemoveNewArea();
+        createArea = false;
+    }
+
+    public void RemoveNewArea()
+    {
+        // Remove Polygon
+        if (polygon != null)
+        {
+            OnlineMapsDrawingElementManager.RemoveItem(polygon);
+            polygon = null;
+        }
+
+        // Remove Markers
+        if (markersCreateArea != null)
+        {
+            foreach (OnlineMapsMarker marker in markersCreateArea)
+            {
+                if (marker != null)
+                    OnlineMapsMarkerManager.RemoveItem(marker);
+            }
+
+            // Reset arrays to default values
+            markersCreateArea.Initialize();
+            positionsCreateArea.Initialize();
         }
     }
 
@@ -343,8 +393,8 @@ public class MapManager : MonoBehaviour
     
     private bool IsWithinConstraints()
     {
-        if ((currentArea.constraintsMin.x < OnlineMapsLocationService.instance.position.x) && (OnlineMapsLocationService.instance.position.x < currentArea.constraintsMax.x)
-            && (currentArea.constraintsMin.y < OnlineMapsLocationService.instance.position.y) && (OnlineMapsLocationService.instance.position.y < currentArea.constraintsMax.y))
+        if ((currentArea.areaConstraintsMin.x < OnlineMapsLocationService.instance.position.x) && (OnlineMapsLocationService.instance.position.x < currentArea.areaConstraintsMax.x)
+            && (currentArea.areaConstraintsMin.y < OnlineMapsLocationService.instance.position.y) && (OnlineMapsLocationService.instance.position.y < currentArea.areaConstraintsMax.y))
         {
             return true;
 
@@ -556,66 +606,48 @@ public class MapManager : MonoBehaviour
         userMarker.scale = 2;
     }
 
-    private void CheckMarkerCreateAreaPositions()
+    private void CheckMarkerPositions()
     {
-        // Check the position of each marker.
-        //for (int i = 0; i < markersCreateArea.Length; i++)
+        // Check if the markers moved
+        if ((markersCreateArea[0].position != positionsCreateArea[0]) || (markersCreateArea[1].position != positionsCreateArea[2]))
         {
-            //if (positionsCreateArea[i] != markersCreateArea[i].position)
+            // Check limits and reset marker positions if necessary.
+            if ((markersCreateArea[0].position.x > markersCreateArea[1].position.x) || (markersCreateArea[0].position.y > markersCreateArea[1].position.y))
             {
-                // If the position marker changed, then change the value in markerPositions. 
-                // In the polygon value changes automatically.
-                // TODO: Check on marker change location
-                positionsCreateArea[0] = markersCreateArea[0].position;
-                positionsCreateArea[1] = new Vector2(markersCreateArea[0].position.x, markersCreateArea[1].position.y);
-                positionsCreateArea[2] = markersCreateArea[1].position;
-                positionsCreateArea[3] = new Vector2(markersCreateArea[1].position.x, markersCreateArea[0].position.y);
-                changed = true;
+                markersCreateArea[0].position = positionsCreateArea[0];
             }
+            if ((markersCreateArea[1].position.x < markersCreateArea[0].position.x) || (markersCreateArea[1].position.y < markersCreateArea[0].position.y))
+            {
+                markersCreateArea[1].position = positionsCreateArea[2];
+            }
+
+            positionsCreateArea[0] = markersCreateArea[0].position;
+            positionsCreateArea[1] = new Vector2(markersCreateArea[0].position.x, markersCreateArea[1].position.y);
+            positionsCreateArea[2] = markersCreateArea[1].position;
+            positionsCreateArea[3] = new Vector2(markersCreateArea[1].position.x, markersCreateArea[0].position.y);
         }
     }
 
-    private void CreatePolygon()
+    private OnlineMapsDrawingPoly CreatePolygon(Vector2[] _arrayOfPoints)
     {
-        // If the polygon is not created, then create.
-        if (polygon == null)
-        {
-            // For points, reference to markerPositions. 
-            // If you change the values ​​in markerPositions, value in the polygon will be adjusted automatically.
-            polygon = new OnlineMapsDrawingPoly(positionsCreateArea, Color.black, borderWidth, new Color(1, 1, 1, 0.3f));
+        // For points, reference to markerPositions. 
+        // If you change the values ​​in markerPositions, value in the polygon will be adjusted automatically.
+        OnlineMapsDrawingPoly onlineMapsDrawingPoly = new OnlineMapsDrawingPoly(_arrayOfPoints, Color.black, borderWidth, new Color(1, 1, 1, 0.3f));
+        OnlineMapsDrawingElementManager.AddItem(onlineMapsDrawingPoly);
 
-            // Add an element to the map.
-            OnlineMapsDrawingElementManager.AddItem(polygon);
-        }
+        return onlineMapsDrawingPoly;
+    }
 
-        // Calculates area of ​​the polygon.
-        // Important: this algorithm works correctly only if the lines do not intersect.
-        float area = 0;
+    public void DisplayArea(cArea _areaToDisplay)
+    {
+        Vector2[] points = new Vector2[4];
 
-        // Triangulate points.
-        /*int[] indexes = OnlineMapsUtils.Triangulate(positionsCreateArea.ToList()).ToArray();
+        points[0] = _areaToDisplay.areaConstraintsMin;
+        points[1] = new Vector2(_areaToDisplay.areaConstraintsMin.x, _areaToDisplay.areaConstraintsMax.y);
+        points[2] = _areaToDisplay.areaConstraintsMax;
+        points[3] = new Vector2(_areaToDisplay.areaConstraintsMax.x, _areaToDisplay.areaConstraintsMin.y);
 
-        // Calculate the area of each triangle.
-        for (int i = 0; i < indexes.Length / 3; i++)
-        {
-            // Get the points of the triangle.
-            Vector2 p1 = positionsCreateArea[indexes[i * 3]];
-            Vector2 p2 = positionsCreateArea[indexes[i * 3 + 1]];
-            Vector2 p3 = positionsCreateArea[indexes[i * 3 + 2]];
-
-            // Calculate the distance between points.
-            float d1 = OnlineMapsUtils.DistanceBetweenPoints(p1, p2).magnitude;
-            float d2 = OnlineMapsUtils.DistanceBetweenPoints(p2, p3).magnitude;
-            float d3 = OnlineMapsUtils.DistanceBetweenPoints(p3, p1).magnitude;
-
-            // Calculate the area.
-            float p = (d1 + d2 + d3) / 2;
-            area += Mathf.Sqrt(p * (p - d1) * (p - d2) * (p - d3));
-        }
-
-        Debug.Log("Area: " + area + " km^2");*/
-
-        OnlineMaps.instance.Redraw();
+        CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
     }
     #endregion
 
