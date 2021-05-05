@@ -11,8 +11,10 @@ public class cArea
     public string title;
     public Vector2 position; // longitude, latitude (x, y)
     public int zoom;
-    public Vector2 constraintsMin; // minLongitude, minLatitude, maxLongitude, maxLatitude (x, y, z, w)
-    public Vector2 constraintsMax; // minLongitude, minLatitude, maxLongitude, maxLatitude (x, y, z, w)
+    public Vector2 areaConstraintsMin; // minLongitude, minLatitude (x, y)
+    public Vector2 areaConstraintsMax; // maxLongitude, maxLatitude (x, y)
+    public Vector2 viewConstraintsMin; // minLongitude, minLatitude (x, y)
+    public Vector2 viewConstraintsMax; // maxLongitude, maxLatitude (x, y)
     //public Vector4 constraints; // minLongitude, minLatitude, maxLongitude, maxLatitude (x, y, z, w)
     public List<cPath> paths = new List<cPath>();
 
@@ -24,23 +26,24 @@ public class cArea
     public static readonly string TITLE = "title";
     public static readonly string POSITION = "position";
     public static readonly string ZOOM = "zoom";
-    public static readonly string CONSTRAINTS_MIN = "constraintsMin"; // "areaConstraintsMin";
-    public static readonly string CONSTRAINTS_MAX = "constraintsMax"; // "areaConstraintsMax";
-    // public static readonly string VIEW_CONSTRAINTS_MIN = "viewConstraintsMin";
-    // public static readonly string VIEW_CONSTRAINTS_MAX = "viewConstraintsMax";
+    public static readonly string AREA_CONSTRAINTS_MIN = "areaConstraintsMin";
+    public static readonly string AREA_CONSTRAINTS_MAX = "areaConstraintsMax";
+    public static readonly string VIEW_CONSTRAINTS_MIN = "viewConstraintsMin";
+    public static readonly string VIEW_CONSTRAINTS_MAX = "viewConstraintsMax";
     public static readonly string PATHS = "paths";
     #endregion
 
     #region Methods
-    public cArea(int _id, string _title, Vector2 _position, int _zoom, Vector2 _constraintsMin, Vector2 _constraintsMax) // TODO: Make private when testing is finished
+    public cArea(int _id, string _title, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax) // TODO: Make private when testing is finished
     {
         Id = _id;
         title = _title;
         position = _position;
         zoom = _zoom;
-        //constraints = _constraints;
-        constraintsMin = _constraintsMin;
-        constraintsMax = _constraintsMax;
+        areaConstraintsMin = _areaConstraintsMin;
+        areaConstraintsMax = _areaConstraintsMax;
+        viewConstraintsMin = _viewConstraintsMin;
+        viewConstraintsMax = _viewConstraintsMax;
     }
 
     public cArea(string _title, Vector2 _position, int _zoom, Vector2 _constraintsMin, Vector2 _constraintsMax)
@@ -50,19 +53,21 @@ public class cArea
         position = _position;
         zoom = _zoom;
         //constraints = _constraints;
-        constraintsMin = _constraintsMin;
-        constraintsMax = _constraintsMax;
+        areaConstraintsMin = _constraintsMin;
+        areaConstraintsMax = _constraintsMax;
     }
 
-    public cArea(string _title) // for creating a new area on map click
+    public cArea(string _title, Vector2 _centerPosition, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax) // for creating a new area
     {
         Id = GetAvailableAreaID();
         title = _title;
-        position = OnlineMaps.instance.position;
+        position = _centerPosition; //OnlineMaps.instance.position;
         zoom = OnlineMaps.instance.zoom; //MapManager.DEFAULT_ZOOM;
-        //constraints = new Vector4(_position.x - MapManager.DEFAULT_POSITION_OFFSET, _position.y - MapManager.DEFAULT_POSITION_OFFSET, _position.x + MapManager.DEFAULT_POSITION_OFFSET, _position.y + MapManager.DEFAULT_POSITION_OFFSET);
-        constraintsMin = new Vector2((float)OnlineMaps.instance.bounds.left, (float)OnlineMaps.instance.bounds.bottom);
-        constraintsMax = new Vector2((float)OnlineMaps.instance.bounds.right, (float)OnlineMaps.instance.bounds.top);
+        //constraints = new Vector4(_position.x - MapManager.DEFAULT_POSITION_OFFSET, _position.y - MapManager.DEFAULT_POSITION_OFFSET, _position.x + MapManager.DEFAULT_POSITION_OFFSET, _position.y + MapManager.DEFAULT_POSITION_OFFSET); // for testing
+        areaConstraintsMin = _areaConstraintsMin;
+        areaConstraintsMax = _areaConstraintsMax;
+        viewConstraintsMin = new Vector2((float)OnlineMaps.instance.bounds.left, (float)OnlineMaps.instance.bounds.bottom);
+        viewConstraintsMax = new Vector2((float)OnlineMaps.instance.bounds.right, (float)OnlineMaps.instance.bounds.top);
     }
 
     /*void Create()
@@ -163,8 +168,10 @@ public class cArea
         areaNode.Create(TITLE, _areaToSave.title);
         areaNode.Create(POSITION, _areaToSave.position);
         areaNode.Create(ZOOM, _areaToSave.zoom);
-        areaNode.Create(CONSTRAINTS_MIN, new Vector2(_areaToSave.constraintsMin.x, _areaToSave.constraintsMin.y));
-        areaNode.Create(CONSTRAINTS_MAX, new Vector2(_areaToSave.constraintsMax.x, _areaToSave.constraintsMax.y));
+        areaNode.Create(AREA_CONSTRAINTS_MIN, new Vector2(_areaToSave.areaConstraintsMin.x, _areaToSave.areaConstraintsMin.y));
+        areaNode.Create(AREA_CONSTRAINTS_MAX, new Vector2(_areaToSave.areaConstraintsMax.x, _areaToSave.areaConstraintsMax.y));
+        areaNode.Create(VIEW_CONSTRAINTS_MIN, new Vector2(_areaToSave.viewConstraintsMin.x, _areaToSave.viewConstraintsMin.y));
+        areaNode.Create(VIEW_CONSTRAINTS_MAX, new Vector2(_areaToSave.viewConstraintsMax.x, _areaToSave.viewConstraintsMax.y));
         areaNode.Create(PATHS);
         
         // Save xml string to PlayerPrefs
@@ -193,11 +200,13 @@ public class cArea
         string title = _areaNode.Get<string>(TITLE);
         Vector2 position = _areaNode.Get<Vector2>(POSITION);
         int zoom = _areaNode.Get<int>(ZOOM);
-        Vector2 constraints_min = _areaNode.Get<Vector2>(CONSTRAINTS_MIN);
-        Vector2 constraints_max = _areaNode.Get<Vector2>(CONSTRAINTS_MAX);
+        Vector2 areaConstraints_min = _areaNode.Get<Vector2>(AREA_CONSTRAINTS_MIN);
+        Vector2 areaConstraints_max = _areaNode.Get<Vector2>(AREA_CONSTRAINTS_MAX);
+        Vector2 viewConstraints_min = _areaNode.Get<Vector2>(VIEW_CONSTRAINTS_MIN);
+        Vector2 viewConstraints_max = _areaNode.Get<Vector2>(VIEW_CONSTRAINTS_MAX);
 
         // Create cArea and add it to loadedAreas list
-        cArea loadedArea = new cArea(id, title, position, zoom, constraints_min, constraints_max);
+        cArea loadedArea = new cArea(id, title, position, zoom, areaConstraints_min, areaConstraints_max, viewConstraints_min, viewConstraints_max);
         return loadedArea;
     }
 

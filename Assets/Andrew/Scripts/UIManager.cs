@@ -28,14 +28,16 @@ public class UIManager : MonoBehaviour
     [Header("Create Area Screen")]
     // Create Area Screen
     public GameObject pnlCreateArea;
+    public GameObject pnlSaveArea;
     public TMP_InputField inptFldCreateArea;
     public Button btnCreateAreaSave;
     public Button btnCreateAreaCancel;
+    public Button btnSaveArea;
 
     private List<GameObject> selectAreaObjects;
     private float interval = 0.001f;
 
-    private bool createArea = false;
+    //private bool createArea = false;
 
     [Space]
     [Header("GPS Screen")]
@@ -104,9 +106,9 @@ public class UIManager : MonoBehaviour
         btnCreateArea.onClick.AddListener(() => CreateNewAreaSelected());
 
         // CreateAreaScreen
-        // inptFldCreateArea.onValidateInput.//AddListener(() => EnableScreen(pnlCreateArea, true));
+        btnSaveArea.onClick.AddListener(() => EnableScreen(pnlSaveArea, true));
         btnCreateAreaSave.onClick.AddListener(() => SaveArea());
-        btnCreateAreaCancel.onClick.AddListener(() => EnableScreen(pnlCreateArea, false));
+        btnCreateAreaCancel.onClick.AddListener(() => RemoveNewArea());
 
         //btn GPS
         btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeAndroidSettings());
@@ -144,10 +146,10 @@ public class UIManager : MonoBehaviour
         DestroySelectAreaObjects(selectAreaObjects);
         selectAreaObjects = InstantiateSelectAreaObjects();
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
-        createArea = false;
+        AppManager.Instance.mapManager.CreateNewAreaFinalize();
         EnableScreen(pnlPathScreen, false);
         imgRecord.gameObject.SetActive(false);
-        EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
+        EnableScreen(pnlSavedPaths, false); //the panel for saved paths can be removed afterwards, for testing purposes
         ActivateButtons(false, false);
         pnlWarningDeleteScreen.SetActive(false);
     }
@@ -220,7 +222,7 @@ public class UIManager : MonoBehaviour
         }
         EnableScreen(pnlPathScreen, true);
         imgRecord.gameObject.SetActive(true);
-        EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
+        EnableScreen(pnlSavedPaths, false); //the panel for saved paths can be removed afterwards, for testing purposes
         ActivateButtons(true,true);
         btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Areas";
         pnlSavePathsScreen.SetActive(false);
@@ -301,7 +303,7 @@ public class UIManager : MonoBehaviour
     //back to all the panel accordingly and even if we press back whilst recording path
     private void BackToAreasScreen()
     {
-        if (pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlCreateArea.activeSelf && pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath )
+        if (pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath )
         {
             pnlSavedPaths.SetActive(false);
             pnlSavePathsScreen.SetActive(false);
@@ -309,25 +311,25 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
 
-        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlCreateArea.activeSelf && !pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
         {
             DisplayAreasScreen();
             pnlPathScreen.SetActive(false);
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
         //pnlAreasScreen.SetActive(false);
-        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf && pnlCreateArea.activeSelf && !pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf && pnlSaveArea.activeSelf && !pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
         {
-            pnlCreateArea.SetActive(false);
+            pnlSaveArea.SetActive(false);
             Debug.Log("pnlCreateArea false");
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         } 
-        else if(!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlCreateArea.activeSelf && !pnlSavePathsScreen.activeSelf && AppManager.Instance.mapManager.isRecordingPath)
+        else if(!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlSavePathsScreen.activeSelf && AppManager.Instance.mapManager.isRecordingPath)
         {
             
             SaveUIButton();
         }
-        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlCreateArea.activeSelf && pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
         {
             DisplayPathsScreen();
         }
@@ -347,25 +349,32 @@ public class UIManager : MonoBehaviour
     private void CreateNewAreaSelected()
     {
         pnlAreasScreen.SetActive(false);
-        createArea = true;
+        pnlCreateArea.SetActive(true);
+        btnSaveArea.interactable = false;
         //mapScreen.SetActive(true);
         ActivateButtons(false,true);
-        AppManager.Instance.mapManager.SetMapViewToLocation();
-        // Resets the map view at my location, DONE
-       
+        AppManager.Instance.mapManager.CreateNewAreaInitialize();
+    }
+
+    private void RemoveNewArea()
+    {
+        AppManager.Instance.mapManager.RemoveNewArea();
+        btnSaveArea.interactable = false;
+        EnableScreen(pnlSaveArea, false);
     }
 
     private void SaveArea() // MUST BE UPDATED
     {
         string newAreaTitle = inptFldCreateArea.text;
-        AppManager.Instance.mapManager.SaveArea(new cArea(newAreaTitle)); //new cArea(newAreaTitle, OnlineMaps.instance.position
+        AppManager.Instance.mapManager.SaveArea(newAreaTitle);
 
+        pnlSaveArea.SetActive(false);
         pnlCreateArea.SetActive(false);
     }
 
     public void EnableSaveAreaScreen()
     {
-        pnlCreateArea.SetActive(true);
+        pnlSaveArea.SetActive(true);
     }
 
     /*public void OnMapClick()
