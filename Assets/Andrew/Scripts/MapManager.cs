@@ -49,6 +49,7 @@ public class MapManager : MonoBehaviour
     OnlineMapsMarker[] markersCreateArea = new OnlineMapsMarker[2];
     Vector2[] positionsCreateArea = new Vector2[4];
     private OnlineMapsDrawingPoly polygon;
+    private static readonly int DEFAULT_MARKER_SCALE = 2;
     #endregion
 
     #region Unity Functions
@@ -290,15 +291,13 @@ public class MapManager : MonoBehaviour
 
     private void OnMapClick()
     {
-        //AppManager.Instance.uIManager.EnableSaveAreaPanel(); // On button pressed
-
         // Create a new area
         if (createArea)
         {
             // if there is no polygon
             if (polygon == null)
             {
-                Vector2 centerPosition = OnlineMaps.instance.position; //OnlineMaps.instance.control.GetCoords(); //OnlineMaps.instance.position;
+                Vector2 centerPosition = OnlineMaps.instance.position;
 
                 // Calculate polygon positions
                 Vector2 bottomLeftPosition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
@@ -308,12 +307,12 @@ public class MapManager : MonoBehaviour
 
                 // Create two markers on the specified coordinates.
                 OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTexture, "Marker Min");
-                markerMin.scale = 2;
-                markerMin.isDraggable = true;
+                markerMin.scale = DEFAULT_MARKER_SCALE;
+                markerMin.SetDraggable(true);
                 //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
                 OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTexture, "Marker Max");
-                markerMax.scale = 2;
-                markerMax.isDraggable = true;
+                markerMax.scale = DEFAULT_MARKER_SCALE;
+                markerMax.SetDraggable(true);
                 //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
 
                 // Set markers and positions.
@@ -397,7 +396,6 @@ public class MapManager : MonoBehaviour
             && (currentArea.areaConstraintsMin.y < OnlineMapsLocationService.instance.position.y) && (OnlineMapsLocationService.instance.position.y < currentArea.areaConstraintsMax.y))
         {
             return true;
-
         }
         return false;
     }
