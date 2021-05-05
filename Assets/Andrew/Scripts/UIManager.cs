@@ -72,7 +72,7 @@ public class UIManager : MonoBehaviour
     [Header("Testing Purposes")]
     public Texture2D userMarker;
     public TextMeshProUGUI infoText;
-    public Button btnPaths, btnCancelShow, btnUploadServer;
+    public Button btnPaths, btnCancelShow, btnUploadServer, btnDownloadServer;
     public GameObject pnlSavedPaths, btnShowPath, pnlScrollViewPaths, pnlSavePathsScreen;
     private List<GameObject> selectPathObjects;
     #endregion
@@ -128,8 +128,8 @@ public class UIManager : MonoBehaviour
         //for testing the saving of paths is happening smoothly
         btnPaths.onClick.AddListener(() => DisplayPathsScreen());
         btnCancelShow.onClick.AddListener(() => CancelInGeneral());
-        btnUploadServer.onClick.AddListener(() => StartCoroutine(AppManager.Instance.serverManager.UploadFileData(cArea.ID)));
-        
+        btnUploadServer.onClick.AddListener(() => AppManager.Instance.serverManager.GetTest());
+        btnDownloadServer.onClick.AddListener(() => AppManager.Instance.serverManager.PostTest());
     }
     void ActivateButtons(bool valPath, bool valBack)
     {   
@@ -471,7 +471,7 @@ public class UIManager : MonoBehaviour
 
         btnAddNewPath.onClick.RemoveAllListeners();
         btnAddNewPath.onClick.AddListener(() => AddNewPath());
-
+        
         EnableScreen(pnlWarningSavePathScreen, false);
         IsInRecordingPath(false);
         btnPaths.interactable = true;

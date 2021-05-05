@@ -3,20 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class ServerManager : MonoBehaviour
 {
-    readonly string getUrl = "http://localhost/UnityWebRequest/date.php";
+    readonly string getUrl = "http://localhost/UnityWebRequest/date.php?name=";
     readonly string postUrl = "http://localhost/UnityWebRequest/post.php";
-    void Start()
-    {
-        StartCoroutine(GetText());
-        
-    }
 
-    IEnumerator GetText()
+    public void GetTest()
     {
-        UnityWebRequest www = UnityWebRequest.Get(getUrl);
+        Debug.Log("Get Test Server Manager\n" + AppManager.Instance.mapManager.currentArea.title);
+        StartCoroutine(GetFile(PlayerPrefs.GetString(cArea.PREFS_KEY)));
+    }
+    
+    IEnumerator GetFile(string areaName)
+    {
+        string URL = getUrl + areaName ;
+
+        UnityWebRequest www = UnityWebRequest.Get(URL);
         yield return www.SendWebRequest();
 
         if (www.isNetworkError || www.isHttpError)
@@ -27,13 +31,24 @@ public class ServerManager : MonoBehaviour
         {
             // Show results as text
             Debug.Log(www.downloadHandler.text);
-
+            //point.title = areaName;
             // Or retrieve results as binary data
             byte[] results = www.downloadHandler.data;
         }
     }
+    public void PostTest()
+    {
+        StartCoroutine(PostText());
+    }
 
-    public IEnumerator UploadFileData(string areaKey)
+    public IEnumerator PostText()
+    {
+        string URL = postUrl;
+        UnityWebRequest www = UnityWebRequest.Get(URL);
+        yield return www.SendWebRequest();
+        AppManager.Instance.uIManager.infoText.text = www.downloadHandler.text;
+    }
+    /*public IEnumerator UploadFileData(string areaKey)
     {
         List<IMultipartFormSection> wwwForm = new List<IMultipartFormSection>();
         areaKey = AppManager.Instance.mapManager.currentArea.ToString();
@@ -52,7 +67,7 @@ public class ServerManager : MonoBehaviour
         {
             Debug.Log("File has uploaded");
         }
-    }
+    }*/
     //from Stathis
     /*public void UploadPathsToServer()
     {
