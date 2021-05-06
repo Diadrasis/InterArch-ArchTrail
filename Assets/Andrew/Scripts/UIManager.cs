@@ -10,7 +10,6 @@ public class UIManager : MonoBehaviour
 {
     #region Variables
     public GameObject mapScreen;
-    public Camera worldCamera;
 
     [Space]
     [Header("Top Screen")]
