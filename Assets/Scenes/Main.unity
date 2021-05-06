@@ -629,7 +629,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &284174840
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4518,6 +4518,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapScreen: {fileID: 6710081423201752178}
+  worldCamera: {fileID: 1540955361}
   btnBackToAreasScreen: {fileID: 6710081423828564209}
   btnQuit: {fileID: 1106544752}
   imgRecord: {fileID: 1276906861}
@@ -4556,7 +4557,6 @@ MonoBehaviour:
   btnShowPath: {fileID: 1443173278506380, guid: 104894555f90e7644913e94b4d18817c,
     type: 3}
   pnlScrollViewPaths: {fileID: 527385140}
-  pnlSavePathsScreen: {fileID: 1345862883}
 --- !u!1 &1031194544
 GameObject:
   m_ObjectHideFlags: 0
@@ -4948,6 +4948,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: btnDownload
+      objectReference: {fileID: 0}
+    - target: {fileID: 7656002947675019213, guid: c4bf9e227dc51d84798526972b091673,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7656002947675019214, guid: c4bf9e227dc51d84798526972b091673,
         type: 3}
@@ -6522,41 +6527,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1315398038}
   m_CullTransparentMesh: 0
---- !u!1 &1345862883
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1345862884}
-  m_Layer: 5
-  m_Name: pnlSavePathsScreen
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &1345862884
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1345862883}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1563276632}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0.9883839}
-  m_AnchoredPosition: {x: 0, y: -0.19995117}
-  m_SizeDelta: {x: 0, y: -0.43933105}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1347052469
 GameObject:
   m_ObjectHideFlags: 0
@@ -7131,7 +7101,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1454816634
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7802,7 +7772,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1563276632
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7818,7 +7788,6 @@ RectTransform:
   - {fileID: 2036377747}
   - {fileID: 246880057}
   - {fileID: 171761354}
-  - {fileID: 1345862884}
   m_Father: {fileID: 986791946}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -12105,7 +12074,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _items: []
   defaultScale: 1
-  defaultTexture: {fileID: 2800000, guid: ea7eb0aa8eaab054a91d4219f9719f63, type: 3}
+  defaultTexture: {fileID: 2800000, guid: 8e96007364423234cab8b5a42e93bf20, type: 3}
   defaultAlign: 7
   allowAddMarkerByM: 1
 --- !u!114 &6710081424181877752

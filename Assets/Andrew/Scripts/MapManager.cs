@@ -50,6 +50,8 @@ public class MapManager : MonoBehaviour
     Vector2[] positionsCreateArea = new Vector2[4];
     private OnlineMapsDrawingPoly polygon;
     private static readonly int DEFAULT_MARKER_SCALE = 2;
+
+    
     #endregion
 
     #region Unity Functions
@@ -78,7 +80,6 @@ public class MapManager : MonoBehaviour
 
         userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), AppManager.Instance.uIManager.userMarker, "User");
         userMarker.SetDraggable(false);
-
         // Test
         //List<cPath> pathsToTest = GetTestPaths();
         //DisplayPath(pathsToTest[0]);
@@ -453,12 +454,11 @@ public class MapManager : MonoBehaviour
             {
                 // Creates a new marker
                 string label = "Point_" + currentPath.pathPoints.Count + "_" + DateTime.Now.TimeOfDay;
-                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
+                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position,label);
                 marker.SetDraggable(false);
-
                 // Creates and Adds a new PathPoint
                 currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, position, DateTime.Now.TimeOfDay));
-
+                
                 //marker.label = label;
                 //marker.position = position;
                 //OnlineMapsMarkerManager.AddItem(marker);
@@ -649,6 +649,8 @@ public class MapManager : MonoBehaviour
             OnlineMapsDrawingElementManager.RemoveItem(polygon);
         polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
     }
+
+   
     #endregion
 
     #region Screencapture the path
@@ -692,3 +694,4 @@ public class MapManager : MonoBehaviour
     #endregion
     #endregion
 }
+
