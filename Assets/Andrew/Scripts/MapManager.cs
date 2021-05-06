@@ -337,6 +337,7 @@ public class MapManager : MonoBehaviour
 
     public void CreateNewAreaInitialize()
     {
+        OnlineMapsDrawingElementManager.RemoveAllItems();
         SetMapViewToLocation();
         createArea = true;
         polygon = null;
@@ -464,7 +465,7 @@ public class MapManager : MonoBehaviour
 
                 // Creates a line
                 markerListCurrPath.Add(marker);
-                OnlineMapsDrawingElementManager.RemoveAllItems();
+                OnlineMapsDrawingElementManager.RemoveAllItems(e => e != polygon);
                 OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListCurrPath.Select(m => m.position).ToArray(), Color.red, 3)); //OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3) // Average human walk speed is 1.4m/s
 
                 previousPosition = position;
@@ -589,9 +590,8 @@ public class MapManager : MonoBehaviour
 
     public void RemoveMarkersAndLine()
     {
-        //OnlineMapsMarkerManager.instance.RemoveAll();
         OnlineMapsMarkerManager.RemoveAllItems(m => m != userMarker);
-        OnlineMapsDrawingElementManager.RemoveAllItems();
+        OnlineMapsDrawingElementManager.RemoveAllItems(e => e != polygon);
         OnlineMaps.instance.Redraw();
     }
 
@@ -645,7 +645,9 @@ public class MapManager : MonoBehaviour
         points[2] = _areaToDisplay.areaConstraintsMax;
         points[3] = new Vector2(_areaToDisplay.areaConstraintsMax.x, _areaToDisplay.areaConstraintsMin.y);
 
-        CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
+        if (polygon != null)
+            OnlineMapsDrawingElementManager.RemoveItem(polygon);
+        polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
     }
     #endregion
 
