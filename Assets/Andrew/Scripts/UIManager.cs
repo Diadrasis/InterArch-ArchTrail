@@ -13,7 +13,7 @@ public class UIManager : MonoBehaviour
 
     [Space]
     [Header("Top Screen")]
-    public Button btnBackToAreasScreen;
+    public Button btnBackToAreasScreen, btnQuit;
     public Animator imgRecord;
 
     [Space]
@@ -75,7 +75,7 @@ public class UIManager : MonoBehaviour
     public Texture2D userMarker;
     public TextMeshProUGUI infoText;
     public Button btnPaths, btnCancelShow, btnUploadServer, btnDownloadServer;
-    public GameObject pnlSavedPaths, btnShowPath, pnlScrollViewPaths, pnlSavePathsScreen;
+    public GameObject pnlSavedPaths, btnShowPath, pnlScrollViewPaths;
     private List<GameObject> selectPathObjects;
     #endregion
 
@@ -101,6 +101,7 @@ public class UIManager : MonoBehaviour
     {
         // Map Screen
         btnBackToAreasScreen.onClick.AddListener(() => BackToAreasScreen());
+        btnQuit.onClick.AddListener(() => Escape());
 
         // Areas Screen
         btnCreateArea.onClick.AddListener(() => CreateNewAreaSelected());
@@ -133,10 +134,11 @@ public class UIManager : MonoBehaviour
         btnUploadServer.onClick.AddListener(() => AppManager.Instance.serverManager.GetTest());
         btnDownloadServer.onClick.AddListener(() => AppManager.Instance.serverManager.PostTest());
     }
-    void ActivateButtons(bool valPath, bool valBack)
+    void ActivateButtons(bool valPath, bool valBack, bool valQuit)
     {   
         btnPaths.gameObject.SetActive(valPath);
         btnBackToAreasScreen.gameObject.SetActive(valBack);
+        btnQuit.gameObject.SetActive(valQuit);
         btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Areas";
 
     }
@@ -150,7 +152,8 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, false);
         imgRecord.gameObject.SetActive(false);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths can be removed afterwards, for testing purposes
-        ActivateButtons(false, false);
+        ActivateButtons(false, false,true);
+        
         pnlWarningDeleteScreen.SetActive(false);
     }
 
@@ -223,9 +226,8 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, true);
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths can be removed afterwards, for testing purposes
-        ActivateButtons(true,true);
+        ActivateButtons(true,true,false);
         btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Areas";
-        pnlSavePathsScreen.SetActive(false);
         AppManager.Instance.mapManager.CheckUserPosition();
     }
 
@@ -258,7 +260,6 @@ public class UIManager : MonoBehaviour
         Debug.Log("OnPathSelectPressed");
         cPath selectedPath = AppManager.Instance.mapManager.GetPathByTitle(selectPathText.text);
         //AppManager.Instance.mapManager.currentPath = selectedPath;
-        pnlSavePathsScreen.SetActive(true);
         if (selectedPath != null)
         {
             pnlScrollViewPaths.SetActive(false);
@@ -268,7 +269,7 @@ public class UIManager : MonoBehaviour
         //EnableScreen(pnlSelectedAreaScreen, true);
         //imgRecord.gameObject.SetActive(true);
         //EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
-        btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Back";
+        btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Areas";
         //AppManager.Instance.mapManager.CheckUserPosition();
     }
 
@@ -303,37 +304,35 @@ public class UIManager : MonoBehaviour
     //back to all the panel accordingly and even if we press back whilst recording path
     private void BackToAreasScreen()
     {
-        if (pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath )
+        if (pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath )
         {
             pnlSavedPaths.SetActive(false);
-            pnlSavePathsScreen.SetActive(false);
             btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Areas";
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
 
-        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
         {
             DisplayAreasScreen();
             pnlPathScreen.SetActive(false);
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
         //pnlAreasScreen.SetActive(false);
-        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf && pnlSaveArea.activeSelf && !pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf && pnlSaveArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
         {
             pnlSaveArea.SetActive(false);
             Debug.Log("pnlCreateArea false");
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         } 
-        else if(!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlSavePathsScreen.activeSelf && AppManager.Instance.mapManager.isRecordingPath)
-        {
-            
+        else if(!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && AppManager.Instance.mapManager.isRecordingPath)
+        { 
             SaveUIButton();
         }
-        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && pnlSavePathsScreen.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
         {
             DisplayPathsScreen();
         }
-        else
+        else 
         {
             DisplayAreasScreen();
         }
@@ -352,7 +351,7 @@ public class UIManager : MonoBehaviour
         pnlCreateArea.SetActive(true);
         btnSaveArea.interactable = false;
         //mapScreen.SetActive(true);
-        ActivateButtons(false,true);
+        ActivateButtons(false,true,false);
         AppManager.Instance.mapManager.CreateNewAreaInitialize();
     }
 
@@ -489,13 +488,12 @@ public class UIManager : MonoBehaviour
     //the panel for saved paths can be removed afterwards, for testing purposes
     void DisplayPathsScreen()
     {
-        pnlSavePathsScreen.SetActive(true);
         pnlSavedPaths.SetActive(true);
         DestroySelectAreaObjects(selectPathObjects);
         selectPathObjects = InstantiateSelectPathObjects();
         StartCoroutine(ReloadLayout(pnlSavedPaths));
         pnlScrollViewPaths.SetActive(true);
-        ActivateButtons(true, true);
+        ActivateButtons(true, true,false);
         btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Back";
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
         pnlWarningDeleteScreen.SetActive(false);
