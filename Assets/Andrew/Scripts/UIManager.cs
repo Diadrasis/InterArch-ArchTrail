@@ -56,6 +56,7 @@ public class UIManager : MonoBehaviour
     [Header("Warning Area Screen")]
     //WarningScreen if user is near area
     public GameObject pnlWarningScreen;
+    public TextMeshProUGUI txtWarning;
     public Button btnCancel;
 
     [Space]

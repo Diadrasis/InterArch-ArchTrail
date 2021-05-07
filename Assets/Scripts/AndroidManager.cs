@@ -136,7 +136,8 @@ public class AndroidManager : MonoBehaviour
     {
         if (val)
         {
-            AppManager.Instance.uIManager.infoText.text = "internet";
+            //AppManager.Instance.uIManager.txtWarning.text = "internet";
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.btnUploadServer.interactable = true;
             /*btnInternet.image.color = Color.green;
             if (!isReadDatabase)
@@ -147,7 +148,8 @@ public class AndroidManager : MonoBehaviour
         }
         else
         {
-            AppManager.Instance.uIManager.infoText.text = "no internet";
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
             AppManager.Instance.uIManager.btnUploadServer.interactable = false;
             //btnInternet.image.color = Color.gray;
         }
