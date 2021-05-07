@@ -114,6 +114,10 @@ public class MapManager : MonoBehaviour
     {
         //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
+    private void OnDisable()
+    {
+        AppManager.Instance.serverManager.OnCheckInternetCheckComplete -= AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
+    }
     #endregion
 
     #region Methods
@@ -288,6 +292,9 @@ public class MapManager : MonoBehaviour
 
         //Changed Location Event
         OnlineMapsLocationService.instance.OnLocationChanged += OnLocationChanged;
+
+        //Interent Events
+        AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
     }
 
     private void OnMapClick()
@@ -650,7 +657,7 @@ public class MapManager : MonoBehaviour
         polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
     }
 
-   
+
     #endregion
 
     #region Screencapture the path
@@ -692,6 +699,8 @@ public class MapManager : MonoBehaviour
         yield break;
     }*/
     #endregion
+
+
     #endregion
 }
 

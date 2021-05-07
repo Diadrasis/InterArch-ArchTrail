@@ -11,6 +11,7 @@ public class AndroidManager : MonoBehaviour
     private void Start()
     {
         Init();
+        AppManager.Instance.serverManager.CheckInternet();
     }
 
     void Init()
@@ -97,7 +98,7 @@ public class AndroidManager : MonoBehaviour
     
     private void Update()
     {
-        //if (CheckForLocationServices()) return;//if we remove this line, we shouldn't leave the StopLocationService on the method ON!!!
+        //if (CheckForLocationServices()) return;//if we remove this line, we shouldn't leave the StopLocationService on the method ON, on the bool method!!!
 
     }
     private void OnApplicationPause(bool pause)
@@ -105,6 +106,7 @@ public class AndroidManager : MonoBehaviour
         if (!pause)
         {
             if (CheckForLocationServices()) { return; }
+            AppManager.Instance.serverManager.CheckInternet();
         }
         else
         {
@@ -124,8 +126,30 @@ public class AndroidManager : MonoBehaviour
         }
         else
         {
+            AppManager.Instance.serverManager.CheckInternet();
             Debug.LogWarning("OnApplicationFocus = true");
             if (CheckForLocationServices()) { return; }
+        }
+    }
+
+    public void OnCheckInternetCheckComplete(bool val)
+    {
+        if (val)
+        {
+            AppManager.Instance.uIManager.infoText.text = "internet";
+            AppManager.Instance.uIManager.btnUploadServer.interactable = true;
+            /*btnInternet.image.color = Color.green;
+            if (!isReadDatabase)
+            {
+                serverManager.GetPathsFromServer();
+                isReadDatabase = true;
+            }*/
+        }
+        else
+        {
+            AppManager.Instance.uIManager.infoText.text = "no internet";
+            AppManager.Instance.uIManager.btnUploadServer.interactable = false;
+            //btnInternet.image.color = Color.gray;
         }
     }
 }

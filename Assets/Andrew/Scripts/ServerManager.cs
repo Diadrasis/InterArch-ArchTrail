@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,11 +8,22 @@ using UnityEngine.UI;
 
 public class ServerManager : MonoBehaviour
 {
+    #region Variables
     readonly string getUrl = "http://localhost/UnityWebRequest/date.php?name=";
     readonly string postUrl = "http://localhost/UnityWebRequest/post.php";
 
+    public delegate void InternetConnection(bool isOn);
+    public InternetConnection OnCheckInternetCheckComplete;
+
+    #endregion
+
+    #region UnityMethods
+    #endregion
+
+    #region Methods
     public void GetTest()
     {
+        Debug.Log("Pressed");
         Debug.Log("Get Test Server Manager\n" + AppManager.Instance.mapManager.currentArea.title);
         StartCoroutine(GetFile(PlayerPrefs.GetString(cArea.PREFS_KEY)));
     }
@@ -119,7 +131,7 @@ public class ServerManager : MonoBehaviour
                                                                           //wwwForm.AddBinaryData("photo", myPhoto.EncodeToJPG());
 
         yield return new WaitForEndOfFrame();
-        *//*Texture2D txt2D = Stathis.File_Manager.loadImage<Texture2D>(pathName, Stathis.File_Manager.Ext.JPG);
+        Texture2D txt2D = Stathis.File_Manager.loadImage<Texture2D>(pathName, Stathis.File_Manager.Ext.JPG);
 
         if (txt2D)
         {
@@ -129,7 +141,7 @@ public class ServerManager : MonoBehaviour
         }
 
         yield return new WaitForEndOfFrame();
-*//*
+
 
         UnityWebRequest www = UnityWebRequest.Get(getUrl);
 
@@ -150,4 +162,28 @@ public class ServerManager : MonoBehaviour
 
         yield break;
     }*/
+
+    #region InternetConnection
+
+    public void CheckInternet()
+    {
+        OnlineMaps.instance.CheckServerConnection(OnCheckConnectionComplete);
+    }
+
+    public void OnCheckConnectionComplete(bool status)
+    {
+        // If the test is successful, then allow the user to manipulate the map.
+        //OnlineMapsControlBase.instance.allowUserControl = status;
+
+        // Showing test result in console.
+        // Debug.Log(status ? "Has connection" : "No connection");
+
+        if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
+        
+
+    }
+
+    #endregion
+
+    #endregion
 }
