@@ -257,6 +257,9 @@ public class MapManager : MonoBehaviour
         {
             cArea.Save(areaToSave);
             areas = cArea.LoadAreas();
+
+            // Upload user data to server
+            AppManager.Instance.serverManager.postUserData = true;
         }
     }
 
@@ -541,6 +544,9 @@ public class MapManager : MonoBehaviour
         Debug.Log("currentPath pathPoints.Count = " + currentPath.pathPoints.Count);*/
         cPath.Save(currentPath);
         currentPath = null;
+
+        // Upload user data to server
+        AppManager.Instance.serverManager.postUserData = true;
     }
 
     public void DisplayPath(cPath _pathToDisplay)

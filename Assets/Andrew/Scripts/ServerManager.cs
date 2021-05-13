@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using System.IO;
 
 public class ServerManager : MonoBehaviour
 {
@@ -15,12 +16,43 @@ public class ServerManager : MonoBehaviour
     public delegate void InternetConnection(bool isOn);
     public InternetConnection OnCheckInternetCheckComplete;
 
+    // URL to Post
+    readonly string postDiadrasisUrl = "http://diadrasis.net/"; //"http://diadrasis.net/test_form.php";
+    private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
+    public bool postUserData = true;
     #endregion
 
     #region UnityMethods
+    private void Start()
+    {
+        // CreateXMLFile();
+        // Debug.Log(cArea.GetXML().outerXml);
+    }
+
+    private void Update()
+    {
+        // Check if there is an internet connection
+        //if ()
+        {
+            // if postUserData is true, uploads the user's data to the server
+            // NOTE: The postUserData variable is set to true when opening the application, when the user saves a new area or when a path is added etc.
+            if (postUserData)
+            {
+                PostUserDataToDiadrasis();
+                postUserData = false;
+            }
+        }
+    }
     #endregion
 
     #region Methods
+    void CreateXMLFile() // For Testing
+    {
+        string path = Application.dataPath + "/testXMLFile.xml";
+        File.WriteAllText(path, cArea.GetXML().outerXml);
+        Debug.Log("Created/Updated file at path: " + path);
+    }
+
     public void GetTest()
     {
         Debug.Log("Pressed");
@@ -32,22 +64,23 @@ public class ServerManager : MonoBehaviour
     {
         string URL = getUrl + areaName ;
 
-        UnityWebRequest www = UnityWebRequest.Get(URL);
-        yield return www.SendWebRequest();
+        UnityWebRequest webRequest = UnityWebRequest.Get(URL);
+        yield return webRequest.SendWebRequest();
 
-        if (www.isNetworkError || www.isHttpError)
+        if (webRequest.isNetworkError || webRequest.isHttpError)
         {
-            Debug.Log(www.error);
+            Debug.Log(webRequest.error);
         }
         else
         {
             // Show results as text
-            Debug.Log(www.downloadHandler.text);
+            Debug.Log(webRequest.downloadHandler.text);
             //point.title = areaName;
             // Or retrieve results as binary data
-            byte[] results = www.downloadHandler.data;
+            byte[] results = webRequest.downloadHandler.data;
         }
     }
+
     public void PostTest()
     {
         StartCoroutine(PostText());
@@ -60,6 +93,7 @@ public class ServerManager : MonoBehaviour
         yield return www.SendWebRequest();
         AppManager.Instance.uIManager.infoText.text = www.downloadHandler.text;
     }
+
     /*public IEnumerator UploadFileData(string areaKey)
     {
         List<IMultipartFormSection> wwwForm = new List<IMultipartFormSection>();
@@ -159,12 +193,10 @@ public class ServerManager : MonoBehaviour
             //pathManager.ShowMessage(www.error, 3f);
         }
 
-
         yield break;
     }*/
 
     #region InternetConnection
-
     public void CheckInternet()
     {
         OnlineMaps.instance.CheckServerConnection(OnCheckConnectionComplete);
@@ -179,11 +211,40 @@ public class ServerManager : MonoBehaviour
         // Debug.Log(status ? "Has connection" : "No connection");
 
         if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
-        
-
     }
-
     #endregion
 
+    // ============= Andrew ============= //
+    private void PostUserDataToDiadrasis()
+    {
+        // Uploading data
+        StartCoroutine(PostXMLFileToDiadrasis());
+    }
+
+    IEnumerator PostXMLFileToDiadrasis()
+    {
+        // Create web form and add data to it
+        List<IMultipartFormSection> webForm = new List<IMultipartFormSection>();
+        webForm.Add(new MultipartFormFileSection(cArea.GetXML().outerXml, "areasData.xml")); // webForm.Add(new MultipartFormFileSection("my file data", "myfile.txt"));
+        // webForm.Add(new MultipartFormDataSection("area_no", "100"));
+        // webForm.Add(new MultipartFormDataSection("area_name", "Sarri"));
+
+        UnityWebRequest webRequest = UnityWebRequest.Post(postDiadrasisUrl, webForm);
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError || webRequest.isHttpError)
+        {
+            Debug.Log("Test failed. Error #" + webRequest.error);
+        }
+        else
+        {
+            Debug.Log("Posted successfully");
+        }
+
+        //yield return new WaitForSeconds(1);
+
+        //CreateXMLFile();
+    }
     #endregion
 }
