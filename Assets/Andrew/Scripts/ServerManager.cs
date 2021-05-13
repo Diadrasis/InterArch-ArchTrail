@@ -17,7 +17,7 @@ public class ServerManager : MonoBehaviour
     public InternetConnection OnCheckInternetCheckComplete;
 
     // URL to Post
-    readonly string postDiadrasisUrl = "http://diadrasis.net/"; //"http://diadrasis.net/test_form.php";
+    readonly string postDiadrasisUrl = "http://diadrasis.net/test_form.php"; //"http://diadrasis.net/test_form.php"; //"http://diadrasis.net/test_upload.php"
     private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
     public bool postUserData = true;
     #endregion
@@ -25,6 +25,7 @@ public class ServerManager : MonoBehaviour
     #region UnityMethods
     private void Start()
     {
+        Debug.Log(SystemInfo.deviceModel);
         // CreateXMLFile();
         // Debug.Log(cArea.GetXML().outerXml);
     }
@@ -224,10 +225,13 @@ public class ServerManager : MonoBehaviour
     IEnumerator PostXMLFileToDiadrasis()
     {
         // Create web form and add data to it
+        string xmlData = cArea.GetXML().outerXml;
         List<IMultipartFormSection> webForm = new List<IMultipartFormSection>();
-        webForm.Add(new MultipartFormFileSection(cArea.GetXML().outerXml, "areasData.xml")); // webForm.Add(new MultipartFormFileSection("my file data", "myfile.txt"));
-        // webForm.Add(new MultipartFormDataSection("area_no", "100"));
-        // webForm.Add(new MultipartFormDataSection("area_name", "Sarri"));
+        //webForm.Add(new MultipartFormFileSection(xmlData, "areasData.xml")); // webForm.Add(new MultipartFormFileSection("my file data", "myfile.txt"));
+        webForm.Add(new MultipartFormDataSection("area_no", "100"));
+        webForm.Add(new MultipartFormDataSection("area_name", "Sarri"));
+        webForm.Add(new MultipartFormDataSection("area_xml", xmlData)); // SystemInfo.deviceModel
+        //Debug.Log(xmlData);
 
         UnityWebRequest webRequest = UnityWebRequest.Post(postDiadrasisUrl, webForm);
 
@@ -239,7 +243,8 @@ public class ServerManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Posted successfully");
+            //webRequest.downloadHandler.text;
+            Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
         }
 
         //yield return new WaitForSeconds(1);
