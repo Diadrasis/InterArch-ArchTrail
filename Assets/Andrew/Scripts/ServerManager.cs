@@ -17,17 +17,25 @@ public class ServerManager : MonoBehaviour
     public InternetConnection OnCheckInternetCheckComplete;
 
     // URL to Post
-    readonly string postDiadrasisUrl = "http://diadrasis.net/test_form.php"; //"http://diadrasis.net/test_form.php"; //"http://diadrasis.net/test_upload.php"
+    readonly string postDiadrasisUrl = "http://diadrasis.net/test_upload.php"; //"http://diadrasis.net/test_form.php"; //"http://diadrasis.net/test_upload.php"
+    readonly string diadrasisAreaManagerUrl = "http://diadrasis.net/interarch_area_manager.php";
     private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
     public bool postUserData = true;
+
+    public enum PHPActions {Save, Get}
     #endregion
 
     #region UnityMethods
     private void Start()
     {
-        Debug.Log(SystemInfo.deviceModel);
+        cArea.Download();
+        //Debug.Log(Enum.GetName(typeof(PHPActions), 0));
+        //Debug.Log("dataPath : " + Application.dataPath + "/../sunflowerTest.jpg");
+        //Debug.Log(SystemInfo.deviceModel);
         // CreateXMLFile();
         // Debug.Log(cArea.GetXML().outerXml);
+        //Texture2D sunflowerTexture = Resources.Load("Sunflower", typeof(Texture2D)) as Texture2D;
+        //Debug.Log(sunflowerTexture.);
     }
 
     private void Update()
@@ -39,7 +47,7 @@ public class ServerManager : MonoBehaviour
             // NOTE: The postUserData variable is set to true when opening the application, when the user saves a new area or when a path is added etc.
             if (postUserData)
             {
-                PostUserDataToDiadrasis();
+                //PostUserDataToDiadrasis();
                 postUserData = false;
             }
         }
@@ -216,10 +224,82 @@ public class ServerManager : MonoBehaviour
     #endregion
 
     // ============= Andrew ============= //
+    public void UploadArea(cArea _areaToUpload)
+    {
+        // Create a form and add all the fields of the area
+        List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
+        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 0))); // Save
+        formToPost.Add(new MultipartFormDataSection("id", _areaToUpload.Id.ToString()));
+        formToPost.Add(new MultipartFormDataSection("title", _areaToUpload.title));
+        formToPost.Add(new MultipartFormDataSection("position", _areaToUpload.position.ToString("F6")));
+        formToPost.Add(new MultipartFormDataSection("zoom", _areaToUpload.zoom.ToString()));
+        formToPost.Add(new MultipartFormDataSection("areaConstraintsMin", _areaToUpload.areaConstraintsMin.ToString("F6")));
+        formToPost.Add(new MultipartFormDataSection("areaConstraintsMax", _areaToUpload.areaConstraintsMax.ToString("F6")));
+        formToPost.Add(new MultipartFormDataSection("viewConstraintsMin", _areaToUpload.viewConstraintsMin.ToString("F6")));
+        formToPost.Add(new MultipartFormDataSection("viewConstraintsMax", _areaToUpload.viewConstraintsMax.ToString("F6")));
+        
+        /*formToPost.Add(new MultipartFormDataSection("areaConstraintsMinX", _areaToUpload.areaConstraintsMin.x.ToString()));
+        formToPost.Add(new MultipartFormDataSection("areaConstraintsMinY", _areaToUpload.areaConstraintsMin.y.ToString()));
+        formToPost.Add(new MultipartFormDataSection("areaConstraintsMaxX", _areaToUpload.areaConstraintsMax.x.ToString()));
+        formToPost.Add(new MultipartFormDataSection("areaConstraintsMaxY", _areaToUpload.areaConstraintsMax.y.ToString()));
+        formToPost.Add(new MultipartFormDataSection("viewConstraintsMinX", _areaToUpload.viewConstraintsMin.x.ToString()));
+        formToPost.Add(new MultipartFormDataSection("viewConstraintsMinY", _areaToUpload.viewConstraintsMin.y.ToString()));
+        formToPost.Add(new MultipartFormDataSection("viewConstraintsMaxX", _areaToUpload.viewConstraintsMax.x.ToString()));
+        formToPost.Add(new MultipartFormDataSection("viewConstraintsMaxY", _areaToUpload.viewConstraintsMax.y.ToString()));*/
+
+        // Uploading data
+        StartCoroutine(PostToDiadrasisAreaManager(formToPost));
+    }
+
+    IEnumerator PostToDiadrasisAreaManager(List<IMultipartFormSection> _formToPost)
+    {
+        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, _formToPost);
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError || webRequest.isHttpError)
+        {
+            Debug.Log("Test failed. Error #" + webRequest.error);
+        }
+        else
+        {
+            Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
+            Debug.Log("Echo: " + webRequest.downloadHandler.text);
+        }
+    }
+
+    public void DownloadArea()
+    {
+        // Downloading data
+        StartCoroutine(GetAreaFromDiadrasisAreaManager());
+    }
+
+    IEnumerator GetAreaFromDiadrasisAreaManager()
+    {
+        WWWForm formToPost = new WWWForm();
+        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 1)); // Get
+
+        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
+        //UnityWebRequest webRequest = UnityWebRequest.Get(diadrasisAreaManagerUrl);
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError || webRequest.isHttpError)
+        {
+            Debug.Log("Test failed. Error #" + webRequest.error);
+        }
+        else
+        {
+            Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
+            Debug.Log("Echo: " + webRequest.downloadHandler.text);
+            Debug.Log("Data length: " + webRequest.downloadHandler.data);
+        }
+    }
+
     private void PostUserDataToDiadrasis()
     {
         // Uploading data
-        StartCoroutine(PostXMLFileToDiadrasis());
+        StartCoroutine(PostJPGFileToDiadrasis()); // PostXMLFileToDiadrasis()
     }
 
     IEnumerator PostXMLFileToDiadrasis()
@@ -231,6 +311,7 @@ public class ServerManager : MonoBehaviour
         webForm.Add(new MultipartFormDataSection("area_no", "100"));
         webForm.Add(new MultipartFormDataSection("area_name", "Sarri"));
         webForm.Add(new MultipartFormDataSection("area_xml", xmlData)); // SystemInfo.deviceModel
+        //webForm.Add
         //Debug.Log(xmlData);
 
         UnityWebRequest webRequest = UnityWebRequest.Post(postDiadrasisUrl, webForm);
@@ -251,5 +332,65 @@ public class ServerManager : MonoBehaviour
 
         //CreateXMLFile();
     }
+
+    IEnumerator PostJPGFileToDiadrasis()
+    {
+        // Get jpg from resources folder
+        Texture2D sunflowerTexture = Resources.Load("Sunflower", typeof(Texture2D)) as Texture2D;
+
+        // Encode texture to JPG
+        byte[] textureBytes = sunflowerTexture.EncodeToJPG();
+        Debug.Log("array length = " + textureBytes.Length);
+        WWWForm form = new WWWForm();
+        form.AddBinaryData("sunflower", textureBytes, "sunflower.jpg", "image/jpg");
+        // Create web form and add data to it
+        //List<IMultipartFormSection> webForm = new List<IMultipartFormSection>();
+        //webForm.Add(new MultipartFormFileSection("sunflower2.jpg", textureBytes)); // webForm.Add(new MultipartFormFileSection("my file data", "myfile.txt"));
+        //webForm.Add(new MultipartFormDataSection("area_no", "100"));
+        //webForm.Add(new MultipartFormDataSection("area_name", "Sarri"));
+        //webForm.Add(new MultipartFormDataSection("area_xml", xmlData)); // SystemInfo.deviceModel
+        //Debug.Log(xmlData);
+
+        // For testing purposes, also write to a file in the project folder
+        File.WriteAllBytes(Application.dataPath + "/../sunflowerTest.jpg", textureBytes);
+
+        UnityWebRequest webRequest = UnityWebRequest.Post(postDiadrasisUrl, form); //UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(path)
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError || webRequest.isHttpError)
+        {
+            Debug.Log("Test failed. Error #" + webRequest.error);
+        }
+        else
+        {
+            //webRequest.downloadHandler.text;
+            Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
+            Debug.Log("Echo: " + webRequest.downloadHandler.text);
+        }
+
+        //yield return new WaitForSeconds(1);
+
+        //CreateXMLFile();
+    }
+
+    /*IEnumerator GetText()
+    {
+        using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(path))
+        {
+            yield return uwr.SendWebRequest();
+
+            if (uwr.isNetworkError || uwr.isHttpError)
+            {
+                Debug.Log(uwr.error);
+            }
+            else
+            {
+                // Get downloaded asset bundle
+                t = DownloadHandlerTexture.GetContent(uwr);
+                skybox.SetTexture("_MainTex", t);
+            }
+        }
+    }*/
     #endregion
 }

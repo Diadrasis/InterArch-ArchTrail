@@ -259,7 +259,8 @@ public class MapManager : MonoBehaviour
             areas = cArea.LoadAreas();
 
             // Upload user data to server
-            AppManager.Instance.serverManager.postUserData = true;
+            cArea.Upload(areaToSave);
+            //AppManager.Instance.serverManager.postUserData = true;
         }
     }
 

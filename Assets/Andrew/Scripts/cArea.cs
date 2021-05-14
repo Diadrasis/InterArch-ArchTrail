@@ -233,6 +233,16 @@ public class cArea
         //Debug.Log(xml.outerXml);
         return loadedAreas;
     }
+
+    public static void Upload(cArea _areaToUpload)
+    {
+        AppManager.Instance.serverManager.UploadArea(_areaToUpload);
+    }
+
+    public static void Download()
+    {
+        AppManager.Instance.serverManager.DownloadArea();
+    }
     #endregion
 }
 
