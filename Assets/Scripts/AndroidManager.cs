@@ -127,7 +127,7 @@ public class AndroidManager : MonoBehaviour
         else
         {
             AppManager.Instance.serverManager.CheckInternet();
-            Debug.LogWarning("OnApplicationFocus = true");
+            //Debug.LogWarning("OnApplicationFocus = true");
             if (CheckForLocationServices()) { return; }
         }
     }

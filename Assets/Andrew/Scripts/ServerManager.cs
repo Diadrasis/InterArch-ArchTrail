@@ -22,13 +22,15 @@ public class ServerManager : MonoBehaviour
     private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
     public bool postUserData = true;
 
-    public enum PHPActions {Save, Get}
+    public enum PHPActions {Save, Get, Delete, Edit}
+    private cArea downloadedArea;
     #endregion
 
     #region UnityMethods
     private void Start()
     {
-        cArea.Download();
+        //cArea.DeleteAreaFromServer(15);
+        //cArea.DownloadAreas();
         //Debug.Log(Enum.GetName(typeof(PHPActions), 0));
         //Debug.Log("dataPath : " + Application.dataPath + "/../sunflowerTest.jpg");
         //Debug.Log(SystemInfo.deviceModel);
@@ -268,19 +270,93 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    public void DownloadArea()
+    public void DownloadAreas()
     {
         // Downloading data
-        StartCoroutine(GetAreaFromDiadrasisAreaManager());
+        StartCoroutine(GetAreas());
     }
 
-    IEnumerator GetAreaFromDiadrasisAreaManager()
+    IEnumerator GetAreas()
     {
         WWWForm formToPost = new WWWForm();
         formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 1)); // Get
 
         UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
-        //UnityWebRequest webRequest = UnityWebRequest.Get(diadrasisAreaManagerUrl);
+
+        yield return webRequest.SendWebRequest();
+        
+        if (webRequest.isNetworkError || webRequest.isHttpError)
+        {
+            Debug.Log("Test failed. Error #" + webRequest.error);
+        }
+        else
+        {
+            //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
+            //Debug.Log("Echo: " + webRequest.downloadHandler.text);
+            //Debug.Log("Data length: " + webRequest.downloadHandler.data);
+
+            // Get Area byte[] data
+            byte[] areasData = webRequest.downloadHandler.data;
+
+            if (areasData != null)
+            {
+                // Create a Json string from byte[]
+                string json = System.Text.Encoding.UTF8.GetString(areasData);
+                Debug.Log("Json string = " + json);
+
+                // Create a cAreasData from json string
+                cAreaData[] areasDataFromJSON = MethodHelper.FromJson<cAreaData>(MethodHelper.SetupJson(json));
+
+                if (areasDataFromJSON != null)
+                {
+                    foreach (cAreaData areaData in areasDataFromJSON)
+                    {
+                        // Create an area from json string
+                        cArea areaToSave = new cArea(
+                            //areaData.area_id
+                            areaData.id,
+                            areaData.title,
+                            MethodHelper.ToVector2(areaData.position),
+                            areaData.zoom,
+                            MethodHelper.ToVector2(areaData.areaConstraintsMin),
+                            MethodHelper.ToVector2(areaData.areaConstraintsMax),
+                            MethodHelper.ToVector2(areaData.viewConstraintsMin),
+                            MethodHelper.ToVector2(areaData.viewConstraintsMax));
+
+                        areaToSave.area_id = areaData.area_id; // TODO: Remove and add it to Constructor
+
+                        // Debug
+                        //Debug.Log("areaDataFromJSON area_id = " + areasDataFromJSON[0].area_id);
+                        Debug.Log("downloadedArea id = " + areaToSave.Id);
+                        Debug.Log("downloadedArea title = " + areaToSave.title);
+                        Debug.Log("downloadedArea position = " + areaToSave.position);
+                        Debug.Log("downloadedArea zoom = " + areaToSave.zoom);
+                        Debug.Log("downloadedArea areaConstraintsMin = " + areaToSave.areaConstraintsMin);
+                        Debug.Log("downloadedArea areaConstraintsMax = " + areaToSave.areaConstraintsMax);
+                        Debug.Log("downloadedArea viewConstraintsMin = " + areaToSave.viewConstraintsMin);
+                        Debug.Log("downloadedArea viewConstraintsMax = " + areaToSave.viewConstraintsMax);
+
+                        // Save to Player Prefs
+                        cArea.Save(areaToSave);
+                    }
+                }
+            }
+        }
+    }
+
+    public void DeleteAreaFromServer(int _areaIdToDelete)
+    {
+        // Downloading data
+        StartCoroutine(DeleteArea(_areaIdToDelete));
+    }
+
+    IEnumerator DeleteArea(int _areaIdToDelete)
+    {
+        WWWForm formToPost = new WWWForm();
+        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 2)); // Delete
+        formToPost.AddField("area_id", _areaIdToDelete);
+
+        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
 
         yield return webRequest.SendWebRequest();
 

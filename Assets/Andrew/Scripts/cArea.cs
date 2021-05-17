@@ -7,6 +7,7 @@ using UnityEngine;
 public class cArea
 {
     #region Variables
+    public int area_id;
     public int Id { get; private set; }
     public string title;
     public Vector2 position; // longitude, latitude (x, y)
@@ -239,12 +240,34 @@ public class cArea
         AppManager.Instance.serverManager.UploadArea(_areaToUpload);
     }
 
-    public static void Download()
+    public static void DownloadAreas()
     {
-        AppManager.Instance.serverManager.DownloadArea();
+        AppManager.Instance.serverManager.DownloadAreas();
+    }
+
+    public static void DeleteAreaFromServer(int _areaIdToDelete)
+    {
+        AppManager.Instance.serverManager.DeleteAreaFromServer(_areaIdToDelete);
     }
     #endregion
 }
+
+[Serializable]
+public class cAreaData
+{
+    public int area_id;
+    public int id;
+    public string title;
+    public string position; // longitude, latitude (x, y)
+    public int zoom;
+    public string areaConstraintsMin; // minLongitude, minLatitude (x, y)
+    public string areaConstraintsMax; // maxLongitude, maxLatitude (x, y)
+    public string viewConstraintsMin; // minLongitude, minLatitude (x, y)
+    public string viewConstraintsMax; // maxLongitude, maxLatitude (x, y)
+}
+
+
+
 
 /*
  * private static readonly string AREA_KEY = "area_";
