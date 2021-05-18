@@ -20,15 +20,15 @@ public class ServerManager : MonoBehaviour
     readonly string postDiadrasisUrl = "http://diadrasis.net/test_upload.php"; //"http://diadrasis.net/test_form.php"; //"http://diadrasis.net/test_upload.php"
     readonly string diadrasisAreaManagerUrl = "http://diadrasis.net/interarch_area_manager.php";
     private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
-    public bool postUserData = true;
+    public bool postUserData = false; // true;
 
     public enum PHPActions {Save, Get, Delete, Edit}
-    private cArea downloadedArea;
     #endregion
 
     #region UnityMethods
     private void Start()
     {
+        postUserData = false;
         //cArea.DeleteAreaFromServer(15);
         //cArea.DownloadAreas();
         //Debug.Log(Enum.GetName(typeof(PHPActions), 0));
@@ -49,7 +49,7 @@ public class ServerManager : MonoBehaviour
             // NOTE: The postUserData variable is set to true when opening the application, when the user saves a new area or when a path is added etc.
             if (postUserData)
             {
-                //PostUserDataToDiadrasis();
+                PostUserDataToDiadrasis();
                 postUserData = false;
             }
         }
@@ -231,6 +231,8 @@ public class ServerManager : MonoBehaviour
         // Create a form and add all the fields of the area
         List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
         formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 0))); // Save
+
+        formToPost.Add(new MultipartFormDataSection("databaseId", _areaToUpload.databaseId.ToString()));
         formToPost.Add(new MultipartFormDataSection("id", _areaToUpload.Id.ToString()));
         formToPost.Add(new MultipartFormDataSection("title", _areaToUpload.title));
         formToPost.Add(new MultipartFormDataSection("position", _areaToUpload.position.ToString("F6")));
@@ -239,18 +241,52 @@ public class ServerManager : MonoBehaviour
         formToPost.Add(new MultipartFormDataSection("areaConstraintsMax", _areaToUpload.areaConstraintsMax.ToString("F6")));
         formToPost.Add(new MultipartFormDataSection("viewConstraintsMin", _areaToUpload.viewConstraintsMin.ToString("F6")));
         formToPost.Add(new MultipartFormDataSection("viewConstraintsMax", _areaToUpload.viewConstraintsMax.ToString("F6")));
-        
-        /*formToPost.Add(new MultipartFormDataSection("areaConstraintsMinX", _areaToUpload.areaConstraintsMin.x.ToString()));
-        formToPost.Add(new MultipartFormDataSection("areaConstraintsMinY", _areaToUpload.areaConstraintsMin.y.ToString()));
-        formToPost.Add(new MultipartFormDataSection("areaConstraintsMaxX", _areaToUpload.areaConstraintsMax.x.ToString()));
-        formToPost.Add(new MultipartFormDataSection("areaConstraintsMaxY", _areaToUpload.areaConstraintsMax.y.ToString()));
-        formToPost.Add(new MultipartFormDataSection("viewConstraintsMinX", _areaToUpload.viewConstraintsMin.x.ToString()));
-        formToPost.Add(new MultipartFormDataSection("viewConstraintsMinY", _areaToUpload.viewConstraintsMin.y.ToString()));
-        formToPost.Add(new MultipartFormDataSection("viewConstraintsMaxX", _areaToUpload.viewConstraintsMax.x.ToString()));
-        formToPost.Add(new MultipartFormDataSection("viewConstraintsMaxY", _areaToUpload.viewConstraintsMax.y.ToString()));*/
 
         // Uploading data
         StartCoroutine(PostToDiadrasisAreaManager(formToPost));
+    }
+
+    public void UploadPath(cPath _pathToUpload)
+    {
+        // Create a form and add all the fields of the area
+        List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
+        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 0))); // Save
+        // TODO: add database id
+        formToPost.Add(new MultipartFormDataSection("areaId", _pathToUpload.areaId.ToString()));
+        formToPost.Add(new MultipartFormDataSection("id", _pathToUpload.Id.ToString()));
+        formToPost.Add(new MultipartFormDataSection("title", _pathToUpload.title));
+        formToPost.Add(new MultipartFormDataSection("date", _pathToUpload.date.ToShortDateString()));
+
+        // Uploading data
+        StartCoroutine(PostToDiadrasisAreaManager(formToPost));
+    }
+
+    private void PostUserDataToDiadrasis()
+    {
+        // Debug
+        Debug.Log("Started posting user data!");
+
+        // Get areas to upload
+        List<cArea> areasToUpload = cArea.GetAreasToUpload();
+
+        if (areasToUpload != null)
+        {
+            foreach (cArea areaToUpload in areasToUpload)
+            {
+                UploadArea(areaToUpload);
+            }
+        }
+
+        // Get paths to upload
+        /*List<cPath> pathsToUpload = cPath.GetPathsToUpload();
+
+        if (pathsToUpload != null)
+        {
+            foreach (cPath pathToUpload in pathsToUpload)
+            {
+                UploadPath(pathToUpload);
+            }
+        }*/
     }
 
     IEnumerator PostToDiadrasisAreaManager(List<IMultipartFormSection> _formToPost)
@@ -267,6 +303,14 @@ public class ServerManager : MonoBehaviour
         {
             Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
             Debug.Log("Echo: " + webRequest.downloadHandler.text);
+
+            // Get area id and remove it from the areas to be uploaded
+            string echo = webRequest.downloadHandler.text;
+            string cleanString = echo.Substring(echo.LastIndexOf('=') + 1);
+            cleanString = cleanString.Replace(" ", "");
+            Debug.Log("id = " + cleanString);
+            if (int.TryParse(cleanString, out int result))
+                cArea.RemoveIdToUpload(result);
         }
     }
 
@@ -302,7 +346,7 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(areasData);
-                Debug.Log("Json string = " + json);
+                //Debug.Log("Json string = " + json);
 
                 // Create a cAreasData from json string
                 cAreaData[] areasDataFromJSON = MethodHelper.FromJson<cAreaData>(MethodHelper.SetupJson(json));
@@ -311,9 +355,9 @@ public class ServerManager : MonoBehaviour
                 {
                     foreach (cAreaData areaData in areasDataFromJSON)
                     {
-                        // Create an area from json string
+                        // Create an area from areaData
                         cArea areaToSave = new cArea(
-                            //areaData.area_id
+                            areaData.databaseId,
                             areaData.id,
                             areaData.title,
                             MethodHelper.ToVector2(areaData.position),
@@ -323,10 +367,8 @@ public class ServerManager : MonoBehaviour
                             MethodHelper.ToVector2(areaData.viewConstraintsMin),
                             MethodHelper.ToVector2(areaData.viewConstraintsMax));
 
-                        areaToSave.area_id = areaData.area_id; // TODO: Remove and add it to Constructor
-
                         // Debug
-                        //Debug.Log("areaDataFromJSON area_id = " + areasDataFromJSON[0].area_id);
+                        Debug.Log("downloadedArea databaseId = " + areaToSave.databaseId);
                         Debug.Log("downloadedArea id = " + areaToSave.Id);
                         Debug.Log("downloadedArea title = " + areaToSave.title);
                         Debug.Log("downloadedArea position = " + areaToSave.position);
@@ -370,12 +412,6 @@ public class ServerManager : MonoBehaviour
             Debug.Log("Echo: " + webRequest.downloadHandler.text);
             Debug.Log("Data length: " + webRequest.downloadHandler.data);
         }
-    }
-
-    private void PostUserDataToDiadrasis()
-    {
-        // Uploading data
-        StartCoroutine(PostJPGFileToDiadrasis()); // PostXMLFileToDiadrasis()
     }
 
     IEnumerator PostXMLFileToDiadrasis()

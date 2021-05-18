@@ -6,6 +6,7 @@ using UnityEngine;
 public class cPath
 {
     #region Variables
+    public int databaseId;
     public int areaId;
     public int Id { get; private set; }
     public string title;

@@ -51,7 +51,7 @@ public class MapManager : MonoBehaviour
     private OnlineMapsDrawingPoly polygon;
     private static readonly int DEFAULT_MARKER_SCALE = 2;
 
-    
+    private int areaCounter = 0;
     #endregion
 
     #region Unity Functions
@@ -59,6 +59,7 @@ public class MapManager : MonoBehaviour
     {
         //List<cArea> areasToTestSave = GetTestAreas();
         //cArea.SaveAreas(areasToTestSave);
+
         areas = new List<cArea>();
         areas = cArea.LoadAreas();
 
@@ -125,9 +126,9 @@ public class MapManager : MonoBehaviour
     {
         List<cArea> areasFromDatabase = new List<cArea>()
         {
-            new cArea(0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f), new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f)),
-            new cArea(1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f), new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f)),
-            new cArea(2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f), 19, new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f), new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f))
+            new cArea(-1, 0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f), new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f)),
+            new cArea(-1, 1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f), new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f)),
+            new cArea(-1, 2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f), 19, new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f), new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f))
         };
 
         //DisplayAreaDebug(areasFromDatabase[0]);
@@ -255,20 +256,31 @@ public class MapManager : MonoBehaviour
 
         //if (areas != null && !areas.Contains(_areaToSave))
         {
+            // Save area locally and reload areas
             cArea.Save(areaToSave);
+            cArea.AddIdToUpload(areaToSave.Id);
             areas = cArea.LoadAreas();
 
             // Upload user data to server
-            cArea.Upload(areaToSave);
-            //AppManager.Instance.serverManager.postUserData = true;
+            /*if (areaCounter >= 3) // TODO: For testing only. Remove.
+            {*/
+                AppManager.Instance.serverManager.postUserData = true;
+                /*areaCounter = 0;
+            }
+            else
+                areaCounter += 1;*/
         }
     }
 
     public void DeleteArea(int _selectAreaObjectIndex)
     {
+        // Delete area locally and reload areas
         cArea areaSelected = areas[_selectAreaObjectIndex];
         cArea.Delete(areaSelected.Id);
         areas = cArea.LoadAreas();
+
+        // Delete Area from server
+        cArea.DeleteAreaFromServer(areaSelected.databaseId);
     }
 
     public void DeletePath(int _selectPathObjectIndex)
@@ -547,7 +559,7 @@ public class MapManager : MonoBehaviour
         currentPath = null;
 
         // Upload user data to server
-        AppManager.Instance.serverManager.postUserData = true;
+        //AppManager.Instance.serverManager.postUserData = true;
     }
 
     public void DisplayPath(cPath _pathToDisplay)

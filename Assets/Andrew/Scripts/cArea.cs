@@ -7,7 +7,7 @@ using UnityEngine;
 public class cArea
 {
     #region Variables
-    public int area_id;
+    public int databaseId;
     public int Id { get; private set; }
     public string title;
     public Vector2 position; // longitude, latitude (x, y)
@@ -20,9 +20,11 @@ public class cArea
     public List<cPath> paths = new List<cPath>();
 
     public static readonly string PREFS_KEY = "areas";
+    public static readonly string UPLOAD_PREFS_KEY = "areasToUpload";
     public static readonly string AREAS = "areas";
 
     public static readonly string AREA = "area";
+    public static readonly string DATABASE_ID = "databaseId";
     public static readonly string ID = "id";
     public static readonly string TITLE = "title";
     public static readonly string POSITION = "position";
@@ -35,8 +37,10 @@ public class cArea
     #endregion
 
     #region Methods
-    public cArea(int _id, string _title, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax) // TODO: Make private when testing is finished
+    // Constructor for Loading from Player Prefs / Server
+    public cArea(int _databaseId, int _id, string _title, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax) // TODO: Make private when testing is finished
     {
+        databaseId = _databaseId;
         Id = _id;
         title = _title;
         position = _position;
@@ -49,6 +53,7 @@ public class cArea
 
     public cArea(string _title, Vector2 _position, int _zoom, Vector2 _constraintsMin, Vector2 _constraintsMax)
     {
+        databaseId = -1;
         Id = GetAvailableAreaID();
         title = _title;
         position = _position;
@@ -58,8 +63,10 @@ public class cArea
         areaConstraintsMax = _constraintsMax;
     }
 
-    public cArea(string _title, Vector2 _centerPosition, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax) // for creating a new area
+    // Constructor for creating a new area locally
+    public cArea(string _title, Vector2 _centerPosition, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax) 
     {
+        databaseId = -1;
         Id = GetAvailableAreaID();
         title = _title;
         position = _centerPosition; //OnlineMaps.instance.position;
@@ -70,16 +77,6 @@ public class cArea
         viewConstraintsMin = new Vector2((float)OnlineMaps.instance.bounds.left, (float)OnlineMaps.instance.bounds.bottom);
         viewConstraintsMax = new Vector2((float)OnlineMaps.instance.bounds.right, (float)OnlineMaps.instance.bounds.top);
     }
-
-    /*void Create()
-    {
-
-    }
-
-    void Show()
-    {
-
-    }*/
 
     private static int GetAvailableAreaID()
     {
@@ -142,6 +139,80 @@ public class cArea
         PlayerPrefs.Save();
     }
 
+    public static void RemoveIdToUpload(int _idToRemove)
+    {
+        // Load previously saved ids array
+        int[] loadedIds = PlayerPrefsX.GetIntArray(UPLOAD_PREFS_KEY);
+        Debug.Log("loadedIds length = " + loadedIds.Length);
+        // Create a new int array based on the loaded ids array
+        int[] idsToUpload = new int[loadedIds.Length - 1];
+
+        // Insert all loaded ids to the new ids array except the _idToRemove
+        int i = 0;
+        foreach (int id in loadedIds)
+        {
+            if (id == _idToRemove)
+                continue;
+
+            idsToUpload[i] = id;
+            i++;
+        }
+
+        // Save new ids array
+        PlayerPrefsX.SetIntArray(UPLOAD_PREFS_KEY, idsToUpload);
+    }
+
+    public static void AddIdToUpload(int _idToUpload)
+    {
+        // Load previously saved ids array
+        int[] loadedIds = PlayerPrefsX.GetIntArray(UPLOAD_PREFS_KEY);
+        Debug.Log("loadedIds length = " + loadedIds.Length);
+        // Create a new int array based on the loaded ids array
+        int[] idsToUpload = new int[loadedIds.Length + 1];
+
+        // Insert all loaded ids to the new ids array
+        for (int i = 0; i < loadedIds.Length; i++)
+        {
+            idsToUpload[i] = loadedIds[i];
+        }
+
+        // Insert the new id
+        idsToUpload[idsToUpload.Length - 1] = _idToUpload;
+
+        // Save new ids array
+        PlayerPrefsX.SetIntArray(UPLOAD_PREFS_KEY, idsToUpload);
+    }
+
+    public static List<cArea> GetAreasToUpload()
+    {
+        // List of areas
+        List<cArea> areasToUpload = new List<cArea>();
+
+        // Load previously saved ids array
+        int[] idsToUpload = PlayerPrefsX.GetIntArray(UPLOAD_PREFS_KEY);
+
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = GetXML();
+
+        foreach (int id in idsToUpload)
+        {
+            // Load Area
+            OnlineMapsXML areaNode = xml.Find("/" + AREAS + "/" + AREA + "[" + ID + "=" + id + "]");
+            if (areaNode.isNull)
+            {
+                Debug.Log("Area with id: " + id + " has been deleted!");
+                continue;
+            }
+
+            cArea loadedArea = Load(areaNode);
+
+            if (loadedArea != null)
+                areasToUpload.Add(loadedArea);
+        }
+
+        return areasToUpload;
+    }
+
     public static OnlineMapsXML GetXML()
     {
         // Load xml string from PlayerPrefs
@@ -160,11 +231,20 @@ public class cArea
 
     public static void Save(cArea _areaToSave)
     {
-        // Load xml document, if null create new
+        // Load xml document, if null creates new
         OnlineMapsXML xml = GetXML();
 
-        // Create a new path
+        // Check if area is already saved
+        OnlineMapsXML areaSaved = xml.Find("/" + AREAS + "/" + AREA + "[" + ID + "=" + _areaToSave.Id + "]");
+        if (!areaSaved.isNull)
+        {
+            Debug.Log("Area is already saved!");
+            return;
+        }
+
+        // Create a new area node
         OnlineMapsXML areaNode = xml.Create(AREA);
+        areaNode.Create(DATABASE_ID, _areaToSave.databaseId);
         areaNode.Create(ID, _areaToSave.Id);
         areaNode.Create(TITLE, _areaToSave.title);
         areaNode.Create(POSITION, _areaToSave.position);
@@ -197,6 +277,7 @@ public class cArea
 
     private static cArea Load(OnlineMapsXML _areaNode)
     {
+        int databaseId = _areaNode.Get<int>(DATABASE_ID);
         int id = _areaNode.Get<int>(ID);
         string title = _areaNode.Get<string>(TITLE);
         Vector2 position = _areaNode.Get<Vector2>(POSITION);
@@ -207,7 +288,7 @@ public class cArea
         Vector2 viewConstraints_max = _areaNode.Get<Vector2>(VIEW_CONSTRAINTS_MAX);
 
         // Create cArea and add it to loadedAreas list
-        cArea loadedArea = new cArea(id, title, position, zoom, areaConstraints_min, areaConstraints_max, viewConstraints_min, viewConstraints_max);
+        cArea loadedArea = new cArea(databaseId, id, title, position, zoom, areaConstraints_min, areaConstraints_max, viewConstraints_min, viewConstraints_max);
         return loadedArea;
     }
 
@@ -255,7 +336,7 @@ public class cArea
 [Serializable]
 public class cAreaData
 {
-    public int area_id;
+    public int databaseId;
     public int id;
     public string title;
     public string position; // longitude, latitude (x, y)

@@ -364,13 +364,17 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlSaveArea, false);
     }
 
-    private void SaveArea() // MUST BE UPDATED
+    private void SaveArea()
     {
         string newAreaTitle = inptFldCreateArea.text;
-        AppManager.Instance.mapManager.SaveArea(newAreaTitle);
 
-        pnlSaveArea.SetActive(false);
-        pnlCreateArea.SetActive(false);
+        if (!string.IsNullOrEmpty(newAreaTitle))
+        {
+            AppManager.Instance.mapManager.SaveArea(newAreaTitle);
+
+            pnlSaveArea.SetActive(false);
+            pnlCreateArea.SetActive(false);
+        }
     }
 
     public void EnableSaveAreaScreen()
