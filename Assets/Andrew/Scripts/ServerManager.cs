@@ -19,17 +19,24 @@ public class ServerManager : MonoBehaviour
     // URL to Post
     readonly string postDiadrasisUrl = "http://diadrasis.net/test_upload.php"; //"http://diadrasis.net/test_form.php"; //"http://diadrasis.net/test_upload.php"
     readonly string diadrasisAreaManagerUrl = "http://diadrasis.net/interarch_area_manager.php";
+    //readonly string diadrasisPathManagerUrl = "http://diadrasis.net/interarch_path_manager.php";
     private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
     public bool postUserData = false; // true;
 
-    public enum PHPActions {Save, Get, Delete, Edit}
+    public enum PHPActions {Save, Get, Delete, Edit } // TODO: SaveArea, GetArea, DeleteArea, EditArea, SavePath, GetPath, DeletePath, EditPath
     #endregion
 
     #region UnityMethods
     private void Start()
     {
         postUserData = false;
-        //cArea.DeleteAreaFromServer(15);
+
+        for (int i = 0; i < 100; i++)
+        {
+            cArea.DeleteAreaFromServer(i);
+        }
+
+        //cArea.DeleteAreaFromServer(90);
         //cArea.DownloadAreas();
         //Debug.Log(Enum.GetName(typeof(PHPActions), 0));
         //Debug.Log("dataPath : " + Application.dataPath + "/../sunflowerTest.jpg");
@@ -232,8 +239,8 @@ public class ServerManager : MonoBehaviour
         List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
         formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 0))); // Save
 
-        formToPost.Add(new MultipartFormDataSection("databaseId", _areaToUpload.databaseId.ToString()));
-        formToPost.Add(new MultipartFormDataSection("id", _areaToUpload.Id.ToString()));
+        //formToPost.Add(new MultipartFormDataSection("server_area_id", _areaToUpload.server_area_id.ToString()));
+        //formToPost.Add(new MultipartFormDataSection("local_area_id", _areaToUpload.local_area_id.ToString()));
         formToPost.Add(new MultipartFormDataSection("title", _areaToUpload.title));
         formToPost.Add(new MultipartFormDataSection("position", _areaToUpload.position.ToString("F6")));
         formToPost.Add(new MultipartFormDataSection("zoom", _areaToUpload.zoom.ToString()));
@@ -243,22 +250,22 @@ public class ServerManager : MonoBehaviour
         formToPost.Add(new MultipartFormDataSection("viewConstraintsMax", _areaToUpload.viewConstraintsMax.ToString("F6")));
 
         // Uploading data
-        StartCoroutine(PostToDiadrasisAreaManager(formToPost));
+        StartCoroutine(PostAreaToDiadrasis(formToPost, _areaToUpload.local_area_id));
     }
 
     public void UploadPath(cPath _pathToUpload)
     {
         // Create a form and add all the fields of the area
         List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
-        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 0))); // Save
-        // TODO: add database id
-        formToPost.Add(new MultipartFormDataSection("areaId", _pathToUpload.areaId.ToString()));
-        formToPost.Add(new MultipartFormDataSection("id", _pathToUpload.Id.ToString()));
+        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 0))); // TODO: Change number to correspond to PHPAction
+        //formToPost.Add(new MultipartFormDataSection("server_path_id", _pathToUpload.databaseId.ToString()));
+        formToPost.Add(new MultipartFormDataSection("local_area_id", _pathToUpload.local_area_id.ToString()));
+        formToPost.Add(new MultipartFormDataSection("local_path_id", _pathToUpload.local_path_id.ToString()));
         formToPost.Add(new MultipartFormDataSection("title", _pathToUpload.title));
         formToPost.Add(new MultipartFormDataSection("date", _pathToUpload.date.ToShortDateString()));
 
         // Uploading data
-        StartCoroutine(PostToDiadrasisAreaManager(formToPost));
+        StartCoroutine(PostPathToDiadrasis(formToPost, _pathToUpload.local_path_id));
     }
 
     private void PostUserDataToDiadrasis()
@@ -289,7 +296,7 @@ public class ServerManager : MonoBehaviour
         }*/
     }
 
-    IEnumerator PostToDiadrasisAreaManager(List<IMultipartFormSection> _formToPost)
+    IEnumerator PostAreaToDiadrasis(List<IMultipartFormSection> _formToPost, int _local_area_id)
     {
         UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, _formToPost);
 
@@ -301,16 +308,52 @@ public class ServerManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
+            //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
             Debug.Log("Echo: " + webRequest.downloadHandler.text);
 
-            // Get area id and remove it from the areas to be uploaded
+            // Get database id and set it
             string echo = webRequest.downloadHandler.text;
+            string server_area_idString = echo.Replace("[{\"max(server_area_id)\":\"", "").Replace("\"}]", "");
+            // Debug.Log("_" + server_area_idString + "_");
+            // Debug.Log("length = " + server_area_idString.Length);
+            if (int.TryParse(server_area_idString, out int server_area_id))
+            {
+                //Debug.Log("server_area_id = " + server_area_id);
+                cArea.SetServerAreaId(_local_area_id, server_area_id);
+            }
+                
+            /*string echo = webRequest.downloadHandler.text;
             string cleanString = echo.Substring(echo.LastIndexOf('=') + 1);
-            cleanString = cleanString.Replace(" ", "");
-            Debug.Log("id = " + cleanString);
-            if (int.TryParse(cleanString, out int result))
-                cArea.RemoveIdToUpload(result);
+            string databaseIdString = cleanString.Replace(" ", "");
+            Debug.Log("databaseId = " + databaseIdString);
+            if (int.TryParse(databaseIdString, out int databaseId))
+                cArea.SetDatabaseId(_areaId, databaseId);*/
+            //cArea.RemoveIdToUpload(result);
+        }
+    }
+
+    // FOR TEST
+    IEnumerator PostPathToDiadrasis(List<IMultipartFormSection> _formToPost, int _local_path_id)
+    {
+        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, _formToPost);
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError || webRequest.isHttpError)
+        {
+            Debug.Log("Test failed. Error #" + webRequest.error);
+        }
+        else
+        {
+            Debug.Log("Echo: " + webRequest.downloadHandler.text);
+
+            // Get database id and set it
+            string echo = webRequest.downloadHandler.text;
+            string server_path_idString = echo.Replace("[{\"max(server_path_id)\":\"", "").Replace("\"}]", "");
+            //string server_path_idString = cleanString.Replace(" ", "");
+            //Debug.Log("databaseId = " + server_path_idString);
+            if (int.TryParse(server_path_idString, out int server_path_id))
+                cPath.SetServerPathId(_local_path_id, server_path_id);
         }
     }
 
@@ -357,8 +400,8 @@ public class ServerManager : MonoBehaviour
                     {
                         // Create an area from areaData
                         cArea areaToSave = new cArea(
-                            areaData.databaseId,
-                            areaData.id,
+                            areaData.server_area_id,
+                            areaData.local_area_id,
                             areaData.title,
                             MethodHelper.ToVector2(areaData.position),
                             areaData.zoom,
@@ -368,8 +411,8 @@ public class ServerManager : MonoBehaviour
                             MethodHelper.ToVector2(areaData.viewConstraintsMax));
 
                         // Debug
-                        Debug.Log("downloadedArea databaseId = " + areaToSave.databaseId);
-                        Debug.Log("downloadedArea id = " + areaToSave.Id);
+                        Debug.Log("downloadedArea databaseId = " + areaToSave.server_area_id);
+                        Debug.Log("downloadedArea id = " + areaToSave.local_area_id);
                         Debug.Log("downloadedArea title = " + areaToSave.title);
                         Debug.Log("downloadedArea position = " + areaToSave.position);
                         Debug.Log("downloadedArea zoom = " + areaToSave.zoom);
@@ -386,17 +429,17 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    public void DeleteAreaFromServer(int _areaIdToDelete)
+    public void DeleteAreaFromServer(int _server_area_idToDelete)
     {
         // Downloading data
-        StartCoroutine(DeleteArea(_areaIdToDelete));
+        StartCoroutine(DeleteArea(_server_area_idToDelete));
     }
 
-    IEnumerator DeleteArea(int _areaIdToDelete)
+    IEnumerator DeleteArea(int _server_area_idToDelete)
     {
         WWWForm formToPost = new WWWForm();
         formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 2)); // Delete
-        formToPost.AddField("area_id", _areaIdToDelete);
+        formToPost.AddField("server_area_id", _server_area_idToDelete);
 
         UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
 
@@ -410,7 +453,7 @@ public class ServerManager : MonoBehaviour
         {
             Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
             Debug.Log("Echo: " + webRequest.downloadHandler.text);
-            Debug.Log("Data length: " + webRequest.downloadHandler.data);
+            //Debug.Log("Data length: " + webRequest.downloadHandler.data);
         }
     }
 

@@ -7,8 +7,8 @@ using UnityEngine;
 public class cArea
 {
     #region Variables
-    public int databaseId;
-    public int Id { get; private set; }
+    public int server_area_id;
+    public int local_area_id { get; private set; }
     public string title;
     public Vector2 position; // longitude, latitude (x, y)
     public int zoom;
@@ -20,12 +20,12 @@ public class cArea
     public List<cPath> paths = new List<cPath>();
 
     public static readonly string PREFS_KEY = "areas";
-    public static readonly string UPLOAD_PREFS_KEY = "areasToUpload";
+    //public static readonly string UPLOAD_PREFS_KEY = "areasToUpload";
     public static readonly string AREAS = "areas";
 
     public static readonly string AREA = "area";
-    public static readonly string DATABASE_ID = "databaseId";
-    public static readonly string ID = "id";
+    public static readonly string SERVER_AREA_ID = "server_area_id";
+    public static readonly string LOCAL_AREA_ID = "local_area_id";
     public static readonly string TITLE = "title";
     public static readonly string POSITION = "position";
     public static readonly string ZOOM = "zoom";
@@ -38,10 +38,10 @@ public class cArea
 
     #region Methods
     // Constructor for Loading from Player Prefs / Server
-    public cArea(int _databaseId, int _id, string _title, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax) // TODO: Make private when testing is finished
+    public cArea(int _server_area_id, int _local_area_id, string _title, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax) // TODO: Make private when testing is finished
     {
-        databaseId = _databaseId;
-        Id = _id;
+        server_area_id = _server_area_id;
+        local_area_id = _local_area_id;
         title = _title;
         position = _position;
         zoom = _zoom;
@@ -51,23 +51,23 @@ public class cArea
         viewConstraintsMax = _viewConstraintsMax;
     }
 
-    public cArea(string _title, Vector2 _position, int _zoom, Vector2 _constraintsMin, Vector2 _constraintsMax)
+    /*public cArea(string _title, Vector2 _position, int _zoom, Vector2 _constraintsMin, Vector2 _constraintsMax)
     {
-        databaseId = -1;
-        Id = GetAvailableAreaID();
+        server_area_id = -1;
+        local_area_id = GetAvailableAreaID();
         title = _title;
         position = _position;
         zoom = _zoom;
         //constraints = _constraints;
         areaConstraintsMin = _constraintsMin;
         areaConstraintsMax = _constraintsMax;
-    }
+    }*/
 
     // Constructor for creating a new area locally
     public cArea(string _title, Vector2 _centerPosition, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax) 
     {
-        databaseId = -1;
-        Id = GetAvailableAreaID();
+        server_area_id = -1;
+        local_area_id = GetAvailableAreaID();
         title = _title;
         position = _centerPosition; //OnlineMaps.instance.position;
         zoom = OnlineMaps.instance.zoom; //MapManager.DEFAULT_ZOOM;
@@ -92,7 +92,7 @@ public class cArea
         // get all area ids
         HashSet<int> areaIDs = new HashSet<int>();
         
-        OnlineMapsXMLList areaIDNodes = xml.FindAll("/"+ AREAS + "/" + AREA + "/" + ID);
+        OnlineMapsXMLList areaIDNodes = xml.FindAll("/"+ AREAS + "/" + AREA + "/" + LOCAL_AREA_ID);
 
         foreach (OnlineMapsXML node in areaIDNodes)
         {
@@ -131,7 +131,7 @@ public class cArea
     {
         OnlineMapsXML xml = GetXML();
 
-        OnlineMapsXML areaToDelete = xml.Find("/" + AREAS + "/" + AREA + "[" + ID + "=" + _areaId + "]");
+        OnlineMapsXML areaToDelete = xml.Find("/" + AREAS + "/" + AREA + "[" + LOCAL_AREA_ID + "=" + _areaId + "]");
         if (!areaToDelete.isNull)
             areaToDelete.Remove();
 
@@ -139,7 +139,7 @@ public class cArea
         PlayerPrefs.Save();
     }
 
-    public static void RemoveIdToUpload(int _idToRemove)
+    /*public static void RemoveIdToUpload(int _idToRemove)
     {
         // Load previously saved ids array
         int[] loadedIds = PlayerPrefsX.GetIntArray(UPLOAD_PREFS_KEY);
@@ -211,6 +211,36 @@ public class cArea
         }
 
         return areasToUpload;
+    }*/
+
+    public static List<cArea> GetAreasToUpload()
+    {
+        // List of paths
+        List<cArea> areasToUpload = new List<cArea>();
+
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = GetXML();
+
+        // Get paths with server_area_id = -1
+        OnlineMapsXMLList areaNodes = xml.FindAll("/" + AREAS + "/" + AREA + "[" + SERVER_AREA_ID + "= -1" + "]");
+
+        foreach (OnlineMapsXML areaNode in areaNodes)
+        {
+            if (areaNode.isNull)
+            {
+                Debug.Log("Area has been deleted!");
+                continue;
+            }
+
+            cArea loadedArea = Load(areaNode);
+
+            if (loadedArea != null)
+                areasToUpload.Add(loadedArea);
+        }
+
+        Debug.Log("areasToUpload count = " + areasToUpload.Count);
+
+        return areasToUpload;
     }
 
     public static OnlineMapsXML GetXML()
@@ -235,7 +265,7 @@ public class cArea
         OnlineMapsXML xml = GetXML();
 
         // Check if area is already saved
-        OnlineMapsXML areaSaved = xml.Find("/" + AREAS + "/" + AREA + "[" + ID + "=" + _areaToSave.Id + "]");
+        OnlineMapsXML areaSaved = xml.Find("/" + AREAS + "/" + AREA + "[" + LOCAL_AREA_ID + "=" + _areaToSave.local_area_id + "]");
         if (!areaSaved.isNull)
         {
             Debug.Log("Area is already saved!");
@@ -244,8 +274,8 @@ public class cArea
 
         // Create a new area node
         OnlineMapsXML areaNode = xml.Create(AREA);
-        areaNode.Create(DATABASE_ID, _areaToSave.databaseId);
-        areaNode.Create(ID, _areaToSave.Id);
+        areaNode.Create(SERVER_AREA_ID, _areaToSave.server_area_id);
+        areaNode.Create(LOCAL_AREA_ID, _areaToSave.local_area_id);
         areaNode.Create(TITLE, _areaToSave.title);
         areaNode.Create(POSITION, _areaToSave.position);
         areaNode.Create(ZOOM, _areaToSave.zoom);
@@ -268,6 +298,37 @@ public class cArea
         }
     }
 
+    public static void SetServerAreaId(int _local_area_id, int _server_area_id)
+    {
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = GetXML();
+
+        // Find path
+        OnlineMapsXML areaNode = xml.Find("/" + AREAS + "/" + AREA + "[" + LOCAL_AREA_ID + "=" + _local_area_id + "]");
+
+        // Load path
+        cArea loadedArea = Load(areaNode);
+        loadedArea.server_area_id = _server_area_id;
+
+        // Edit path
+        EditServerAreaId(loadedArea);
+    }
+
+    private static void EditServerAreaId(cArea _areaToEdit)
+    {
+        // Load xml document, if null create new
+        OnlineMapsXML xml = GetXML();
+
+        // Create a new path
+        OnlineMapsXML areaNode = xml.Find("/" + AREAS + "/" + AREA + "[" + LOCAL_AREA_ID + "=" + _areaToEdit.local_area_id + "]");
+        areaNode.Remove(SERVER_AREA_ID);
+        areaNode.Create(SERVER_AREA_ID, _areaToEdit.server_area_id);
+        Debug.Log("Edited xml = " + xml.outerXml);
+        // Save xml string to PlayerPrefs
+        PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
+        PlayerPrefs.Save();
+    }
+
     /*public static string GetInfoFromXML(string _xpath)
     {
         OnlineMapsXML xml = GetXML();
@@ -277,8 +338,8 @@ public class cArea
 
     private static cArea Load(OnlineMapsXML _areaNode)
     {
-        int databaseId = _areaNode.Get<int>(DATABASE_ID);
-        int id = _areaNode.Get<int>(ID);
+        int server_area_id = _areaNode.Get<int>(SERVER_AREA_ID);
+        int local_area_id = _areaNode.Get<int>(LOCAL_AREA_ID);
         string title = _areaNode.Get<string>(TITLE);
         Vector2 position = _areaNode.Get<Vector2>(POSITION);
         int zoom = _areaNode.Get<int>(ZOOM);
@@ -288,7 +349,7 @@ public class cArea
         Vector2 viewConstraints_max = _areaNode.Get<Vector2>(VIEW_CONSTRAINTS_MAX);
 
         // Create cArea and add it to loadedAreas list
-        cArea loadedArea = new cArea(databaseId, id, title, position, zoom, areaConstraints_min, areaConstraints_max, viewConstraints_min, viewConstraints_max);
+        cArea loadedArea = new cArea(server_area_id, local_area_id, title, position, zoom, areaConstraints_min, areaConstraints_max, viewConstraints_min, viewConstraints_max);
         return loadedArea;
     }
 
@@ -326,9 +387,9 @@ public class cArea
         AppManager.Instance.serverManager.DownloadAreas();
     }
 
-    public static void DeleteAreaFromServer(int _areaIdToDelete)
+    public static void DeleteAreaFromServer(int _server_area_idToDelete)
     {
-        AppManager.Instance.serverManager.DeleteAreaFromServer(_areaIdToDelete);
+        AppManager.Instance.serverManager.DeleteAreaFromServer(_server_area_idToDelete);
     }
     #endregion
 }
@@ -336,8 +397,8 @@ public class cArea
 [Serializable]
 public class cAreaData
 {
-    public int databaseId;
-    public int id;
+    public int server_area_id;
+    public int local_area_id;
     public string title;
     public string position; // longitude, latitude (x, y)
     public int zoom;

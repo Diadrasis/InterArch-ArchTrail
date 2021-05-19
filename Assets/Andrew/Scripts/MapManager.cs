@@ -30,7 +30,7 @@ public class MapManager : MonoBehaviour
     [HideInInspector]
     public List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
 
-    //createMarker on user position
+    // createMarker on user position
     public OnlineMapsMarker userMarker;
 
     private float angle = 0.5f;
@@ -138,7 +138,7 @@ public class MapManager : MonoBehaviour
         return areasFromDatabase;
     }
 
-    private List<cPath> GetTestPaths()
+    /*private List<cPath> GetTestPaths()
     {
         List<cPathPoint> pathPointsToTest0 = new List<cPathPoint>()
         {
@@ -166,7 +166,7 @@ public class MapManager : MonoBehaviour
         };
 
         return pathsToTest;
-    }
+    }*/
 
     private List<cPathPoint> GetTestPathPoints()
     {
@@ -183,7 +183,7 @@ public class MapManager : MonoBehaviour
     private void DisplayAreaDebug(cArea _area)
     {
         // ID
-        Debug.Log("Id = " + _area.Id);
+        Debug.Log("Id = " + _area.local_area_id);
 
         // Title
         Debug.Log("Title = " + _area.title);
@@ -258,7 +258,7 @@ public class MapManager : MonoBehaviour
         {
             // Save area locally and reload areas
             cArea.Save(areaToSave);
-            cArea.AddIdToUpload(areaToSave.Id);
+            //cArea.AddIdToUpload(areaToSave.Id);
             areas = cArea.LoadAreas();
 
             // Upload user data to server
@@ -276,11 +276,11 @@ public class MapManager : MonoBehaviour
     {
         // Delete area locally and reload areas
         cArea areaSelected = areas[_selectAreaObjectIndex];
-        cArea.Delete(areaSelected.Id);
+        cArea.Delete(areaSelected.local_area_id);
         areas = cArea.LoadAreas();
 
         // Delete Area from server
-        cArea.DeleteAreaFromServer(areaSelected.databaseId);
+        //cArea.DeleteAreaFromServer(areaSelected.databaseId);
     }
 
     public void DeletePath(int _selectPathObjectIndex)
@@ -480,7 +480,7 @@ public class MapManager : MonoBehaviour
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position,label);
                 marker.SetDraggable(false);
                 // Creates and Adds a new PathPoint
-                currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, position, DateTime.Now.TimeOfDay));
+                currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, position, DateTime.Now.TimeOfDay));
                 
                 //marker.label = label;
                 //marker.position = position;
@@ -530,8 +530,8 @@ public class MapManager : MonoBehaviour
         markerListCurrPath.Clear();
         markerListCurrPath.Add(marker);
 
-        currentPath = new cPath(currentArea.Id);
-        currentPath.pathPoints.Add(new cPathPoint(currentPath.Id, currentPath.pathPoints.Count, previousPosition, DateTime.Now.TimeOfDay));
+        currentPath = new cPath(currentArea.local_area_id);
+        currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, previousPosition, DateTime.Now.TimeOfDay));
         
         /* TIMESPAN TESTING
         TimeSpan time = DateTime.Now.TimeOfDay;
@@ -576,7 +576,7 @@ public class MapManager : MonoBehaviour
             cPathPoint pathPoint = sortedList[i];
 
             // Create marker
-            string label = "Path_" + _pathToDisplay.Id + "_Point_" + pathPoint.index + "_" + pathPoint.time.ToString();
+            string label = "Path_" + _pathToDisplay.local_path_id + "_Point_" + pathPoint.index + "_" + pathPoint.time.ToString();
             OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
             marker.SetDraggable(false);
 
@@ -600,7 +600,7 @@ public class MapManager : MonoBehaviour
 
     public List<cPath> GetPaths()
     {
-        currentArea.paths = cPath.LoadPathsOfArea(currentArea.Id);
+        currentArea.paths = cPath.LoadPathsOfArea(currentArea.local_area_id);
         return currentArea.paths;
     }
 
