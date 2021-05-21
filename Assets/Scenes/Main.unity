@@ -400,6 +400,7 @@ GameObject:
   - component: {fileID: 97083294}
   - component: {fileID: 97083293}
   - component: {fileID: 97083292}
+  - component: {fileID: 97083295}
   m_Layer: 5
   m_Name: imgRecord
   m_TagString: Untagged
@@ -482,6 +483,49 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 97083290}
   m_CullTransparentMesh: 0
+--- !u!114 &97083295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 97083290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 97083293}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &123525761
 GameObject:
   m_ObjectHideFlags: 0
@@ -2140,7 +2184,7 @@ GameObject:
   - component: {fileID: 384965489}
   - component: {fileID: 384965488}
   m_Layer: 5
-  m_Name: btnCancel
+  m_Name: btnEditCancel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3366,7 +3410,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &619361494
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3752,7 +3796,7 @@ GameObject:
   - component: {fileID: 732534862}
   - component: {fileID: 732534861}
   m_Layer: 5
-  m_Name: btnSaveArea
+  m_Name: btnSaveEditArea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5729,7 +5773,6 @@ MonoBehaviour:
   mapScreen: {fileID: 6710081423201752178}
   btnBackToAreasScreen: {fileID: 6710081423828564209}
   btnQuit: {fileID: 1106544752}
-  imgRecord: {fileID: 97083292}
   pnlAreasScreen: {fileID: 6710081423141846123}
   pnlLoadedAreas: {fileID: 6710081423394034077}
   selectAreaPrefab: {fileID: 1443173278506380, guid: 104894555f90e7644913e94b4d18817c,
@@ -5741,12 +5784,22 @@ MonoBehaviour:
   btnCreateAreaSave: {fileID: 6710081423859581475}
   btnCreateAreaCancel: {fileID: 6710081423391561181}
   btnSaveArea: {fileID: 1290230368}
+  pnlEditArea: {fileID: 1238854883}
+  pnlSaveEditArea: {fileID: 619361493}
+  inptFldEditArea: {fileID: 1989316579}
+  btnEditAreaSave: {fileID: 1217135646}
+  btnEditAreaCancel: {fileID: 384965488}
+  btnSaveEditArea: {fileID: 732534861}
   pnlGPSScreen: {fileID: 1037881413}
   btnGPSPermission: {fileID: 1035755653}
   pnlPathScreen: {fileID: 1563276631}
+  pnlRecordButton: {fileID: 1304790715}
+  pnlMainButtons: {fileID: 1803980836}
   btnAddNewPath: {fileID: 2036377748}
+  btnStopRecording: {fileID: 97083295}
   sprAddNewPath: {fileID: 21300000, guid: 107c97d36064d014d815cd5ccd5cab96, type: 3}
   sprSaveIcon: {fileID: 21300000, guid: 107c97d36064d014d815cd5ccd5cab96, type: 3}
+  imgRecord: {fileID: 97083292}
   pnlWarningScreen: {fileID: 892694329}
   txtWarning: {fileID: 317760068}
   btnCancel: {fileID: 962736992}
@@ -7378,7 +7431,7 @@ GameObject:
   - component: {fileID: 1217135647}
   - component: {fileID: 1217135646}
   m_Layer: 5
-  m_Name: btnSave
+  m_Name: btnEditSave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7631,7 +7684,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1238854884
 RectTransform:
   m_ObjectHideFlags: 0
