@@ -38,6 +38,14 @@ public class UIManager : MonoBehaviour
     private float interval = 0.001f;
 
     //private bool createArea = false;
+    [Space]
+    [Header("Edit Area Screen")]
+    public GameObject pnlEditArea;
+    public GameObject pnlSaveEditArea;
+    public TMP_InputField inptFldEditArea;
+    public Button btnEditAreaSave;
+    public Button btnEditAreaCancel;
+    public Button btnSaveEditArea;
 
     [Space]
     [Header("GPS Screen")]
@@ -140,7 +148,6 @@ public class UIManager : MonoBehaviour
         btnPaths.gameObject.SetActive(valPath);
         btnBackToAreasScreen.gameObject.SetActive(valBack);
         btnQuit.gameObject.SetActive(valQuit);
-        btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Areas";
 
     }
     public void DisplayAreasScreen()
@@ -229,7 +236,6 @@ public class UIManager : MonoBehaviour
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths can be removed afterwards, for testing purposes
         ActivateButtons(true,true,false);
-        btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Areas";
         AppManager.Instance.mapManager.CheckUserPosition();
     }
 
@@ -271,7 +277,7 @@ public class UIManager : MonoBehaviour
         //EnableScreen(pnlSelectedAreaScreen, true);
         //imgRecord.gameObject.SetActive(true);
         //EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
-        btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Areas";
+        
         //AppManager.Instance.mapManager.CheckUserPosition();
     }
 
@@ -309,7 +315,6 @@ public class UIManager : MonoBehaviour
         if (pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath )
         {
             pnlSavedPaths.SetActive(false);
-            btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Areas";
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
 
@@ -513,7 +518,6 @@ public class UIManager : MonoBehaviour
         StartCoroutine(ReloadLayout(pnlSavedPaths));
         pnlScrollViewPaths.SetActive(true);
         ActivateButtons(true, true,false);
-        btnBackToAreasScreen.GetComponentInChildren<TextMeshProUGUI>().text = "Back";
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
         pnlWarningDeleteScreen.SetActive(false);
     }

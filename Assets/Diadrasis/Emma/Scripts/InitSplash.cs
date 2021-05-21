@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class InitSplash : MonoBehaviour
 {
-    public Animator animAppLogo, /*animEspaLogo,*/ animDiadrasisLogo/*, animUniLogo,ministry1logo, ministry2logo*/, animPanel;
-    //public GameObject menuPanel;
+    public Animator animAppLogo, /*animEspaLogo,*/ animDiadrasisLogo/*, animUniLogo,ministry1logo, ministry2logo, animPanel*/;
+    public GameObject menuPanel;
 
     public static int isStarted;
 
@@ -18,7 +18,7 @@ public class InitSplash : MonoBehaviour
         //menuPanel.SetActive(false);
         if (isStarted == 0)
         {
-            animPanel.gameObject.SetActive(true);
+            menuPanel.gameObject.SetActive(true);
 
             //Screen.orientation = ScreenOrientation.Landscape;
         }
@@ -34,15 +34,15 @@ public class InitSplash : MonoBehaviour
             {
                 Screen.orientation = ScreenOrientation.Portrait;
             }
-            
-            animPanel.gameObject.SetActive(false);
+
+            menuPanel.gameObject.SetActive(false);
             //menuPanel.SetActive(true);
             //animMenu.SetBool("color", true);
             yield break;
         }
-
-        animPanel.SetBool("show", true);
-        yield return new WaitForSeconds(0.7f);
+        
+        /*animPanel.SetBool("show", false);*/
+        yield return new WaitForSeconds(1f);
         animAppLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
         /*animEspaLogo.SetBool("show", true);
@@ -68,7 +68,7 @@ public class InitSplash : MonoBehaviour
         yield return new WaitForSeconds(0.7f);
         animAppLogo.SetBool("show", false);
         Screen.orientation = ScreenOrientation.Portrait;
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(1f);
         SceneManager.LoadScene(1);
         //animPanel.SetBool("show", false);
         //animMenu.SetBool("color", true);
