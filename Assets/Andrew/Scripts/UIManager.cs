@@ -14,7 +14,7 @@ public class UIManager : MonoBehaviour
     [Space]
     [Header("Top Screen")]
     public Button btnBackToAreasScreen, btnQuit;
-    public Animator imgRecord;
+    
 
     [Space]
     [Header("Areas Screen")]
@@ -56,9 +56,10 @@ public class UIManager : MonoBehaviour
     [Space]
     [Header("Path Screen")]
     //PathScreen
-    public GameObject pnlPathScreen;
-    public Button btnAddNewPath;
+    public GameObject pnlPathScreen, pnlRecordButton, pnlMainButtons;
+    public Button btnAddNewPath, btnStopRecording;
     public Sprite sprAddNewPath, sprSaveIcon;
+    public Animator imgRecord;
 
     [Space]
     [Header("Warning Area Screen")]
@@ -123,8 +124,9 @@ public class UIManager : MonoBehaviour
         //btn GPS
         btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeAndroidSettings());
 
-        //btn Path
+        //btn Path and stop record
         btnAddNewPath.onClick.AddListener(() => AddNewPath());
+        btnStopRecording.onClick.AddListener(() => SaveUIButton());
 
         //btn warning on area
         btnCancel.onClick.AddListener(() => CloseScreenPanels());
@@ -312,32 +314,36 @@ public class UIManager : MonoBehaviour
     //back to all the panel accordingly and even if we press back whilst recording path
     private void BackToAreasScreen()
     {
-        if (pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath )
+        if (pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath )
         {
             pnlSavedPaths.SetActive(false);
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
 
-        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
         {
             DisplayAreasScreen();
             pnlPathScreen.SetActive(false);
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
         //pnlAreasScreen.SetActive(false);
-        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf && pnlSaveArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf && pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
         {
             pnlSaveArea.SetActive(false);
             Debug.Log("pnlCreateArea false");
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         } 
-        else if(!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlCreateArea.activeSelf && AppManager.Instance.mapManager.isRecordingPath)
+        else if(!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && AppManager.Instance.mapManager.isRecordingPath)
         { 
             SaveUIButton();
         }
-        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
         {
             DisplayPathsScreen();
+        }
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf && !pnlSaveArea.activeSelf && pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath)
+        {
+            //to open edit panel
         }
         else 
         {
@@ -382,7 +388,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /*private void EditArea(cArea _areaToEdit)
+    private void EditArea(cArea _areaToEdit)
     {
         string newAreaTitle = inptFldEditArea.text;
 
@@ -393,7 +399,7 @@ public class UIManager : MonoBehaviour
             pnlSaveEditArea.SetActive(false);
             pnlEditArea.SetActive(false);
         }
-    }*/
+    }
 
     public void EnableSaveAreaScreen()
     {
@@ -452,7 +458,7 @@ public class UIManager : MonoBehaviour
                 OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
                 //OnlineMapsDrawingElementManager.AddItem(path);
                 OnlineMaps.instance.Redraw();
-            }*//*
+            }
         }
     }*/
 
@@ -475,20 +481,22 @@ public class UIManager : MonoBehaviour
         
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
 
-        btnAddNewPath.GetComponentInChildren<Text>().text = "Save"; // sprSaveIcon;
+        //btnAddNewPath.GetComponentInChildren<Text>().text = "Save"; // sprSaveIcon;
         IsInRecordingPath(true);
 
-        btnAddNewPath.onClick.RemoveAllListeners();
-        btnAddNewPath.onClick.AddListener(() => SaveUIButton());
+        //btnAddNewPath.onClick.RemoveAllListeners();
+        //btnAddNewPath.onClick.AddListener(() => SaveUIButton());
 
         AppManager.Instance.mapManager.StartRecordingPath();
         btnPaths.interactable = false;
+        pnlRecordButton.SetActive(true);
     }
 
     //change the icon from plus to save, opens warning screen for saving or cancel path
     private void SaveUIButton()
     {
         EnableScreen(pnlWarningSavePathScreen, true);
+        pnlRecordButton.SetActive(false);
         AppManager.Instance.mapManager.StopRecordingPath();
         btnPaths.interactable = true;
         //btnAddNewPath.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
@@ -499,10 +507,10 @@ public class UIManager : MonoBehaviour
     private void SavePath()
     {
         AppManager.Instance.mapManager.SavePath();
-        btnAddNewPath.GetComponentInChildren<Text>().text = "Add"; // sprAddNewPath;
+        /*btnAddNewPath.GetComponentInChildren<Text>().text = "Add"; // sprAddNewPath;
 
         btnAddNewPath.onClick.RemoveAllListeners();
-        btnAddNewPath.onClick.AddListener(() => AddNewPath());
+        btnAddNewPath.onClick.AddListener(() => AddNewPath());*/
         
         EnableScreen(pnlWarningSavePathScreen, false);
         IsInRecordingPath(false);
