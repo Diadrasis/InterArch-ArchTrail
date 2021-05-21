@@ -21,6 +21,7 @@ public class cArea
 
     public static readonly string PREFS_KEY = "areas";
     //public static readonly string UPLOAD_PREFS_KEY = "areasToUpload";
+    public static readonly string DELETE_PREFS_KEY = "areasToDelete";
     public static readonly string AREAS = "areas";
 
     public static readonly string AREA = "area";
@@ -138,14 +139,14 @@ public class cArea
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
     }
-
-    /*public static void RemoveIdToUpload(int _idToRemove)
+    /*
+    public static void RemoveIdToUpload(int _idToRemove)
     {
         // Load previously saved ids array
-        int[] loadedIds = PlayerPrefsX.GetIntArray(UPLOAD_PREFS_KEY);
-        Debug.Log("loadedIds length = " + loadedIds.Length);
+        int[] loadedIds = PlayerPrefsX.GetIntArray(DELETE_PREFS_KEY);
+
         // Create a new int array based on the loaded ids array
-        int[] idsToUpload = new int[loadedIds.Length - 1];
+        int[] idsToDelete = new int[loadedIds.Length - 1];
 
         // Insert all loaded ids to the new ids array except the _idToRemove
         int i = 0;
@@ -154,18 +155,18 @@ public class cArea
             if (id == _idToRemove)
                 continue;
 
-            idsToUpload[i] = id;
+            idsToDelete[i] = id;
             i++;
         }
 
         // Save new ids array
-        PlayerPrefsX.SetIntArray(UPLOAD_PREFS_KEY, idsToUpload);
+        PlayerPrefsX.SetIntArray(DELETE_PREFS_KEY, idsToDelete);
     }
 
     public static void AddIdToUpload(int _idToUpload)
     {
         // Load previously saved ids array
-        int[] loadedIds = PlayerPrefsX.GetIntArray(UPLOAD_PREFS_KEY);
+        int[] loadedIds = PlayerPrefsX.GetIntArray(DELETE_PREFS_KEY);
         Debug.Log("loadedIds length = " + loadedIds.Length);
         // Create a new int array based on the loaded ids array
         int[] idsToUpload = new int[loadedIds.Length + 1];
@@ -180,10 +181,19 @@ public class cArea
         idsToUpload[idsToUpload.Length - 1] = _idToUpload;
 
         // Save new ids array
-        PlayerPrefsX.SetIntArray(UPLOAD_PREFS_KEY, idsToUpload);
+        PlayerPrefsX.SetIntArray(DELETE_PREFS_KEY, idsToUpload);
     }
 
-    public static List<cArea> GetAreasToUpload()
+    public static List<int> GetServerAreaIdsToDelete()
+    {
+        // List of area server ids
+        List<int> areasToDelete = new List<int>();
+
+        // Load previously saved ids array
+        int[] idsToDelete = PlayerPrefsX.GetIntArray(DELETE_PREFS_KEY);
+    }*/
+
+    /*public static List<cArea> GetAreasToUpload()
     {
         // List of areas
         List<cArea> areasToUpload = new List<cArea>();
@@ -197,7 +207,7 @@ public class cArea
         foreach (int id in idsToUpload)
         {
             // Load Area
-            OnlineMapsXML areaNode = xml.Find("/" + AREAS + "/" + AREA + "[" + ID + "=" + id + "]");
+            OnlineMapsXML areaNode = xml.Find("/" + AREAS + "/" + AREA + "[" + LOCAL_AREA_ID + "=" + id + "]");
             if (areaNode.isNull)
             {
                 Debug.Log("Area with id: " + id + " has been deleted!");
@@ -377,20 +387,20 @@ public class cArea
         return loadedAreas;
     }
 
-    public static void Upload(cArea _areaToUpload)
+    /*public static void Upload(cArea _areaToUpload)
     {
         AppManager.Instance.serverManager.UploadArea(_areaToUpload);
-    }
+    }*/
 
-    public static void DownloadAreas()
+    /*public static void DownloadAreas()
     {
         AppManager.Instance.serverManager.DownloadAreas();
-    }
+    }*/
 
-    public static void DeleteAreaFromServer(int _server_area_idToDelete)
+    /*public static void DeleteAreaFromServer(int _server_area_idToDelete)
     {
         AppManager.Instance.serverManager.DeleteAreaFromServer(_server_area_idToDelete);
-    }
+    }*/
     #endregion
 }
 
@@ -407,143 +417,3 @@ public class cAreaData
     public string viewConstraintsMin; // minLongitude, minLatitude (x, y)
     public string viewConstraintsMax; // maxLongitude, maxLatitude (x, y)
 }
-
-
-
-
-/*
- * private static readonly string AREA_KEY = "area_";
-    //private static readonly string TITLE_KEY = "_title";
-    private static readonly string POSITION_KEY = "_position";
-    private static readonly string ZOOM_KEY = "_zoom";
-    private static readonly string CONSTRAINTS_KEY = "_constraints";
- * 
- * 
- * 
-    private static int GetAvailableAreaIndex()
-    {
-        int index = 0;
-
-        do
-        {
-            string areaTitle = PlayerPrefs.GetString(AREA_KEY + index.ToString());
-            if (String.IsNullOrEmpty(areaTitle))
-                break;
-            index++;
-        }
-        while (index < 1000000);
-
-        return (index < 1000000) ? index : -1;
-    }
-
-    public static void Save(cArea _areaToSave)
-    {
-        int availableAreaIndex = GetAvailableAreaIndex();
-        Debug.Log("available area index = " + availableAreaIndex); // TODO: Remove!!!
-        if (availableAreaIndex == -1)
-        {
-            Debug.Log("GetAvailableAreaIndex method has run out of available indexes");
-            return;
-        }
-
-        PlayerPrefs.SetString(AREA_KEY + availableAreaIndex, _areaToSave.title); // area_0, Mεσσήνη
-        PlayerPrefs.SetInt(_areaToSave.title + ZOOM_KEY, _areaToSave.zoom); // Mεσσήνη_zoom, 19
-        PlayerPrefsX.SetVector2(_areaToSave.title + POSITION_KEY, _areaToSave.position); // Mεσσήνη_position, Vector2
-        PlayerPrefsX.SetVector4(_areaToSave.title + CONSTRAINTS_KEY, _areaToSave.constraints);
-    }
-
-    public static void SaveAreas(List<cArea> _areasToSave)
-    {
-        foreach (cArea areaToSave in _areasToSave)
-        {
-            Save(areaToSave);
-        }
-    }
-
-    private static cArea Load(int _areaId)
-    {
-        string areaKey = AREA_KEY + _areaId.ToString();
-
-        if (!PlayerPrefs.HasKey(areaKey))
-        {
-            return null;
-        }
-
-        string title = PlayerPrefs.GetString(areaKey);
-        Vector2 position = PlayerPrefsX.GetVector2(title + POSITION_KEY, Vector2.zero);
-        int zoom = PlayerPrefs.GetInt(title + ZOOM_KEY);
-        Vector4 constraints = PlayerPrefsX.GetVector4(title + CONSTRAINTS_KEY);
-
-        cArea loadedArea = new cArea(title, position, zoom, constraints);
-        loadedArea.id = _areaId;
-
-        return loadedArea;
-    }
-
-    public static List<cArea> LoadAreas()
-    {
-        List<cArea> loadedAreas = new List<cArea>();
-        cArea loadedArea = null;
-        int index = 0;
-
-        do
-        {
-            loadedArea = Load(index);
-            if (loadedArea != null)
-                loadedAreas.Add(loadedArea);
-            index++;
-        }
-        while (index < 100); // TODO: This value means that the user can only save 100 areas, we must make a new system to save and load.
-
-        /*do
-        {
-            loadedArea = Load(index);
-            if (loadedArea != null)
-                loadedAreas.Add(loadedArea);
-            else
-                break;
-            index++;
-        }
-        while (index < 1000000); */
-/*
-return loadedAreas;
-}
-
-private static cArea GetAreaByTitle(string _areaTitle)
-{
-cArea loadedArea = null;
-int index = 0;
-
-do
-{
-loadedArea = Load(index);
-if (loadedArea != null && loadedArea.title.Equals(_areaTitle))
-{
-    loadedArea.id = index;
-    break;
-}
-
-index++;
-}
-while (index < 100); // TODO: This value means that the user can only save 100 areas, we must make a new system to save and load.
-
-return loadedArea;
-}
-
-private static void Delete(cArea _areaToDelete)
-{
-PlayerPrefs.DeleteKey(AREA_KEY + _areaToDelete.id); // Deletes title
-PlayerPrefs.DeleteKey(_areaToDelete.title + POSITION_KEY); // Deletes position
-PlayerPrefs.DeleteKey(_areaToDelete.title + ZOOM_KEY); // Deletes zoom
-PlayerPrefs.DeleteKey(_areaToDelete.title + CONSTRAINTS_KEY); // Deletes constraints
-                                                          //Debug.Log("HasKey = " + PlayerPrefs.HasKey(_areaToDelete.title + POSITION_KEY)); // check if it is deleted.
-}
-
-// Deletes all keys related to this area. Paths, Points etc.
-public static void Delete(string _areaTitle)
-{
-//Debug.Log(GetAreaByTitle(_areaTitle).title);
-Delete(GetAreaByTitle(_areaTitle));
-//cPath.Delete(_areaTitle);
-}
-*/

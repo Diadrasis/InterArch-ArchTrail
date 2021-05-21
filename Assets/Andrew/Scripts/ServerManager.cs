@@ -23,7 +23,7 @@ public class ServerManager : MonoBehaviour
     private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
     public bool postUserData = false; // true;
 
-    public enum PHPActions {Save, Get, Delete, Edit } // TODO: SaveArea, GetArea, DeleteArea, EditArea, SavePath, GetPath, DeletePath, EditPath
+    public enum PHPActions {Save, Get, Delete, Edit, Save_Path } // TODO: SaveArea, GetArea, DeleteArea, EditArea, Save_Path, GetPath, DeletePath, EditPath
     #endregion
 
     #region UnityMethods
@@ -31,13 +31,14 @@ public class ServerManager : MonoBehaviour
     {
         postUserData = false;
 
-        for (int i = 0; i < 100; i++)
+        // Delete all areas from server
+        /*for (int i = 0; i < 100; i++)
         {
-            cArea.DeleteAreaFromServer(i);
-        }
+            DeleteAreaFromServer(i);
+        }*/
 
         //cArea.DeleteAreaFromServer(90);
-        //cArea.DownloadAreas();
+        // DownloadAreas();
         //Debug.Log(Enum.GetName(typeof(PHPActions), 0));
         //Debug.Log("dataPath : " + Application.dataPath + "/../sunflowerTest.jpg");
         //Debug.Log(SystemInfo.deviceModel);
@@ -56,7 +57,7 @@ public class ServerManager : MonoBehaviour
             // NOTE: The postUserData variable is set to true when opening the application, when the user saves a new area or when a path is added etc.
             if (postUserData)
             {
-                PostUserDataToDiadrasis();
+                //PostUserDataToDiadrasis();
                 postUserData = false;
             }
         }
@@ -257,15 +258,32 @@ public class ServerManager : MonoBehaviour
     {
         // Create a form and add all the fields of the area
         List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
-        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 0))); // TODO: Change number to correspond to PHPAction
-        //formToPost.Add(new MultipartFormDataSection("server_path_id", _pathToUpload.databaseId.ToString()));
-        formToPost.Add(new MultipartFormDataSection("local_area_id", _pathToUpload.local_area_id.ToString()));
-        formToPost.Add(new MultipartFormDataSection("local_path_id", _pathToUpload.local_path_id.ToString()));
+        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 4)));
+        formToPost.Add(new MultipartFormDataSection("server_area_id", _pathToUpload.server_area_id.ToString()));
+        //formToPost.Add(new MultipartFormDataSection("local_area_id", _pathToUpload.local_area_id.ToString()));
+        //formToPost.Add(new MultipartFormDataSection("local_path_id", _pathToUpload.local_path_id.ToString()));
         formToPost.Add(new MultipartFormDataSection("title", _pathToUpload.title));
-        formToPost.Add(new MultipartFormDataSection("date", _pathToUpload.date.ToShortDateString()));
+        formToPost.Add(new MultipartFormDataSection("date", _pathToUpload.date.ToShortDateString())); // TODO: Change???
 
         // Uploading data
-        StartCoroutine(PostPathToDiadrasis(formToPost, _pathToUpload.local_path_id));
+        StartCoroutine(PostPathToDiadrasis(formToPost, _pathToUpload.server_area_id, _pathToUpload.local_path_id));
+    }
+
+    public void UploadPoint(cPathPoint _pointToUpload)
+    {
+        // Create a form and add all the fields of the area
+        List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
+        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 0))); // TODO: Change number to correspond to PHPAction
+        formToPost.Add(new MultipartFormDataSection("server_path_id", _pointToUpload.server_path_id.ToString()));
+        //formToPost.Add(new MultipartFormDataSection("local_area_id", _pathToUpload.local_area_id.ToString()));
+        //formToPost.Add(new MultipartFormDataSection("local_path_id", _pathToUpload.local_path_id.ToString()));
+        formToPost.Add(new MultipartFormDataSection("index", _pointToUpload.index.ToString()));
+        formToPost.Add(new MultipartFormDataSection("position", _pointToUpload.position.ToString()));
+        //formToPost.Add(new MultipartFormDataSection("time", _pointToUpload.time.ToString())); // TODO: Change???
+        formToPost.Add(new MultipartFormDataSection("duration", _pointToUpload.duration.ToString()));
+
+        // Uploading data
+        StartCoroutine(PostPointToDiadrasis(formToPost, _pointToUpload.server_path_id, _pointToUpload.index));
     }
 
     private void PostUserDataToDiadrasis()
@@ -285,7 +303,7 @@ public class ServerManager : MonoBehaviour
         }
 
         // Get paths to upload
-        /*List<cPath> pathsToUpload = cPath.GetPathsToUpload();
+        List<cPath> pathsToUpload = cPath.GetPathsToUpload();
 
         if (pathsToUpload != null)
         {
@@ -293,7 +311,22 @@ public class ServerManager : MonoBehaviour
             {
                 UploadPath(pathToUpload);
             }
+        }
+
+        // Get paths to upload
+        /*List<cPathPoint> pointsToUpload = cPathPoint.GetPointsToUpload();
+
+        if (pointsToUpload != null)
+        {
+            foreach (cPathPoint pointToUpload in pointsToUpload)
+            {
+                UploadPoint(pointToUpload);
+            }
         }*/
+
+        // Get areas to delete
+
+        // Get paths to delete
     }
 
     IEnumerator PostAreaToDiadrasis(List<IMultipartFormSection> _formToPost, int _local_area_id)
@@ -332,8 +365,7 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    // FOR TEST
-    IEnumerator PostPathToDiadrasis(List<IMultipartFormSection> _formToPost, int _local_path_id)
+    IEnumerator PostPathToDiadrasis(List<IMultipartFormSection> _formToPost, int _server_area_id, int _local_path_id)
     {
         UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, _formToPost);
 
@@ -353,7 +385,31 @@ public class ServerManager : MonoBehaviour
             //string server_path_idString = cleanString.Replace(" ", "");
             //Debug.Log("databaseId = " + server_path_idString);
             if (int.TryParse(server_path_idString, out int server_path_id))
-                cPath.SetServerPathId(_local_path_id, server_path_id);
+                cPath.SetServerAreaAndPathId(_server_area_id, server_path_id, _local_path_id);
+        }
+    }
+
+    IEnumerator PostPointToDiadrasis(List<IMultipartFormSection> _formToPost, int _server_path_id, int _index)
+    {
+        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, _formToPost);
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError || webRequest.isHttpError)
+        {
+            Debug.Log("Test failed. Error #" + webRequest.error);
+        }
+        else
+        {
+            Debug.Log("Echo: " + webRequest.downloadHandler.text);
+
+            // Get database id and set it
+            string echo = webRequest.downloadHandler.text;
+            string server_point_idString = echo.Replace("[{\"max(server_point_id)\":\"", "").Replace("\"}]", "");
+            //string server_path_idString = cleanString.Replace(" ", "");
+            //Debug.Log("databaseId = " + server_path_idString);
+            if (int.TryParse(server_point_idString, out int server_point_id))
+                cPathPoint.SetServerPathAndPointId(_server_path_id, server_point_id, _index);
         }
     }
 
@@ -447,7 +503,35 @@ public class ServerManager : MonoBehaviour
 
         if (webRequest.isNetworkError || webRequest.isHttpError)
         {
-            Debug.Log("Test failed. Error #" + webRequest.error);
+            Debug.Log("Delete area with server id " + _server_area_idToDelete + " failed. Error #" + webRequest.error);
+        }
+        else
+        {
+            Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
+            Debug.Log("Echo: " + webRequest.downloadHandler.text);
+            //Debug.Log("Data length: " + webRequest.downloadHandler.data);
+        }
+    }
+
+    public void DeletePathFromServer(int _server_path_idToDelete)
+    {
+        // Downloading data
+        StartCoroutine(DeletePath(_server_path_idToDelete));
+    }
+
+    IEnumerator DeletePath(int _server_path_idToDelete)
+    {
+        WWWForm formToPost = new WWWForm();
+        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 2)); // TODO: Change number to correspond to PHPAction
+        formToPost.AddField("server_path_id", _server_path_idToDelete);
+
+        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.isNetworkError || webRequest.isHttpError)
+        {
+            Debug.Log("Delete path with server id " + _server_path_idToDelete + " failed. Error #" + webRequest.error);
         }
         else
         {
