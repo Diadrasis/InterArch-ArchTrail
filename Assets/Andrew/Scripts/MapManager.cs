@@ -85,7 +85,7 @@ public class MapManager : MonoBehaviour
 
         userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), AppManager.Instance.uIManager.userMarker, "User");
         userMarker.SetDraggable(false);
-        userMarker.scale = 2;
+        userMarker.scale = 0.3f;
         // Test
         //List<cPath> pathsToTest = GetTestPaths();
         //DisplayPath(pathsToTest[0]);
@@ -263,7 +263,6 @@ public class MapManager : MonoBehaviour
         {
             // Save area locally and reload areas
             cArea.Save(areaToSave);
-            //cArea.AddIdToUpload(areaToSave.Id);
             areas = cArea.LoadAreas();
 
             // Upload user data to server
@@ -277,6 +276,27 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    public void EditArea(cArea _areaToEdit, string _areaTitle)
+    {
+        // Get center point
+        OnlineMapsUtils.GetCenterPointAndZoom(markersCreateArea, out Vector2 center, out int zoom);
+
+        // Edit area values
+        _areaToEdit.title = _areaTitle;
+        _areaToEdit.position = center;
+        _areaToEdit.zoom = zoom;
+        _areaToEdit.areaConstraintsMin = markersCreateArea[0].position;
+        _areaToEdit.areaConstraintsMax = markersCreateArea[1].position;
+        _areaToEdit.viewConstraintsMin = new Vector2((float)OnlineMaps.instance.bounds.left, (float)OnlineMaps.instance.bounds.bottom);
+        _areaToEdit.viewConstraintsMax = new Vector2((float)OnlineMaps.instance.bounds.right, (float)OnlineMaps.instance.bounds.top);
+
+        // Edit area locally and reload areas
+        cArea.Edit(_areaToEdit);
+        areas = cArea.LoadAreas();
+
+        // Edit area on server
+    }
+
     public void DeleteArea(int _selectAreaObjectIndex)
     {
         // Delete area locally and reload areas
@@ -285,7 +305,25 @@ public class MapManager : MonoBehaviour
         areas = cArea.LoadAreas();
 
         // Delete Area from server
-        //cArea.DeleteAreaFromServer(areaSelected.databaseId);
+        /*if (areaSelected.server_area_id != -1)
+        {
+            cArea.AddIdToDelete(areaSelected.server_area_id);
+            AppManager.Instance.serverManager.postUserData = true;
+        }*/
+
+        // TODO: For testing only. Remove.
+        if (areaSelected.server_area_id != -1)
+        {
+            cArea.AddIdToDelete(areaSelected.server_area_id);
+        }
+
+        if (areaCounter >= 3)
+        {
+            AppManager.Instance.serverManager.postUserData = true;
+            areaCounter = 0;
+        }
+        else
+            areaCounter += 1;
     }
 
     public void DeletePath(int _selectPathObjectIndex)
@@ -293,6 +331,13 @@ public class MapManager : MonoBehaviour
         cPath pathSelected = currentArea.paths[_selectPathObjectIndex];
         Debug.Log(pathSelected.title);
         cPath.Delete(pathSelected);
+
+        // Delete Path from server
+        /*if (pathSelected.server_path_id != -1)
+        {
+            cArea.AddIdToDelete(pathSelected.server_path_id);
+            AppManager.Instance.serverManager.postUserData = true;
+        }*/
     }
 
     private void ResetMapConstraints()
@@ -458,7 +503,7 @@ public class MapManager : MonoBehaviour
         }
     }*/
 
-    public void OnLocationChanged(Vector2 position)
+        public void OnLocationChanged(Vector2 position)
     {
         //AppManager.Instance.uIManager.infoText.text = "Location changed to: " + position;
 

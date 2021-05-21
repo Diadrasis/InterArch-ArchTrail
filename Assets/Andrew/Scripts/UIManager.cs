@@ -377,6 +377,19 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    /*private void EditArea(cArea _areaToEdit)
+    {
+        string newAreaTitle = inptFldEditArea.text;
+
+        if (!string.IsNullOrEmpty(newAreaTitle))
+        {
+            AppManager.Instance.mapManager.EditArea(_areaToEdit, newAreaTitle);
+
+            pnlSaveEditArea.SetActive(false);
+            pnlEditArea.SetActive(false);
+        }
+    }*/
+
     public void EnableSaveAreaScreen()
     {
         pnlSaveArea.SetActive(true);

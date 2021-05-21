@@ -21,7 +21,7 @@ public class cArea
 
     public static readonly string PREFS_KEY = "areas";
     //public static readonly string UPLOAD_PREFS_KEY = "areasToUpload";
-    public static readonly string DELETE_PREFS_KEY = "areasToDelete";
+    public static readonly string AREAS_TO_DELETE_PREFS_KEY = "areasToDelete";
     public static readonly string AREAS = "areas";
 
     public static readonly string AREA = "area";
@@ -139,18 +139,18 @@ public class cArea
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
     }
-    /*
-    public static void RemoveIdToUpload(int _idToRemove)
+    
+    public static void RemoveIdToDelete(int _idToRemove)
     {
         // Load previously saved ids array
-        int[] loadedIds = PlayerPrefsX.GetIntArray(DELETE_PREFS_KEY);
+        int[] loadedIdsToDelete = PlayerPrefsX.GetIntArray(AREAS_TO_DELETE_PREFS_KEY);
 
         // Create a new int array based on the loaded ids array
-        int[] idsToDelete = new int[loadedIds.Length - 1];
+        int[] idsToDelete = new int[loadedIdsToDelete.Length - 1];
 
         // Insert all loaded ids to the new ids array except the _idToRemove
         int i = 0;
-        foreach (int id in loadedIds)
+        foreach (int id in loadedIdsToDelete)
         {
             if (id == _idToRemove)
                 continue;
@@ -158,40 +158,35 @@ public class cArea
             idsToDelete[i] = id;
             i++;
         }
-
+        Debug.Log("idsToDelete length = " + idsToDelete.Length);
         // Save new ids array
-        PlayerPrefsX.SetIntArray(DELETE_PREFS_KEY, idsToDelete);
+        PlayerPrefsX.SetIntArray(AREAS_TO_DELETE_PREFS_KEY, idsToDelete);
+        PlayerPrefs.Save();
     }
 
-    public static void AddIdToUpload(int _idToUpload)
+    public static void AddIdToDelete(int _idToDelete)
     {
         // Load previously saved ids array
-        int[] loadedIds = PlayerPrefsX.GetIntArray(DELETE_PREFS_KEY);
-        Debug.Log("loadedIds length = " + loadedIds.Length);
+        int[] loadedIdsToDelete = PlayerPrefsX.GetIntArray(AREAS_TO_DELETE_PREFS_KEY);
+        
         // Create a new int array based on the loaded ids array
-        int[] idsToUpload = new int[loadedIds.Length + 1];
+        int[] idsToDelete = new int[loadedIdsToDelete.Length + 1];
 
         // Insert all loaded ids to the new ids array
-        for (int i = 0; i < loadedIds.Length; i++)
+        for (int i = 0; i < loadedIdsToDelete.Length; i++)
         {
-            idsToUpload[i] = loadedIds[i];
+            idsToDelete[i] = loadedIdsToDelete[i];
         }
 
         // Insert the new id
-        idsToUpload[idsToUpload.Length - 1] = _idToUpload;
-
+        idsToDelete[idsToDelete.Length - 1] = _idToDelete;
+        Debug.Log("idsToDelete length = " + idsToDelete.Length);
         // Save new ids array
-        PlayerPrefsX.SetIntArray(DELETE_PREFS_KEY, idsToUpload);
+        PlayerPrefsX.SetIntArray(AREAS_TO_DELETE_PREFS_KEY, idsToDelete);
+        PlayerPrefs.Save();
     }
 
-    public static List<int> GetServerAreaIdsToDelete()
-    {
-        // List of area server ids
-        List<int> areasToDelete = new List<int>();
-
-        // Load previously saved ids array
-        int[] idsToDelete = PlayerPrefsX.GetIntArray(DELETE_PREFS_KEY);
-    }*/
+    public static int[] GetServerIdsToDelete() => PlayerPrefsX.GetIntArray(AREAS_TO_DELETE_PREFS_KEY);
 
     /*public static List<cArea> GetAreasToUpload()
     {
@@ -248,7 +243,7 @@ public class cArea
                 areasToUpload.Add(loadedArea);
         }
 
-        Debug.Log("areasToUpload count = " + areasToUpload.Count);
+        //Debug.Log("areasToUpload count = " + areasToUpload.Count);
 
         return areasToUpload;
     }
@@ -306,6 +301,40 @@ public class cArea
         {
             Save(areaToSave);
         }
+    }
+
+    public static void Edit(cArea _areaToEdit)
+    {
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = GetXML();
+
+        // Get area
+        OnlineMapsXML areaNode = xml.Find("/" + AREAS + "/" + AREA + "[" + LOCAL_AREA_ID + "=" + _areaToEdit.local_area_id + "]");
+        if (areaNode.isNull)
+        {
+            Debug.Log("Cannot edit because area is not saved!");
+            return;
+        }
+
+        // Remove old and Create new values
+        areaNode.Remove(TITLE);
+        areaNode.Create(TITLE, _areaToEdit.title);
+        areaNode.Remove(POSITION);
+        areaNode.Create(POSITION, _areaToEdit.position);
+        areaNode.Remove(ZOOM);
+        areaNode.Create(ZOOM, _areaToEdit.zoom);
+        areaNode.Remove(AREA_CONSTRAINTS_MIN);
+        areaNode.Create(AREA_CONSTRAINTS_MIN, _areaToEdit.areaConstraintsMin);
+        areaNode.Remove(AREA_CONSTRAINTS_MAX);
+        areaNode.Create(AREA_CONSTRAINTS_MAX, _areaToEdit.areaConstraintsMax);
+        areaNode.Remove(VIEW_CONSTRAINTS_MIN);
+        areaNode.Create(VIEW_CONSTRAINTS_MIN, _areaToEdit.viewConstraintsMin);
+        areaNode.Remove(VIEW_CONSTRAINTS_MAX);
+        areaNode.Create(VIEW_CONSTRAINTS_MAX, _areaToEdit.viewConstraintsMax);
+
+        // Save xml string to PlayerPrefs
+        PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
+        PlayerPrefs.Save();
     }
 
     public static void SetServerAreaId(int _local_area_id, int _server_area_id)

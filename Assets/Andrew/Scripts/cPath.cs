@@ -14,6 +14,8 @@ public class cPath
     public DateTime date;
     public List<cPathPoint> pathPoints;
 
+    public static readonly string PATHS_TO_DELETE_PREFS_KEY = "pathsToDelete";
+
     public static readonly string PATH = "path";
     public static readonly string SERVER_PATH_ID = "server_path_id";
     public static readonly string LOCAL_AREA_ID = "local_area_id";
@@ -192,6 +194,54 @@ public class cPath
 
         return areaPaths;
     }
+
+    public static void RemoveIdToDelete(int _idToRemove)
+    {
+        // Load previously saved ids array
+        int[] loadedIdsToDelete = PlayerPrefsX.GetIntArray(PATHS_TO_DELETE_PREFS_KEY);
+
+        // Create a new int array based on the loaded ids array
+        int[] idsToDelete = new int[loadedIdsToDelete.Length - 1];
+
+        // Insert all loaded ids to the new ids array except the _idToRemove
+        int i = 0;
+        foreach (int id in loadedIdsToDelete)
+        {
+            if (id == _idToRemove)
+                continue;
+
+            idsToDelete[i] = id;
+            i++;
+        }
+        Debug.Log("idsToDelete length = " + idsToDelete.Length);
+        // Save new ids array
+        PlayerPrefsX.SetIntArray(PATHS_TO_DELETE_PREFS_KEY, idsToDelete);
+        PlayerPrefs.Save();
+    }
+
+    public static void AddIdToDelete(int _idToDelete)
+    {
+        // Load previously saved ids array
+        int[] loadedIdsToDelete = PlayerPrefsX.GetIntArray(PATHS_TO_DELETE_PREFS_KEY);
+
+        // Create a new int array based on the loaded ids array
+        int[] idsToDelete = new int[loadedIdsToDelete.Length + 1];
+
+        // Insert all loaded ids to the new ids array
+        for (int i = 0; i < loadedIdsToDelete.Length; i++)
+        {
+            idsToDelete[i] = loadedIdsToDelete[i];
+        }
+
+        // Insert the new id
+        idsToDelete[idsToDelete.Length - 1] = _idToDelete;
+        Debug.Log("idsToDelete length = " + idsToDelete.Length);
+        // Save new ids array
+        PlayerPrefsX.SetIntArray(PATHS_TO_DELETE_PREFS_KEY, idsToDelete);
+        PlayerPrefs.Save();
+    }
+
+    public static int[] GetServerIdsToDelete() => PlayerPrefsX.GetIntArray(PATHS_TO_DELETE_PREFS_KEY);
 
     public static List<cPath> GetPathsToUpload()
     {
