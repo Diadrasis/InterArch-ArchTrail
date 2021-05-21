@@ -6,9 +6,9 @@ using UnityEngine;
 public class cPath
 {
     #region Variables
-    // TODO: server_area_id
-    public int server_path_id;
+    public int server_area_id;
     public int local_area_id;
+    public int server_path_id;
     public int local_path_id { get; private set; }
     public string title;
     public DateTime date;
@@ -17,7 +17,7 @@ public class cPath
     public static readonly string PATH = "path";
     public static readonly string SERVER_PATH_ID = "server_path_id";
     public static readonly string LOCAL_AREA_ID = "local_area_id";
-    public static readonly string ID = "id"; // TODO: Change name
+    public static readonly string LOCAL_PATH_ID = "local_path_id";
     public static readonly string TITLE = "title";
     public static readonly string DATE = "date";
     public static readonly string PATH_POINTS = "pathPoints";
@@ -34,6 +34,7 @@ public class cPath
 
     public cPath(int _local_area_id) // For Creating
     {
+        server_area_id = -1;
         server_path_id = -1;
         local_area_id = _local_area_id;
         local_path_id = GetAvailablePathID();
@@ -42,11 +43,12 @@ public class cPath
         pathPoints = new List<cPathPoint>();
     }
 
-    private cPath(int _server_path_id, int _local_area_id, int _id, string _title, DateTime _date, List<cPathPoint> _pathPoints) // For Load
+    private cPath(int _server_area_id, int _server_path_id, int _local_area_id, int _local_path_id, string _title, DateTime _date, List<cPathPoint> _pathPoints) // For Load
     {
-        server_path_id = _server_path_id;
+        server_area_id = _server_area_id;
         local_area_id = _local_area_id;
-        local_path_id = _id;
+        server_path_id = _server_path_id;
+        local_path_id = _local_path_id;
         title = _title;
         date = _date;
         pathPoints = _pathPoints;
@@ -74,7 +76,7 @@ public class cPath
         // Get all area ids
         HashSet<int> pathIDs = new HashSet<int>();
 
-        OnlineMapsXMLList pathIDNodes = xml.FindAll("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + PATH + "/" + ID); //"/areas/area/paths/path/id"
+        OnlineMapsXMLList pathIDNodes = xml.FindAll("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + PATH + "/" + LOCAL_PATH_ID); //"/areas/area/paths/path/id"
 
         foreach (OnlineMapsXML node in pathIDNodes)
         {
@@ -100,7 +102,7 @@ public class cPath
     {
         OnlineMapsXML xml = cArea.GetXML();
         //xml.Remove(_pathToDelete.areaTitle + _pathToDelete.title);
-        OnlineMapsXML pathToDelete = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.LOCAL_AREA_ID + "=" + _pathToDelete.local_area_id + "]/" + cArea.PATHS + "/" + PATH + "[" + ID + "=" + _pathToDelete.local_path_id + "]"); // /areas/area[id=0]/paths/path[id=0]
+        OnlineMapsXML pathToDelete = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.LOCAL_AREA_ID + "=" + _pathToDelete.local_area_id + "]/" + cArea.PATHS + "/" + PATH + "[" + LOCAL_PATH_ID + "=" + _pathToDelete.local_path_id + "]"); // /areas/area[id=0]/paths/path[id=0]
         if (!pathToDelete.isNull)
             pathToDelete.Remove();
 
@@ -116,9 +118,10 @@ public class cPath
         // Create a new path
         OnlineMapsXML pathsNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.LOCAL_AREA_ID + "=" + _pathToSave.local_area_id + "]/" + cArea.PATHS);
         OnlineMapsXML pathNode = pathsNode.Create(PATH);
-        pathNode.Create(SERVER_PATH_ID, _pathToSave.server_path_id);
+        pathNode.Create(cArea.SERVER_AREA_ID, _pathToSave.server_area_id);
         pathNode.Create(LOCAL_AREA_ID, _pathToSave.local_area_id);
-        pathNode.Create(ID, _pathToSave.local_path_id);
+        pathNode.Create(SERVER_PATH_ID, _pathToSave.server_path_id);
+        pathNode.Create(LOCAL_PATH_ID, _pathToSave.local_path_id);
         pathNode.Create(TITLE, _pathToSave.title);
         pathNode.Create(DATE, _pathToSave.date.ToString());
         cPathPoint.SavePathPoints(pathNode.Create(PATH_POINTS), _pathToSave.pathPoints);
@@ -141,8 +144,10 @@ public class cPath
         // Load xml document, if null create new
         OnlineMapsXML xml = cArea.GetXML();
 
-        // Create a new path
-        OnlineMapsXML pathNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.LOCAL_AREA_ID + "=" + _pathToEdit.local_area_id + "]/" + cArea.PATHS + "/" + PATH + "[" + ID + "=" + _pathToEdit.local_path_id + "]");
+        // Get path from xml and Edit values
+        OnlineMapsXML pathNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.LOCAL_AREA_ID + "=" + _pathToEdit.local_area_id + "]/" + cArea.PATHS + "/" + PATH + "[" + LOCAL_PATH_ID + "=" + _pathToEdit.local_path_id + "]");
+        pathNode.Remove(cArea.SERVER_AREA_ID);
+        pathNode.Create(cArea.SERVER_AREA_ID, _pathToEdit.server_area_id);
         pathNode.Remove(SERVER_PATH_ID);
         pathNode.Create(SERVER_PATH_ID, _pathToEdit.server_path_id);
 
@@ -153,16 +158,17 @@ public class cPath
 
     private static cPath Load(OnlineMapsXML _pathNode)
     {
-        int server_path_id = _pathNode.Get<int>(SERVER_PATH_ID);
+        int server_area_id = _pathNode.Get<int>(cArea.SERVER_AREA_ID);
         int local_area_id = _pathNode.Get<int>(LOCAL_AREA_ID);
-        int id = _pathNode.Get<int>(ID);
+        int server_path_id = _pathNode.Get<int>(SERVER_PATH_ID);
+        int local_path_id = _pathNode.Get<int>(LOCAL_PATH_ID);
         string title = _pathNode.Get<string>(TITLE);
         string dateString = _pathNode.Get<string>(DATE);
         DateTime date = DateTime.Parse(dateString);
         List<cPathPoint> pathPoints = cPathPoint.LoadPathPointsOfPath(_pathNode[PATH_POINTS]);
 
         // Create cArea and add it to loadedAreas list
-        cPath loadedPath = new cPath(server_path_id, local_area_id, id, title, date, pathPoints);
+        cPath loadedPath = new cPath(server_area_id, server_path_id, local_area_id, local_path_id, title, date, pathPoints);
         return loadedPath;
     }
 
@@ -209,22 +215,39 @@ public class cPath
             cPath loadedPath = Load(pathNode);
 
             if (loadedPath != null)
-                pathsToUpload.Add(loadedPath);
+            {
+                // Get server_area_id
+                OnlineMapsXML areaNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + LOCAL_AREA_ID + "=" + loadedPath.local_area_id + "]/" + cArea.SERVER_AREA_ID);
+                string server_area_idString = areaNode.Value();
+                if (int.TryParse(server_area_idString, out int server_area_id))
+                Debug.Log("area's server_area_id = " + server_area_id);
+                // If server_area_id is -1 then the area is not uploaded yet so don't upload its paths yet.
+                if (server_area_id != -1)
+                {
+                    // Set path's server_area_id
+                    if (loadedPath.server_area_id == -1)
+                        loadedPath.server_area_id = server_area_id;
+
+                    pathsToUpload.Add(loadedPath);
+                }
+            }
         }
 
         return pathsToUpload;
     }
 
-    public static void SetServerPathId(int _id, int _server_path_id)
+    public static void SetServerAreaAndPathId(int _server_area_id, int _server_path_id, int _local_path_id)
     {
         // Load xml document, if null creates new
         OnlineMapsXML xml = cArea.GetXML();
 
         // Find path
-        OnlineMapsXML pathNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + PATH + "[" + ID + "=" + _id + "]");
+        OnlineMapsXML pathNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + PATH + "[" + LOCAL_PATH_ID + "=" + _local_path_id + "]");
 
         // Load path
         cPath loadedPath = Load(pathNode);
+        if (loadedPath.server_area_id == -1)
+            loadedPath.server_area_id = _server_area_id;
         loadedPath.server_path_id = _server_path_id;
 
         // Edit path
