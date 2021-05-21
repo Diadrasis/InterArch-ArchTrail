@@ -23,7 +23,7 @@ public class ServerManager : MonoBehaviour
     private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
     public bool postUserData = false; // true;
 
-    public enum PHPActions {Save, Get, Delete, Edit, Save_Path, Delete_Path, Save_Point } // TODO: Edit, Edit_Path
+    public enum PHPActions { Get_Areas, Save_Area, Delete_Area, Get_Paths, Save_Path, Delete_Path, Get_Points, Save_Point, Delete_Point }
     #endregion
 
     #region UnityMethods
@@ -32,10 +32,17 @@ public class ServerManager : MonoBehaviour
         postUserData = false;
 
         // Delete all areas from server
-        /*for (int i = 0; i < 100; i++)
+        /*for (int i = 0; i < 10; i++)
         {
             DeleteAreaFromServer(i);
         }*/
+
+        // Delete all areas from server
+        /*for (int i = 0; i < 10; i++)
+        {
+            DeletePathFromServer(i);
+        }*/
+
 
         //cArea.DeleteAreaFromServer(90);
         // DownloadAreas();
@@ -238,9 +245,9 @@ public class ServerManager : MonoBehaviour
     {
         // Create a form and add all the fields of the area
         List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
-        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 0))); // Save
+        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 1))); // Save_Area
 
-        //formToPost.Add(new MultipartFormDataSection("server_area_id", _areaToUpload.server_area_id.ToString()));
+        formToPost.Add(new MultipartFormDataSection("server_area_id", _areaToUpload.server_area_id.ToString()));
         //formToPost.Add(new MultipartFormDataSection("local_area_id", _areaToUpload.local_area_id.ToString()));
         formToPost.Add(new MultipartFormDataSection("title", _areaToUpload.title));
         formToPost.Add(new MultipartFormDataSection("position", _areaToUpload.position.ToString("F6")));
@@ -258,8 +265,9 @@ public class ServerManager : MonoBehaviour
     {
         // Create a form and add all the fields of the area
         List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
-        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 4)));
+        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 4))); // Save_Path
         formToPost.Add(new MultipartFormDataSection("server_area_id", _pathToUpload.server_area_id.ToString()));
+        formToPost.Add(new MultipartFormDataSection("server_path_id", _pathToUpload.server_area_id.ToString()));
         //formToPost.Add(new MultipartFormDataSection("local_area_id", _pathToUpload.local_area_id.ToString()));
         //formToPost.Add(new MultipartFormDataSection("local_path_id", _pathToUpload.local_path_id.ToString()));
         formToPost.Add(new MultipartFormDataSection("title", _pathToUpload.title));
@@ -273,11 +281,12 @@ public class ServerManager : MonoBehaviour
     {
         // Create a form and add all the fields of the area
         List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
-        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 6))); // Save_Point
+        formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 7))); // Save_Point
         formToPost.Add(new MultipartFormDataSection("server_path_id", _pointToUpload.server_path_id.ToString()));
+        formToPost.Add(new MultipartFormDataSection("server_point_id", _pointToUpload.server_point_id.ToString()));
         //formToPost.Add(new MultipartFormDataSection("local_area_id", _pathToUpload.local_area_id.ToString()));
         //formToPost.Add(new MultipartFormDataSection("local_path_id", _pathToUpload.local_path_id.ToString()));
-        formToPost.Add(new MultipartFormDataSection("index", _pointToUpload.index.ToString()));
+        formToPost.Add(new MultipartFormDataSection("indexx", _pointToUpload.index.ToString()));
         formToPost.Add(new MultipartFormDataSection("position", _pointToUpload.position.ToString()));
         //formToPost.Add(new MultipartFormDataSection("time", _pointToUpload.time.ToString())); // TODO: Change???
         formToPost.Add(new MultipartFormDataSection("duration", _pointToUpload.duration.ToString()));
@@ -440,7 +449,7 @@ public class ServerManager : MonoBehaviour
     IEnumerator GetAreas()
     {
         WWWForm formToPost = new WWWForm();
-        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 1)); // Get
+        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 0)); // Get_Areas
 
         UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
 
@@ -512,7 +521,7 @@ public class ServerManager : MonoBehaviour
     IEnumerator DeleteArea(int _server_area_idToDelete)
     {
         WWWForm formToPost = new WWWForm();
-        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 2)); // Delete
+        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 2)); // Delete_Area
         formToPost.AddField("server_area_id", _server_area_idToDelete);
 
         UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
@@ -543,7 +552,7 @@ public class ServerManager : MonoBehaviour
     IEnumerator DeletePath(int _server_path_idToDelete)
     {
         WWWForm formToPost = new WWWForm();
-        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 2)); // TODO: Change number to correspond to PHPAction
+        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 5)); // Delete_Path
         formToPost.AddField("server_path_id", _server_path_idToDelete);
 
         UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
@@ -559,6 +568,9 @@ public class ServerManager : MonoBehaviour
             Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
             Debug.Log("Echo: " + webRequest.downloadHandler.text);
             //Debug.Log("Data length: " + webRequest.downloadHandler.data);
+
+            // Remove id to delete from player prefs
+            cPath.RemoveIdToDelete(_server_path_idToDelete);
         }
     }
 
