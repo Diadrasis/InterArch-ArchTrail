@@ -4109,9 +4109,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\u03A0\u03B1\u03C4\u03AE\u03C3\u03C4\u03B5 \u03C4\u03BF \u03BA\u03BF\u03C5\u03BC\u03C0\u03AF
-    <b>GPS</b> \u03C4\u03BF\u03C5 \u03C4\u03B7\u03BB\u03B5\u03C6\u03CE\u03BD\u03BF\u03C5
-    \u03C3\u03B1\u03C2 \u03B3\u03B9\u03B1 \u03BD\u03B1 <color=#90ee90>\u03B5\u03BD\u03B5\u03C1\u03B3\u03BF\u03C0\u03BF\u03B9\u03AE\u03C3\u03B5\u03C4\u03B5</color>
-    \u03C4\u03B1 <b>Location Services</b>"
+    \u03C4\u03BF\u03C5 <b>GPS</b> \u03B3\u03B9\u03B1 \u03BD\u03B1 <color=#90ee90>\u03B5\u03BD\u03B5\u03C1\u03B3\u03BF\u03C0\u03BF\u03B9\u03AE\u03C3\u03B5\u03C4\u03B5</color>
+    \u03C4\u03B1 <b>Location Services</b> \u03C4\u03BF\u03C5 \u03C4\u03B7\u03BB\u03B5\u03C6\u03CE\u03BD\u03BF\u03C5
+    \u03C3\u03B1\u03C2"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ec710b30ebc00bc4b9638cf75501909e, type: 2}
   m_sharedMaterial: {fileID: 669479800088959382, guid: ec710b30ebc00bc4b9638cf75501909e,
@@ -13459,7 +13459,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 1
-  m_Spacing: 20
+  m_Spacing: 50
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0

@@ -480,16 +480,11 @@ public class UIManager : MonoBehaviour
         }*/
         
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
-
-        //btnAddNewPath.GetComponentInChildren<Text>().text = "Save"; // sprSaveIcon;
         IsInRecordingPath(true);
-
-        //btnAddNewPath.onClick.RemoveAllListeners();
-        //btnAddNewPath.onClick.AddListener(() => SaveUIButton());
-
         AppManager.Instance.mapManager.StartRecordingPath();
         btnPaths.interactable = false;
         pnlRecordButton.SetActive(true);
+        pnlMainButtons.SetActive(false);
     }
 
     //change the icon from plus to save, opens warning screen for saving or cancel path
@@ -497,6 +492,7 @@ public class UIManager : MonoBehaviour
     {
         EnableScreen(pnlWarningSavePathScreen, true);
         pnlRecordButton.SetActive(false);
+        pnlMainButtons.SetActive(true);
         AppManager.Instance.mapManager.StopRecordingPath();
         btnPaths.interactable = true;
         //btnAddNewPath.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
