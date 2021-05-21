@@ -246,7 +246,6 @@ public class ServerManager : MonoBehaviour
         // Create a form and add all the fields of the area
         List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
         formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 1))); // Save_Area
-
         formToPost.Add(new MultipartFormDataSection("server_area_id", _areaToUpload.server_area_id.ToString()));
         //formToPost.Add(new MultipartFormDataSection("local_area_id", _areaToUpload.local_area_id.ToString()));
         formToPost.Add(new MultipartFormDataSection("title", _areaToUpload.title));
