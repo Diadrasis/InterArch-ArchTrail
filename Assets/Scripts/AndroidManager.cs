@@ -11,7 +11,7 @@ public class AndroidManager : MonoBehaviour
     private void Start()
     {
         Init();
-        AppManager.Instance.serverManager.CheckInternet();
+        //AppManager.Instance.serverManager.CheckInternet();
     }
 
     void Init()
@@ -101,7 +101,7 @@ public class AndroidManager : MonoBehaviour
         //if (CheckForLocationServices()) return;//if we remove this line, we shouldn't leave the StopLocationService on the method ON, on the bool method!!!
 
     }
-    private void OnApplicationPause(bool pause)
+    /*private void OnApplicationPause(bool pause)
     {
         if (!pause)
         {
@@ -113,7 +113,7 @@ public class AndroidManager : MonoBehaviour
             locationService.StopLocationService();
             
         }
-    }
+    }*/
 
 
     private void OnApplicationFocus(bool focus)
@@ -126,32 +126,31 @@ public class AndroidManager : MonoBehaviour
         }
         else
         {
-            AppManager.Instance.serverManager.CheckInternet();
-            //Debug.LogWarning("OnApplicationFocus = true");
+            //AppManager.Instance.serverManager.CheckInternet();
+            Debug.LogWarning("OnApplicationFocus = true");
             if (CheckForLocationServices()) { return; }
         }
     }
 
-    public void OnCheckInternetCheckComplete(bool val)
+    /*public void OnCheckInternetCheckComplete(bool val)
     {
         if (val)
         {
-            //AppManager.Instance.uIManager.txtWarning.text = "internet";
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
-            AppManager.Instance.uIManager.btnUploadServer.interactable = true;
-            /*btnInternet.image.color = Color.green;
+            Debug.Log("Internet check on Android Manager and val is: "+val);
+            *//*btnInternet.image.color = Color.green;
             if (!isReadDatabase)
             {
                 serverManager.GetPathsFromServer();
                 isReadDatabase = true;
-            }*/
+            }*//*
         }
         else
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
-            AppManager.Instance.uIManager.btnUploadServer.interactable = false;
-            //btnInternet.image.color = Color.gray;
+            Debug.Log("Internet check on Android Manager (else) and val is: " + val);
+            
         }
-    }
+    }*/
 }

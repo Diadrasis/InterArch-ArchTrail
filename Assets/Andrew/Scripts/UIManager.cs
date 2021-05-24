@@ -480,10 +480,10 @@ public class UIManager : MonoBehaviour
         }*/
         
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
-        IsInRecordingPath(true);
         AppManager.Instance.mapManager.StartRecordingPath();
         btnPaths.interactable = false;
         pnlRecordButton.SetActive(true);
+        IsInRecordingPath(true);
         pnlMainButtons.SetActive(false);
     }
 

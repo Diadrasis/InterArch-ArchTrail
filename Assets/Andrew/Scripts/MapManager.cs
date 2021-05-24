@@ -44,13 +44,13 @@ public class MapManager : MonoBehaviour
     private double fromTileX, fromTileY, toTileX, toTileY;
 
     // Create Area
-    public Texture2D markerCreateAreaTexture;
+    public Texture2D markerCreateAreaTextureMax, markerCreateAreaTextureMin;
     public float borderWidth = 1;
     private bool createArea = false;
     OnlineMapsMarker[] markersCreateArea = new OnlineMapsMarker[2];
     Vector2[] positionsCreateArea = new Vector2[4];
     private OnlineMapsDrawingPoly polygon;
-    private static readonly int DEFAULT_MARKER_SCALE = 2;
+    private static readonly float DEFAULT_MARKER_SCALE = 0.2f;
 
     // Create Path
     TimeSpan previousPointTime;
@@ -122,7 +122,7 @@ public class MapManager : MonoBehaviour
     }
     private void OnDisable()
     {
-        AppManager.Instance.serverManager.OnCheckInternetCheckComplete -= AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
+        //AppManager.Instance.serverManager.OnCheckInternetCheckComplete -= AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
     }
     #endregion
 
@@ -360,7 +360,8 @@ public class MapManager : MonoBehaviour
         OnlineMapsLocationService.instance.OnLocationChanged += OnLocationChanged;
 
         //Interent Events
-        AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
+        /*AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
+        Debug.Log("Internet check on Subscribe to Events");*/
     }
 
     private void OnMapClick()
@@ -380,13 +381,15 @@ public class MapManager : MonoBehaviour
                 Vector2 bottomRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
 
                 // Create two markers on the specified coordinates.
-                OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTexture, "Marker Min");
+                OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTextureMax, "Marker Min");
                 markerMin.scale = DEFAULT_MARKER_SCALE;
                 markerMin.SetDraggable(true);
+                markerMin.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
                 //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
-                OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTexture, "Marker Max");
+                OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTextureMin, "Marker Max");
                 markerMax.scale = DEFAULT_MARKER_SCALE;
                 markerMax.SetDraggable(true);
+                markerMax.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
                 //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
 
                 // Set markers and positions.
