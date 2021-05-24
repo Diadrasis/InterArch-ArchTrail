@@ -142,8 +142,6 @@ public class UIManager : MonoBehaviour
         //for testing the saving of paths is happening smoothly
         btnPaths.onClick.AddListener(() => DisplayPathsScreen());
         btnCancelShow.onClick.AddListener(() => CancelInGeneral());
-        btnUploadServer.onClick.AddListener(() => AppManager.Instance.serverManager.GetTest());
-        btnDownloadServer.onClick.AddListener(() => AppManager.Instance.serverManager.PostTest());
     }
     void ActivateButtons(bool valPath, bool valBack, bool valQuit)
     {   

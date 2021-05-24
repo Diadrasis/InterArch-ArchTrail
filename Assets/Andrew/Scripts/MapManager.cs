@@ -266,7 +266,7 @@ public class MapManager : MonoBehaviour
             areas = cArea.LoadAreas();
 
             // Upload user data to server
-            if (areaCounter >= 3) // TODO: For testing only. Remove.
+            if (areaCounter >= 2) // TODO: For testing only. Remove.
             {
                 AppManager.Instance.serverManager.postUserData = true;
                 areaCounter = 0;

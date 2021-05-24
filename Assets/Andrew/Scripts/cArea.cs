@@ -145,23 +145,30 @@ public class cArea
         // Load previously saved ids array
         int[] loadedIdsToDelete = PlayerPrefsX.GetIntArray(AREAS_TO_DELETE_PREFS_KEY);
 
-        // Create a new int array based on the loaded ids array
-        int[] idsToDelete = new int[loadedIdsToDelete.Length - 1];
-
-        // Insert all loaded ids to the new ids array except the _idToRemove
-        int i = 0;
-        foreach (int id in loadedIdsToDelete)
+        if (loadedIdsToDelete.Length > 0)
         {
-            if (id == _idToRemove)
-                continue;
+            // Create a new int array based on the loaded ids array
+            int[] idsToDelete = new int[loadedIdsToDelete.Length - 1];
+            Debug.Log("RemoveIdToDelete, idsToDelete length = " + idsToDelete.Length);
+            // Insert all loaded ids to the new ids array except the _idToRemove
+            int i = 0;
+            foreach (int id in loadedIdsToDelete)
+            {
+                if (id == _idToRemove)
+                {
+                    Debug.Log("id == _idToRemove: " + (id == _idToRemove));
+                    continue;
+                }
 
-            idsToDelete[i] = id;
-            i++;
+                idsToDelete[i] = id;
+                Debug.Log("id to delete = " + idsToDelete[i]);
+                i++;
+            }
+            
+            // Save new ids array
+            PlayerPrefsX.SetIntArray(AREAS_TO_DELETE_PREFS_KEY, idsToDelete);
+            PlayerPrefs.Save();
         }
-        Debug.Log("idsToDelete length = " + idsToDelete.Length);
-        // Save new ids array
-        PlayerPrefsX.SetIntArray(AREAS_TO_DELETE_PREFS_KEY, idsToDelete);
-        PlayerPrefs.Save();
     }
 
     public static void AddIdToDelete(int _idToDelete)
@@ -171,16 +178,17 @@ public class cArea
         
         // Create a new int array based on the loaded ids array
         int[] idsToDelete = new int[loadedIdsToDelete.Length + 1];
-
+        Debug.Log("AddIdToDelete, idsToDelete length = " + idsToDelete.Length);
         // Insert all loaded ids to the new ids array
         for (int i = 0; i < loadedIdsToDelete.Length; i++)
         {
             idsToDelete[i] = loadedIdsToDelete[i];
+            Debug.Log("id to delete = " + idsToDelete[i]);
         }
 
         // Insert the new id
         idsToDelete[idsToDelete.Length - 1] = _idToDelete;
-        Debug.Log("idsToDelete length = " + idsToDelete.Length);
+        Debug.Log("id to delete = " + idsToDelete[idsToDelete.Length - 1]);
         // Save new ids array
         PlayerPrefsX.SetIntArray(AREAS_TO_DELETE_PREFS_KEY, idsToDelete);
         PlayerPrefs.Save();
