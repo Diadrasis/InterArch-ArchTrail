@@ -101,19 +101,7 @@ public class AndroidManager : MonoBehaviour
         //if (CheckForLocationServices()) return;//if we remove this line, we shouldn't leave the StopLocationService on the method ON, on the bool method!!!
 
     }
-    /*private void OnApplicationPause(bool pause)
-    {
-        if (!pause)
-        {
-            if (CheckForLocationServices()) { return; }
-            AppManager.Instance.serverManager.CheckInternet();
-        }
-        else
-        {
-            locationService.StopLocationService();
-            
-        }
-    }*/
+    
 
 
     private void OnApplicationFocus(bool focus)
@@ -131,6 +119,20 @@ public class AndroidManager : MonoBehaviour
             if (CheckForLocationServices()) { return; }
         }
     }
+    #region NOT IN USE
+    /*private void OnApplicationPause(bool pause)
+    {
+        if (!pause)
+        {
+            if (CheckForLocationServices()) { return; }
+            AppManager.Instance.serverManager.CheckInternet();
+        }
+        else
+        {
+            locationService.StopLocationService();
+            
+        }
+    }*/
 
     /*public void OnCheckInternetCheckComplete(bool val)
     {
@@ -153,4 +155,6 @@ public class AndroidManager : MonoBehaviour
             
         }
     }*/
+    #endregion
+
 }

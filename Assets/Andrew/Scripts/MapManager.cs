@@ -236,7 +236,6 @@ public class MapManager : MonoBehaviour
             if (area.title.Equals(_areaTitle))
                 return area;
         }
-
         return null;
     }
 
@@ -275,7 +274,7 @@ public class MapManager : MonoBehaviour
                 areaCounter += 1;
         }
     }
-
+    //to save when edits have been made
     public void EditArea(cArea _areaToEdit, string _areaTitle)
     {
         // Get center point
@@ -293,6 +292,7 @@ public class MapManager : MonoBehaviour
         // Edit area locally and reload areas
         cArea.Edit(_areaToEdit);
         areas = cArea.LoadAreas();
+
 
         // Edit area on server
     }
@@ -361,7 +361,7 @@ public class MapManager : MonoBehaviour
 
         //Interent Events
         /*AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
-        Debug.Log("Internet check on Subscribe to Events");*/
+        */
     }
 
     private void OnMapClick()
@@ -383,12 +383,14 @@ public class MapManager : MonoBehaviour
                 // Create two markers on the specified coordinates.
                 OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTextureMax, "Marker Min");
                 markerMin.scale = DEFAULT_MARKER_SCALE;
-                markerMin.SetDraggable(true);
+                markerMin.OnLongPress += OnMarkerLongPress;
+                //markerMin.SetDraggable(true);
                 markerMin.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
                 //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
                 OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTextureMin, "Marker Max");
                 markerMax.scale = DEFAULT_MARKER_SCALE;
-                markerMax.SetDraggable(true);
+                markerMax.OnLongPress += OnMarkerLongPress;
+                //markerMax.SetDraggable(true);
                 markerMax.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
                 //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
 
@@ -409,9 +411,10 @@ public class MapManager : MonoBehaviour
                 // Activate button
                 AppManager.Instance.uIManager.btnSaveArea.interactable = true;
             }
+            
         }
     }
-
+    
     public void CreateNewAreaInitialize()
     {
         OnlineMapsDrawingElementManager.RemoveAllItems();
@@ -479,34 +482,34 @@ public class MapManager : MonoBehaviour
     }
 
     //can be removed?
-   /* public void CheckMyLocation()
-    {
-        //Debug.Log("CheckMyLocation");
-        //CreateMarkerOnUserPosition();
-        fromPosition = OnlineMaps.instance.position;
-        toPosition = OnlineMapsLocationService.instance.position;
+    /* public void CheckMyLocation()
+     {
+         //Debug.Log("CheckMyLocation");
+         //CreateMarkerOnUserPosition();
+         fromPosition = OnlineMaps.instance.position;
+         toPosition = OnlineMapsLocationService.instance.position;
 
-        // calculates tile positions
-        moveZoom = OnlineMaps.instance.zoom;
-        OnlineMaps.instance.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
-        OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
+         // calculates tile positions
+         moveZoom = OnlineMaps.instance.zoom;
+         OnlineMaps.instance.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
+         OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
 
-        // if tile offset < 4, then start smooth movement
-        if (OnlineMapsUtils.Magnitude(fromTileX, fromTileY, toTileX, toTileY) < 4)
-        {
-            // set relative position 0
-            angle = 0;
+         // if tile offset < 4, then start smooth movement
+         if (OnlineMapsUtils.Magnitude(fromTileX, fromTileY, toTileX, toTileY) < 4)
+         {
+             // set relative position 0
+             angle = 0;
 
-            // start movement
-            isMovement = true;
-        }
-        else // too far
-        {
-            OnlineMaps.instance.position = toPosition;
-        }
-    }*/
-
-        public void OnLocationChanged(Vector2 position)
+             // start movement
+             isMovement = true;
+         }
+         else // too far
+         {
+             OnlineMaps.instance.position = toPosition;
+         }
+     }*/
+    #region Path
+    public void OnLocationChanged(Vector2 position)
     {
         //AppManager.Instance.uIManager.infoText.text = "Location changed to: " + position;
 
@@ -665,8 +668,17 @@ public class MapManager : MonoBehaviour
         currentArea.paths = cPath.LoadPathsOfArea(currentArea.local_area_id);
         return currentArea.paths;
     }
+    #endregion
 
     #region Marker
+
+    private void OnMarkerLongPress(OnlineMapsMarkerBase marker)
+    {
+        // Starts moving the marker.
+        OnlineMapsControlBase.instance.dragMarker = marker;
+        OnlineMapsControlBase.instance.isMapDrag = false;
+        marker.label = "";
+    }
     private void OnMarkerPositionChange(OnlineMapsMarkerBase marker)
     {
         //Debug.Log("OnMarkerPositionChange "+marker.label);
@@ -737,7 +749,15 @@ public class MapManager : MonoBehaviour
         polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
     }
 
-
+    public void EditSelectedArea(cArea _areaToEdit)
+    {
+        DisplayArea(_areaToEdit);
+        SetMapViewToPoint(_areaToEdit.position);
+        //SetMapViewToLocation();
+        if(currentArea == _areaToEdit)
+            CheckMarkerPositions();
+        Debug.Log("Edit Selected Area");
+    }
     #endregion
 
     #region Screencapture the path
