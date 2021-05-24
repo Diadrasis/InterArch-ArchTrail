@@ -13243,7 +13243,9 @@ MonoBehaviour:
     _rotation: 0
     _texture: {fileID: 0}
   time: 10
-  markerCreateAreaTexture: {fileID: 2800000, guid: 0efa5fe34f4b75e4eb7e038b24896959,
+  markerCreateAreaTextureMax: {fileID: 2800000, guid: 9fbde0768e593764bb55d0ccd5f8e4f0,
+    type: 3}
+  markerCreateAreaTextureMin: {fileID: 2800000, guid: 0efa5fe34f4b75e4eb7e038b24896959,
     type: 3}
   borderWidth: 1
 --- !u!222 &6710081423120059520

@@ -63,17 +63,14 @@ public class ServerManager : MonoBehaviour
 
     private void Update()
     {
+
         // Check if there is an internet connection
-        //if ()
+        if (postUserData && CheckInternet())
         {
             // if postUserData is true, uploads the user's data to the server
             // NOTE: The postUserData variable is set to true when opening the application, when the user saves a new area or when a path is added etc.
-            if (postUserData)
-            {
-                //PostUserDataToDiadrasis();
-                StartCoroutine(UploadUserDataToDiadrasis());
-                postUserData = false;
-            }
+			StartCoroutine(UploadUserDataToDiadrasis());
+			postUserData = false;
         }
     }
     #endregion
@@ -128,20 +125,30 @@ public class ServerManager : MonoBehaviour
     }*/
 
     #region InternetConnection
-    public void CheckInternet()
+    public bool CheckInternet()
     {
         OnlineMaps.instance.CheckServerConnection(OnCheckConnectionComplete);
+        return true;
     }
 
     public void OnCheckConnectionComplete(bool status)
     {
+        if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
+
+        if (status)
+        {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+        }
+        else
+        {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
+        }
+
         // If the test is successful, then allow the user to manipulate the map.
         //OnlineMapsControlBase.instance.allowUserControl = status;
-
         // Showing test result in console.
-        // Debug.Log(status ? "Has connection" : "No connection");
-
-        if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
+        Debug.Log(status ? "Has connection" : "No connection");
     }
     #endregion
 
