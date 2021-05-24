@@ -55,29 +55,39 @@ public class MapManager : MonoBehaviour
     // Create Path
     TimeSpan previousPointTime;
 
-    private int areaCounter = 0; // TODO: Remove, for testing only
+    //private int areaCounter = 0; // TODO: Remove, for testing only
     #endregion
 
     #region Unity Functions
     private void Awake()
     {
+        
+
         //List<cArea> areasToTestSave = GetTestAreas();
         //cArea.SaveAreas(areasToTestSave);
-
-        areas = new List<cArea>();
-        areas = cArea.LoadAreas();
 
         //cArea.PrintData("/areas/area/id"); // /areas/area[title='Sarri']
 
         //Debug.Log(cArea.GetInfoFromXML("/areas/Μεσσήνη/title"));
 
-        
+
 
         //cPath.Delete(new cPath(1, 0));
     }
 
     private void Start()
     {
+        // Download areas
+        if (AppManager.Instance.serverManager.CheckInternet())
+        {
+            AppManager.Instance.serverManager.DownloadAreas();
+            AppManager.Instance.serverManager.DownloadPaths();
+        }
+        areas = new List<cArea>();
+        areas = cArea.LoadAreas();
+
+        AppManager.Instance.uIManager.DisplayAreasScreen();
+
         SubscribeToEvents();
         fromPosition = OnlineMaps.instance.position;
         toPosition = OnlineMapsLocationService.instance.position;
@@ -264,15 +274,16 @@ public class MapManager : MonoBehaviour
             // Save area locally and reload areas
             cArea.Save(areaToSave);
             areas = cArea.LoadAreas();
+            AppManager.Instance.serverManager.postUserData = true;
 
             // Upload user data to server
-            if (areaCounter >= 2) // TODO: For testing only. Remove.
+            /*if (areaCounter >= 2) // TODO: For testing only. Remove.
             {
                 AppManager.Instance.serverManager.postUserData = true;
                 areaCounter = 0;
             }
             else
-                areaCounter += 1;
+                areaCounter += 1;*/
         }
     }
 
@@ -303,41 +314,45 @@ public class MapManager : MonoBehaviour
         cArea areaSelected = areas[_selectAreaObjectIndex];
         cArea.Delete(areaSelected.local_area_id);
         areas = cArea.LoadAreas();
+        Debug.Log("Deleted Area, local_area_id = " + areaSelected.local_area_id + "server_area_id = " + areaSelected.server_area_id);
 
         // Delete Area from server
-        /*if (areaSelected.server_area_id != -1)
+        if (areaSelected.server_area_id != -1)
         {
+            Debug.Log("AddIdToDelete, area's server id: " + areaSelected.server_area_id);
             cArea.AddIdToDelete(areaSelected.server_area_id);
             AppManager.Instance.serverManager.postUserData = true;
-        }*/
+        }
 
         // TODO: For testing only. Remove.
-        if (areaSelected.server_area_id != -1)
+        /*if (areaSelected.server_area_id != -1)
         {
             cArea.AddIdToDelete(areaSelected.server_area_id);
         }
 
-        if (areaCounter >= 3)
+        if (areaCounter >= 2)
         {
             AppManager.Instance.serverManager.postUserData = true;
             areaCounter = 0;
         }
         else
-            areaCounter += 1;
+            areaCounter += 1;*/
     }
 
     public void DeletePath(int _selectPathObjectIndex)
     {
         cPath pathSelected = currentArea.paths[_selectPathObjectIndex];
-        Debug.Log(pathSelected.title);
+        //Debug.Log(pathSelected.title);
         cPath.Delete(pathSelected);
+        Debug.Log("Deleted Path, local_path_id = " + pathSelected.local_area_id + "server_path_id = " + pathSelected.server_area_id);
 
         // Delete Path from server
-        /*if (pathSelected.server_path_id != -1)
+        if (pathSelected.server_path_id != -1)
         {
-            cArea.AddIdToDelete(pathSelected.server_path_id);
+            Debug.Log("AddIdToDelete, path's server id: " + pathSelected.server_area_id);
+            cPath.AddIdToDelete(pathSelected.server_path_id);
             AppManager.Instance.serverManager.postUserData = true;
-        }*/
+        }
     }
 
     private void ResetMapConstraints()

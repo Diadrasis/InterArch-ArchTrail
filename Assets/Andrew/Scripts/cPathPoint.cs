@@ -24,7 +24,7 @@ public class cPathPoint
     #endregion
 
     #region Methods
-    // Constructor for Create
+    // Constructor for creating locally
     public cPathPoint(int _local_path_id, int _index, Vector2 _position, float _duration) //TimeSpan _time
     {
         server_path_id = -1;
@@ -36,11 +36,23 @@ public class cPathPoint
         duration = _duration;
     }
 
-    // Constructor for Load
+    // Constructor for loading from Player Prefs
     public cPathPoint(int _server_path_id, int _local_path_id, int _server_point_id, int _index, Vector2 _position, float _duration) // TimeSpan _time
     {
         server_path_id = _server_path_id;
         local_path_id = _local_path_id;
+        server_point_id = _server_point_id;
+        index = _index;
+        position = _position;
+        duration = _duration;
+        //time = _time;
+    }
+
+    // Constructor for downloading from server
+    public cPathPoint(int _server_path_id, int _server_point_id, int _index, Vector2 _position, float _duration)
+    {
+        server_path_id = _server_path_id;
+        local_path_id = -1;
         server_point_id = _server_point_id;
         index = _index;
         position = _position;
@@ -63,7 +75,7 @@ public class cPathPoint
 
     public static void Save(OnlineMapsXML _pathPointsNode, cPathPoint _pathPointToSave)
     {
-        // Create a new path
+        // Create a new point
         OnlineMapsXML pathPointNode = _pathPointsNode.Create(PATHPOINT);
         pathPointNode.Create(cPath.SERVER_PATH_ID, _pathPointToSave.server_path_id);
         pathPointNode.Create(cPath.LOCAL_PATH_ID, _pathPointToSave.local_path_id);
@@ -72,6 +84,41 @@ public class cPathPoint
         pathPointNode.Create(POSITION, _pathPointToSave.position);
         pathPointNode.Create(DURATION, _pathPointToSave.duration);
         //pathPointNode.Create(TIME, _pathPointToSave.time.ToString());
+    }
+
+    public static void SaveFromServer(cPathPoint _pathPointToSave)
+    {
+        // Load xml document, if null create new
+        /*OnlineMapsXML xml = cArea.GetXML();
+
+        // Check if path is already downloaded
+        OnlineMapsXML pathSaved = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]/" + cArea.PATHS + "/" + PATH + "[" + SERVER_PATH_ID + "=" + _pathToSave.server_path_id + "]");
+        if (!pathSaved.isNull)
+        {
+            Debug.Log("Area is already downloaded!");
+            return;
+        }
+
+        // Get local area id from path's server_area_id
+        OnlineMapsXML areaNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]");
+        int local_area_id = areaNode.Get<int>(LOCAL_AREA_ID);
+
+        // Create a new path
+        OnlineMapsXML pathsNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]/" + cArea.PATHS);
+
+        // Create a new point
+        OnlineMapsXML pathPointNode = _pathPointsNode.Create(PATHPOINT);
+        pathPointNode.Create(cPath.SERVER_PATH_ID, _pathPointToSave.server_path_id);
+        pathPointNode.Create(cPath.LOCAL_PATH_ID, _pathPointToSave.local_path_id);
+        pathPointNode.Create(SERVER_POINT_ID, _pathPointToSave.server_point_id);
+        pathPointNode.Create(INDEX, _pathPointToSave.index);
+        pathPointNode.Create(POSITION, _pathPointToSave.position);
+        pathPointNode.Create(DURATION, _pathPointToSave.duration);
+        //pathPointNode.Create(TIME, _pathPointToSave.time.ToString());
+
+        // Save xml string to PlayerPrefs
+        PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
+        PlayerPrefs.Save();*/
     }
 
     public static void SavePathPoints(OnlineMapsXML _pathPointsNode, List<cPathPoint> _pathPointsToSave)
@@ -93,7 +140,7 @@ public class cPathPoint
         pointNode.Create(cPath.SERVER_PATH_ID, _pointToEdit.server_path_id);
         pointNode.Remove(SERVER_POINT_ID);
         pointNode.Create(SERVER_POINT_ID, _pointToEdit.server_point_id);
-
+        Debug.Log("Edited xml = " + xml.outerXml);
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
@@ -154,7 +201,7 @@ public class cPathPoint
                 OnlineMapsXML pathNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + cPath.PATH + "[" + cPath.LOCAL_PATH_ID + "=" + loadedPoint.local_path_id + "]/" + cPath.SERVER_PATH_ID);
                 string server_path_idString = pathNode.Value();
                 if (int.TryParse(server_path_idString, out int server_path_id))
-                    Debug.Log("path's server_path_id = " + server_path_id);
+                    //Debug.Log("point's server_path_id = " + server_path_id);
                 // If server_path_id is -1 then the area is not uploaded yet so don't upload its points yet.
                 if (server_path_id != -1)
                 {
@@ -188,4 +235,15 @@ public class cPathPoint
         EditServerPointId(loadedPoint);
     }
     #endregion
+}
+
+
+[Serializable]
+public class cPointData
+{
+    public int server_point_id;
+    public int server_path_id;
+    public string position;
+    public float duration;
+    public int indexx;
 }

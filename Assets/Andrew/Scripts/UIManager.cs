@@ -97,7 +97,7 @@ public class UIManager : MonoBehaviour
         selectPathObjects = new List<GameObject>();
         SubscribeButtons();
 
-        DisplayAreasScreen();
+        //DisplayAreasScreen();
 
         pnlWarningScreen.SetActive(false);
         pnlWarningSavePathScreen.SetActive(false);

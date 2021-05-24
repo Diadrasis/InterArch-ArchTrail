@@ -34,7 +34,8 @@ public class cPath
         pathPoints = _pathPoints;
     }*/
 
-    public cPath(int _local_area_id) // For Creating
+    // Constructor for creating locally
+    public cPath(int _local_area_id)
     {
         server_area_id = -1;
         server_path_id = -1;
@@ -45,7 +46,8 @@ public class cPath
         pathPoints = new List<cPathPoint>();
     }
 
-    private cPath(int _server_area_id, int _server_path_id, int _local_area_id, int _local_path_id, string _title, DateTime _date, List<cPathPoint> _pathPoints) // For Load
+    // Constructor for Loading from Player Prefs
+    private cPath(int _server_area_id, int _server_path_id, int _local_area_id, int _local_path_id, string _title, DateTime _date, List<cPathPoint> _pathPoints)
     {
         server_area_id = _server_area_id;
         local_area_id = _local_area_id;
@@ -54,6 +56,18 @@ public class cPath
         title = _title;
         date = _date;
         pathPoints = _pathPoints;
+    }
+
+    // Constructor for Downloading from server
+    public cPath(int _server_area_id, int _server_path_id, string _title, DateTime _date) // List<cPathPoint> _pathPoints
+    {
+        server_area_id = _server_area_id;
+        local_area_id = -1;
+        server_path_id = _server_path_id;
+        local_path_id = -1;
+        title = _title;
+        date = _date;
+        pathPoints = null; // _pathPoints;
     }
 
     //add a path point which will happen associated with cRoutePoints.cs
@@ -133,6 +147,39 @@ public class cPath
         PlayerPrefs.Save();
     }
 
+    public static void SaveFromServer(cPath _pathToSave)
+    {
+        // Load xml document, if null create new
+        OnlineMapsXML xml = cArea.GetXML();
+
+        // Check if path is already downloaded
+        OnlineMapsXML pathSaved = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]/" + cArea.PATHS + "/" + PATH + "[" + SERVER_PATH_ID + "=" + _pathToSave.server_path_id + "]");
+        if (!pathSaved.isNull)
+        {
+            Debug.Log("Area is already downloaded!");
+            return;
+        }
+
+        // Get local area id from path's server_area_id
+        OnlineMapsXML areaNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]");
+        int local_area_id = areaNode.Get<int>(LOCAL_AREA_ID);
+
+        // Create a new path
+        OnlineMapsXML pathsNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]/" + cArea.PATHS);
+        OnlineMapsXML pathNode = pathsNode.Create(PATH);
+        pathNode.Create(cArea.SERVER_AREA_ID, _pathToSave.server_area_id);
+        pathNode.Create(LOCAL_AREA_ID, local_area_id);
+        pathNode.Create(SERVER_PATH_ID, _pathToSave.server_path_id);
+        pathNode.Create(LOCAL_PATH_ID, GetAvailablePathID());
+        pathNode.Create(TITLE, _pathToSave.title);
+        pathNode.Create(DATE, _pathToSave.date.ToString());
+        //cPathPoint.SavePathPoints(pathNode.Create(PATH_POINTS), _pathToSave.pathPoints);
+
+        // Save xml string to PlayerPrefs
+        PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
+        PlayerPrefs.Save();
+    }
+
     public static void SavePaths(List<cPath> _pathsToSave)
     {
         foreach (cPath pathToSave in _pathsToSave)
@@ -153,6 +200,7 @@ public class cPath
         pathNode.Remove(SERVER_PATH_ID);
         pathNode.Create(SERVER_PATH_ID, _pathToEdit.server_path_id);
 
+        Debug.Log("Edited xml = " + xml.outerXml);
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
@@ -213,7 +261,7 @@ public class cPath
             idsToDelete[i] = id;
             i++;
         }
-        Debug.Log("idsToDelete length = " + idsToDelete.Length);
+        //Debug.Log("idsToDelete length = " + idsToDelete.Length);
         // Save new ids array
         PlayerPrefsX.SetIntArray(PATHS_TO_DELETE_PREFS_KEY, idsToDelete);
         PlayerPrefs.Save();
@@ -235,7 +283,7 @@ public class cPath
 
         // Insert the new id
         idsToDelete[idsToDelete.Length - 1] = _idToDelete;
-        Debug.Log("idsToDelete length = " + idsToDelete.Length);
+        //Debug.Log("idsToDelete length = " + idsToDelete.Length);
         // Save new ids array
         PlayerPrefsX.SetIntArray(PATHS_TO_DELETE_PREFS_KEY, idsToDelete);
         PlayerPrefs.Save();
@@ -270,7 +318,7 @@ public class cPath
                 OnlineMapsXML areaNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + LOCAL_AREA_ID + "=" + loadedPath.local_area_id + "]/" + cArea.SERVER_AREA_ID);
                 string server_area_idString = areaNode.Value();
                 if (int.TryParse(server_area_idString, out int server_area_id))
-                Debug.Log("area's server_area_id = " + server_area_id);
+                //Debug.Log("area's server_area_id = " + server_area_id);
                 // If server_area_id is -1 then the area is not uploaded yet so don't upload its paths yet.
                 if (server_area_id != -1)
                 {
@@ -304,4 +352,13 @@ public class cPath
         EditServerPathId(loadedPath);
     }
     #endregion
+}
+
+[Serializable]
+public class cPathData
+{
+    public int server_path_id;
+    public int server_area_id;
+    public string title;
+    public string date;
 }

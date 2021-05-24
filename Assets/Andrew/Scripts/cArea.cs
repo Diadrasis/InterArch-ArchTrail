@@ -38,11 +38,25 @@ public class cArea
     #endregion
 
     #region Methods
-    // Constructor for Loading from Player Prefs / Server
+    // Constructor for Loading from Player Prefs
     public cArea(int _server_area_id, int _local_area_id, string _title, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax) // TODO: Make private when testing is finished
     {
         server_area_id = _server_area_id;
         local_area_id = _local_area_id;
+        title = _title;
+        position = _position;
+        zoom = _zoom;
+        areaConstraintsMin = _areaConstraintsMin;
+        areaConstraintsMax = _areaConstraintsMax;
+        viewConstraintsMin = _viewConstraintsMin;
+        viewConstraintsMax = _viewConstraintsMax;
+    }
+
+    // Constructor for Downloading from server
+    public cArea(int _server_area_id, string _title, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax)
+    {
+        server_area_id = _server_area_id;
+        local_area_id = -1;
         title = _title;
         position = _position;
         zoom = _zoom;
@@ -135,7 +149,7 @@ public class cArea
         OnlineMapsXML areaToDelete = xml.Find("/" + AREAS + "/" + AREA + "[" + LOCAL_AREA_ID + "=" + _areaId + "]");
         if (!areaToDelete.isNull)
             areaToDelete.Remove();
-
+        Debug.Log("XML after deleting area: " + xml.outerXml);
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
     }
@@ -149,19 +163,19 @@ public class cArea
         {
             // Create a new int array based on the loaded ids array
             int[] idsToDelete = new int[loadedIdsToDelete.Length - 1];
-            Debug.Log("RemoveIdToDelete, idsToDelete length = " + idsToDelete.Length);
+            //Debug.Log("RemoveIdToDelete, idsToDelete length = " + idsToDelete.Length);
             // Insert all loaded ids to the new ids array except the _idToRemove
             int i = 0;
             foreach (int id in loadedIdsToDelete)
             {
                 if (id == _idToRemove)
                 {
-                    Debug.Log("id == _idToRemove: " + (id == _idToRemove));
+                    //Debug.Log("id == _idToRemove: " + (id == _idToRemove));
                     continue;
                 }
 
                 idsToDelete[i] = id;
-                Debug.Log("id to delete = " + idsToDelete[i]);
+                //Debug.Log("id to delete = " + idsToDelete[i]);
                 i++;
             }
             
@@ -178,17 +192,17 @@ public class cArea
         
         // Create a new int array based on the loaded ids array
         int[] idsToDelete = new int[loadedIdsToDelete.Length + 1];
-        Debug.Log("AddIdToDelete, idsToDelete length = " + idsToDelete.Length);
+        //Debug.Log("AddIdToDelete, idsToDelete length = " + idsToDelete.Length);
         // Insert all loaded ids to the new ids array
         for (int i = 0; i < loadedIdsToDelete.Length; i++)
         {
             idsToDelete[i] = loadedIdsToDelete[i];
-            Debug.Log("id to delete = " + idsToDelete[i]);
+            //Debug.Log("id to delete = " + idsToDelete[i]);
         }
 
         // Insert the new id
         idsToDelete[idsToDelete.Length - 1] = _idToDelete;
-        Debug.Log("id to delete = " + idsToDelete[idsToDelete.Length - 1]);
+        //Debug.Log("id to delete = " + idsToDelete[idsToDelete.Length - 1]);
         // Save new ids array
         PlayerPrefsX.SetIntArray(AREAS_TO_DELETE_PREFS_KEY, idsToDelete);
         PlayerPrefs.Save();
@@ -298,6 +312,37 @@ public class cArea
         areaNode.Create(VIEW_CONSTRAINTS_MAX, new Vector2(_areaToSave.viewConstraintsMax.x, _areaToSave.viewConstraintsMax.y));
         areaNode.Create(PATHS);
         
+        // Save xml string to PlayerPrefs
+        PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
+        PlayerPrefs.Save();
+    }
+
+    public static void SaveFromServer(cArea _areaToSave)
+    {
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = GetXML();
+
+        // Check if area is already saved
+        OnlineMapsXML areaSaved = xml.Find("/" + AREAS + "/" + AREA + "[" + SERVER_AREA_ID + "=" + _areaToSave.server_area_id + "]");
+        if (!areaSaved.isNull)
+        {
+            Debug.Log("Area is already downloaded!");
+            return;
+        }
+
+        // Create a new area node
+        OnlineMapsXML areaNode = xml.Create(AREA);
+        areaNode.Create(SERVER_AREA_ID, _areaToSave.server_area_id);
+        areaNode.Create(LOCAL_AREA_ID, GetAvailableAreaID());
+        areaNode.Create(TITLE, _areaToSave.title);
+        areaNode.Create(POSITION, _areaToSave.position);
+        areaNode.Create(ZOOM, _areaToSave.zoom);
+        areaNode.Create(AREA_CONSTRAINTS_MIN, new Vector2(_areaToSave.areaConstraintsMin.x, _areaToSave.areaConstraintsMin.y));
+        areaNode.Create(AREA_CONSTRAINTS_MAX, new Vector2(_areaToSave.areaConstraintsMax.x, _areaToSave.areaConstraintsMax.y));
+        areaNode.Create(VIEW_CONSTRAINTS_MIN, new Vector2(_areaToSave.viewConstraintsMin.x, _areaToSave.viewConstraintsMin.y));
+        areaNode.Create(VIEW_CONSTRAINTS_MAX, new Vector2(_areaToSave.viewConstraintsMax.x, _areaToSave.viewConstraintsMax.y));
+        areaNode.Create(PATHS);
+
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
@@ -445,7 +490,7 @@ public class cArea
 public class cAreaData
 {
     public int server_area_id;
-    public int local_area_id;
+    //public int local_area_id;
     public string title;
     public string position; // longitude, latitude (x, y)
     public int zoom;
