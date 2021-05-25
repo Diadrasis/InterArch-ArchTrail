@@ -46,7 +46,7 @@ public class MapManager : MonoBehaviour
     // Create Area
     public Texture2D markerCreateAreaTextureMax, markerCreateAreaTextureMin;
     public float borderWidth = 1;
-    private bool createArea = false;
+    private bool createArea, editArea = false;
     OnlineMapsMarker[] markersCreateArea = new OnlineMapsMarker[2];
     Vector2[] positionsCreateArea = new Vector2[4];
     private OnlineMapsDrawingPoly polygon;
@@ -106,7 +106,7 @@ public class MapManager : MonoBehaviour
     private void Update()
     {
         // Checks the position of the markers.
-        if (createArea && polygon != null)
+        if ((createArea || editArea) && polygon != null)
             CheckMarkerPositions();
 
         if (!isMovement) return;
@@ -251,6 +251,18 @@ public class MapManager : MonoBehaviour
         return null;
     }
 
+    /*public cArea GetEditArea(cArea _areaEdit)
+    {
+        foreach(cArea area in areas)
+        {
+            if (editArea)
+            {
+                currentArea = _areaEdit;
+                return area;
+            }
+        }
+        return null;
+    }*/
     public cPath GetPathByTitle(string _pathTitle)
     {
         foreach (cPath path in currentArea.paths)
@@ -302,10 +314,12 @@ public class MapManager : MonoBehaviour
         _areaToEdit.viewConstraintsMin = new Vector2((float)OnlineMaps.instance.bounds.left, (float)OnlineMaps.instance.bounds.bottom);
         _areaToEdit.viewConstraintsMax = new Vector2((float)OnlineMaps.instance.bounds.right, (float)OnlineMaps.instance.bounds.top);
 
+        Debug.Log("Edit Area on Map Manager");
         // Edit area locally and reload areas
         cArea.Edit(_areaToEdit);
         areas = cArea.LoadAreas();
-
+        editArea = false;
+		
         // Edit area on server
         if (_areaToEdit.server_area_id != -1)
         {
@@ -402,46 +416,10 @@ public class MapManager : MonoBehaviour
             // if there is no polygon
             if (polygon == null)
             {
-                Vector2 centerPosition = OnlineMaps.instance.position;
-
-                // Calculate polygon positions
-                Vector2 bottomLeftPosition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
-                Vector2 topLeftposition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
-                Vector2 topRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
-                Vector2 bottomRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
-
-                // Create two markers on the specified coordinates.
-                OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTextureMax, "Marker Min");
-                markerMin.scale = DEFAULT_MARKER_SCALE;
-                markerMin.OnLongPress += OnMarkerLongPress;
-                //markerMin.SetDraggable(true);
-                markerMin.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
-                //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
-                OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTextureMin, "Marker Max");
-                markerMax.scale = DEFAULT_MARKER_SCALE;
-                markerMax.OnLongPress += OnMarkerLongPress;
-                //markerMax.SetDraggable(true);
-                markerMax.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
-                //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
-
-                // Set markers and positions.
-                markersCreateArea[0] = markerMin;
-                markersCreateArea[1] = markerMax;
-                positionsCreateArea[0] = bottomLeftPosition; // markerMin position
-                positionsCreateArea[1] = topLeftposition;
-                positionsCreateArea[2] = topRightPosition; // markerMax position
-                positionsCreateArea[3] = bottomRightPosition;
-
-                // Create polygon
-                polygon = CreatePolygon(positionsCreateArea);
-
-                // Redraw Map
-                OnlineMaps.instance.Redraw();
-
+                GeneralAreaCreation();
                 // Activate button
                 AppManager.Instance.uIManager.btnSaveArea.interactable = true;
             }
-            
         }
     }
     
@@ -761,7 +739,7 @@ public class MapManager : MonoBehaviour
         // If you change the values ​​in markerPositions, value in the polygon will be adjusted automatically.
         OnlineMapsDrawingPoly onlineMapsDrawingPoly = new OnlineMapsDrawingPoly(_arrayOfPoints, Color.black, borderWidth, new Color(1, 1, 1, 0.3f));
         OnlineMapsDrawingElementManager.AddItem(onlineMapsDrawingPoly);
-
+       
         return onlineMapsDrawingPoly;
     }
 
@@ -778,19 +756,84 @@ public class MapManager : MonoBehaviour
             OnlineMapsDrawingElementManager.RemoveItem(polygon);
         polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
     }
-
+    public void OnEditArea(cArea _areaToEdit)
+    {
+        editArea = true;
+        //currentArea = _areaToEdit;
+        //DisplayArea(_areaToEdit);
+        SetMapViewToPoint(_areaToEdit.position);
+    }
     public void EditSelectedArea(cArea _areaToEdit)
     {
-        DisplayArea(_areaToEdit);
-        SetMapViewToPoint(_areaToEdit.position);
-        //SetMapViewToLocation();
-        if(currentArea == _areaToEdit)
-            CheckMarkerPositions();
-        Debug.Log("Edit Selected Area");
-    }
-    #endregion
+        
+        OnEditArea(_areaToEdit);
+        
+        if (editArea)
+        {
+            currentArea = _areaToEdit;
+            
+            if (polygon == null)
+            {
+                GeneralAreaCreation();
+               
+                // Activate button
+                AppManager.Instance.uIManager.btnSaveEditArea.interactable = true;
+                AppManager.Instance.uIManager.btnSaveEditArea.onClick.AddListener(() => AppManager.Instance.uIManager.EnableScreen(AppManager.Instance.uIManager.pnlSaveEditArea,true));
+                AppManager.Instance.uIManager.inptFldEditArea.text = _areaToEdit.title;
+            }
+        }
+        Debug.Log("Edit area bool: " + editArea);
 
-    #region Screencapture the path
+    }
+
+    void GeneralAreaCreation()
+    {
+        Vector2 centerPosition = OnlineMaps.instance.position;
+
+        // Calculate polygon positions
+        Vector2 bottomLeftPosition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
+        Vector2 topLeftposition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
+        Vector2 topRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
+        Vector2 bottomRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
+
+        // Create two markers on the specified coordinates.
+        OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTextureMax, "Marker Min");
+        markerMin.scale = DEFAULT_MARKER_SCALE;
+        markerMin.OnPress += OnMarkerLongPress;
+#if PLATFORM_ANDROID
+        markerMin.OnLongPress += OnMarkerLongPress;
+#endif
+        //markerMin.SetDraggable(true);
+        markerMin.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
+                                                 //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
+        OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTextureMin, "Marker Max");
+        markerMax.scale = DEFAULT_MARKER_SCALE;
+        markerMax.OnPress += OnMarkerLongPress;
+#if PLATFORM_ANDROID
+        markerMax.OnLongPress += OnMarkerLongPress;
+#endif
+        //markerMax.SetDraggable(true);
+        markerMax.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
+                                                 //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
+
+        // Set markers and positions.
+        markersCreateArea[0] = markerMin;
+        markersCreateArea[1] = markerMax;
+        positionsCreateArea[0] = bottomLeftPosition; // markerMin position
+        positionsCreateArea[1] = topLeftposition;
+        positionsCreateArea[2] = topRightPosition; // markerMax position
+        positionsCreateArea[3] = bottomRightPosition;
+
+        // Create polygon
+        polygon = CreatePolygon(positionsCreateArea);
+
+        // Redraw Map
+        OnlineMaps.instance.Redraw();
+
+    }
+#endregion
+
+#region Screencapture the path
     /*void RecMyPath()
     {
         if (isRecPath)
@@ -828,9 +871,9 @@ public class MapManager : MonoBehaviour
 
         yield break;
     }*/
-    #endregion
+#endregion
 
 
-    #endregion
+#endregion
 }
 

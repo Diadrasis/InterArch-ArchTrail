@@ -46,6 +46,7 @@ public class UIManager : MonoBehaviour
     public Button btnEditAreaSave;
     public Button btnEditAreaCancel;
     public Button btnSaveEditArea;
+    Transform pnlForEdit;
     //public Button btnEditArea;
 
     [Space]
@@ -147,8 +148,11 @@ public class UIManager : MonoBehaviour
         btnPaths.onClick.AddListener(() => DisplayPathsScreen());
         btnCancelShow.onClick.AddListener(() => CancelInGeneral());
 
-       /* //btn for edit Area
-        btnEditArea.onClick.AddListener(() => EditArea());*/
+        //btn for edit Area
+        
+        btnEditAreaCancel.onClick.AddListener(() => CancelInGeneral());
+        //btnEditAreaSave.onClick.AddListener(()=> )
+       
     }
     void ActivateButtons(bool valPath, bool valBack, bool valQuit)
     {   
@@ -173,7 +177,7 @@ public class UIManager : MonoBehaviour
         pnlWarningDeleteScreen.SetActive(false);
     }
 
-    private void EnableScreen(GameObject _screenToEnable, bool _valid) // CURRENTLY IN USE
+    public void EnableScreen(GameObject _screenToEnable, bool _valid) // CURRENTLY IN USE
     {
         if (_valid)
             _screenToEnable.SetActive(true);
@@ -221,7 +225,7 @@ public class UIManager : MonoBehaviour
                     if (child.name.Equals("btnEditArea"))
                     {
                         btnEditArea = child.GetComponent<Button>();
-                        btnEditArea.onClick.AddListener(()=>EditAreaMain(area));
+                        btnEditArea.onClick.AddListener(OnEditSelect);
                     }
                 }
 
@@ -275,7 +279,24 @@ public class UIManager : MonoBehaviour
         //AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlSelectArea.gameObject)); // areaTitle
         //DisplayAreasScreen();
     }
+    private void OnEditSelect()
+    {
+        pnlEditArea.SetActive(true);
+        pnlAreasScreen.SetActive(false);
+        GameObject btnEditArea = EventSystem.current.currentSelectedGameObject;
+        string areaTitle = string.Empty;
+        pnlForEdit = btnEditArea.transform.parent;
 
+        //current area when selected on edit
+        cArea selectedArea = AppManager.Instance.mapManager.areas[selectAreaObjects.IndexOf(pnlForEdit.gameObject)];
+        AppManager.Instance.mapManager.currentArea = selectedArea;
+        AppManager.Instance.mapManager.EditSelectedArea(selectedArea);
+        txtMainName.text = selectedArea.title;
+        btnEditAreaSave.onClick.AddListener(EditSaveArea);
+
+        ActivateButtons(false, true, true);
+        
+    }
     private void OnPathSelectPressed()
     {
         Debug.Log("Path selected");
@@ -290,11 +311,7 @@ public class UIManager : MonoBehaviour
             pnlSavedPaths.SetActive(false);
             AppManager.Instance.mapManager.DisplayPath(selectedPath);
         }
-        //EnableScreen(pnlSelectedAreaScreen, true);
-        //imgRecord.gameObject.SetActive(true);
-        //EnableScreen(pnlSavedPaths, false);//the panel for saved paths can be removed afterwards, for testing purposes
         
-        //AppManager.Instance.mapManager.CheckUserPosition();
     }
 
     private void OnPathDeletePressed()
@@ -305,6 +322,7 @@ public class UIManager : MonoBehaviour
         //AppManager.Instance.mapManager.DeletePath(selectPathObjects.IndexOf(pnlSelectArea.gameObject));
     }
 
+    
     private void DestroySelectAreaObjects(List<GameObject> _selectObjects)
     {
         if (_selectObjects != null)
@@ -359,6 +377,7 @@ public class UIManager : MonoBehaviour
         {
             //to open edit panel
             pnlEditArea.SetActive(false);
+            AppManager.Instance.mapManager.RemoveMarkersAndLine();
             DisplayAreasScreen();
         }
         else 
@@ -379,7 +398,9 @@ public class UIManager : MonoBehaviour
         pnlAreasScreen.SetActive(false);
         pnlCreateArea.SetActive(true);
         btnSaveArea.interactable = false;
-        //mapScreen.SetActive(true);
+
+        inptFldCreateArea.text = "";
+
         ActivateButtons(false,true,false);
         AppManager.Instance.mapManager.CreateNewAreaInitialize();
     }
@@ -404,27 +425,28 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void EditSaveArea(cArea _areaToEdit)
+    public void EditSaveArea()
     {
         string newAreaTitle = inptFldEditArea.text;
 
         if (!string.IsNullOrEmpty(newAreaTitle))
         {
-            AppManager.Instance.mapManager.EditArea(_areaToEdit, newAreaTitle);
-
+            AppManager.Instance.mapManager.EditArea(AppManager.Instance.mapManager.currentArea, newAreaTitle);
             pnlSaveEditArea.SetActive(false);
             pnlEditArea.SetActive(false);
+            txtMainName.text = newAreaTitle;
         }
+        
     }
 
     void EditAreaMain(cArea _areaForEdit)
     {
         AppManager.Instance.mapManager.EditSelectedArea(_areaForEdit);
-        pnlEditArea.SetActive(true);
-        pnlAreasScreen.SetActive(false);
+        
         ActivateButtons(false, true, true);
         txtMainName.text = _areaForEdit.title;
-        Debug.Log("Edit Area Main");
+        
+        Debug.Log("Edit Area Main"+ _areaForEdit.title);
     }
     public void EnableSaveAreaScreen()
     {
@@ -487,11 +509,6 @@ public class UIManager : MonoBehaviour
         }
     }*/
 
-    /*private void OnMapRelease()
-    {
-
-    }*/
-
     #region PathPanel
     //changes icon from plus to save icon, listener changes to next method for saving path, here also have the drawing?
     private void AddNewPath()
@@ -520,20 +537,17 @@ public class UIManager : MonoBehaviour
         pnlMainButtons.SetActive(true);
         AppManager.Instance.mapManager.StopRecordingPath();
         btnPaths.interactable = true;
-        //btnAddNewPath.GetComponentInChildren<Text>().text = "Save";// sprSaveIcon;
-        //btnAddNewPath.onClick.AddListener(() => SavePath());
+        
     }
 
     //when save button is pressed on warning screen, the save icon changes back to plus icon. Warning screen is deactivated and listener goes to original method
     private void SavePath()
     {
         AppManager.Instance.mapManager.SavePath();
-        /*btnAddNewPath.GetComponentInChildren<Text>().text = "Add"; // sprAddNewPath;
-
-        btnAddNewPath.onClick.RemoveAllListeners();
-        btnAddNewPath.onClick.AddListener(() => AddNewPath());*/
-        
+               
         EnableScreen(pnlWarningSavePathScreen, false);
+        pnlRecordButton.SetActive(false);
+        pnlMainButtons.SetActive(true);
         IsInRecordingPath(false);
         btnPaths.interactable = true;
         //AppManager.Instance.mapManager.isRecordingPath = false;
@@ -572,10 +586,10 @@ public class UIManager : MonoBehaviour
     {
         if (pnlWarningSavePathScreen.activeSelf)
         {
-            btnAddNewPath.GetComponentInChildren<Text>().text = "Add";// sprAddNewPath;
+            /*btnAddNewPath.GetComponentInChildren<Text>().text = "Add";// sprAddNewPath;
 
             btnAddNewPath.onClick.RemoveAllListeners();
-            btnAddNewPath.onClick.AddListener(() => AddNewPath());
+            btnAddNewPath.onClick.AddListener(() => AddNewPath());*/
 
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
 
@@ -583,10 +597,15 @@ public class UIManager : MonoBehaviour
             IsInRecordingPath(false);
         }
 
-        //the panel for saved paths can be removed afterwards, for testing purposes
+        //the panel for saved paths can be removed afterwards
         if (pnlSavedPaths.activeInHierarchy)
         {
             pnlSavedPaths.SetActive(false);
+        }
+
+        if (pnlSaveEditArea.activeInHierarchy)
+        {
+            pnlSaveEditArea.SetActive(false);
         }
     }
 
