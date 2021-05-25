@@ -61,7 +61,8 @@ public class MapManager : MonoBehaviour
     #region Unity Functions
     private void Awake()
     {
-        
+        areas = new List<cArea>();
+        //areas = cArea.LoadAreas();
 
         //List<cArea> areasToTestSave = GetTestAreas();
         //cArea.SaveAreas(areasToTestSave);
@@ -78,15 +79,16 @@ public class MapManager : MonoBehaviour
     private void Start()
     {
         // Download areas
-        if (AppManager.Instance.serverManager.CheckInternet())
+        /*if (AppManager.Instance.serverManager.CheckInternet())
         {
             AppManager.Instance.serverManager.DownloadAreas();
             AppManager.Instance.serverManager.DownloadPaths();
+            AppManager.Instance.serverManager.DownloadPoints();
         }
         areas = new List<cArea>();
-        areas = cArea.LoadAreas();
+        areas = cArea.LoadAreas();*/
 
-        AppManager.Instance.uIManager.DisplayAreasScreen();
+        //AppManager.Instance.uIManager.DisplayAreasScreen();
 
         SubscribeToEvents();
         fromPosition = OnlineMaps.instance.position;
@@ -304,8 +306,11 @@ public class MapManager : MonoBehaviour
         cArea.Edit(_areaToEdit);
         areas = cArea.LoadAreas();
 
-
         // Edit area on server
+        if (_areaToEdit.server_area_id != -1)
+        {
+            cArea.AddEditedAreaIdToUpload(_areaToEdit.server_area_id);
+        }
     }
 
     public void DeleteArea(int _selectAreaObjectIndex)
@@ -375,8 +380,18 @@ public class MapManager : MonoBehaviour
         OnlineMapsLocationService.instance.OnLocationChanged += OnLocationChanged;
 
         //Interent Events
+        //AppManager.Instance.serverManager.OnDownloadData += ReloadAreasScreen;
         /*AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
         */
+    }
+
+    public void ReloadAreas()
+    {
+        // Reload Areas
+        areas = cArea.LoadAreas();
+
+        // Display Areas
+        AppManager.Instance.uIManager.DisplayAreasScreen();
     }
 
     private void OnMapClick()

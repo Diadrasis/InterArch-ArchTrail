@@ -156,7 +156,19 @@ public class cPath
         OnlineMapsXML pathSaved = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]/" + cArea.PATHS + "/" + PATH + "[" + SERVER_PATH_ID + "=" + _pathToSave.server_path_id + "]");
         if (!pathSaved.isNull)
         {
-            Debug.Log("Area is already downloaded!");
+            Debug.Log("Path is already downloaded!");
+            // Get local area id
+            int localArea_id = pathSaved.Get<int>(LOCAL_AREA_ID);
+
+            // Get local path id
+            int localPath_id = pathSaved.Get<int>(LOCAL_PATH_ID);
+
+            // Set local values
+            _pathToSave.local_area_id = localArea_id;
+            _pathToSave.local_path_id = localPath_id;
+
+            // Edit point
+            Edit(_pathToSave);
             return;
         }
 
@@ -164,20 +176,23 @@ public class cPath
         OnlineMapsXML areaNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]");
         int local_area_id = areaNode.Get<int>(LOCAL_AREA_ID);
 
-        // Create a new path
-        OnlineMapsXML pathsNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]/" + cArea.PATHS);
-        OnlineMapsXML pathNode = pathsNode.Create(PATH);
-        pathNode.Create(cArea.SERVER_AREA_ID, _pathToSave.server_area_id);
-        pathNode.Create(LOCAL_AREA_ID, local_area_id);
-        pathNode.Create(SERVER_PATH_ID, _pathToSave.server_path_id);
-        pathNode.Create(LOCAL_PATH_ID, GetAvailablePathID());
-        pathNode.Create(TITLE, _pathToSave.title);
-        pathNode.Create(DATE, _pathToSave.date.ToString());
-        //cPathPoint.SavePathPoints(pathNode.Create(PATH_POINTS), _pathToSave.pathPoints);
+        if (local_area_id >= 0)
+        {
+            // Create a new path
+            OnlineMapsXML pathsNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.SERVER_AREA_ID + "=" + _pathToSave.server_area_id + "]/" + cArea.PATHS);
+            OnlineMapsXML pathNode = pathsNode.Create(PATH);
+            pathNode.Create(cArea.SERVER_AREA_ID, _pathToSave.server_area_id);
+            pathNode.Create(LOCAL_AREA_ID, local_area_id);
+            pathNode.Create(SERVER_PATH_ID, _pathToSave.server_path_id);
+            pathNode.Create(LOCAL_PATH_ID, GetAvailablePathID());
+            pathNode.Create(TITLE, _pathToSave.title);
+            pathNode.Create(DATE, _pathToSave.date.ToString());
+            //cPathPoint.SavePathPoints(pathNode.Create(PATH_POINTS), _pathToSave.pathPoints);
 
-        // Save xml string to PlayerPrefs
-        PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
-        PlayerPrefs.Save();
+            // Save xml string to PlayerPrefs
+            PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
+            PlayerPrefs.Save();
+        }
     }
 
     public static void SavePaths(List<cPath> _pathsToSave)
@@ -186,6 +201,30 @@ public class cPath
         {
             Save(pathToSave);
         }
+    }
+
+    public static void Edit(cPath _pathToEdit)
+    {
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = cArea.GetXML();
+
+        // Get path
+        OnlineMapsXML pathNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.LOCAL_AREA_ID + "=" + _pathToEdit.local_area_id + "]/" + cArea.PATHS + "/" + PATH + "[" + LOCAL_PATH_ID + "=" + _pathToEdit.local_path_id + "]");
+        if (pathNode.isNull)
+        {
+            Debug.Log("Cannot edit because path is not saved!");
+            return;
+        }
+
+        // Remove old and Create new values
+        pathNode.Remove(TITLE);
+        pathNode.Create(TITLE, _pathToEdit.title);
+        pathNode.Remove(DATE);
+        pathNode.Create(DATE, _pathToEdit.date.ToString());
+
+        // Save xml string to PlayerPrefs
+        PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
+        PlayerPrefs.Save();
     }
 
     private static void EditServerPathId(cPath _pathToEdit)

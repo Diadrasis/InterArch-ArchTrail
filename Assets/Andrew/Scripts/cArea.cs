@@ -20,7 +20,7 @@ public class cArea
     public List<cPath> paths = new List<cPath>();
 
     public static readonly string PREFS_KEY = "areas";
-    //public static readonly string UPLOAD_PREFS_KEY = "areasToUpload";
+    public static readonly string EDITED_AREAS_TO_UPLOAD_PREFS_KEY = "editedAreasToUpload";
     public static readonly string AREAS_TO_DELETE_PREFS_KEY = "areasToDelete";
     public static readonly string AREAS = "areas";
 
@@ -208,6 +208,72 @@ public class cArea
         PlayerPrefs.Save();
     }
 
+    public static void RemoveEditedAreaIdToUpload(int _idToRemove)
+    {
+        // Load previously saved ids array
+        int[] loadedIdsToDelete = PlayerPrefsX.GetIntArray(EDITED_AREAS_TO_UPLOAD_PREFS_KEY);
+
+        if (loadedIdsToDelete.Length > 0)
+        {
+            // Create a new int array based on the loaded ids array
+            int[] idsToDelete = new int[loadedIdsToDelete.Length - 1];
+            //Debug.Log("RemoveIdToDelete, idsToDelete length = " + idsToDelete.Length);
+            // Insert all loaded ids to the new ids array except the _idToRemove
+            int i = 0;
+            foreach (int id in loadedIdsToDelete)
+            {
+                if (id == _idToRemove)
+                {
+                    //Debug.Log("id == _idToRemove: " + (id == _idToRemove));
+                    continue;
+                }
+
+                idsToDelete[i] = id;
+                //Debug.Log("id to delete = " + idsToDelete[i]);
+                i++;
+            }
+
+            // Save new ids array
+            PlayerPrefsX.SetIntArray(EDITED_AREAS_TO_UPLOAD_PREFS_KEY, idsToDelete);
+            PlayerPrefs.Save();
+        }
+    }
+
+    public static void AddEditedAreaIdToUpload(int _idToUpload)
+    {
+        // Load previously saved ids array
+        int[] loadedIdsToUpload = PlayerPrefsX.GetIntArray(EDITED_AREAS_TO_UPLOAD_PREFS_KEY);
+
+        // Check if id has already been added (edited)
+        foreach (int id in loadedIdsToUpload)
+        {
+            if (id == _idToUpload)
+            {
+                Debug.Log("Id has been added already");
+                return;
+            }
+        }
+
+        // Create a new int array based on the loaded ids array
+        int[] idsToUpload = new int[loadedIdsToUpload.Length + 1];
+        //Debug.Log("AddIdToDelete, idsToDelete length = " + idsToDelete.Length);
+        // Insert all loaded ids to the new ids array
+        for (int i = 0; i < loadedIdsToUpload.Length; i++)
+        {
+            idsToUpload[i] = loadedIdsToUpload[i];
+            //Debug.Log("id to delete = " + idsToDelete[i]);
+        }
+
+        // Insert the new id
+        idsToUpload[idsToUpload.Length - 1] = _idToUpload;
+        //Debug.Log("id to delete = " + idsToDelete[idsToDelete.Length - 1]);
+        // Save new ids array
+        PlayerPrefsX.SetIntArray(EDITED_AREAS_TO_UPLOAD_PREFS_KEY, idsToUpload);
+        PlayerPrefs.Save();
+    }
+
+    //public static int[] GetEditedAreaServerIdsToUpload() => PlayerPrefsX.GetIntArray(EDITED_AREAS_TO_UPLOAD_PREFS_KEY);
+
     public static int[] GetServerIdsToDelete() => PlayerPrefsX.GetIntArray(AREAS_TO_DELETE_PREFS_KEY);
 
     /*public static List<cArea> GetAreasToUpload()
@@ -216,7 +282,7 @@ public class cArea
         List<cArea> areasToUpload = new List<cArea>();
 
         // Load previously saved ids array
-        int[] idsToUpload = PlayerPrefsX.GetIntArray(UPLOAD_PREFS_KEY);
+        int[] idsToUpload = PlayerPrefsX.GetIntArray(AREAS_TO_UPLOAD_PREFS_KEY);
 
         // Load xml document, if null creates new
         OnlineMapsXML xml = GetXML();
@@ -240,10 +306,41 @@ public class cArea
         return areasToUpload;
     }*/
 
+    private static List<cArea> GetEditedAreasToUpload()
+    {
+        // List of areas
+        List<cArea> areasToUpload = new List<cArea>();
+
+        // Load previously saved ids array
+        int[] idsToUpload = PlayerPrefsX.GetIntArray(EDITED_AREAS_TO_UPLOAD_PREFS_KEY);
+
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = GetXML();
+
+        foreach (int id in idsToUpload)
+        {
+            // Load Area
+            OnlineMapsXML areaNode = xml.Find("/" + AREAS + "/" + AREA + "[" + LOCAL_AREA_ID + "=" + id + "]");
+            if (areaNode.isNull)
+            {
+                Debug.Log("Area with id: " + id + " has been deleted!");
+                continue;
+            }
+
+            cArea loadedArea = Load(areaNode);
+
+            if (loadedArea != null)
+                areasToUpload.Add(loadedArea);
+        }
+
+        return areasToUpload;
+    }
+
+    // Get areas with server id = -1
     public static List<cArea> GetAreasToUpload()
     {
-        // List of paths
-        List<cArea> areasToUpload = new List<cArea>();
+        // List of areas
+        List<cArea> areasToUpload = new List<cArea>(); // TODO: combine with GetEditedAreasToUpload() in a HashSet
 
         // Load xml document, if null creates new
         OnlineMapsXML xml = GetXML();
@@ -265,7 +362,18 @@ public class cArea
                 areasToUpload.Add(loadedArea);
         }
 
-        //Debug.Log("areasToUpload count = " + areasToUpload.Count);
+        // Get edited areas
+        List<cArea> editedAreasToUpload = GetEditedAreasToUpload();
+
+        if (editedAreasToUpload.Count > 0)
+        {
+            // Add the edited areas to the areasToUpload list if they are not already added
+            foreach (cArea areaToAdd in editedAreasToUpload)
+            {
+                if (!areasToUpload.Exists(area => area.local_area_id == areaToAdd.local_area_id))
+                    areasToUpload.Add(areaToAdd);
+            }
+        }
 
         return areasToUpload;
     }
@@ -324,9 +432,18 @@ public class cArea
 
         // Check if area is already saved
         OnlineMapsXML areaSaved = xml.Find("/" + AREAS + "/" + AREA + "[" + SERVER_AREA_ID + "=" + _areaToSave.server_area_id + "]");
+        // if area is already downloaded edit the area instead.
         if (!areaSaved.isNull)
         {
             Debug.Log("Area is already downloaded!");
+            // Get local area id
+            int local_area_id = areaSaved.Get<int>(LOCAL_AREA_ID);
+
+            // Set local area id
+            _areaToSave.local_area_id = local_area_id;
+
+            // Edit area
+            Edit(_areaToSave);
             return;
         }
 
