@@ -32,8 +32,8 @@ public class ServerManager : MonoBehaviour
     private void Start()
     {
         postUserData = false;
-        uploadedUserData = true;
-        getData = true;
+        uploadedUserData = false; //on build true
+        getData = false; //on build true
 
         //Debug.Log("postUserData = " + postUserData);
         //Debug.Log("getData = " + getData);
@@ -80,7 +80,7 @@ public class ServerManager : MonoBehaviour
         // NOTE: The postUserData bool is set to true when opening the application, when the user saves a new area or when a path is saved.
         if (postUserData && CheckInternet())
         {
-			StartCoroutine(UploadUserDataToDiadrasis());
+			//StartCoroutine(UploadUserDataToDiadrasis());
             postUserData = false;
         }
 
@@ -89,7 +89,7 @@ public class ServerManager : MonoBehaviour
         {
             // if postUserData is true, uploads the user's data to the server
             // NOTE: The postUserData variable is set to true when opening the application, when the user saves a new area or when a path is added etc.
-            StartCoroutine(DownloadDataFromDiadrasis());
+            //StartCoroutine(DownloadDataFromDiadrasis());
             getData = false;
         }
     }

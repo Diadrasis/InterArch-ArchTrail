@@ -24,7 +24,7 @@ public class MapManager : MonoBehaviour
     [HideInInspector]
     public float minDistanceToPutNewMarker = 10f / 1000f;
     [HideInInspector]
-    public bool isRecordingPath, isMovement;
+    public bool isRecordingPath, isMovement, isPausePath;
 
     // Create a list of markers to draw the path lines
     [HideInInspector]
@@ -44,7 +44,7 @@ public class MapManager : MonoBehaviour
     private double fromTileX, fromTileY, toTileX, toTileY;
 
     // Create Area
-    public Texture2D markerCreateAreaTextureMax, markerCreateAreaTextureMin;
+    public Texture2D markerCreateAreaTextureMin, markerCreateAreaTextureMax;
     public float borderWidth = 1;
     private bool createArea, editArea = false;
     OnlineMapsMarker[] markersCreateArea = new OnlineMapsMarker[2];
@@ -62,7 +62,7 @@ public class MapManager : MonoBehaviour
     private void Awake()
     {
         areas = new List<cArea>();
-        //areas = cArea.LoadAreas();
+        areas = cArea.LoadAreas();
 
         //List<cArea> areasToTestSave = GetTestAreas();
         //cArea.SaveAreas(areasToTestSave);
@@ -94,6 +94,7 @@ public class MapManager : MonoBehaviour
         fromPosition = OnlineMaps.instance.position;
         toPosition = OnlineMapsLocationService.instance.position;
         isRecordingPath = false;
+        isPausePath = false;
 
         userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), AppManager.Instance.uIManager.userMarker, "User");
         userMarker.SetDraggable(false);
@@ -126,6 +127,30 @@ public class MapManager : MonoBehaviour
         userMarker.position = Vector2.Lerp(fromPosition, toPosition, angle);
         OnlineMaps.instance.projection.TileToCoordinates(px, py, moveZoom, out px, out py);
         OnlineMaps.instance.SetPosition(px, py);
+
+        //for input touch to be better in mobile
+        /*if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            Vector2 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+
+            if(touch.phase == TouchPhase.Began)
+            {
+                markersCreateArea[0].position = touchPosition;
+                markersCreateArea[1].position = touchPosition;
+            }
+
+            if(touch.phase == TouchPhase.Moved)
+            {
+                CheckMarkerPositions();
+            }
+
+            *//*if(touch.phase == TouchPhase.Ended)
+            {
+
+            }*//*
+        }*/
+        
     }
 
     private void OnDestroy()
@@ -251,18 +276,6 @@ public class MapManager : MonoBehaviour
         return null;
     }
 
-    /*public cArea GetEditArea(cArea _areaEdit)
-    {
-        foreach(cArea area in areas)
-        {
-            if (editArea)
-            {
-                currentArea = _areaEdit;
-                return area;
-            }
-        }
-        return null;
-    }*/
     public cPath GetPathByTitle(string _pathTitle)
     {
         foreach (cPath path in currentArea.paths)
@@ -523,8 +536,8 @@ public class MapManager : MonoBehaviour
 
         SetMarkerOnUserPosition(position);
         CheckUserPosition();
-        
-        if (isRecordingPath && IsWithinConstraints())
+
+        if (isRecordingPath && !isPausePath && IsWithinConstraints())
         {
             //AppManager.Instance.uIManager.infoText.text = "Distance changed to: " + distance;
             OnlineMapsLocationService.instance.UpdatePosition();
@@ -541,7 +554,7 @@ public class MapManager : MonoBehaviour
             {
                 // Creates a new marker
                 string label = "Point_" + currentPath.pathPoints.Count + "_" + DateTime.Now.TimeOfDay;
-                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position,label);
+                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
                 marker.SetDraggable(false);
 
                 // Get new time duration
@@ -550,7 +563,7 @@ public class MapManager : MonoBehaviour
 
                 // Creates and Adds a new PathPoint
                 currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, position, (float)timeDuration.TotalSeconds));
-                
+
                 //marker.label = label;
                 //marker.position = position;
                 //OnlineMapsMarkerManager.AddItem(marker);
@@ -564,17 +577,32 @@ public class MapManager : MonoBehaviour
                 OnlineMaps.instance.Redraw();
             }
         }
-        else if (isRecordingPath && !IsWithinConstraints())
+        else if ((isRecordingPath || isPausePath) && !IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             isRecordingPath = false;
+            isPausePath = false;
+            Debug.Log("dis ");
             //Debug.Log("is recording and not in constraints");
         }
-        else if(!isRecordingPath && IsWithinConstraints())
+        else if((!isRecordingPath && isPausePath) && IsWithinConstraints())
+        {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+            AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
+            Debug.Log("No dis ");
+        }
+        else if ((isRecordingPath && !isPausePath) && IsWithinConstraints())
+        {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+            AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
+            Debug.Log("No dis dis ");
+        }
+        else if (!isRecordingPath && !isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(false);
+            Debug.Log("No no dis dis ");
         }
         else
         {
@@ -587,6 +615,7 @@ public class MapManager : MonoBehaviour
     public void StartRecordingPath()
     {
         isRecordingPath = true;
+        isPausePath = false;
         previousPosition = OnlineMapsLocationService.instance.position;
 
         // Center View 
@@ -615,9 +644,32 @@ public class MapManager : MonoBehaviour
         Debug.Log("Parsed string = " + dateTime);*/
     }
 
+    public void ResumeRecordingPath()
+    {
+        isRecordingPath = true;
+        isPausePath = false;
+        /*previousPosition = OnlineMapsLocationService.instance.position;
+
+        // Center View 
+        OnlineMapsLocationService.instance.UpdatePosition();
+
+        // Create a new marker at the starting position
+        OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
+
+        // Clear and Add new marker to markerListCurrPath
+        //markerListCurrPath.Clear();
+        markerListCurrPath.Add(marker);
+
+        previousPointTime = DateTime.Now.TimeOfDay;
+
+        currentPath = new cPath(currentArea.local_area_id);
+        currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, previousPosition, 0f));*/
+    }
+
     public void StopRecordingPath()
     {
         isRecordingPath = false;
+        isPausePath = false;
     }
 
     public void SavePath()
@@ -684,8 +736,25 @@ public class MapManager : MonoBehaviour
     {
         // Starts moving the marker.
         OnlineMapsControlBase.instance.dragMarker = marker;
+        //marker.SetPosition(marker.position.x, marker.position.y);// hasn't been tested out
         OnlineMapsControlBase.instance.isMapDrag = false;
         marker.label = "";
+        /*if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            Vector2 touchPosition = Camera.main.ScreenToViewportPoint(touch.position);
+
+            if (touch.phase == TouchPhase.Began)
+            {
+                
+            }
+
+            if(touch.phase == TouchPhase.Moved)
+            {
+                marker.position = touchPosition;
+            }
+
+        }*/
     }
     private void OnMarkerPositionChange(OnlineMapsMarkerBase marker)
     {
@@ -797,24 +866,21 @@ public class MapManager : MonoBehaviour
         Vector2 bottomRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
 
         // Create two markers on the specified coordinates.
-        OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTextureMax, "Marker Min");
+
+        //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
+        OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTextureMin, "Marker Min");
         markerMin.scale = DEFAULT_MARKER_SCALE;
         markerMin.OnPress += OnMarkerLongPress;
-#if PLATFORM_ANDROID
-        markerMin.OnLongPress += OnMarkerLongPress;
-#endif
-        //markerMin.SetDraggable(true);
+        //markerMin.SetDraggable();
         markerMin.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
-                                                 //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
-        OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTextureMin, "Marker Max");
+
+        //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
+        OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTextureMax, "Marker Max");
         markerMax.scale = DEFAULT_MARKER_SCALE;
         markerMax.OnPress += OnMarkerLongPress;
-#if PLATFORM_ANDROID
-        markerMax.OnLongPress += OnMarkerLongPress;
-#endif
         //markerMax.SetDraggable(true);
         markerMax.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
-                                                 //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
+                                                 
 
         // Set markers and positions.
         markersCreateArea[0] = markerMin;
