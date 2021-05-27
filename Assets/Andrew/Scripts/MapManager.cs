@@ -417,7 +417,7 @@ public class MapManager : MonoBehaviour
 
         //Interent Events
         //AppManager.Instance.serverManager.OnDownloadData += ReloadAreasScreen;
-        AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
+        //AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
 
     }
 

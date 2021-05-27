@@ -38,8 +38,8 @@ public class ServerManager : MonoBehaviour
     private void Start()
     {
         postUserData = true;
-        uploadedUserData = true; //true on build
-        getData = true; //true on build
+        uploadedUserData = true;
+        getData = true;
 
         //Debug.Log("postUserData = " + postUserData);
         //Debug.Log("getData = " + getData);
