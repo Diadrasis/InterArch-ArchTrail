@@ -473,7 +473,6 @@ public class UIManager : MonoBehaviour
         /*if (AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
-            //infoText.text = "Add New Path on location Services";//testing
             return;
         }*/
 
