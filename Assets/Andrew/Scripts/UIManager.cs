@@ -452,6 +452,7 @@ public class UIManager : MonoBehaviour
 
             pnlSaveArea.SetActive(false);
             pnlCreateArea.SetActive(false);
+            DisplayAreasScreen();
         }
     }
 
