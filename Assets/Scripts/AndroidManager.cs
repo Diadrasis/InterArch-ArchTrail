@@ -141,7 +141,7 @@ public class AndroidManager : MonoBehaviour
         if (val)
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
-            Debug.Log("Internet check on Android Manager and val is: "+val);
+            Debug.Log("Internet check on Android Manager and val is: " + val);
             *//*btnInternet.image.color = Color.green;
             if (!isReadDatabase)
             {
@@ -154,7 +154,7 @@ public class AndroidManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
             Debug.Log("Internet check on Android Manager (else) and val is: " + val);
-            
+
         }
     }*/
     #endregion

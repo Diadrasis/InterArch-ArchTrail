@@ -38,8 +38,8 @@ public class ServerManager : MonoBehaviour
     private void Start()
     {
         postUserData = true;
-        uploadedUserData = true; //true on build
-        getData = true; //true on build
+        uploadedUserData = true;
+        getData = true;
 
         //Debug.Log("postUserData = " + postUserData);
         //Debug.Log("getData = " + getData);
@@ -170,13 +170,13 @@ public class ServerManager : MonoBehaviour
         if (status)
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
-            Debug.Log("Check Internet On Check: " + testInternet);
+            //Debug.Log("Check Internet On Check: " + testInternet);
         }
         else
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
-            Debug.Log("Check Internet On Check: " + testInternet);
+            //Debug.Log("Check Internet On Check: " + testInternet);
         }
 
         // If the test is successful, then allow the user to manipulate the map.

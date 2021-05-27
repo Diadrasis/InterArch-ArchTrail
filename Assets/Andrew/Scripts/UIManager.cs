@@ -470,13 +470,13 @@ public class UIManager : MonoBehaviour
     private void AddNewPath()
     {
         //check if user or app for some reason location services are off, enable appropriate panel(when build remove comments)
-        /*if (AppManager.Instance.androidManager.CheckForLocationServices())
+        if (AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
             //infoText.text = "Add New Path on location Services";//testing
             return;
-        }*/
-        
+        }
+
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
         AppManager.Instance.mapManager.StartRecordingPath();
         //btnPaths.interactable = false;
@@ -495,9 +495,8 @@ public class UIManager : MonoBehaviour
         imgOnRecord.gameObject.SetActive(false);
         imgPauseRecording.gameObject.SetActive(true);
         IsInRecordingPath(false);
+        AppManager.Instance.mapManager.isPausePath = true;
         //pnlMainButtons.SetActive(true);
-        AppManager.Instance.mapManager.StopRecordingPath();
-        //btnPaths.interactable = true;
         
     }
 
@@ -510,10 +509,10 @@ public class UIManager : MonoBehaviour
         pnlRecordButton.SetActive(false);
         pnlMainButtons.SetActive(true);
         IsInRecordingPath(false);
-        //btnPaths.interactable = true;
-        //AppManager.Instance.mapManager.isRecordingPath = false;
+        AppManager.Instance.mapManager.StopRecordingPath();
     }
 
+    //opens the saved paths screen (on click event)
     void DisplaySavedPathsScreen()
     {
         pnlSavedPaths.SetActive(true);
@@ -526,11 +525,11 @@ public class UIManager : MonoBehaviour
         pnlWarningDeleteScreen.SetActive(false);
     }
 
+    //when you pause the path and you resume the recording of the path
     void ResumePath()
     {
-        Debug.Log("Resume Path bool: "+AppManager.Instance.mapManager.isRecordingPath);
+        //Debug.Log("Resume Path bool: "+AppManager.Instance.mapManager.isRecordingPath);
         AppManager.Instance.mapManager.ResumeRecordingPath();
-        //btnPaths.interactable = false;
         pnlRecordButton.SetActive(true);
         imgOnRecord.gameObject.SetActive(true);
         imgPauseRecording.gameObject.SetActive(false);
