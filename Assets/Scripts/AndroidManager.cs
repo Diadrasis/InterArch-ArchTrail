@@ -96,8 +96,6 @@ public class AndroidManager : MonoBehaviour
 
         //System.Diagnostics.Process.GetCurrentProcess().Kill(); //this makes unity to close when stopping, beware!!
         locationService.StopLocationService();
-
-
     }
 
     private void Update()
@@ -118,7 +116,7 @@ public class AndroidManager : MonoBehaviour
         }
         else
         {
-            //AppManager.Instance.serverManager.CheckInternet();
+            AppManager.Instance.serverManager.CheckInternet();
             Debug.LogWarning("OnApplicationFocus = true");
             if (CheckForLocationServices()) { return; }
         }

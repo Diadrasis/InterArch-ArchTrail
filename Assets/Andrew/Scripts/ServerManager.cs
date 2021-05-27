@@ -26,6 +26,7 @@ public class ServerManager : MonoBehaviour
     public bool uploadedUserData = false; // true;
     public bool getData = false; // true;
 
+    bool testInternet;
     public enum PHPActions { Get_Areas, Save_Area, Delete_Area, Get_Paths, Save_Path, Delete_Path, Get_Points, Save_Point, Delete_Point }
     #endregion
 
@@ -33,8 +34,8 @@ public class ServerManager : MonoBehaviour
     private void Start()
     {
         postUserData = true;
-        uploadedUserData = true;
-        getData = true;
+        uploadedUserData = false; //true on build
+        getData = false; //true on build
 
         //Debug.Log("postUserData = " + postUserData);
         //Debug.Log("getData = " + getData);
@@ -79,12 +80,16 @@ public class ServerManager : MonoBehaviour
     {
         // Check if postUserData is true and there is internet connection, uploads the user's data to the server
         // NOTE: The postUserData bool is set to true when opening the application, when the user saves a new area or when a path is saved.
-        if (postUserData && CheckInternet())
+        if (postUserData)
         {
+            CheckInternet();
+			if (testInternet){
+				Debug.Log("Check Internet "+testInternet);
 			StartCoroutine(UploadUserDataToDiadrasis());
+			}
             postUserData = false;
         }
-
+        
         // Check if postUserData is false and getData is true and there is internet connection, downloads the data from the server
         /*if (uploadedUserData && getData && CheckInternet())
         {
@@ -147,24 +152,25 @@ public class ServerManager : MonoBehaviour
 
 
     #region InternetConnection
-    public bool CheckInternet()
+    public void CheckInternet()
     {
         OnlineMaps.instance.CheckServerConnection(OnCheckConnectionComplete);
-        return true;
     }
 
     public void OnCheckConnectionComplete(bool status)
     {
         if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
-
+        testInternet = status;
         if (status)
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+            Debug.Log("Check Internet On Check: " + testInternet);
         }
         else
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
+            Debug.Log("Check Internet On Check: " + testInternet);
         }
 
         // If the test is successful, then allow the user to manipulate the map.
@@ -772,8 +778,12 @@ public class ServerManager : MonoBehaviour
     public void DownloadAreas()
     {
         // Downloading data
-        if (CheckInternet())
+        if (testInternet)
+        {
+            CheckInternet();
             StartCoroutine(GetAreas());
+        }
+            
     }
 
     IEnumerator GetAreas()
@@ -847,8 +857,12 @@ public class ServerManager : MonoBehaviour
     public void DownloadPaths(int _server_area_id)
     {
         // Downloading data
-        if (CheckInternet())
+        if (testInternet)
+        {
+            CheckInternet();
             StartCoroutine(GetPaths(_server_area_id));
+        }
+            
     }
 
     IEnumerator GetPaths(int _server_area_id)
@@ -918,8 +932,12 @@ public class ServerManager : MonoBehaviour
     public void DownloadPoints(int _server_path_id)
     {
         // Downloading data
-        if (CheckInternet())
+        if (testInternet)
+        {
+            CheckInternet();
             StartCoroutine(GetPoints(_server_path_id));
+        }
+            
     }
 
     IEnumerator GetPoints(int _server_path_id)
