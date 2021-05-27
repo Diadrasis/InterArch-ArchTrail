@@ -81,7 +81,7 @@ public class ServerManager : MonoBehaviour
         // NOTE: The postUserData bool is set to true when opening the application, when the user saves a new area or when a path is saved.
         if (postUserData && CheckInternet())
         {
-			//StartCoroutine(UploadUserDataToDiadrasis());
+			StartCoroutine(UploadUserDataToDiadrasis());
             postUserData = false;
         }
 

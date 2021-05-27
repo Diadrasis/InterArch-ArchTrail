@@ -100,6 +100,7 @@ public class MapManager : MonoBehaviour
         userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), AppManager.Instance.uIManager.userMarker, "User");
         userMarker.SetDraggable(false);
         userMarker.scale = 0.3f;
+
         // Test
         //List<cPath> pathsToTest = GetTestPaths();
         //DisplayPath(pathsToTest[0]);
@@ -156,7 +157,7 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
