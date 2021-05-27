@@ -136,27 +136,27 @@ public class AndroidManager : MonoBehaviour
         }
     }*/
 
-    /*public void OnCheckInternetCheckComplete(bool val)
+    public void OnCheckInternetCheckComplete(bool val)
     {
         if (val)
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
-            Debug.Log("Internet check on Android Manager and val is: "+val);
-            *//*btnInternet.image.color = Color.green;
+            Debug.Log("Internet check on Android Manager and val is: " + val);
+            /*btnInternet.image.color = Color.green;
             if (!isReadDatabase)
             {
                 serverManager.GetPathsFromServer();
                 isReadDatabase = true;
-            }*//*
+            }*/
         }
         else
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
             Debug.Log("Internet check on Android Manager (else) and val is: " + val);
-            
+
         }
-    }*/
+    }
     #endregion
 
 }

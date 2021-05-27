@@ -83,9 +83,10 @@ public class ServerManager : MonoBehaviour
         if (postUserData)
         {
             CheckInternet();
-			if (testInternet){
-				Debug.Log("Check Internet "+testInternet);
-			StartCoroutine(UploadUserDataToDiadrasis());
+			if (testInternet)
+            {
+				//Debug.Log("Check Internet "+testInternet);
+			    //StartCoroutine(UploadUserDataToDiadrasis());
 			}
             postUserData = false;
         }
@@ -164,13 +165,13 @@ public class ServerManager : MonoBehaviour
         if (status)
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
-            Debug.Log("Check Internet On Check: " + testInternet);
+            //Debug.Log("Check Internet On Check: " + testInternet);
         }
         else
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
-            Debug.Log("Check Internet On Check: " + testInternet);
+            //Debug.Log("Check Internet On Check: " + testInternet);
         }
 
         // If the test is successful, then allow the user to manipulate the map.

@@ -157,7 +157,7 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
@@ -417,8 +417,8 @@ public class MapManager : MonoBehaviour
 
         //Interent Events
         //AppManager.Instance.serverManager.OnDownloadData += ReloadAreasScreen;
-        /*AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
-        */
+        AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
+
     }
 
     public void ReloadAreas()
@@ -559,21 +559,17 @@ public class MapManager : MonoBehaviour
     #region Path
     public void OnLocationChanged(Vector2 position)
     {
-        //AppManager.Instance.uIManager.infoText.text = "Location changed to: " + position;
-
         SetMarkerOnUserPosition(position);
         CheckUserPosition();
 
         if (isRecordingPath && !isPausePath && IsWithinConstraints())
         {
-            //AppManager.Instance.uIManager.infoText.text = "Distance changed to: " + distance;
             OnlineMapsLocationService.instance.UpdatePosition();
 
             float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
-            //Debug.Log("Distance from previous marker: " + distance);
+            
             if (distance < OnlineMapsLocationService.instance.updateDistance / 1000f)
             {
-                //Debug.Log("Minimum distance needed to create marker");
                 //OnlineMaps.instance.Redraw();
                 return;
             }
@@ -608,32 +604,38 @@ public class MapManager : MonoBehaviour
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
-            isRecordingPath = false;
-            isPausePath = false;
-            Debug.Log("dis ");
+            /*isRecordingPath = false;
+            isPausePath = false;*/
+            /*Debug.Log("isRecording Path: " + isRecordingPath);
+            Debug.Log("isPause Path: " + isPausePath);*/
             //Debug.Log("is recording and not in constraints");
         }
         else if((!isRecordingPath && isPausePath) && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
-            Debug.Log("No dis ");
+           /* Debug.Log("isRecording Path: " + isRecordingPath);
+            Debug.Log("isPause Path: " + isPausePath);*/
         }
         else if ((isRecordingPath && !isPausePath) && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
-            Debug.Log("No dis dis ");
+           /* Debug.Log("isRecording Path: " + isRecordingPath);
+            Debug.Log("isPause Path: " + isPausePath);*/
         }
         else if (!isRecordingPath && !isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(false);
-            Debug.Log("No no dis dis ");
+            /*Debug.Log("isRecording Path: " + isRecordingPath);
+            Debug.Log("isPause Path: " + isPausePath);*/
         }
         else
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            /*Debug.Log("isRecording Path: " + isRecordingPath);
+            Debug.Log("isPause Path: " + isPausePath);*/
             //Debug.Log("is not recording and not in constraints");
         }
         //marker.OnPositionChanged += OnMarkerPositionChange;
@@ -671,28 +673,14 @@ public class MapManager : MonoBehaviour
         Debug.Log("Parsed string = " + dateTime);*/
     }
 
+    //when pausing the recording but user hasn't saved the path yet
     public void ResumeRecordingPath()
     {
         isRecordingPath = true;
         isPausePath = false;
-        /*previousPosition = OnlineMapsLocationService.instance.position;
-
-        // Center View 
-        OnlineMapsLocationService.instance.UpdatePosition();
-
-        // Create a new marker at the starting position
-        OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
-
-        // Clear and Add new marker to markerListCurrPath
-        //markerListCurrPath.Clear();
-        markerListCurrPath.Add(marker);
-
-        previousPointTime = DateTime.Now.TimeOfDay;
-
-        currentPath = new cPath(currentArea.local_area_id);
-        currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, previousPosition, 0f));*/
     }
 
+    //when user stps recording and is not on pause too
     public void StopRecordingPath()
     {
         isRecordingPath = false;
