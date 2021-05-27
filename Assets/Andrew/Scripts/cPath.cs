@@ -45,7 +45,7 @@ public class cPath
         server_path_id = -1;
         local_area_id = _local_area_id;
         local_path_id = GetAvailablePathID();
-        date = DateTime.Now.ToString("d"); //UnixTimeStampToDateTime(timestamp); //DateTime.ParseExact(DateTime.Now.ToString("dd/MM/yyyy"), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+        date = DateTime.Now.ToString("dd/MM/yyyy HH:mm"); //UnixTimeStampToDateTime(timestamp); //DateTime.ParseExact(DateTime.Now.ToString("dd/MM/yyyy"), "dd/MM/yyyy", CultureInfo.InvariantCulture);
         title = "path_" + date; //"path_" + local_path_id + "_" + date.ToString("dd/MM/yyyy");
         pathPoints = new List<cPathPoint>();
     }

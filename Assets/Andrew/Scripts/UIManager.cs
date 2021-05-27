@@ -374,6 +374,7 @@ public class UIManager : MonoBehaviour
             !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath)
         {
             DisplayAreasScreen();
+            AppManager.Instance.serverManager.DownloadAreas();
             pnlPathScreen.SetActive(false);
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
@@ -384,6 +385,7 @@ public class UIManager : MonoBehaviour
             pnlSaveArea.SetActive(false);
             pnlCreateArea.SetActive(false);
             DisplayAreasScreen();
+            AppManager.Instance.serverManager.DownloadAreas();
             Debug.Log("pnlCreateArea false");
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         } 
@@ -404,10 +406,12 @@ public class UIManager : MonoBehaviour
             pnlEditArea.SetActive(false);
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
             DisplayAreasScreen();
+            AppManager.Instance.serverManager.DownloadAreas();
         }
         else 
         {
             DisplayAreasScreen();
+            AppManager.Instance.serverManager.DownloadAreas();
         }
 
         //mapScreen.SetActive(false);
@@ -470,11 +474,11 @@ public class UIManager : MonoBehaviour
     private void AddNewPath()
     {
         //check if user or app for some reason location services are off, enable appropriate panel(when build remove comments)
-        if (AppManager.Instance.androidManager.CheckForLocationServices())
+        /*if (AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
             return;
-        }
+        }*/
 
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
         AppManager.Instance.mapManager.StartRecordingPath();
