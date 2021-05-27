@@ -950,7 +950,7 @@ public class ServerManager : MonoBehaviour
                     {
                         // Fix date
                         string dateString = pathData.date.Replace("\\", "");
-                        //Debug.Log("dateString = " + dateString);
+                        Debug.Log("dateString = " + dateString);
                         DateTime dateFromData = DateTime.ParseExact(dateString, "d/M/yyyy", CultureInfo.InvariantCulture);
 
                         // Create a path from pathData

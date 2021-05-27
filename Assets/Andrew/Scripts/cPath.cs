@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 public class cPath
@@ -41,8 +42,8 @@ public class cPath
         server_path_id = -1;
         local_area_id = _local_area_id;
         local_path_id = GetAvailablePathID();
-        date = DateTime.Now; //DateTime.Today.Date;
-        title = "path_" + local_path_id + "_" + date.ToString("yyyy-MM-dd");
+        date = DateTime.ParseExact(DateTime.Now.ToShortDateString(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+        title = "path_" + local_path_id + "_" + date.ToString("dd/MM/yyyy");
         pathPoints = new List<cPathPoint>();
     }
 
