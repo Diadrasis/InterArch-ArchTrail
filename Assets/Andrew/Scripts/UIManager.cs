@@ -470,12 +470,12 @@ public class UIManager : MonoBehaviour
     private void AddNewPath()
     {
         //check if user or app for some reason location services are off, enable appropriate panel(when build remove comments)
-        if (AppManager.Instance.androidManager.CheckForLocationServices())
+        /*if (AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
             //infoText.text = "Add New Path on location Services";//testing
             return;
-        }
+        }*/
 
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
         AppManager.Instance.mapManager.StartRecordingPath();

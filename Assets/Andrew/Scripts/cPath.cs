@@ -38,11 +38,12 @@ public class cPath
     // Constructor for creating locally
     public cPath(int _local_area_id)
     {
+        Debug.Log(DateTime.Now.ToString("d"));
         server_area_id = -1;
         server_path_id = -1;
         local_area_id = _local_area_id;
         local_path_id = GetAvailablePathID();
-        date = DateTime.ParseExact(DateTime.Now.ToShortDateString(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+        date = DateTime.ParseExact(DateTime.Now.ToString("d"), "d/M/yyyy", CultureInfo.InvariantCulture);
         title = "path_" + local_path_id + "_" + date.ToString("dd/MM/yyyy");
         pathPoints = new List<cPathPoint>();
     }
