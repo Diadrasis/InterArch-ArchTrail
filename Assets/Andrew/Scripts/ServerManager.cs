@@ -343,7 +343,7 @@ public class ServerManager : MonoBehaviour
                 //formToPost.Add(new MultipartFormDataSection("local_area_id", _pathToUpload.local_area_id.ToString()));
                 //formToPost.Add(new MultipartFormDataSection("local_path_id", _pathToUpload.local_path_id.ToString()));
                 formToPost.Add(new MultipartFormDataSection("title", pathToUpload.title));
-                formToPost.Add(new MultipartFormDataSection("date", pathToUpload.date.ToShortDateString()));
+                formToPost.Add(new MultipartFormDataSection("date", pathToUpload.date)); //pathToUpload.date.ToShortDateString()
 
                 UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
 
@@ -949,16 +949,16 @@ public class ServerManager : MonoBehaviour
                     foreach (cPathData pathData in pathsDataFromJSON)
                     {
                         // Fix date
-                        string dateString = pathData.date.Replace("\\", "");
+                        /*string dateString = pathData.date.Replace("\\", "");
                         Debug.Log("dateString = " + dateString);
-                        DateTime dateFromData = DateTime.ParseExact(dateString, "d/M/yyyy", CultureInfo.InvariantCulture);
+                        DateTime dateFromData = DateTime.ParseExact(dateString, "d/M/yyyy", CultureInfo.InvariantCulture);*/
 
                         // Create a path from pathData
                         cPath pathToSave = new cPath(
                             pathData.server_area_id,
                             pathData.server_path_id,
                             pathData.title,
-                            dateFromData);
+                            pathData.date); //dateFromData
 
                         // Debug
                         /*Debug.Log("downloadedPath server_area_id = " + pathToSave.server_area_id);

@@ -12,7 +12,8 @@ public class cPath
     public int server_path_id;
     public int local_path_id { get; private set; }
     public string title;
-    public DateTime date;
+    public string date;
+    //public DateTime date;
     public List<cPathPoint> pathPoints;
 
     public static readonly string PATHS_TO_DELETE_PREFS_KEY = "pathsToDelete";
@@ -38,18 +39,31 @@ public class cPath
     // Constructor for creating locally
     public cPath(int _local_area_id)
     {
-        Debug.Log(DateTime.Now.ToString("d"));
+        //long timestamp = //GetUTCUnixTimestamp();
+        //Debug.Log(DateTime.UtcNow.To); //.ToString("d")
         server_area_id = -1;
         server_path_id = -1;
         local_area_id = _local_area_id;
         local_path_id = GetAvailablePathID();
-        date = DateTime.ParseExact(DateTime.Now.ToString("d"), "d/M/yyyy", CultureInfo.InvariantCulture);
-        title = "path_" + local_path_id + "_" + date.ToString("dd/MM/yyyy");
+        date = DateTime.Now.ToString("d"); //UnixTimeStampToDateTime(timestamp); //DateTime.ParseExact(DateTime.Now.ToString("dd/MM/yyyy"), "dd/MM/yyyy", CultureInfo.InvariantCulture);
+        title = "path_" + date; //"path_" + local_path_id + "_" + date.ToString("dd/MM/yyyy");
         pathPoints = new List<cPathPoint>();
     }
 
+    /*public static long GetUTCUnixTimestamp()
+    {
+        return (long)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc))).TotalMilliseconds;
+    }
+
+    public static DateTime UnixTimeStampToDateTime(long unixTimeStamp)
+    {
+        System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+        dtDateTime = dtDateTime.AddMilliseconds(unixTimeStamp);
+        return dtDateTime;
+    }*/
+
     // Constructor for Loading from Player Prefs
-    private cPath(int _server_area_id, int _server_path_id, int _local_area_id, int _local_path_id, string _title, DateTime _date, List<cPathPoint> _pathPoints)
+    private cPath(int _server_area_id, int _server_path_id, int _local_area_id, int _local_path_id, string _title, string _date, List<cPathPoint> _pathPoints)
     {
         server_area_id = _server_area_id;
         local_area_id = _local_area_id;
@@ -61,7 +75,7 @@ public class cPath
     }
 
     // Constructor for Downloading from server
-    public cPath(int _server_area_id, int _server_path_id, string _title, DateTime _date) // List<cPathPoint> _pathPoints
+    public cPath(int _server_area_id, int _server_path_id, string _title, string _date) // List<cPathPoint> _pathPoints
     {
         server_area_id = _server_area_id;
         local_area_id = -1;
@@ -255,8 +269,9 @@ public class cPath
         int server_path_id = _pathNode.Get<int>(SERVER_PATH_ID);
         int local_path_id = _pathNode.Get<int>(LOCAL_PATH_ID);
         string title = _pathNode.Get<string>(TITLE);
-        string dateString = _pathNode.Get<string>(DATE);
-        DateTime date = DateTime.Parse(dateString);
+        //string dateString = _pathNode.Get<string>(DATE);
+        //DateTime date = DateTime.Parse(dateString);
+        string date = _pathNode.Get<string>(DATE);
         List<cPathPoint> pathPoints = cPathPoint.LoadPathPointsOfPath(_pathNode[PATH_POINTS]);
 
         // Create cArea and add it to loadedAreas list
