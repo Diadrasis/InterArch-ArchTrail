@@ -94,6 +94,9 @@ public class ServerManager : MonoBehaviour
                 postUserData = false;
                 testInternet = false;
             }
+
+            // For testing
+            postUserData = false;
         }
         
         // Check if postUserData is false and getData is true and there is internet connection, downloads the data from the server
