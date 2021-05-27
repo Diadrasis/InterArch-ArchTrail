@@ -205,6 +205,27 @@ public class cPathPoint
         return loadedPathPoint;
     }
 
+    /*public static List<cPathPoint> GetPointsOfPath(int _local_path_id)
+    {
+        // If the key does not exist, returns.
+        if (!PlayerPrefs.HasKey(cArea.PREFS_KEY))
+            return null;
+
+        // Load xml document
+        OnlineMapsXML xml = cArea.GetXML();
+
+        OnlineMapsXML pointsNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + cPath.PATH + "[" + cPath.LOCAL_PATH_ID + "=" + _local_path_id + "]/" + cPath.PATH_POINTS);
+
+        List<cPathPoint> pathPoints = new List<cPathPoint>();
+
+        foreach (OnlineMapsXML pointNode in pointsNode)
+        {
+            pathPoints.Add(Load(pointNode));
+        }
+
+        return pathPoints;
+    }*/
+
     public static List<cPathPoint> LoadPathPointsOfPath(OnlineMapsXML _pathPointsNode)
     {
         List<cPathPoint> loadedpathPoints = new List<cPathPoint>();

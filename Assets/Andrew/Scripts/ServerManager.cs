@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using System.IO;
+using System.Globalization;
 
 public class ServerManager : MonoBehaviour
 {
@@ -31,7 +32,7 @@ public class ServerManager : MonoBehaviour
     #region UnityMethods
     private void Start()
     {
-        postUserData = false;
+        postUserData = true;
         uploadedUserData = true;
         getData = true;
 
@@ -85,13 +86,13 @@ public class ServerManager : MonoBehaviour
         }
 
         // Check if postUserData is false and getData is true and there is internet connection, downloads the data from the server
-        if (uploadedUserData && getData && CheckInternet())
+        /*if (uploadedUserData && getData && CheckInternet())
         {
             // if postUserData is true, uploads the user's data to the server
             // NOTE: The postUserData variable is set to true when opening the application, when the user saves a new area or when a path is added etc.
             StartCoroutine(DownloadDataFromDiadrasis());
             getData = false;
-        }
+        }*/
     }
     #endregion
 
@@ -272,7 +273,7 @@ public class ServerManager : MonoBehaviour
                         cArea.SetServerAreaId(areaToUpload.local_area_id, server_area_id);
 
                         // remove the area's server id if the area was included in the edited areas array
-                        cArea.RemoveEditedAreaIdToUpload(areaToUpload.server_area_id);
+                        cArea.RemoveAreaIdToEdit(areaToUpload.server_area_id);
                     }
                 }
             }
@@ -337,9 +338,9 @@ public class ServerManager : MonoBehaviour
                 //formToPost.Add(new MultipartFormDataSection("local_area_id", pointToUpload.local_area_id.ToString()));
                 //formToPost.Add(new MultipartFormDataSection("local_path_id", pointToUpload.local_path_id.ToString()));
                 formToPost.Add(new MultipartFormDataSection("index", pointToUpload.index.ToString()));
-                formToPost.Add(new MultipartFormDataSection("position", pointToUpload.position.ToString()));
+                formToPost.Add(new MultipartFormDataSection("position", pointToUpload.position.ToString("F6")));
                 //formToPost.Add(new MultipartFormDataSection("time", pointToUpload.time.ToString())); // TODO: Change???
-                formToPost.Add(new MultipartFormDataSection("duration", pointToUpload.duration.ToString()));
+                formToPost.Add(new MultipartFormDataSection("duration", pointToUpload.duration.ToString("F6")));
 
                 UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
 
@@ -464,7 +465,7 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(areasData);
-                //Debug.Log("Json string = " + json);
+                Debug.Log("areas --> Json string = " + json);
 
                 // Create a cAreasData from json string
                 cAreaData[] areasDataFromJSON = MethodHelper.FromJson<cAreaData>(MethodHelper.SetupJson(json));
@@ -486,7 +487,7 @@ public class ServerManager : MonoBehaviour
                             MethodHelper.ToVector2(areaData.viewConstraintsMax));
 
                         // Debug
-                        Debug.Log("downloadedArea databaseId = " + areaToSave.server_area_id);
+                        /*Debug.Log("downloadedArea databaseId = " + areaToSave.server_area_id);
                         Debug.Log("downloadedArea id = " + areaToSave.local_area_id);
                         Debug.Log("downloadedArea title = " + areaToSave.title);
                         Debug.Log("downloadedArea position = " + areaToSave.position);
@@ -494,7 +495,7 @@ public class ServerManager : MonoBehaviour
                         Debug.Log("downloadedArea areaConstraintsMin = " + areaToSave.areaConstraintsMin);
                         Debug.Log("downloadedArea areaConstraintsMax = " + areaToSave.areaConstraintsMax);
                         Debug.Log("downloadedArea viewConstraintsMin = " + areaToSave.viewConstraintsMin);
-                        Debug.Log("downloadedArea viewConstraintsMax = " + areaToSave.viewConstraintsMax);
+                        Debug.Log("downloadedArea viewConstraintsMax = " + areaToSave.viewConstraintsMax);*/
 
                         // Save to Player Prefs
                         cArea.SaveFromServer(areaToSave);
@@ -504,9 +505,9 @@ public class ServerManager : MonoBehaviour
         }
 
         // ============== Download Paths ============== //
-        WWWForm formToPostGetPaths = new WWWForm();
+        /*WWWForm formToPostGetPaths = new WWWForm();
         formToPostGetPaths.AddField("action", Enum.GetName(typeof(PHPActions), 3)); // Get_Paths
-
+        formToPostGetPaths.AddField("server_area_id", "48");
         UnityWebRequest webRequestPaths = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPostGetPaths);
 
         yield return webRequestPaths.SendWebRequest();
@@ -528,7 +529,7 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(pathsData);
-                //Debug.Log("Json string = " + json);
+                Debug.Log("paths --> Json string = " + json);
 
                 // Create a cAreasData from json string
                 cPathData[] pathsDataFromJSON = MethodHelper.FromJson<cPathData>(MethodHelper.SetupJson(json));
@@ -537,18 +538,23 @@ public class ServerManager : MonoBehaviour
                 {
                     foreach (cPathData pathData in pathsDataFromJSON)
                     {
+                        // Fix date
+                        string dateString = pathData.date.Replace("\\", "");
+                        //Debug.Log("dateString = " + dateString);
+                        DateTime dateFromData = DateTime.ParseExact(dateString, "d/M/yyyy", CultureInfo.InvariantCulture);
+
                         // Create a path from pathData
                         cPath pathToSave = new cPath(
                             pathData.server_area_id,
                             pathData.server_path_id,
                             pathData.title,
-                            DateTime.ParseExact(pathData.date, "dd/MM/yyyy", null));
+                            dateFromData);
 
                         // Debug
-                        Debug.Log("downloadedPath server_area_id = " + pathToSave.server_area_id);
+                        *//*Debug.Log("downloadedPath server_area_id = " + pathToSave.server_area_id);
                         Debug.Log("downloadedPath server_path_id = " + pathToSave.server_path_id);
                         Debug.Log("downloadedPath title = " + pathToSave.title);
-                        Debug.Log("downloadedPath date = " + pathToSave.date);
+                        Debug.Log("downloadedPath date = " + pathToSave.date);*//*
 
                         // Save to Player Prefs
                         cPath.SaveFromServer(pathToSave);
@@ -560,6 +566,7 @@ public class ServerManager : MonoBehaviour
         // ============== Download Points ============== //
         WWWForm formToPostGetPoints = new WWWForm();
         formToPostGetPoints.AddField("action", Enum.GetName(typeof(PHPActions), 6)); // Get_Points
+        formToPostGetPoints.AddField("server_path_id", "14");
 
         UnityWebRequest webRequestPoints = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPostGetPoints);
 
@@ -582,7 +589,7 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(pointsData);
-                //Debug.Log("Json string = " + json);
+                Debug.Log("points --> Json string = " + json);
 
                 // Create a cAreasData from json string
                 cPointData[] pointsDataFromJSON = MethodHelper.FromJson<cPointData>(MethodHelper.SetupJson(json));
@@ -600,18 +607,18 @@ public class ServerManager : MonoBehaviour
                             pointData.duration);
 
                         // Debug
-                        Debug.Log("downloadedPoint server_path_id = " + pointToSave.server_path_id);
+                        *//*Debug.Log("downloadedPoint server_path_id = " + pointToSave.server_path_id);
                         Debug.Log("downloadedPoint server_point_id = " + pointToSave.server_point_id);
                         Debug.Log("downloadedPoint index = " + pointToSave.index);
                         Debug.Log("downloadedPoint position = " + pointToSave.position);
-                        Debug.Log("downloadedPoint duration = " + pointToSave.duration);
+                        Debug.Log("downloadedPoint duration = " + pointToSave.duration);*//*
 
                         // Save to Player Prefs
                         cPathPoint.SaveFromServer(pointToSave);
                     }
                 }
             }
-        }
+        }*/
 
         AppManager.Instance.mapManager.ReloadAreas();
     }
@@ -765,18 +772,19 @@ public class ServerManager : MonoBehaviour
     public void DownloadAreas()
     {
         // Downloading data
-        StartCoroutine(GetAreas());
+        if (CheckInternet())
+            StartCoroutine(GetAreas());
     }
 
     IEnumerator GetAreas()
     {
-        WWWForm formToPost = new WWWForm();
-        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 0)); // Get_Areas
+        WWWForm formToPostGetAreas = new WWWForm();
+        formToPostGetAreas.AddField("action", Enum.GetName(typeof(PHPActions), 0)); // Get_Areas
 
-        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
+        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPostGetAreas);
 
         yield return webRequest.SendWebRequest();
-        
+
         if (webRequest.isNetworkError || webRequest.isHttpError)
         {
             Debug.Log("Test failed. Error #" + webRequest.error);
@@ -794,7 +802,7 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(areasData);
-                //Debug.Log("Json string = " + json);
+                Debug.Log("areas --> Json string = " + json);
 
                 // Create a cAreasData from json string
                 cAreaData[] areasDataFromJSON = MethodHelper.FromJson<cAreaData>(MethodHelper.SetupJson(json));
@@ -816,7 +824,7 @@ public class ServerManager : MonoBehaviour
                             MethodHelper.ToVector2(areaData.viewConstraintsMax));
 
                         // Debug
-                        Debug.Log("downloadedArea databaseId = " + areaToSave.server_area_id);
+                        /*Debug.Log("downloadedArea databaseId = " + areaToSave.server_area_id);
                         Debug.Log("downloadedArea id = " + areaToSave.local_area_id);
                         Debug.Log("downloadedArea title = " + areaToSave.title);
                         Debug.Log("downloadedArea position = " + areaToSave.position);
@@ -824,7 +832,7 @@ public class ServerManager : MonoBehaviour
                         Debug.Log("downloadedArea areaConstraintsMin = " + areaToSave.areaConstraintsMin);
                         Debug.Log("downloadedArea areaConstraintsMax = " + areaToSave.areaConstraintsMax);
                         Debug.Log("downloadedArea viewConstraintsMin = " + areaToSave.viewConstraintsMin);
-                        Debug.Log("downloadedArea viewConstraintsMax = " + areaToSave.viewConstraintsMax);
+                        Debug.Log("downloadedArea viewConstraintsMax = " + areaToSave.viewConstraintsMax);*/
 
                         // Save to Player Prefs
                         cArea.SaveFromServer(areaToSave);
@@ -832,26 +840,30 @@ public class ServerManager : MonoBehaviour
                 }
             }
         }
+
+        AppManager.Instance.mapManager.ReloadAreas();
     }
 
-    public void DownloadPaths()
+    public void DownloadPaths(int _server_area_id)
     {
         // Downloading data
-        StartCoroutine(GetPaths());
+        if (CheckInternet())
+            StartCoroutine(GetPaths(_server_area_id));
     }
 
-    IEnumerator GetPaths()
+    IEnumerator GetPaths(int _server_area_id)
     {
-        WWWForm formToPost = new WWWForm();
-        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 3)); // Get_Paths
+        WWWForm formToPostGetPaths = new WWWForm();
+        formToPostGetPaths.AddField("action", Enum.GetName(typeof(PHPActions), 3)); // Get_Paths
+        formToPostGetPaths.AddField("server_area_id", _server_area_id);
 
-        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
+        UnityWebRequest webRequestPaths = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPostGetPaths);
 
-        yield return webRequest.SendWebRequest();
+        yield return webRequestPaths.SendWebRequest();
 
-        if (webRequest.isNetworkError || webRequest.isHttpError)
+        if (webRequestPaths.isNetworkError || webRequestPaths.isHttpError)
         {
-            Debug.Log("Test failed. Error #" + webRequest.error);
+            Debug.Log("Test failed. Error #" + webRequestPaths.error);
         }
         else
         {
@@ -860,13 +872,13 @@ public class ServerManager : MonoBehaviour
             //Debug.Log("Data length: " + webRequest.downloadHandler.data);
 
             // Get Area byte[] data
-            byte[] pathsData = webRequest.downloadHandler.data;
+            byte[] pathsData = webRequestPaths.downloadHandler.data;
 
             if (pathsData != null)
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(pathsData);
-                //Debug.Log("Json string = " + json);
+                Debug.Log("paths --> Json string = " + json);
 
                 // Create a cAreasData from json string
                 cPathData[] pathsDataFromJSON = MethodHelper.FromJson<cPathData>(MethodHelper.SetupJson(json));
@@ -875,18 +887,23 @@ public class ServerManager : MonoBehaviour
                 {
                     foreach (cPathData pathData in pathsDataFromJSON)
                     {
+                        // Fix date
+                        string dateString = pathData.date.Replace("\\", "");
+                        //Debug.Log("dateString = " + dateString);
+                        DateTime dateFromData = DateTime.ParseExact(dateString, "d/M/yyyy", CultureInfo.InvariantCulture);
+
                         // Create a path from pathData
                         cPath pathToSave = new cPath(
                             pathData.server_area_id,
                             pathData.server_path_id,
                             pathData.title,
-                            Convert.ToDateTime(pathData.date));
+                            dateFromData);
 
                         // Debug
-                        Debug.Log("downloadedPath server_area_id = " + pathToSave.server_area_id);
+                        /*Debug.Log("downloadedPath server_area_id = " + pathToSave.server_area_id);
                         Debug.Log("downloadedPath server_path_id = " + pathToSave.server_path_id);
                         Debug.Log("downloadedPath title = " + pathToSave.title);
-                        Debug.Log("downloadedPath date = " + pathToSave.date);
+                        Debug.Log("downloadedPath date = " + pathToSave.date);*/
 
                         // Save to Player Prefs
                         cPath.SaveFromServer(pathToSave);
@@ -894,26 +911,30 @@ public class ServerManager : MonoBehaviour
                 }
             }
         }
+
+        AppManager.Instance.mapManager.ReloadPaths();
     }
 
-    public void DownloadPoints()
+    public void DownloadPoints(int _server_path_id)
     {
         // Downloading data
-        StartCoroutine(GetPoints());
+        if (CheckInternet())
+            StartCoroutine(GetPoints(_server_path_id));
     }
 
-    IEnumerator GetPoints()
+    IEnumerator GetPoints(int _server_path_id)
     {
-        WWWForm formToPost = new WWWForm();
-        formToPost.AddField("action", Enum.GetName(typeof(PHPActions), 6)); // Get_Points
+        WWWForm formToPostGetPoints = new WWWForm();
+        formToPostGetPoints.AddField("action", Enum.GetName(typeof(PHPActions), 6)); // Get_Points
+        formToPostGetPoints.AddField("server_path_id", _server_path_id);
 
-        UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
+        UnityWebRequest webRequestPoints = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPostGetPoints);
 
-        yield return webRequest.SendWebRequest();
+        yield return webRequestPoints.SendWebRequest();
 
-        if (webRequest.isNetworkError || webRequest.isHttpError)
+        if (webRequestPoints.isNetworkError || webRequestPoints.isHttpError)
         {
-            Debug.Log("Test failed. Error #" + webRequest.error);
+            Debug.Log("Test failed. Error #" + webRequestPoints.error);
         }
         else
         {
@@ -922,13 +943,13 @@ public class ServerManager : MonoBehaviour
             //Debug.Log("Data length: " + webRequest.downloadHandler.data);
 
             // Get Area byte[] data
-            byte[] pointsData = webRequest.downloadHandler.data;
+            byte[] pointsData = webRequestPoints.downloadHandler.data;
 
             if (pointsData != null)
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(pointsData);
-                //Debug.Log("Json string = " + json);
+                Debug.Log("points --> Json string = " + json);
 
                 // Create a cAreasData from json string
                 cPointData[] pointsDataFromJSON = MethodHelper.FromJson<cPointData>(MethodHelper.SetupJson(json));
@@ -946,11 +967,11 @@ public class ServerManager : MonoBehaviour
                             pointData.duration);
 
                         // Debug
-                        Debug.Log("downloadedPoint server_path_id = " + pointToSave.server_path_id);
+                        /*Debug.Log("downloadedPoint server_path_id = " + pointToSave.server_path_id);
                         Debug.Log("downloadedPoint server_point_id = " + pointToSave.server_point_id);
                         Debug.Log("downloadedPoint index = " + pointToSave.index);
                         Debug.Log("downloadedPoint position = " + pointToSave.position);
-                        Debug.Log("downloadedPoint duration = " + pointToSave.duration);
+                        Debug.Log("downloadedPoint duration = " + pointToSave.duration);*/
 
                         // Save to Player Prefs
                         cPathPoint.SaveFromServer(pointToSave);
@@ -958,6 +979,8 @@ public class ServerManager : MonoBehaviour
                 }
             }
         }
+
+        AppManager.Instance.mapManager.ReloadPoints();
     }
 
     public void DeleteAreaFromServer(int _server_area_idToDelete)

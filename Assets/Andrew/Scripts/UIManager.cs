@@ -101,7 +101,7 @@ public class UIManager : MonoBehaviour
         selectPathObjects = new List<GameObject>();
         SubscribeButtons();
 
-        //DisplayAreasScreen();
+        DisplayAreasScreen();
 
         pnlWarningScreen.SetActive(false);
         pnlWarningSavePathScreen.SetActive(false);
@@ -244,14 +244,22 @@ public class UIManager : MonoBehaviour
         TMP_Text selectAreaText = selectAreaObject.GetComponentInChildren<TMP_Text>();
 
         cArea selectedArea = AppManager.Instance.mapManager.GetAreaByTitle(selectAreaText.text);
-        AppManager.Instance.mapManager.currentArea = selectedArea;
-        txtMainName.text = selectAreaText.text;
-
+        
         if (selectedArea != null)
         {
+            AppManager.Instance.mapManager.currentArea = selectedArea;
+
+            // Download Paths of Area
+            if (selectedArea.server_area_id != -1)
+            {
+                AppManager.Instance.serverManager.DownloadPaths(selectedArea.server_area_id);
+            }
+
+            txtMainName.text = selectAreaText.text;
             pnlAreasScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
+
         EnableScreen(pnlPathScreen, true);
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths can be removed afterwards, for testing purposes
@@ -299,7 +307,6 @@ public class UIManager : MonoBehaviour
     }
     private void OnPathSelectPressed()
     {
-        Debug.Log("Path selected");
         GameObject selectPathObject = EventSystem.current.currentSelectedGameObject;
         TMP_Text selectPathText = selectPathObject.GetComponentInChildren<TMP_Text>();
         Debug.Log("OnPathSelectPressed");
@@ -307,6 +314,12 @@ public class UIManager : MonoBehaviour
         //AppManager.Instance.mapManager.currentPath = selectedPath;
         if (selectedPath != null)
         {
+            // Download Points of Path
+            if (selectedPath.server_path_id != -1)
+            {
+                AppManager.Instance.serverManager.DownloadPoints(selectedPath.server_path_id); // TODO: Wait until download is finished to display path
+            }
+
             pnlScrollViewPaths.SetActive(false);
             pnlSavedPaths.SetActive(false);
             AppManager.Instance.mapManager.DisplayPath(selectedPath);
@@ -553,7 +566,7 @@ public class UIManager : MonoBehaviour
         //AppManager.Instance.mapManager.isRecordingPath = false;
     }
     //the panel for saved paths can be removed afterwards, for testing purposes
-    void DisplayPathsScreen()
+    public void DisplayPathsScreen()
     {
         pnlSavedPaths.SetActive(true);
         DestroySelectAreaObjects(selectPathObjects);

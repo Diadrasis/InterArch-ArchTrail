@@ -187,6 +187,7 @@ public class cPath
             pathNode.Create(LOCAL_PATH_ID, GetAvailablePathID());
             pathNode.Create(TITLE, _pathToSave.title);
             pathNode.Create(DATE, _pathToSave.date.ToString());
+            pathNode.Create(PATH_POINTS);
             //cPathPoint.SavePathPoints(pathNode.Create(PATH_POINTS), _pathToSave.pathPoints);
 
             // Save xml string to PlayerPrefs

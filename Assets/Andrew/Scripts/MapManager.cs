@@ -62,7 +62,7 @@ public class MapManager : MonoBehaviour
     private void Awake()
     {
         areas = new List<cArea>();
-        //areas = cArea.LoadAreas();
+        areas = cArea.LoadAreas();
 
         //List<cArea> areasToTestSave = GetTestAreas();
         //cArea.SaveAreas(areasToTestSave);
@@ -79,6 +79,7 @@ public class MapManager : MonoBehaviour
     private void Start()
     {
         // Download areas
+        AppManager.Instance.serverManager.DownloadAreas();
         /*if (AppManager.Instance.serverManager.CheckInternet())
         {
             AppManager.Instance.serverManager.DownloadAreas();
@@ -268,7 +269,12 @@ public class MapManager : MonoBehaviour
         foreach (cPath path in currentArea.paths)
         {
             if (path.title.Equals(_pathTitle))
+            {
+                //path.pathPoints = cPathPoint.GetPointsOfPath(path.local_path_id);
+                //Debug.Log("GetPathByTitle, path.local_path_id = " + path.local_path_id);
+                //Debug.Log("GetPathByTitle, path.pathPoints = " + path.pathPoints.Count);
                 return path;
+            }
         }
 
         return null;
@@ -287,6 +293,7 @@ public class MapManager : MonoBehaviour
             // Save area locally and reload areas
             cArea.Save(areaToSave);
             areas = cArea.LoadAreas();
+            Debug.Log("Saved new area!");
             AppManager.Instance.serverManager.postUserData = true;
 
             // Upload user data to server
@@ -314,7 +321,6 @@ public class MapManager : MonoBehaviour
         _areaToEdit.viewConstraintsMin = new Vector2((float)OnlineMaps.instance.bounds.left, (float)OnlineMaps.instance.bounds.bottom);
         _areaToEdit.viewConstraintsMax = new Vector2((float)OnlineMaps.instance.bounds.right, (float)OnlineMaps.instance.bounds.top);
 
-        Debug.Log("Edit Area on Map Manager");
         // Edit area locally and reload areas
         cArea.Edit(_areaToEdit);
         areas = cArea.LoadAreas();
@@ -323,7 +329,9 @@ public class MapManager : MonoBehaviour
         // Edit area on server
         if (_areaToEdit.server_area_id != -1)
         {
-            cArea.AddEditedAreaIdToUpload(_areaToEdit.server_area_id);
+            Debug.Log(_areaToEdit.title + " has server id = " + _areaToEdit.server_area_id);
+            cArea.AddAreaIdToEdit(_areaToEdit.server_area_id);
+            AppManager.Instance.serverManager.postUserData = true;
         }
     }
 
@@ -333,7 +341,7 @@ public class MapManager : MonoBehaviour
         cArea areaSelected = areas[_selectAreaObjectIndex];
         cArea.Delete(areaSelected.local_area_id);
         areas = cArea.LoadAreas();
-        Debug.Log("Deleted Area, local_area_id = " + areaSelected.local_area_id + "server_area_id = " + areaSelected.server_area_id);
+        Debug.Log("Delete Area, local_area_id = " + areaSelected.local_area_id + "server_area_id = " + areaSelected.server_area_id);
 
         // Delete Area from server
         if (areaSelected.server_area_id != -1)
@@ -406,6 +414,24 @@ public class MapManager : MonoBehaviour
 
         // Display Areas
         AppManager.Instance.uIManager.DisplayAreasScreen();
+    }
+
+    public void ReloadPaths()
+    {
+        // Reload Paths
+        currentArea.paths = cPath.LoadPathsOfArea(currentArea.local_area_id);
+
+        // Display Paths
+        //AppManager.Instance.uIManager.DisplayPathsScreen();
+    }
+
+    public void ReloadPoints()
+    {
+        // Reload Paths
+        //currentPath.pathPoints = cPathPoint.LoadPointsOfPath(currentPath.local_path_id);
+
+        // Display Paths
+        //AppManager.Instance.uIManager.DisplayPointsScreen();
     }
 
     private void OnMapClick()
@@ -655,14 +681,17 @@ public class MapManager : MonoBehaviour
             markerListOfCurrentPath.Add(marker);
 
             // Set marker scale
-            if (pathPoint.index != 0)
+            //if (pathPoint.index != 0)
             {
                 /*cPathPoint previousPathPoint = sortedList[i - 1];
                 TimeSpan timeDuration= (pathPoint.time - previousPathPoint.time);
                 marker.scale = 1f + 2f * Mathf.Clamp((float)timeDuration.TotalSeconds/600f, 0f, 1f); // 3 will be max value (timeDuration >= 600 sec(10min)), 1 is min value/default (timeDuration <= 7 sec)
                 Debug.Log("Scale = " + marker.scale);*/
 
-                marker.scale = 1f + 2f * Mathf.Clamp(pathPoint.duration / 600f, 0f, 1f);
+                //Debug.Log("Marker " + pathPoint.index + ", Scale = " + marker.scale);
+                Debug.Log("pathPoint.duration = " + pathPoint.duration);
+                marker.scale = 1f + DEFAULT_MARKER_SCALE * Mathf.Clamp(pathPoint.duration / 600f, 0f, 1f); // 1f, 2f
+                Debug.Log("Marker " + pathPoint.index + ", Scale = " + marker.scale);
             }
         }
 
@@ -676,6 +705,12 @@ public class MapManager : MonoBehaviour
         currentArea.paths = cPath.LoadPathsOfArea(currentArea.local_area_id);
         return currentArea.paths;
     }
+
+    /*public List<cPathPoint> GetPoints()
+    {
+        currentPath.pathPoints = cPathPoint.GetPointsOfPath(currentPath.local_path_id);
+        return currentPath.pathPoints;
+    }*/
     #endregion
 
     #region Marker
@@ -765,7 +800,6 @@ public class MapManager : MonoBehaviour
     }
     public void EditSelectedArea(cArea _areaToEdit)
     {
-        
         OnEditArea(_areaToEdit);
         
         if (editArea)
@@ -782,8 +816,7 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.inptFldEditArea.text = _areaToEdit.title;
             }
         }
-        Debug.Log("Edit area bool: " + editArea);
-
+        //Debug.Log("Edit area bool: " + editArea);
     }
 
     void GeneralAreaCreation()
