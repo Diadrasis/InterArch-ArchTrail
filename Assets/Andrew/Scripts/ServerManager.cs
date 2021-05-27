@@ -32,6 +32,11 @@ public class ServerManager : MonoBehaviour
     private bool downloadAreas;
     private int downloadAreaId = -1;
     private int downloadPathId = -1;
+
+    private float timeToCount = 5f;
+    private float timeRemaining = 5f;
+
+    private bool panelInternetWarning;
     #endregion
 
     #region UnityMethods
@@ -86,17 +91,33 @@ public class ServerManager : MonoBehaviour
         // NOTE: The postUserData bool is set to true when opening the application, when the user saves a new area or when a path is saved.
         if (postUserData)
         {
-            CheckInternet();
+            if (!testInternet)
+            {
+                if (timeRemaining > 0)
+                {
+                    timeRemaining -= Time.deltaTime;
+                }
+                else
+                {
+                    OnlineMaps.instance.CheckServerConnection(OnCheckConnectionCompleteUpload);
+                    timeRemaining = timeToCount;
+                }
+                
+                //CheckInternet();
+                return;
+            }
+                
 			if (testInternet)
             {
-                //Debug.Log("testInternet = " + testInternet);
-			    StartCoroutine(UploadUserDataToDiadrasis());
+                //Debug.Log("Entered testInternet");
+                StartCoroutine(UploadUserDataToDiadrasis());
                 postUserData = false;
                 testInternet = false;
             }
 
+            //Debug.Log("Out of test");
             // For testing
-            postUserData = false;
+            //postUserData = false;
         }
         
         // Check if postUserData is false and getData is true and there is internet connection, downloads the data from the server
@@ -165,11 +186,29 @@ public class ServerManager : MonoBehaviour
     {
         OnlineMaps.instance.CheckServerConnection(OnCheckConnectionComplete);
     }
+    
+    public void OnCheckConnectionCompleteUpload(bool status)
+    {
+        //if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
+        testInternet = status;
+
+        if (!status && panelInternetWarning)
+        {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
+            panelInternetWarning = false;
+        }
+        
+        if (status)
+        {
+            panelInternetWarning = true;
+        }
+    }
 
     public void OnCheckConnectionComplete(bool status)
     {
         if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
-        testInternet = status;
+        //testInternet = status;
         if (status)
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
@@ -185,7 +224,7 @@ public class ServerManager : MonoBehaviour
         // If the test is successful, then allow the user to manipulate the map.
         //OnlineMapsControlBase.instance.allowUserControl = status;
         // Showing test result in console.
-        Debug.Log(status ? "Has connection" : "No connection");
+        //Debug.Log(status ? "Has connection" : "No connection");
     }
 
     public void OnCheckConnectionCompleteDownload(bool status)
