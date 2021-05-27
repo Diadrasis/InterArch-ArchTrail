@@ -28,14 +28,18 @@ public class ServerManager : MonoBehaviour
 
     bool testInternet;
     public enum PHPActions { Get_Areas, Save_Area, Delete_Area, Get_Paths, Save_Path, Delete_Path, Get_Points, Save_Point, Delete_Point }
+
+    private bool downloadAreas;
+    private int downloadAreaId = -1;
+    private int downloadPathId = -1;
     #endregion
 
     #region UnityMethods
     private void Start()
     {
         postUserData = true;
-        uploadedUserData = false; //true on build
-        getData = false; //true on build
+        uploadedUserData = true; //true on build
+        getData = true; //true on build
 
         //Debug.Log("postUserData = " + postUserData);
         //Debug.Log("getData = " + getData);
@@ -85,10 +89,11 @@ public class ServerManager : MonoBehaviour
             CheckInternet();
 			if (testInternet)
             {
-				//Debug.Log("Check Internet "+testInternet);
-			    //StartCoroutine(UploadUserDataToDiadrasis());
-			}
-            postUserData = false;
+                //Debug.Log("testInternet = " + testInternet);
+			    StartCoroutine(UploadUserDataToDiadrasis());
+                postUserData = false;
+                testInternet = false;
+            }
         }
         
         // Check if postUserData is false and getData is true and there is internet connection, downloads the data from the server
@@ -178,6 +183,41 @@ public class ServerManager : MonoBehaviour
         //OnlineMapsControlBase.instance.allowUserControl = status;
         // Showing test result in console.
         Debug.Log(status ? "Has connection" : "No connection");
+    }
+
+    public void OnCheckConnectionCompleteDownload(bool status)
+    {
+        //if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
+
+        if (status)
+        {
+            // Has connection
+
+            // Download Areas
+            if (downloadAreas)
+            {
+                StartCoroutine(GetAreas());
+                downloadAreas = false;
+            }
+
+            // Download Paths
+            if (downloadAreaId != -1)
+            {
+                StartCoroutine(GetPaths(downloadAreaId));
+                downloadAreaId = -1;
+            }
+
+            // Download Points
+            if (downloadPathId != -1)
+            {
+                StartCoroutine(GetPoints(downloadPathId));
+                downloadPathId = -1;
+            }
+        }
+        /*else
+        {
+            // No connection
+        }*/
     }
     #endregion
 
@@ -778,14 +818,23 @@ public class ServerManager : MonoBehaviour
 
     public void DownloadAreas()
     {
-        // Downloading data
+        downloadAreas = true;
+        OnlineMaps.instance.CheckServerConnection(OnCheckConnectionCompleteDownload);
+        //StartCoroutine(GetAreas());
+
+
+        /*
+        CheckInternet();
         if (testInternet)
         {
-            CheckInternet();
+            // Downloading data
+            Debug.Log("GetAreas, testInternet = " + testInternet);
             StartCoroutine(GetAreas());
-        }
-            
+            testInternet = false;
+        }*/
     }
+
+    public 
 
     IEnumerator GetAreas()
     {
@@ -857,13 +906,10 @@ public class ServerManager : MonoBehaviour
 
     public void DownloadPaths(int _server_area_id)
     {
-        // Downloading data
-        if (testInternet)
-        {
-            CheckInternet();
-            StartCoroutine(GetPaths(_server_area_id));
-        }
-            
+        downloadAreaId = _server_area_id;
+        OnlineMaps.instance.CheckServerConnection(OnCheckConnectionCompleteDownload);
+
+        //StartCoroutine(GetPaths(_server_area_id));
     }
 
     IEnumerator GetPaths(int _server_area_id)
@@ -932,13 +978,16 @@ public class ServerManager : MonoBehaviour
 
     public void DownloadPoints(int _server_path_id)
     {
-        // Downloading data
+        downloadPathId = _server_path_id;
+        OnlineMaps.instance.CheckServerConnection(OnCheckConnectionCompleteDownload);
+
+        /*CheckInternet();
         if (testInternet)
         {
-            CheckInternet();
+            // Downloading data
             StartCoroutine(GetPoints(_server_path_id));
-        }
-            
+            testInternet = false;
+        }*/
     }
 
     IEnumerator GetPoints(int _server_path_id)
