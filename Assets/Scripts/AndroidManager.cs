@@ -91,11 +91,15 @@ public class AndroidManager : MonoBehaviour
     {
         AndroidBridge.OpenIntent(IntentNames.GPS_SETTINGS);
     }
-    void OnApplicationQuit()
+    public void OnApplicationQuit()
     {
+
+        //System.Diagnostics.Process.GetCurrentProcess().Kill(); //this makes unity to close when stopping, beware!!
         locationService.StopLocationService();
+
+
     }
-    
+
     private void Update()
     {
         //if (CheckForLocationServices()) return;//if we remove this line, we shouldn't leave the StopLocationService on the method ON, on the bool method!!!
