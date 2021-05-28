@@ -55,6 +55,9 @@ public class MapManager : MonoBehaviour
     // Create Path
     TimeSpan previousPointTime;
 
+    //for markers
+    private bool touchedLastUpdate = false;
+    int lastTouchCount;
     //private int areaCounter = 0; // TODO: Remove, for testing only
     #endregion
 
@@ -129,30 +132,54 @@ public class MapManager : MonoBehaviour
         userMarker.position = Vector2.Lerp(fromPosition, toPosition, angle);
         OnlineMaps.instance.projection.TileToCoordinates(px, py, moveZoom, out px, out py);
         OnlineMaps.instance.SetPosition(px, py);
-
+        /*int touchCount = 0;
         //for input touch to be better in mobile
-        /*if (Input.touchCount > 0)
+        bool touched = touchCount > 0;
+        if (!touchedLastUpdate && touched)
         {
-            Touch touch = Input.GetTouch(0);
-            Vector2 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
+            OnlineMapsControlBase.instance.UpdateLastPosition();
+            OnlineMapsControlBase.instance.GetTile(out lastPositionLng, out lastPositionLat);
+        }
 
-            if(touch.phase == TouchPhase.Began)
-            {
-                markersCreateArea[0].position = touchPosition;
-                markersCreateArea[1].position = touchPosition;
-            }
-
-            if(touch.phase == TouchPhase.Moved)
-            {
-                CheckMarkerPositions();
-            }
-
-            *//*if(touch.phase == TouchPhase.Ended)
-            {
-
-            }*//*
+        touchedLastUpdate = touched;
+        if (OnlineMapsControlBase.instance.dragMarker != null) OnlineMapsControlBase.instance.DragMarker();
+        else if (OnlineMapsControlBase.instance.HitTest())
+        {
+            map.tooltipDrawer.ShowMarkersTooltip(GetInputPosition());
+        }
+        else
+        {
+            OnlineMapsTooltipDrawerBase.tooltip = string.Empty;
+            OnlineMapsTooltipDrawerBase.tooltipMarker = null;
         }*/
-        
+        /*int i = 0;
+        while (i < Input.touchCount)
+        {
+            Vector2 touchPosition = Camera.main.ScreenToWorldPoint(marker.position);
+            Touch touch = Input.GetTouch(i);
+            if (touch.phase == TouchPhase.Began)
+            {
+
+                marker.position = touchPosition;
+                AppManager.Instance.uIManager.infoText.text = "Began";
+
+            }
+
+            if (touch.phase == TouchPhase.Ended)
+            {
+
+                AppManager.Instance.uIManager.infoText.text = "Ended";
+            }
+
+
+            *//*if (touch.phase == TouchPhase.Moved)
+            {
+                marker.position = touchPosition;
+                AppManager.Instance.uIManager.infoText.text = "Moved";
+            }*//*
+            ++i;
+        }*/
+
     }
 
     private void OnDestroy()
@@ -166,85 +193,9 @@ public class MapManager : MonoBehaviour
     #endregion
 
     #region Methods
-    private List<cArea> GetTestAreas()
-    {
-        List<cArea> areasFromDatabase = new List<cArea>()
-        {
-            new cArea(-1, 0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f), new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f)),
-            new cArea(-1, 1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f), new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f)),
-            new cArea(-1, 2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f), 19, new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f), new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f))
-        };
+    
 
-        //DisplayAreaDebug(areasFromDatabase[0]);
-        //DisplayAreaDebug(areasFromDatabase[1]);
-        //DisplayAreaDebug(areasFromDatabase[2]);
-
-        return areasFromDatabase;
-    }
-
-    /*private List<cPath> GetTestPaths()
-    {
-        List<cPathPoint> pathPointsToTest0 = new List<cPathPoint>()
-        {
-            new cPathPoint(0, 0, new Vector2(23.724021164280998f, 37.979955135461715f), DateTime.Now.TimeOfDay),
-            new cPathPoint(0, 1, new Vector2(23.7242f, 37.979955135461715f), DateTime.Now.TimeOfDay),
-            new cPathPoint(0, 2, new Vector2(23.7244f, 37.9801f), DateTime.Now.TimeOfDay)
-        };
-
-        List<cPathPoint> pathPointsToTest1 = new List<cPathPoint>()
-        {
-            new cPathPoint(1, 0, Vector2.zero, DateTime.Now.TimeOfDay)
-        };
-
-        List<cPathPoint> pathPointsToTest2 = new List<cPathPoint>()
-        {
-            new cPathPoint(2, 0, Vector2.zero, DateTime.Now.TimeOfDay),
-            new cPathPoint(2, 1, Vector2.zero, DateTime.Now.TimeOfDay)
-        };
-
-        List <cPath> pathsToTest = new List<cPath>()
-        {
-            new cPath(0, 0, pathPointsToTest0),
-            new cPath(0, 1, pathPointsToTest1),
-            new cPath(1, 2, pathPointsToTest2)
-        };
-
-        return pathsToTest;
-    }*/
-
-    private List<cPathPoint> GetTestPathPoints()
-    {
-        List<cPathPoint> pathPointsToTest = new List<cPathPoint>()
-        {
-            //new cPathPoint("path_0", ),
-            //new cPathPoint("Μεσσήνη", "path_1"),
-            //new cPathPoint("Κνωσός", "path_0")
-        };
-
-        return pathPointsToTest;
-    }
-
-    private void DisplayAreaDebug(cArea _area)
-    {
-        // ID
-        Debug.Log("Id = " + _area.local_area_id);
-
-        // Title
-        Debug.Log("Title = " + _area.title);
-
-        // Position
-        Debug.Log("Longitude = " + _area.position.x);
-        Debug.Log("Latitude = " + _area.position.y);
-
-        // Zoom
-        Debug.Log("Zoom = " + _area.zoom);
-
-        // Constraints
-        Debug.Log("minLongitude = " + _area.areaConstraintsMin.x);
-        Debug.Log("minLatitude = " + _area.areaConstraintsMin.y);
-        Debug.Log("maxLongitude = " + _area.areaConstraintsMax.x);
-        Debug.Log("maxLatitude = " + _area.areaConstraintsMax.y);
-    }
+   
 
     public void SetMapViewToPoint(Vector2 _positionToView)
     {
@@ -529,33 +480,7 @@ public class MapManager : MonoBehaviour
         return false;
     }
 
-    //can be removed?
-    /* public void CheckMyLocation()
-     {
-         //Debug.Log("CheckMyLocation");
-         //CreateMarkerOnUserPosition();
-         fromPosition = OnlineMaps.instance.position;
-         toPosition = OnlineMapsLocationService.instance.position;
-
-         // calculates tile positions
-         moveZoom = OnlineMaps.instance.zoom;
-         OnlineMaps.instance.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
-         OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
-
-         // if tile offset < 4, then start smooth movement
-         if (OnlineMapsUtils.Magnitude(fromTileX, fromTileY, toTileX, toTileY) < 4)
-         {
-             // set relative position 0
-             angle = 0;
-
-             // start movement
-             isMovement = true;
-         }
-         else // too far
-         {
-             OnlineMaps.instance.position = toPosition;
-         }
-     }*/
+    
     #region Path
     public void OnLocationChanged(Vector2 position)
     {
@@ -747,47 +672,30 @@ public class MapManager : MonoBehaviour
         return currentArea.paths;
     }
 
-    /*public List<cPathPoint> GetPoints()
-    {
-        currentPath.pathPoints = cPathPoint.GetPointsOfPath(currentPath.local_path_id);
-        return currentPath.pathPoints;
-    }*/
+
     #endregion
 
     #region Marker
 
     private void OnMarkerLongPress(OnlineMapsMarkerBase marker)
     {
-        // Starts moving the marker.
-        OnlineMapsControlBase.instance.dragMarker = marker;
-        //marker.SetPosition(marker.position.x, marker.position.y);// hasn't been tested out
-        OnlineMapsControlBase.instance.isMapDrag = false;
-        marker.label = "";
-        /*if (Input.touchCount > 0)
+        int touchCount = OnlineMapsControlBase.instance.GetTouchCount();
+        
+        if (touchCount != lastTouchCount)
         {
-            Touch touch = Input.GetTouch(0);
-            Vector2 touchPosition = Camera.main.ScreenToViewportPoint(touch.position);
-
-            if (touch.phase == TouchPhase.Began)
+            /*if (allowTouchZoom)
             {
-                
-            }
+                if (touchCount == 1) OnlineMapsControlBase.instance.OnMapBasePress();
+                else if (touchCount == 0) OnlineMapsControlBase.instance.OnMapBaseRelease();
+            }*/
 
-            if(touch.phase == TouchPhase.Moved)
-            {
-                marker.position = touchPosition;
-            }
-
-        }*/
+            if (lastTouchCount == 0) OnlineMapsControlBase.instance.UpdateLastPosition();
+            OnlineMapsControlBase.instance.dragMarker = marker;
+            OnlineMapsControlBase.instance.isMapDrag = false;
+            marker.label = "";
+        }
     }
-    private void OnMarkerPositionChange(OnlineMapsMarkerBase marker)
-    {
-        //Debug.Log("OnMarkerPositionChange "+marker.label);
-        OnlineMapsMarkerManager.instance.RemoveAll();
-        OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
-        //MarkersManager.CreateLineFromList(OnlineMaps.instance.markers.ToList(), Color.red, 3f);
-        OnlineMaps.instance.Redraw();
-    }
+        
 
     public void RemoveMarkersAndLine()
     {
@@ -900,7 +808,7 @@ public class MapManager : MonoBehaviour
         OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTextureMax, "Marker Max");
         markerMax.scale = DEFAULT_MARKER_SCALE;
         markerMax.OnPress += OnMarkerLongPress;
-        //markerMax.SetDraggable(true);
+        //markerMax.SetDraggable();
         markerMax.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
                                                  
 
@@ -919,9 +827,9 @@ public class MapManager : MonoBehaviour
         OnlineMaps.instance.Redraw();
 
     }
-#endregion
+    #endregion
 
-#region Screencapture the path
+    #region Screencapture the path
     /*void RecMyPath()
     {
         if (isRecPath)
@@ -959,9 +867,130 @@ public class MapManager : MonoBehaviour
 
         yield break;
     }*/
-#endregion
+    #endregion
 
+    #region NotInUse
+    private void OnMarkerPositionChange(OnlineMapsMarkerBase marker)
+    {
+        //Debug.Log("OnMarkerPositionChange "+marker.label);
+        OnlineMapsMarkerManager.instance.RemoveAll();
+        OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
+        //MarkersManager.CreateLineFromList(OnlineMaps.instance.markers.ToList(), Color.red, 3f);
+        OnlineMaps.instance.Redraw();
+    }
+    private List<cArea> GetTestAreas()
+    {
+        List<cArea> areasFromDatabase = new List<cArea>()
+        {
+            new cArea(-1, 0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f), new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f)),
+            new cArea(-1, 1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f), new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f)),
+            new cArea(-1, 2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f), 19, new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f), new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f))
+        };
 
-#endregion
+        //DisplayAreaDebug(areasFromDatabase[0]);
+        //DisplayAreaDebug(areasFromDatabase[1]);
+        //DisplayAreaDebug(areasFromDatabase[2]);
+
+        return areasFromDatabase;
+    }
+
+    /*private List<cPath> GetTestPaths()
+    {
+        List<cPathPoint> pathPointsToTest0 = new List<cPathPoint>()
+        {
+            new cPathPoint(0, 0, new Vector2(23.724021164280998f, 37.979955135461715f), DateTime.Now.TimeOfDay),
+            new cPathPoint(0, 1, new Vector2(23.7242f, 37.979955135461715f), DateTime.Now.TimeOfDay),
+            new cPathPoint(0, 2, new Vector2(23.7244f, 37.9801f), DateTime.Now.TimeOfDay)
+        };
+
+        List<cPathPoint> pathPointsToTest1 = new List<cPathPoint>()
+        {
+            new cPathPoint(1, 0, Vector2.zero, DateTime.Now.TimeOfDay)
+        };
+
+        List<cPathPoint> pathPointsToTest2 = new List<cPathPoint>()
+        {
+            new cPathPoint(2, 0, Vector2.zero, DateTime.Now.TimeOfDay),
+            new cPathPoint(2, 1, Vector2.zero, DateTime.Now.TimeOfDay)
+        };
+
+        List <cPath> pathsToTest = new List<cPath>()
+        {
+            new cPath(0, 0, pathPointsToTest0),
+            new cPath(0, 1, pathPointsToTest1),
+            new cPath(1, 2, pathPointsToTest2)
+        };
+
+        return pathsToTest;
+    }*/
+    private List<cPathPoint> GetTestPathPoints()
+    {
+        List<cPathPoint> pathPointsToTest = new List<cPathPoint>()
+        {
+            //new cPathPoint("path_0", ),
+            //new cPathPoint("Μεσσήνη", "path_1"),
+            //new cPathPoint("Κνωσός", "path_0")
+        };
+
+        return pathPointsToTest;
+    }
+
+    private void DisplayAreaDebug(cArea _area)
+    {
+        // ID
+        Debug.Log("Id = " + _area.local_area_id);
+
+        // Title
+        Debug.Log("Title = " + _area.title);
+
+        // Position
+        Debug.Log("Longitude = " + _area.position.x);
+        Debug.Log("Latitude = " + _area.position.y);
+
+        // Zoom
+        Debug.Log("Zoom = " + _area.zoom);
+
+        // Constraints
+        Debug.Log("minLongitude = " + _area.areaConstraintsMin.x);
+        Debug.Log("minLatitude = " + _area.areaConstraintsMin.y);
+        Debug.Log("maxLongitude = " + _area.areaConstraintsMax.x);
+        Debug.Log("maxLatitude = " + _area.areaConstraintsMax.y);
+    }
+    //can be removed?
+    /* public void CheckMyLocation()
+     {
+         //Debug.Log("CheckMyLocation");
+         //CreateMarkerOnUserPosition();
+         fromPosition = OnlineMaps.instance.position;
+         toPosition = OnlineMapsLocationService.instance.position;
+
+         // calculates tile positions
+         moveZoom = OnlineMaps.instance.zoom;
+         OnlineMaps.instance.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
+         OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
+
+         // if tile offset < 4, then start smooth movement
+         if (OnlineMapsUtils.Magnitude(fromTileX, fromTileY, toTileX, toTileY) < 4)
+         {
+             // set relative position 0
+             angle = 0;
+
+             // start movement
+             isMovement = true;
+         }
+         else // too far
+         {
+             OnlineMaps.instance.position = toPosition;
+         }
+     }*/
+
+    /*public List<cPathPoint> GetPoints()
+    {
+        currentPath.pathPoints = cPathPoint.GetPointsOfPath(currentPath.local_path_id);
+        return currentPath.pathPoints;
+    }*/
+    #endregion
+
+    #endregion
 }
 
