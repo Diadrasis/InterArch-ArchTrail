@@ -238,6 +238,27 @@ public class cPathPoint
         return loadedpathPoints;
     }
 
+    public static List<cPathPoint> LoadPathPointsOfPath(int _local_path_id)
+    {
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = cArea.GetXML();
+
+        // Get point nodes
+        OnlineMapsXMLList pointNodes = xml.FindAll("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + cPath.PATH + "[" + cPath.LOCAL_PATH_ID + "=" + _local_path_id + "]/" + cPath.PATH_POINTS + "/" + PATHPOINT);
+
+        List<cPathPoint> loadedpathPoints = new List<cPathPoint>();
+
+        if (pointNodes.count > 0)
+        {
+            foreach (OnlineMapsXML pointNode in pointNodes)
+            {
+                loadedpathPoints.Add(Load(pointNode));
+            }
+        }
+
+        return loadedpathPoints;
+    }
+
     public static List<cPathPoint> GetPointsToUpload()
     {
         // List of points

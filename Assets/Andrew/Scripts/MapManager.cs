@@ -29,6 +29,7 @@ public class MapManager : MonoBehaviour
     // Create a list of markers to draw the path lines
     [HideInInspector]
     public List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
+    public cPath pathToDisplay;
 
     // createMarker on user position
     public OnlineMapsMarker userMarker;
@@ -54,6 +55,10 @@ public class MapManager : MonoBehaviour
 
     // Create Path
     TimeSpan previousPointTime;
+    TimeSpan startedPauseTime;
+    float pausedDuration = 0f;
+
+    //TimeSpan testTime;
 
     //for markers
     private bool touchedLastUpdate = false;
@@ -74,8 +79,8 @@ public class MapManager : MonoBehaviour
 
         //Debug.Log(cArea.GetInfoFromXML("/areas/Μεσσήνη/title"));
 
-
-
+        //testTime = DateTime.Now.TimeOfDay;
+        //Debug.Log("Awake, testTime = " + testTime);
         //cPath.Delete(new cPath(1, 0));
     }
 
@@ -184,6 +189,10 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        //TimeSpan timeDuration = (DateTime.Now.TimeOfDay - testTime);
+        //float duration = (float)timeDuration.TotalSeconds;
+        //Debug.Log("timeDuration in seconds = " + duration);
+
         //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
@@ -369,7 +378,6 @@ public class MapManager : MonoBehaviour
         //Interent Events
         //AppManager.Instance.serverManager.OnDownloadData += ReloadAreasScreen;
         //AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
-
     }
 
     public void ReloadAreas()
@@ -392,11 +400,17 @@ public class MapManager : MonoBehaviour
 
     public void ReloadPoints()
     {
-        // Reload Paths
-        //currentPath.pathPoints = cPathPoint.LoadPointsOfPath(currentPath.local_path_id);
+        if (pathToDisplay != null)
+        {
+            if (pathToDisplay.pathPoints.Count <= 0)
+            {
+                // Reload Points
+                pathToDisplay.pathPoints = cPathPoint.LoadPathPointsOfPath(pathToDisplay.local_path_id);
 
-        // Display Paths
-        //AppManager.Instance.uIManager.DisplayPointsScreen();
+                // Display Points
+                DisplayPath(pathToDisplay);
+            }
+        }
     }
 
     private void OnMapClick()
@@ -504,13 +518,21 @@ public class MapManager : MonoBehaviour
                 string label = "Point_" + currentPath.pathPoints.Count + "_" + DateTime.Now.TimeOfDay;
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
                 marker.SetDraggable(false);
+                marker.align = OnlineMapsAlign.Center;
 
                 // Get new time duration
                 TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime);
                 previousPointTime = DateTime.Now.TimeOfDay;
 
+                // Set duration of previous path point
+                if (currentPath.pathPoints.Count > 0)
+                    currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration = (float)timeDuration.TotalSeconds - pausedDuration;
+
+                // Reset pausedDuration
+                pausedDuration = 0f;
+
                 // Creates and Adds a new PathPoint
-                currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, position, (float)timeDuration.TotalSeconds));
+                currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, position, 0f));
 
                 //marker.label = label;
                 //marker.position = position;
@@ -577,13 +599,13 @@ public class MapManager : MonoBehaviour
 
         // Create a new marker at the starting position
         OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
-
+        marker.align = OnlineMapsAlign.Center;
         // Clear and Add new marker to markerListCurrPath
         markerListCurrPath.Clear();
         markerListCurrPath.Add(marker);
 
         previousPointTime = DateTime.Now.TimeOfDay;
-
+        
         currentPath = new cPath(currentArea.local_area_id);
         currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, previousPosition, 0f));
 
@@ -598,9 +620,20 @@ public class MapManager : MonoBehaviour
         Debug.Log("Parsed string = " + dateTime);*/
     }
 
+    public void PauseRecordingPath()
+    {
+        startedPauseTime = DateTime.Now.TimeOfDay;
+        //Debug.Log("PauseRecordingPath, startedPauseTime = " + startedPauseTime);
+        isPausePath = true;
+    }
+
     //when pausing the recording but user hasn't saved the path yet
     public void ResumeRecordingPath()
     {
+        // Get pausedDuration and add it to previous pausedDuration
+        TimeSpan pausedTimeDuration = (DateTime.Now.TimeOfDay - startedPauseTime);
+        pausedDuration += (float)pausedTimeDuration.TotalSeconds;
+        //Debug.Log("pausedDuration = " + pausedDuration);
         isRecordingPath = true;
         isPausePath = false;
     }
@@ -614,10 +647,24 @@ public class MapManager : MonoBehaviour
 
     public void SavePath()
     {
-        /*Debug.Log("currentPath areaId = " + currentPath.areaId);
-        Debug.Log("currentPath Id = " + currentPath.Id);
-        Debug.Log("currentPath title = " + currentPath.title);
-        Debug.Log("currentPath pathPoints.Count = " + currentPath.pathPoints.Count);*/
+        // Get pausedDuration and add it to previous pausedDuration
+        TimeSpan pausedTimeDuration = (DateTime.Now.TimeOfDay - startedPauseTime);
+        pausedDuration += (float)pausedTimeDuration.TotalSeconds;
+        //Debug.Log("pausedDuration = " + pausedDuration);
+        // Get new time duration
+        TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime);
+
+        // Set duration of the last path point
+        if (currentPath.pathPoints.Count > 0)
+            currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration = (float)timeDuration.TotalSeconds - pausedDuration;
+
+        // Debug path
+        /*foreach (cPathPoint point in currentPath.pathPoints)
+        {
+            Debug.Log("point " + point.index + " duration = " + point.duration);
+        }*/
+
+        // Save
         cPath.Save(currentPath);
         currentPath = null;
 
@@ -627,11 +674,20 @@ public class MapManager : MonoBehaviour
 
     public void DisplayPath(cPath _pathToDisplay)
     {
-        // Sort points by index
-        List<cPathPoint> sortedList = _pathToDisplay.pathPoints.OrderBy(point => point.index).ToList();
+        // Get displaying path
+        pathToDisplay = _pathToDisplay;
 
+        // Sort points by index
+        List<cPathPoint> sortedList = pathToDisplay.pathPoints.OrderBy(point => point.index).ToList();
+        
         // Create a list of markers to draw the path lines
-        List<OnlineMapsMarker> markerListOfCurrentPath = new List<OnlineMapsMarker>();
+        //List<OnlineMapsMarker> markerListOfCurrentPath = new List<OnlineMapsMarker>();
+        foreach (OnlineMapsMarker mapsMarker in markerListCurrPath)
+        {
+            mapsMarker.DestroyInstance();
+        }
+        markerListCurrPath.Clear();
+        markerListCurrPath = new List<OnlineMapsMarker>();
 
         for (int i = 0; i < sortedList.Count; i++)
         {
@@ -639,12 +695,16 @@ public class MapManager : MonoBehaviour
             cPathPoint pathPoint = sortedList[i];
 
             // Create marker
-            string label = "Path_" + _pathToDisplay.local_path_id + "_Point_" + pathPoint.index + "_" + pathPoint.duration.ToString();
+            string label = "Path_" + pathToDisplay.local_path_id + "_Point_" + pathPoint.index + "_" + pathPoint.duration.ToString();
             OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
             marker.SetDraggable(false);
+            marker.align = OnlineMapsAlign.Center;
 
             // Add marker to current path marker list
-            markerListOfCurrentPath.Add(marker);
+            markerListCurrPath.Add(marker);
+            Debug.Log("i = " + i);
+            Debug.Log("Add marker = " + marker.label);
+            //markerListOfCurrentPath.Add(marker);
 
             // Set marker scale
             //if (pathPoint.index != 0)
@@ -655,14 +715,14 @@ public class MapManager : MonoBehaviour
                 Debug.Log("Scale = " + marker.scale);*/
 
                 //Debug.Log("Marker " + pathPoint.index + ", Scale = " + marker.scale);
-                Debug.Log("pathPoint.duration = " + pathPoint.duration);
+                //Debug.Log("pathPoint.duration = " + pathPoint.duration);
                 marker.scale = 1f + DEFAULT_MARKER_SCALE * Mathf.Clamp(pathPoint.duration / 600f, 0f, 1f); // 1f, 2f
                 Debug.Log("Marker " + pathPoint.index + ", Scale = " + marker.scale);
             }
         }
 
         // Draw lines
-        OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListOfCurrentPath.Select(m => m.position).ToArray(), Color.red, 3));
+        OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListCurrPath.Select(m => m.position).ToArray(), Color.red, 3)); //markerListOfCurrentPath
         OnlineMaps.instance.Redraw();
     }
 
