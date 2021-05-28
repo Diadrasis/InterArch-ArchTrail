@@ -326,9 +326,9 @@ public class UIManager : MonoBehaviour
 
             pnlScrollViewPaths.SetActive(false);
             pnlSavedPaths.SetActive(false);
+            //if (selectedPath.pathPoints.Count > 0)
             AppManager.Instance.mapManager.DisplayPath(selectedPath);
         }
-        
     }
 
     private void OnPathDeletePressed()
@@ -499,7 +499,8 @@ public class UIManager : MonoBehaviour
         imgOnRecord.gameObject.SetActive(false);
         imgPauseRecording.gameObject.SetActive(true);
         IsInRecordingPath(false);
-        AppManager.Instance.mapManager.isPausePath = true;
+
+        AppManager.Instance.mapManager.PauseRecordingPath();
         //pnlMainButtons.SetActive(true);
         
     }

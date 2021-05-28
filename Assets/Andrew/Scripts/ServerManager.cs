@@ -109,7 +109,6 @@ public class ServerManager : MonoBehaviour
                 
 			if (testInternet)
             {
-                //Debug.Log("Entered testInternet");
                 StartCoroutine(UploadUserDataToDiadrasis());
                 postUserData = false;
                 testInternet = false;
