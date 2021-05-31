@@ -34,7 +34,7 @@ public class ServerManager : MonoBehaviour
     private int downloadPathId = -1;
 
     private float timeToCount = 5f;
-    private float timeRemaining = 5f;
+    public float timeRemaining = 0f;
 
     private bool panelInternetWarning;
     #endregion
@@ -43,6 +43,7 @@ public class ServerManager : MonoBehaviour
     private void Start()
     {
         postUserData = true;
+        timeRemaining = 0f;
         uploadedUserData = true;
         getData = true;
 

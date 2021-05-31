@@ -266,8 +266,9 @@ public class MapManager : MonoBehaviour
             // Save area locally and reload areas
             cArea.Save(areaToSave);
             areas = cArea.LoadAreas();
-            Debug.Log("Saved new area!");
+            //Debug.Log("Saved new area!");
             AppManager.Instance.serverManager.postUserData = true;
+            AppManager.Instance.serverManager.timeRemaining = 0f;
 
             // Upload user data to server
             /*if (areaCounter >= 2) // TODO: For testing only. Remove.
@@ -305,6 +306,7 @@ public class MapManager : MonoBehaviour
             Debug.Log(_areaToEdit.title + " has server id = " + _areaToEdit.server_area_id);
             cArea.AddAreaIdToEdit(_areaToEdit.server_area_id);
             AppManager.Instance.serverManager.postUserData = true;
+            AppManager.Instance.serverManager.timeRemaining = 0f;
         }
     }
 
@@ -322,6 +324,7 @@ public class MapManager : MonoBehaviour
             Debug.Log("AddIdToDelete, area's server id: " + areaSelected.server_area_id);
             cArea.AddIdToDelete(areaSelected.server_area_id);
             AppManager.Instance.serverManager.postUserData = true;
+            AppManager.Instance.serverManager.timeRemaining = 0f;
         }
 
         // TODO: For testing only. Remove.
@@ -352,6 +355,7 @@ public class MapManager : MonoBehaviour
             Debug.Log("AddIdToDelete, path's server id: " + pathSelected.server_area_id);
             cPath.AddIdToDelete(pathSelected.server_path_id);
             AppManager.Instance.serverManager.postUserData = true;
+            AppManager.Instance.serverManager.timeRemaining = 0f;
         }
     }
 
@@ -420,7 +424,7 @@ public class MapManager : MonoBehaviour
             // if there is no polygon
             if (polygon == null)
             {
-                GeneralAreaCreation();
+                GeneralAreaCreation(null);
                 // Activate button
                 AppManager.Instance.uIManager.btnSaveArea.interactable = true;
             }
@@ -669,6 +673,7 @@ public class MapManager : MonoBehaviour
 
         // Upload user data to server
         AppManager.Instance.serverManager.postUserData = true;
+        AppManager.Instance.serverManager.timeRemaining = 0f;
     }
 
     public void DisplayPath(cPath _pathToDisplay)
@@ -835,46 +840,38 @@ public class MapManager : MonoBehaviour
             OnlineMapsDrawingElementManager.RemoveItem(polygon);
         polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
     }
-    public void OnEditArea(cArea _areaToEdit)
+
+    public void StartEditArea(cArea _areaToEdit)
     {
+        // Set current area
+        currentArea = _areaToEdit;
+
+        // Remove Polygon if it exists
+        if (polygon != null)
+            OnlineMapsDrawingElementManager.RemoveItem(polygon);
+
+        // Recreate area to edit
+        GeneralAreaCreation(_areaToEdit);
+
+        // Center map view to area and reset view constraints
+        ResetMapConstraints();
+        OnlineMaps.instance.SetPositionAndZoom(_areaToEdit.position.x, _areaToEdit.position.y, _areaToEdit.zoom);
+
+        // Start editing
         editArea = true;
-        //currentArea = _areaToEdit;
-        //DisplayArea(_areaToEdit);
-        SetMapViewToPoint(_areaToEdit.position);
-    }
-    public void EditSelectedArea(cArea _areaToEdit)
-    {
-        OnEditArea(_areaToEdit);
-        
-        if (editArea)
-        {
-            currentArea = _areaToEdit;
-            
-            if (polygon == null)
-            {
-                GeneralAreaCreation();
-               
-                // Activate button
-                AppManager.Instance.uIManager.btnSaveEditArea.interactable = true;
-                AppManager.Instance.uIManager.btnSaveEditArea.onClick.AddListener(() => AppManager.Instance.uIManager.EnableScreen(AppManager.Instance.uIManager.pnlSaveEditArea,true));
-                AppManager.Instance.uIManager.inptFldEditArea.text = _areaToEdit.title;
-            }
-        }
-        //Debug.Log("Edit area bool: " + editArea);
     }
 
-    void GeneralAreaCreation()
+    private void GeneralAreaCreation(cArea _areaToRecreate)
     {
-        Vector2 centerPosition = OnlineMaps.instance.position;
+        Vector2 centerPosition = _areaToRecreate == null ? OnlineMaps.instance.position : _areaToRecreate.position;
 
         // Calculate polygon positions
-        Vector2 bottomLeftPosition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
-        Vector2 topLeftposition = new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
-        Vector2 topRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2);
-        Vector2 bottomRightPosition = new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2);
+        Vector2 bottomLeftPosition = _areaToRecreate == null ? new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2) : _areaToRecreate.areaConstraintsMin;
+        Vector2 topLeftposition = _areaToRecreate == null ? new Vector2((float)(OnlineMaps.instance.bounds.left + centerPosition.x) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2) : new Vector2(_areaToRecreate.areaConstraintsMin.x, _areaToRecreate.areaConstraintsMax.y);
+        Vector2 topRightPosition = _areaToRecreate == null ? new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(centerPosition.y + OnlineMaps.instance.bounds.top) / 2) : _areaToRecreate.areaConstraintsMax;
+        Vector2 bottomRightPosition = _areaToRecreate == null ? new Vector2((float)(centerPosition.x + OnlineMaps.instance.bounds.right) / 2, (float)(OnlineMaps.instance.bounds.bottom + centerPosition.y) / 2) : new Vector2(_areaToRecreate.areaConstraintsMax.x, _areaToRecreate.areaConstraintsMin.y);
 
         // Create two markers on the specified coordinates.
-
         //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
         OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTextureMin, "Marker Min");
         markerMin.scale = DEFAULT_MARKER_SCALE;
@@ -888,8 +885,7 @@ public class MapManager : MonoBehaviour
         markerMax.OnPress += OnMarkerLongPress;
         //markerMax.SetDraggable();
         markerMax.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
-                                                 
-
+        
         // Set markers and positions.
         markersCreateArea[0] = markerMin;
         markersCreateArea[1] = markerMax;
@@ -903,7 +899,6 @@ public class MapManager : MonoBehaviour
 
         // Redraw Map
         OnlineMaps.instance.Redraw();
-
     }
     #endregion
 

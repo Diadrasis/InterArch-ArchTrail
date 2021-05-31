@@ -298,22 +298,25 @@ public class UIManager : MonoBehaviour
     //to edit an area
     private void OnEditSelect()
     {
+        // Get selected area
+        GameObject btnEditArea = EventSystem.current.currentSelectedGameObject;
+        pnlForEdit = btnEditArea.transform.parent;
+        cArea selectedArea = AppManager.Instance.mapManager.areas[selectAreaObjects.IndexOf(pnlForEdit.gameObject)];
+
+        // Change UI
         pnlEditArea.SetActive(true);
         pnlAreasScreen.SetActive(false);
-        GameObject btnEditArea = EventSystem.current.currentSelectedGameObject;
-        string areaTitle = string.Empty;
-        pnlForEdit = btnEditArea.transform.parent;
-
-        //current area when selected on edit
-        cArea selectedArea = AppManager.Instance.mapManager.areas[selectAreaObjects.IndexOf(pnlForEdit.gameObject)];
-        AppManager.Instance.mapManager.currentArea = selectedArea;
-        AppManager.Instance.mapManager.EditSelectedArea(selectedArea);
         txtMainName.text = selectedArea.title;
         btnEditAreaSave.onClick.AddListener(EditSaveArea);
-
+        btnSaveEditArea.interactable = true;
+        btnSaveEditArea.onClick.AddListener(() => EnableScreen(pnlSaveEditArea, true));
+        inptFldEditArea.text = selectedArea.title;
         ActivateButtons(true, true);
-        
+
+        // Start edit selected area
+        AppManager.Instance.mapManager.StartEditArea(selectedArea);
     }
+
     private void OnPathSelectPressed()
     {
         GameObject selectPathObject = EventSystem.current.currentSelectedGameObject;
@@ -472,7 +475,6 @@ public class UIManager : MonoBehaviour
             pnlEditArea.SetActive(false);
             txtMainName.text = newAreaTitle;
         }
-        
     }
 
     #region PathPanel
