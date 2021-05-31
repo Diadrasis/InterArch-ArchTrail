@@ -456,7 +456,7 @@ public class cArea
 
             // Set local area id
             _areaToSave.local_area_id = local_area_id;
-
+            AppManager.Instance.uIManager.txtLoading.text = "Updating...";
             // Edit area
             Edit(_areaToSave);
             return;

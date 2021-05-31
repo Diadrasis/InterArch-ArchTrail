@@ -91,6 +91,11 @@ public class UIManager : MonoBehaviour
     private List<GameObject> selectPathObjects;
 
     private readonly string DEFAULT_TEXT_NAME = "";
+
+    [Space]
+    [Header("Loading Screen")]
+    public Image imgLoading;
+    public TextMeshProUGUI txtLoading;
     #endregion
 
     #region Unity Functions
@@ -475,7 +480,7 @@ public class UIManager : MonoBehaviour
     private void AddNewPath()
     {
         //check if user or app for some reason location services are off, enable appropriate panel(when build remove comments)
-        /*if (AppManager.Instance.androidManager.CheckForLocationServices())
+       /* if (AppManager.Instance.androidManager.CheckForLocationServices())
         {
             EnableScreen(pnlGPSScreen, true);
             return;
@@ -578,7 +583,7 @@ public class UIManager : MonoBehaviour
             pnlSaveEditArea.SetActive(false);
         }
     }
-
+    //final warning on delete
     public void DeleteFinal()
     {
         if (pnlPathScreen.activeSelf)
@@ -636,6 +641,22 @@ public class UIManager : MonoBehaviour
 
     }
 
+    //when uploading/loading or updating from and to server, to show info (needs fixing)
+    /*public void LoadingScreen(string txtMessage, float timeAmount, float speedAmount)
+    {
+        txtLoading.text = txtMessage;
+        speedAmount += Time.deltaTime;
+        if (speedAmount > 0)
+        {
+            timeAmount = Mathf.Lerp(0, 1, speedAmount);
+            imgLoading.fillAmount = timeAmount;
+        }
+        else
+        {
+            imgLoading.fillAmount = 0;
+        }
+        
+    }*/
     #endregion
 
     #region NotInUse

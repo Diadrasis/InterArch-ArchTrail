@@ -233,7 +233,8 @@ public class ServerManager : MonoBehaviour
         if (status)
         {
             // Has connection
-
+            AppManager.Instance.uIManager.txtLoading.text = "Downloading...";
+            Debug.Log("Downloading");
             // Download Areas
             if (downloadAreas)
             {
@@ -254,7 +255,13 @@ public class ServerManager : MonoBehaviour
                 StartCoroutine(GetPoints(downloadPathId));
                 downloadPathId = -1;
             }
+
         }
+        else
+        {
+            AppManager.Instance.uIManager.txtLoading.text = "";
+        }
+       
         /*else
         {
             // No connection
@@ -320,6 +327,8 @@ public class ServerManager : MonoBehaviour
     {
         // ============== Upload Areas ============== //
         Debug.Log("Started uploading user data!");
+        AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
+
         // Get areas to upload
         List<cArea> areasToUpload = cArea.GetAreasToUpload();
 
@@ -351,6 +360,7 @@ public class ServerManager : MonoBehaviour
                 {
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
                     Debug.Log("Uploaded area successfully!");
+                    AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     
                     // Get database id and set it
@@ -366,7 +376,7 @@ public class ServerManager : MonoBehaviour
                 }
             }
         }
-
+       
         // ============== Upload Paths ============== //
 
         // Get paths to upload
@@ -398,6 +408,7 @@ public class ServerManager : MonoBehaviour
                 {
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     Debug.Log("Uploaded path successfully!");
+                    AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
                     string server_path_idString = echo.Replace("[{\"max(server_path_id)\":\"", "").Replace("\"}]", "");
@@ -442,7 +453,7 @@ public class ServerManager : MonoBehaviour
                 {
                     Debug.Log("Uploaded point successfully!");
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
-
+                    AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
                     string server_point_idString = echo.Replace("[{\"max(server_point_id)\":\"", "").Replace("\"}]", "");
@@ -481,6 +492,9 @@ public class ServerManager : MonoBehaviour
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
                     Debug.Log("Deleted area from server successfully!: " + server_area_idToDelete);
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
+                    //AppManager.Instance.uIManager.LoadingScreen("Updating...",1,3);
+                    AppManager.Instance.uIManager.txtLoading.text = "Updating...";
+                    //AppManager.Instance.uIManager.imgLoading.fillAmount -= timeToCount / 10;
                     //Debug.Log("Data length: " + webRequest.downloadHandler.data);
 
                     // Remove id to delete from player prefs
@@ -514,6 +528,9 @@ public class ServerManager : MonoBehaviour
                 {
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
                     Debug.Log("Deleted path from server successfully!: " + server_path_idToDelete);
+                    //AppManager.Instance.uIManager.LoadingScreen("Updating...", 1, 3);
+                    AppManager.Instance.uIManager.txtLoading.text = "Updating...";
+                    //AppManager.Instance.uIManager.imgLoading.fillAmount -= timeToCount / 10;
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     //Debug.Log("Data length: " + webRequest.downloadHandler.data);
 
@@ -523,7 +540,8 @@ public class ServerManager : MonoBehaviour
             }
         }
 
-        uploadedUserData = true;
+        uploadedUserData = true; 
+        AppManager.Instance.uIManager.txtLoading.text = "";
     }
 
     IEnumerator DownloadDataFromDiadrasis()
@@ -861,6 +879,7 @@ public class ServerManager : MonoBehaviour
     {
         downloadAreas = true;
         OnlineMaps.instance.CheckServerConnection(OnCheckConnectionCompleteDownload);
+        
         //StartCoroutine(GetAreas());
 
 
@@ -879,6 +898,7 @@ public class ServerManager : MonoBehaviour
 
     IEnumerator GetAreas()
     {
+
         WWWForm formToPostGetAreas = new WWWForm();
         formToPostGetAreas.AddField("action", Enum.GetName(typeof(PHPActions), 0)); // Get_Areas
 
@@ -904,7 +924,7 @@ public class ServerManager : MonoBehaviour
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(areasData);
                 Debug.Log("areas --> Json string = " + json);
-
+                
                 // Create a cAreasData from json string
                 cAreaData[] areasDataFromJSON = MethodHelper.FromJson<cAreaData>(MethodHelper.SetupJson(json));
 
@@ -937,12 +957,14 @@ public class ServerManager : MonoBehaviour
 
                         // Save to Player Prefs
                         cArea.SaveFromServer(areaToSave);
+                        
                     }
                 }
             }
         }
 
         AppManager.Instance.mapManager.ReloadAreas();
+        AppManager.Instance.uIManager.txtLoading.text = "";
     }
 
     public void DownloadPaths(int _server_area_id)
@@ -981,7 +1003,6 @@ public class ServerManager : MonoBehaviour
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(pathsData);
                 Debug.Log("paths --> Json string = " + json);
-
                 // Create a cAreasData from json string
                 cPathData[] pathsDataFromJSON = MethodHelper.FromJson<cPathData>(MethodHelper.SetupJson(json));
 
@@ -1015,6 +1036,7 @@ public class ServerManager : MonoBehaviour
         }
 
         AppManager.Instance.mapManager.ReloadPaths();
+        AppManager.Instance.uIManager.txtLoading.text = "";
     }
 
     public void DownloadPoints(int _server_path_id)
@@ -1059,7 +1081,6 @@ public class ServerManager : MonoBehaviour
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(pointsData);
                 Debug.Log("points --> Json string = " + json);
-
                 // Create a cAreasData from json string
                 cPointData[] pointsDataFromJSON = MethodHelper.FromJson<cPointData>(MethodHelper.SetupJson(json));
 
@@ -1090,6 +1111,7 @@ public class ServerManager : MonoBehaviour
         }
 
         AppManager.Instance.mapManager.ReloadPoints();
+        AppManager.Instance.uIManager.txtLoading.text = "";
     }
 
     public void DeleteAreaFromServer(int _server_area_idToDelete)
