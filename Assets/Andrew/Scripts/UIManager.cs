@@ -461,6 +461,11 @@ public class UIManager : MonoBehaviour
             pnlCreateArea.SetActive(false);
             DisplayAreasScreen();
         }
+        else
+        {
+            pnlWarningScreen.SetActive(true);
+            txtWarning.text = "Please enter a valid name";
+        }
     }
 
     public void EditSaveArea()
@@ -474,7 +479,12 @@ public class UIManager : MonoBehaviour
             pnlEditArea.SetActive(false);
             txtMainName.text = newAreaTitle;
         }
-        
+        else
+        {
+            pnlWarningScreen.SetActive(true);
+            txtWarning.text = "Please enter a valid name";
+        }
+
     }
 
     #region PathPanel
@@ -506,9 +516,7 @@ public class UIManager : MonoBehaviour
         imgOnRecord.gameObject.SetActive(false);
         imgPauseRecording.gameObject.SetActive(true);
         IsInRecordingPath(false);
-
         AppManager.Instance.mapManager.PauseRecordingPath();
-        //pnlMainButtons.SetActive(true);
         
     }
 

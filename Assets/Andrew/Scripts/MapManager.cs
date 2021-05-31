@@ -472,6 +472,7 @@ public class MapManager : MonoBehaviour
             if (!IsWithinConstraints())
             {
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+                AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
                 
             }
@@ -549,6 +550,7 @@ public class MapManager : MonoBehaviour
         else if ((isRecordingPath || isPausePath) && !IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             /*isRecordingPath = false;
             isPausePath = false;*/
