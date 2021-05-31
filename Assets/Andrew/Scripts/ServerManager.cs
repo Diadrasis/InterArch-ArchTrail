@@ -202,6 +202,7 @@ public class ServerManager : MonoBehaviour
         if (status)
         {
             panelInternetWarning = true;
+            AppManager.Instance.uIManager.imgLoading.color = Color.green;
         }
     }
 
@@ -212,12 +213,14 @@ public class ServerManager : MonoBehaviour
         if (status)
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+            AppManager.Instance.uIManager.imgLoading.color = Color.green;
             //Debug.Log("Check Internet On Check: " + testInternet);
         }
         else
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
+            AppManager.Instance.uIManager.imgLoading.color = Color.red;
             //Debug.Log("Check Internet On Check: " + testInternet);
         }
 
@@ -235,6 +238,7 @@ public class ServerManager : MonoBehaviour
         {
             // Has connection
             AppManager.Instance.uIManager.txtLoading.text = "Downloading...";
+            AppManager.Instance.uIManager.imgLoading.color = Color.green;
             Debug.Log("Downloading");
             // Download Areas
             if (downloadAreas)

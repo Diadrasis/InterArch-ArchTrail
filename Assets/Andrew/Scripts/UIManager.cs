@@ -74,7 +74,8 @@ public class UIManager : MonoBehaviour
     [Header("Warning Save Path Screen")]
     //WarningScreen when user is about to save the path
     public GameObject pnlWarningSavePathScreen;
-    public Button btnSave, btnSaveCancel;
+    public Button btnSave, btnContinue, btnSaveCancel;
+
     [Space]
     [Header("Warning Delete")]
     //Warning screen when user is about to delete
@@ -150,6 +151,7 @@ public class UIManager : MonoBehaviour
 
         //btn warning panel for save or cancel a path
         btnSave.onClick.AddListener(() =>SavePath());
+        btnContinue.onClick.AddListener(() => ResumePath());
         btnSaveCancel.onClick.AddListener(() => CancelInGeneral());
 
         //for testing the saving of paths is happening smoothly
@@ -396,8 +398,8 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.serverManager.DownloadAreas();
             Debug.Log("pnlCreateArea false");
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
-        } 
-        else if(!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
+        }
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
             !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && (AppManager.Instance.mapManager.isRecordingPath || AppManager.Instance.mapManager.isPausePath))
         {
             SaveUIButton();
@@ -416,7 +418,7 @@ public class UIManager : MonoBehaviour
             DisplayAreasScreen();
             AppManager.Instance.serverManager.DownloadAreas();
         }
-        else 
+        else
         {
             DisplayAreasScreen();
             AppManager.Instance.serverManager.DownloadAreas();
@@ -462,6 +464,11 @@ public class UIManager : MonoBehaviour
             pnlCreateArea.SetActive(false);
             DisplayAreasScreen();
         }
+        else
+        {
+            pnlWarningScreen.SetActive(true);
+            txtWarning.text = "Please enter a valid name";
+        }
     }
 
     public void EditSaveArea()
@@ -474,6 +481,11 @@ public class UIManager : MonoBehaviour
             pnlSaveEditArea.SetActive(false);
             pnlEditArea.SetActive(false);
             txtMainName.text = newAreaTitle;
+        }
+        else
+        {
+            pnlWarningScreen.SetActive(true);
+            txtWarning.text = "Please enter a valid name";
         }
     }
 
@@ -498,7 +510,7 @@ public class UIManager : MonoBehaviour
         pnlMainButtons.SetActive(false);
     }
 
-    //change the icon from plus to save, opens warning screen for saving or cancel path
+    //stops the anim of recording, opens warning screen for saving, continue or cancel path
     private void SaveUIButton()
     {
         EnableScreen(pnlWarningSavePathScreen, true);
@@ -506,13 +518,11 @@ public class UIManager : MonoBehaviour
         imgOnRecord.gameObject.SetActive(false);
         imgPauseRecording.gameObject.SetActive(true);
         IsInRecordingPath(false);
-
         AppManager.Instance.mapManager.PauseRecordingPath();
-        //pnlMainButtons.SetActive(true);
         
     }
 
-    //when save button is pressed on warning screen, the save icon changes back to plus icon. Warning screen is deactivated and listener goes to original method
+    //when save button is pressed on warning screen and recording, pausing goes to false. Same with anim recording
     private void SavePath()
     {
         AppManager.Instance.mapManager.SavePath();
@@ -547,6 +557,7 @@ public class UIManager : MonoBehaviour
         imgPauseRecording.gameObject.SetActive(false);
         IsInRecordingPath(true);
         pnlMainButtons.SetActive(false);
+        if (pnlWarningSavePathScreen.activeSelf) pnlWarningSavePathScreen.SetActive(false);
     }
     #endregion
 
@@ -570,8 +581,10 @@ public class UIManager : MonoBehaviour
     {
         if (pnlWarningSavePathScreen.activeSelf)
         {
-            //AppManager.Instance.mapManager.RemoveMarkersAndLine();
+            AppManager.Instance.mapManager.RemoveMarkersAndLine();
             EnableScreen(pnlWarningSavePathScreen, false);
+            EnableScreen(pnlMainButtons, true);
+            AppManager.Instance.mapManager.StopRecordingPath();
         }
 
         //the panel for saved paths

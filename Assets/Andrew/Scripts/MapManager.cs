@@ -196,7 +196,7 @@ public class MapManager : MonoBehaviour
         //float duration = (float)timeDuration.TotalSeconds;
         //Debug.Log("timeDuration in seconds = " + duration);
 
-        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
@@ -476,6 +476,7 @@ public class MapManager : MonoBehaviour
             if (!IsWithinConstraints())
             {
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+                AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
                 
             }
@@ -552,7 +553,8 @@ public class MapManager : MonoBehaviour
         }
         else if ((isRecordingPath || isPausePath) && !IsWithinConstraints())
         {
-            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             /*isRecordingPath = false;
             isPausePath = false;*/
@@ -560,14 +562,14 @@ public class MapManager : MonoBehaviour
             Debug.Log("isPause Path: " + isPausePath);*/
             //Debug.Log("is recording and not in constraints");
         }
-        else if((!isRecordingPath && isPausePath) && IsWithinConstraints())
+        else if(!isRecordingPath && isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
            /* Debug.Log("isRecording Path: " + isRecordingPath);
             Debug.Log("isPause Path: " + isPausePath);*/
         }
-        else if ((isRecordingPath && !isPausePath) && IsWithinConstraints())
+        else if (isRecordingPath && !isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
@@ -581,13 +583,14 @@ public class MapManager : MonoBehaviour
             /*Debug.Log("isRecording Path: " + isRecordingPath);
             Debug.Log("isPause Path: " + isPausePath);*/
         }
-        else
+        /*else if(isRecordingPath && !isPausePath && !IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-            /*Debug.Log("isRecording Path: " + isRecordingPath);
-            Debug.Log("isPause Path: " + isPausePath);*/
-            //Debug.Log("is not recording and not in constraints");
-        }
+            AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
+            Debug.Log("isRecording Path: " + isRecordingPath);
+            Debug.Log("isPause Path: " + isPausePath);
+            //Debug.Log("is not recording is paused and not in constraints");
+        }*/
         //marker.OnPositionChanged += OnMarkerPositionChange;
     }
 
