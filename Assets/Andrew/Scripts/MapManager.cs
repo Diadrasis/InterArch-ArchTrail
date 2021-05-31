@@ -29,6 +29,7 @@ public class MapManager : MonoBehaviour
     // Create a list of markers to draw the path lines
     [HideInInspector]
     public List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
+    //public List<OnlineMapsMarker> markersForDuration = new List<OnlineMapsMarker>();
     public cPath pathToDisplay;
 
     // createMarker on user position
@@ -57,6 +58,8 @@ public class MapManager : MonoBehaviour
     TimeSpan previousPointTime;
     TimeSpan startedPauseTime;
     float pausedDuration = 0f;
+    public Texture2D markerForDurationTexture;
+    private List<Texture2D> markerDurationTextures;
 
     //TimeSpan testTime;
 
@@ -202,10 +205,6 @@ public class MapManager : MonoBehaviour
     #endregion
 
     #region Methods
-    
-
-   
-
     public void SetMapViewToPoint(Vector2 _positionToView)
     {
         OnlineMaps.instance.SetPositionAndZoom(_positionToView.x, _positionToView.y, DEFAULT_ZOOM);
@@ -695,17 +694,29 @@ public class MapManager : MonoBehaviour
             // Get cPathPoint
             cPathPoint pathPoint = sortedList[i];
 
-            // Create marker
+            // Create marker base
             string label = "Path_" + pathToDisplay.local_path_id + "_Point_" + pathPoint.index + "_" + pathPoint.duration.ToString();
             OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
             marker.SetDraggable(false);
             marker.align = OnlineMapsAlign.Center;
+            marker.scale = 0.1f;
 
             // Add marker to current path marker list
             markerListCurrPath.Add(marker);
-            Debug.Log("i = " + i);
-            Debug.Log("Add marker = " + marker.label);
+            //Debug.Log("i = " + i);
+            //Debug.Log("Add marker = " + marker.label);
             //markerListOfCurrentPath.Add(marker);
+
+            // Create marker ontop of marker to display duration
+            OnlineMapsMarker markerForDuration = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
+            markerForDuration.SetDraggable(false);
+            markerForDuration.align = OnlineMapsAlign.Center;
+            markerForDuration.texture = markerForDurationTexture;
+            markerForDuration.scale = 0.085f - DEFAULT_MARKER_SCALE * Mathf.Clamp(pathPoint.duration / 600f, 0f, 1f); // 1f, 2f
+            //Debug.Log("Marker " + pathPoint.index + ", Scale = " + markerForDuration.scale);
+
+            // Add markerForDuration on markersForDuaration list to remove later
+            //markersForDuration.Add(markerForDuration);
 
             // Set marker scale
             //if (pathPoint.index != 0)
@@ -717,14 +728,21 @@ public class MapManager : MonoBehaviour
 
                 //Debug.Log("Marker " + pathPoint.index + ", Scale = " + marker.scale);
                 //Debug.Log("pathPoint.duration = " + pathPoint.duration);
-                marker.scale = 1f + DEFAULT_MARKER_SCALE * Mathf.Clamp(pathPoint.duration / 600f, 0f, 1f); // 1f, 2f
-                Debug.Log("Marker " + pathPoint.index + ", Scale = " + marker.scale);
+
+                //markerForDuration.scale = 1f + DEFAULT_MARKER_SCALE * Mathf.Clamp(pathPoint.duration / 600f, 0f, 1f); // 1f, 2f
+                //Debug.Log("Marker " + pathPoint.index + ", Scale = " + markerForDuration.scale);
             }
         }
 
         // Draw lines
         OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListCurrPath.Select(m => m.position).ToArray(), Color.red, 3)); //markerListOfCurrentPath
         OnlineMaps.instance.Redraw();
+
+        // Set map view on path
+        if (sortedList.Count > 0)
+        {
+            OnlineMaps.instance.SetPositionAndZoom(sortedList[0].position.x, sortedList[0].position.y, 20);
+        }
     }
 
     public List<cPath> GetPaths()

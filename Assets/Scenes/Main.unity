@@ -14446,6 +14446,8 @@ MonoBehaviour:
   markerCreateAreaTextureMax: {fileID: 2800000, guid: 0efa5fe34f4b75e4eb7e038b24896959,
     type: 3}
   borderWidth: 1
+  markerForDurationTexture: {fileID: 2800000, guid: 7ca9aea6a57326d409d3e4e8ad03a904,
+    type: 3}
 --- !u!222 &6710081423120059520
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -15934,7 +15936,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _items: []
   defaultScale: 0.5
-  defaultTexture: {fileID: 2800000, guid: 8e96007364423234cab8b5a42e93bf20, type: 3}
+  defaultTexture: {fileID: 2800000, guid: 4a5746964ce559941a0253c2e525b9c7, type: 3}
   defaultAlign: 7
   allowAddMarkerByM: 1
 --- !u!114 &6710081424181877752
