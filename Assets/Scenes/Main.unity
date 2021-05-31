@@ -376,6 +376,7 @@ MonoBehaviour:
   postUserData: 1
   uploadedUserData: 0
   getData: 0
+  timeRemaining: 5
 --- !u!4 &95051428
 Transform:
   m_ObjectHideFlags: 0
@@ -7342,7 +7343,7 @@ MonoBehaviour:
     m_Left: 0
     m_Right: 0
     m_Top: 0
-    m_Bottom: 20
+    m_Bottom: 10
   m_ChildAlignment: 8
   m_Spacing: 20
   m_ChildForceExpandWidth: 0
