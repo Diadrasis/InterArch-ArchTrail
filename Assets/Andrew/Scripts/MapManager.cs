@@ -196,7 +196,7 @@ public class MapManager : MonoBehaviour
         //float duration = (float)timeDuration.TotalSeconds;
         //Debug.Log("timeDuration in seconds = " + duration);
 
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
