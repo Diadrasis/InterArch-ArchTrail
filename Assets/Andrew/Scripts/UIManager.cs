@@ -84,6 +84,11 @@ public class UIManager : MonoBehaviour
     Transform pnlForDelete;
 
     [Space]
+    [Header("Warning Server Screen")]
+    public GameObject pnlWarningServerScreen;
+    public TextMeshProUGUI txtWarningServer;
+
+    [Space]
     [Header("Testing Purposes")]
     public Texture2D userMarker;
     public TextMeshProUGUI infoText;
