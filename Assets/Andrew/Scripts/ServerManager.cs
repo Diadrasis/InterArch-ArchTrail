@@ -36,7 +36,7 @@ public class ServerManager : MonoBehaviour
     private float timeToCount = 5f;
     public float timeRemaining = 0f;
 
-    private bool panelInternetWarning;
+    private bool panelInternetWarning, isShownOnce;
     #endregion
 
     #region UnityMethods
@@ -192,17 +192,20 @@ public class ServerManager : MonoBehaviour
         //if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
         testInternet = status;
 
-        if (!status && panelInternetWarning)
+        if (!status && panelInternetWarning && isShownOnce)
         {
-            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            /*AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
+            AppManager.Instance.uIManager.imgLoading.color = Color.red;*/
             panelInternetWarning = false;
+            isShownOnce = false;
         }
         
         if (status)
         {
             panelInternetWarning = true;
-            AppManager.Instance.uIManager.imgLoading.color = Color.green;
+            isShownOnce = true;
+            //AppManager.Instance.uIManager.imgLoading.color = Color.green;
         }
     }
 
