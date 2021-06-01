@@ -237,7 +237,6 @@ public class UIManager : MonoBehaviour
                     {
                         btnSelectArea = child.GetComponentInChildren<Button>();
                         btnSelectArea.onClick.AddListener(OnAreaSelectPressed);
-                        
                     }
 
                     if (child.name.Equals("btnDeleteArea"))
@@ -264,11 +263,12 @@ public class UIManager : MonoBehaviour
 
     private void OnAreaSelectPressed()
     {
-        GameObject selectAreaObject = EventSystem.current.currentSelectedGameObject;
-        TMP_Text selectAreaText = selectAreaObject.GetComponentInChildren<TMP_Text>();
+        GameObject selectAreaObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
+        //TMP_Text selectAreaText = selectAreaObject.GetComponentInChildren<TMP_Text>();
 
-        cArea selectedArea = AppManager.Instance.mapManager.GetAreaByTitle(selectAreaText.text);
-        
+        //cArea selectedArea = AppManager.Instance.mapManager.GetAreaByTitle(selectAreaText.text);
+        cArea selectedArea = AppManager.Instance.mapManager.GetAreaByIndex(selectAreaObjects.IndexOf(selectAreaObject.gameObject));
+
         if (selectedArea != null)
         {
             AppManager.Instance.mapManager.currentArea = selectedArea;
@@ -279,7 +279,7 @@ public class UIManager : MonoBehaviour
                 AppManager.Instance.serverManager.DownloadPaths(selectedArea.server_area_id);
             }
 
-            txtMainName.text = selectAreaText.text;
+            txtMainName.text = selectedArea.title; // selectAreaText.text;
             pnlAreasScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
@@ -295,7 +295,7 @@ public class UIManager : MonoBehaviour
     {
         pnlWarningDeleteScreen.SetActive(true);
         GameObject btnDeleteArea = EventSystem.current.currentSelectedGameObject;
-        string areaTitle = string.Empty;
+        //string areaTitle = string.Empty;
         pnlForDelete = btnDeleteArea.transform.parent;
         //Debug.Log(pnlSelectArea.name);
         /*foreach (Transform child in pnlSelectArea)
@@ -336,10 +336,11 @@ public class UIManager : MonoBehaviour
 
     private void OnPathSelectPressed()
     {
-        GameObject selectPathObject = EventSystem.current.currentSelectedGameObject;
-        TMP_Text selectPathText = selectPathObject.GetComponentInChildren<TMP_Text>();
-        Debug.Log("OnPathSelectPressed");
-        cPath selectedPath = AppManager.Instance.mapManager.GetPathByTitle(selectPathText.text);
+        GameObject selectPathObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
+        //TMP_Text selectPathText = selectPathObject.GetComponentInChildren<TMP_Text>();
+        // Get index
+        //Debug.Log("OnPathSelectPressed");
+        cPath selectedPath = AppManager.Instance.mapManager.GetPathByIndex(selectPathObjects.IndexOf(selectPathObject.gameObject));  //AppManager.Instance.mapManager.GetPathByTitle(selectPathText.text); // AppManager.Instance.mapManager.currentArea[selectAreaObjects.IndexOf(selectPathObject.gameObject)]; 
         //AppManager.Instance.mapManager.currentPath = selectedPath;
         if (selectedPath != null)
         {

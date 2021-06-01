@@ -229,7 +229,7 @@ public class MapManager : MonoBehaviour
         DisplayArea(_areaToView);
     }
 
-    public cArea GetAreaByTitle(string _areaTitle)
+    /*public cArea GetAreaByTitle(string _areaTitle)
     {
         foreach (cArea area in areas)
         {
@@ -253,6 +253,16 @@ public class MapManager : MonoBehaviour
         }
 
         return null;
+    }*/
+
+    public cPath GetPathByIndex(int _index)
+    {
+        return currentArea.paths[_index];
+    }
+
+    public cArea GetAreaByIndex(int _index)
+    {
+        return areas[_index];
     }
 
     public void SaveArea(string _areaTitle)
@@ -509,7 +519,8 @@ public class MapManager : MonoBehaviour
 
         if (isRecordingPath && !isPausePath && IsWithinConstraints())
         {
-            OnlineMapsLocationService.instance.UpdatePosition();
+            OnlineMaps.instance.SetPositionAndZoom(position.x, position.y, OnlineMaps.MAXZOOM);
+            // OnlineMapsLocationService.instance.UpdatePosition();
 
             float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
             
@@ -529,8 +540,8 @@ public class MapManager : MonoBehaviour
                 marker.scale = 0.1f;
 
                 // Get new time duration
-                Debug.Log("DateTime.Now.TimeOfDay = " + DateTime.Now.TimeOfDay);
-                Debug.Log("previousPointTime.TimeOfDay = " + previousPointTime.TimeOfDay);
+                //Debug.Log("DateTime.Now.TimeOfDay = " + DateTime.Now.TimeOfDay);
+                //Debug.Log("previousPointTime.TimeOfDay = " + previousPointTime.TimeOfDay);
                 TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime.TimeOfDay);
                 previousPointTime = DateTime.Now;
 
@@ -539,9 +550,9 @@ public class MapManager : MonoBehaviour
                 {
                     float totalDuration = (float)timeDuration.TotalSeconds + pausedDuration;
                     currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration = totalDuration - pausedDuration;
-                    Debug.Log("totalDuration = " + totalDuration);
-                    Debug.Log("pausedDuration = " + pausedDuration);
-                    Debug.Log("duration = " + currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration);
+                    //Debug.Log("totalDuration = " + totalDuration);
+                    //Debug.Log("pausedDuration = " + pausedDuration);
+                    //Debug.Log("duration = " + currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration);
                 }
 
                 // Reset pausedDuration
@@ -609,8 +620,9 @@ public class MapManager : MonoBehaviour
         isPausePath = false;
         previousPosition = OnlineMapsLocationService.instance.position;
 
-        // Center View 
-        OnlineMapsLocationService.instance.UpdatePosition();
+        // Center View
+        OnlineMaps.instance.SetPositionAndZoom(previousPosition.x, previousPosition.y, OnlineMaps.MAXZOOM);
+        //OnlineMapsLocationService.instance.UpdatePosition();
 
         // Create a new marker at the starting position
         OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
@@ -670,8 +682,8 @@ public class MapManager : MonoBehaviour
         pausedDuration += (float)pausedTimeDuration.TotalSeconds;
         //Debug.Log("pausedDuration = " + pausedDuration);
         // Get new time duration
-        Debug.Log("DateTime.Now.TimeOfDay = " + DateTime.Now.TimeOfDay);
-        Debug.Log("previousPointTime.TimeOfDay = " + previousPointTime.TimeOfDay);
+        //Debug.Log("DateTime.Now.TimeOfDay = " + DateTime.Now.TimeOfDay);
+        //Debug.Log("previousPointTime.TimeOfDay = " + previousPointTime.TimeOfDay);
         TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime.TimeOfDay);
 
         // Set duration of the last path point
@@ -679,9 +691,9 @@ public class MapManager : MonoBehaviour
         {
             float totalDuration = (float)timeDuration.TotalSeconds + pausedDuration;
             currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration = totalDuration - pausedDuration;
-            Debug.Log("totalDuration = " + totalDuration);
-            Debug.Log("pausedDuration = " + pausedDuration);
-            Debug.Log("duration = " + currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration);
+            //Debug.Log("totalDuration = " + totalDuration);
+            //Debug.Log("pausedDuration = " + pausedDuration);
+            //Debug.Log("duration = " + currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration);
         }
 
         // Debug path
