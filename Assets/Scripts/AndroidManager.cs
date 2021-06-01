@@ -6,7 +6,6 @@ using TMPro;
 public class AndroidManager : MonoBehaviour
 {
     private OnlineMapsLocationService locationService;
-
     // Start is called before the first frame update
     private void Start()
     {
@@ -113,6 +112,7 @@ public class AndroidManager : MonoBehaviour
             //Debug.LogWarning("OnApplicationFocus = false");
             //popUpLocationOff.SetActive(false);
             //ShowErrorMessage(false, null);
+            locationService.StopLocationService();
         }
         else
         {

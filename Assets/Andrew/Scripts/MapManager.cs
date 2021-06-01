@@ -53,6 +53,7 @@ public class MapManager : MonoBehaviour
     Vector2[] positionsCreateArea = new Vector2[4];
     private OnlineMapsDrawingPoly polygon;
     private static readonly float MARKER_SCALE = 0.1f;
+    private static readonly float AREA_MARKER_SCALE = 0.2f;
     private static readonly float MARKERFORDURATION_SCALE = 0.085f;
     private static readonly float MAX_DURATION = 300f; // 5 min //600f; // 10 min
 
@@ -562,6 +563,7 @@ public class MapManager : MonoBehaviour
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
+            AppManager.Instance.uIManager.btnContinue.interactable = false;
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             /*isRecordingPath = false;
             isPausePath = false;*/
@@ -895,14 +897,14 @@ public class MapManager : MonoBehaviour
         // Create two markers on the specified coordinates.
         //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
         OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTextureMin, "Marker Min");
-        markerMin.scale = MARKER_SCALE;
+        markerMin.scale = AREA_MARKER_SCALE;
         markerMin.OnPress += OnMarkerLongPress;
         //markerMin.SetDraggable();
         markerMin.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
 
         //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
         OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTextureMax, "Marker Max");
-        markerMax.scale = MARKER_SCALE;
+        markerMax.scale = AREA_MARKER_SCALE;
         markerMax.OnPress += OnMarkerLongPress;
         //markerMax.SetDraggable();
         markerMax.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
