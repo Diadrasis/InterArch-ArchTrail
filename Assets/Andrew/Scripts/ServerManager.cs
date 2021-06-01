@@ -438,6 +438,11 @@ public class ServerManager : MonoBehaviour
         {
             foreach (cPathPoint pointToUpload in pointsToUpload)
             {
+                /*Debug.Log("Point to upload: server_path_id = " + pointToUpload.server_path_id.ToString());
+                Debug.Log("server_point_id = " + pointToUpload.server_point_id.ToString());
+                Debug.Log("index = " + pointToUpload.index.ToString());
+                Debug.Log("duration = " + pointToUpload.duration.ToString("F6"));*/
+
                 // Create a form and add all the fields of the area
                 List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
                 formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 7))); // Save_Point
