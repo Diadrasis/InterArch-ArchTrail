@@ -516,7 +516,7 @@ public class cArea
         areaNode.Create(VIEW_CONSTRAINTS_MIN, _areaToEdit.viewConstraintsMin);
         areaNode.Remove(VIEW_CONSTRAINTS_MAX);
         areaNode.Create(VIEW_CONSTRAINTS_MAX, _areaToEdit.viewConstraintsMax);
-        Debug.Log("Edited xml = " + xml.outerXml);
+        //Debug.Log("Edited xml = " + xml.outerXml);
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();

@@ -298,21 +298,26 @@ public class cPathPoint
                 }
             }
         }
-
+        
         return pointsToUpload;
     }
 
     public static void SetServerPathAndPointId(int _server_path_id, int _server_point_id, int _index)
     {
+        /*Debug.Log("SetServerPathAndPointId");
+        Debug.Log("_server_path_id = " + _server_path_id);
+        Debug.Log("_server_point_id = " + _server_point_id);
+        Debug.Log("_index = " + _index);*/
+
         // Load xml document, if null creates new
         OnlineMapsXML xml = cArea.GetXML();
 
         // Find point
-        OnlineMapsXML pointNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + cPath.PATH + "/" + cPath.PATH_POINTS + "/" + PATHPOINT + "[" + INDEX + "=" + _index + "]");
+        OnlineMapsXML pointNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + cPath.PATH + "[" + cPath.SERVER_PATH_ID + "=" + _server_path_id + "]/" + cPath.PATH_POINTS + "/" + PATHPOINT + "[" + INDEX + "=" + _index + "]");
 
         // Load point
         cPathPoint loadedPoint = Load(pointNode);
-        if (loadedPoint.server_path_id == -1)
+        if (loadedPoint.server_path_id == -1) // Never enters???
             loadedPoint.server_path_id = _server_path_id;
         loadedPoint.server_point_id = _server_point_id;
 
