@@ -237,7 +237,8 @@ public class ServerManager : MonoBehaviour
         if (status)
         {
             // Has connection
-            AppManager.Instance.uIManager.txtLoading.text = "Downloading...";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            AppManager.Instance.uIManager.txtWarningServer.text = "Downloading...";
             AppManager.Instance.uIManager.imgLoading.color = Color.green;
             Debug.Log("Downloading");
             // Download Areas
@@ -264,7 +265,7 @@ public class ServerManager : MonoBehaviour
         }
         else
         {
-            AppManager.Instance.uIManager.txtLoading.text = "";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
         }
        
         /*else
@@ -332,7 +333,9 @@ public class ServerManager : MonoBehaviour
     {
         // ============== Upload Areas ============== //
         Debug.Log("Started uploading user data!");
-        AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
+        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+        AppManager.Instance.uIManager.txtWarningServer.text = "Uploading user data...";
+        yield return new WaitForSeconds(1.0f);
 
         // Get areas to upload
         List<cArea> areasToUpload = cArea.GetAreasToUpload();
@@ -365,7 +368,7 @@ public class ServerManager : MonoBehaviour
                 {
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
                     Debug.Log("Uploaded area successfully!");
-                    AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
+                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     
                     // Get database id and set it
@@ -413,7 +416,8 @@ public class ServerManager : MonoBehaviour
                 {
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     Debug.Log("Uploaded path successfully!");
-                    AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
+                    AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+                    //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
                     string server_path_idString = echo.Replace("[{\"max(server_path_id)\":\"", "").Replace("\"}]", "");
@@ -458,7 +462,8 @@ public class ServerManager : MonoBehaviour
                 {
                     Debug.Log("Uploaded point successfully!");
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
-                    AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
+                    AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+                    //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
                     string server_point_idString = echo.Replace("[{\"max(server_point_id)\":\"", "").Replace("\"}]", "");
@@ -498,7 +503,6 @@ public class ServerManager : MonoBehaviour
                     Debug.Log("Deleted area from server successfully!: " + server_area_idToDelete);
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     //AppManager.Instance.uIManager.LoadingScreen("Updating...",1,3);
-                    AppManager.Instance.uIManager.txtLoading.text = "Updating...";
                     //AppManager.Instance.uIManager.imgLoading.fillAmount -= timeToCount / 10;
                     //Debug.Log("Data length: " + webRequest.downloadHandler.data);
 
@@ -534,7 +538,6 @@ public class ServerManager : MonoBehaviour
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
                     Debug.Log("Deleted path from server successfully!: " + server_path_idToDelete);
                     //AppManager.Instance.uIManager.LoadingScreen("Updating...", 1, 3);
-                    AppManager.Instance.uIManager.txtLoading.text = "Updating...";
                     //AppManager.Instance.uIManager.imgLoading.fillAmount -= timeToCount / 10;
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     //Debug.Log("Data length: " + webRequest.downloadHandler.data);
@@ -545,8 +548,9 @@ public class ServerManager : MonoBehaviour
             }
         }
 
-        uploadedUserData = true; 
-        AppManager.Instance.uIManager.txtLoading.text = "";
+        uploadedUserData = true;
+        yield return new WaitForSeconds(1.0f);
+        AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
     }
 
     IEnumerator DownloadDataFromDiadrasis()
@@ -969,7 +973,8 @@ public class ServerManager : MonoBehaviour
         }
 
         AppManager.Instance.mapManager.ReloadAreas();
-        AppManager.Instance.uIManager.txtLoading.text = "";
+        yield return new WaitForSeconds(0.5f);
+        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 
     public void DownloadPaths(int _server_area_id)
@@ -1041,7 +1046,8 @@ public class ServerManager : MonoBehaviour
         }
 
         AppManager.Instance.mapManager.ReloadPaths();
-        AppManager.Instance.uIManager.txtLoading.text = "";
+        yield return new WaitForSeconds(0.5f);
+        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 
     public void DownloadPoints(int _server_path_id)
@@ -1116,7 +1122,8 @@ public class ServerManager : MonoBehaviour
         }
 
         AppManager.Instance.mapManager.ReloadPoints();
-        AppManager.Instance.uIManager.txtLoading.text = "";
+        yield return new WaitForSeconds(0.5f);
+        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 
     public void DeleteAreaFromServer(int _server_area_idToDelete)
