@@ -52,14 +52,15 @@ public class MapManager : MonoBehaviour
     OnlineMapsMarker[] markersCreateArea = new OnlineMapsMarker[2];
     Vector2[] positionsCreateArea = new Vector2[4];
     private OnlineMapsDrawingPoly polygon;
-    private static readonly float DEFAULT_MARKER_SCALE = 0.2f;
+    private static readonly float MARKER_SCALE = 0.1f;
+    private static readonly float MARKERFORDURATION_SCALE = 0.085f;
+    private static readonly float MAX_DURATION = 300f; // 5 min //600f; // 10 min
 
     // Create Path
-    TimeSpan previousPointTime;
+    DateTime previousPointTime;
     TimeSpan startedPauseTime;
     float pausedDuration = 0f;
     public Texture2D markerForDurationTexture;
-    private List<Texture2D> markerDurationTextures;
 
     //TimeSpan testTime;
 
@@ -527,22 +528,26 @@ public class MapManager : MonoBehaviour
                 marker.scale = 0.1f;
 
                 // Get new time duration
-                TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime);
-                previousPointTime = DateTime.Now.TimeOfDay;
+                Debug.Log("DateTime.Now.TimeOfDay = " + DateTime.Now.TimeOfDay);
+                Debug.Log("previousPointTime.TimeOfDay = " + previousPointTime.TimeOfDay);
+                TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime.TimeOfDay);
+                previousPointTime = DateTime.Now;
 
                 // Set duration of previous path point
                 if (currentPath.pathPoints.Count > 0)
-                    currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration = (float)timeDuration.TotalSeconds - pausedDuration;
+                {
+                    float totalDuration = (float)timeDuration.TotalSeconds + pausedDuration;
+                    currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration = totalDuration - pausedDuration;
+                    Debug.Log("totalDuration = " + totalDuration);
+                    Debug.Log("pausedDuration = " + pausedDuration);
+                    Debug.Log("duration = " + currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration);
+                }
 
                 // Reset pausedDuration
                 pausedDuration = 0f;
 
                 // Creates and Adds a new PathPoint
                 currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, position, 0f));
-
-                //marker.label = label;
-                //marker.position = position;
-                //OnlineMapsMarkerManager.AddItem(marker);
 
                 // Creates a line
                 markerListCurrPath.Add(marker);
@@ -608,13 +613,14 @@ public class MapManager : MonoBehaviour
         // Create a new marker at the starting position
         OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
         marker.align = OnlineMapsAlign.Center;
-        marker.scale = 0.1f;
         marker.texture = markerForDurationTexture;
+        marker.scale = 0.1f;
+        
         // Clear and Add new marker to markerListCurrPath
         markerListCurrPath.Clear();
         markerListCurrPath.Add(marker);
 
-        previousPointTime = DateTime.Now.TimeOfDay;
+        previousPointTime = DateTime.Now;
         
         currentPath = new cPath(currentArea.local_area_id);
         currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, previousPosition, 0f));
@@ -662,11 +668,19 @@ public class MapManager : MonoBehaviour
         pausedDuration += (float)pausedTimeDuration.TotalSeconds;
         //Debug.Log("pausedDuration = " + pausedDuration);
         // Get new time duration
-        TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime);
+        Debug.Log("DateTime.Now.TimeOfDay = " + DateTime.Now.TimeOfDay);
+        Debug.Log("previousPointTime.TimeOfDay = " + previousPointTime.TimeOfDay);
+        TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime.TimeOfDay);
 
         // Set duration of the last path point
         if (currentPath.pathPoints.Count > 0)
-            currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration = (float)timeDuration.TotalSeconds - pausedDuration;
+        {
+            float totalDuration = (float)timeDuration.TotalSeconds + pausedDuration;
+            currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration = totalDuration - pausedDuration;
+            Debug.Log("totalDuration = " + totalDuration);
+            Debug.Log("pausedDuration = " + pausedDuration);
+            Debug.Log("duration = " + currentPath.pathPoints[currentPath.pathPoints.Count - 1].duration);
+        }
 
         // Debug path
         /*foreach (cPathPoint point in currentPath.pathPoints)
@@ -710,7 +724,7 @@ public class MapManager : MonoBehaviour
             OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(pathPoint.position, label);
             marker.SetDraggable(false);
             marker.align = OnlineMapsAlign.Center;
-            marker.scale = 0.1f;
+            marker.scale = MARKER_SCALE;
 
             // Add marker to current path marker list
             markerListCurrPath.Add(marker);
@@ -723,7 +737,7 @@ public class MapManager : MonoBehaviour
             markerForDuration.SetDraggable(false);
             markerForDuration.align = OnlineMapsAlign.Center;
             markerForDuration.texture = markerForDurationTexture;
-            markerForDuration.scale = 0.085f - DEFAULT_MARKER_SCALE * Mathf.Clamp(pathPoint.duration / 600f, 0f, 1f); // 1f, 2f
+            markerForDuration.scale = MARKERFORDURATION_SCALE - (MARKERFORDURATION_SCALE * Mathf.Clamp(pathPoint.duration / MAX_DURATION, 0f, 1f));
             //Debug.Log("Marker " + pathPoint.index + ", Scale = " + markerForDuration.scale);
 
             // Add markerForDuration on markersForDuaration list to remove later
@@ -881,14 +895,14 @@ public class MapManager : MonoBehaviour
         // Create two markers on the specified coordinates.
         //OnlineMapsMarker testM = OnlineMapsMarkerManager.CreateItem(topLeftposition, markerCreateAreaTexture, "topLeft");
         OnlineMapsMarker markerMin = OnlineMapsMarkerManager.CreateItem(bottomLeftPosition, markerCreateAreaTextureMin, "Marker Min");
-        markerMin.scale = DEFAULT_MARKER_SCALE;
+        markerMin.scale = MARKER_SCALE;
         markerMin.OnPress += OnMarkerLongPress;
         //markerMin.SetDraggable();
         markerMin.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
 
         //OnlineMapsMarker testM2 = OnlineMapsMarkerManager.CreateItem(bottomRightPosition, markerCreateAreaTexture, "bottomRight");
         OnlineMapsMarker markerMax = OnlineMapsMarkerManager.CreateItem(topRightPosition, markerCreateAreaTextureMax, "Marker Max");
-        markerMax.scale = DEFAULT_MARKER_SCALE;
+        markerMax.scale = MARKER_SCALE;
         markerMax.OnPress += OnMarkerLongPress;
         //markerMax.SetDraggable();
         markerMax.align = OnlineMapsAlign.Center;// so the graphic to be aligned correctly with the rectangle
