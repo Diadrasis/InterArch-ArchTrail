@@ -102,6 +102,11 @@ public class UIManager : MonoBehaviour
     [Header("Loading Screen")]
     public Image imgLoading;
     public TextMeshProUGUI txtLoading;
+
+    [Space]
+    [Header("Profiler Screen")]
+    public GameObject pnlProfilerScreen;
+    public Button btnProfiler;
     #endregion
 
     #region Unity Functions
@@ -116,6 +121,7 @@ public class UIManager : MonoBehaviour
 
         pnlWarningScreen.SetActive(false);
         pnlWarningSavePathScreen.SetActive(false);
+        pnlProfilerScreen.SetActive(false);
         txtMainName.text = DEFAULT_TEXT_NAME;
         imgPauseRecording.gameObject.SetActive(false);
         btnBackToAreasScreen.interactable = true;
@@ -167,7 +173,11 @@ public class UIManager : MonoBehaviour
         
         btnEditAreaCancel.onClick.AddListener(() => CancelInGeneral());
         //btnEditAreaSave.onClick.AddListener(()=> )
-       
+
+        //btn for profiler screen
+        btnProfiler.onClick.AddListener(() => EnableScreen(pnlProfilerScreen, true));
+
+
     }
     void ActivateButtons(bool valBack, bool valQuit)
     {
