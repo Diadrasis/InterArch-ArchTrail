@@ -523,6 +523,8 @@ public class MapManager : MonoBehaviour
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
                 marker.SetDraggable(false);
                 marker.align = OnlineMapsAlign.Center;
+                marker.texture = markerForDurationTexture;
+                marker.scale = 0.1f;
 
                 // Get new time duration
                 TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime);
@@ -606,6 +608,8 @@ public class MapManager : MonoBehaviour
         // Create a new marker at the starting position
         OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
         marker.align = OnlineMapsAlign.Center;
+        marker.scale = 0.1f;
+        marker.texture = markerForDurationTexture;
         // Clear and Add new marker to markerListCurrPath
         markerListCurrPath.Clear();
         markerListCurrPath.Add(marker);
