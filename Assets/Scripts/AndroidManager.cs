@@ -112,13 +112,14 @@ public class AndroidManager : MonoBehaviour
             //Debug.LogWarning("OnApplicationFocus = false");
             //popUpLocationOff.SetActive(false);
             //ShowErrorMessage(false, null);
-            locationService.StopLocationService();
+            //locationService.StopLocationService();
         }
         else
         {
             AppManager.Instance.serverManager.CheckInternet();
             //Debug.LogWarning("OnApplicationFocus = true");
             if (CheckForLocationServices()) { return; }
+            
         }
     }
     #region NOT IN USE

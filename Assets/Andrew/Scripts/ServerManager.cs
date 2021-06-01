@@ -104,7 +104,7 @@ public class ServerManager : MonoBehaviour
                     timeRemaining = timeToCount;
                 }
                 
-                //CheckInternet();
+                
                 return;
             }
                 
@@ -118,6 +118,7 @@ public class ServerManager : MonoBehaviour
             //Debug.Log("Out of test");
             // For testing
             //postUserData = false;
+            
         }
         
         // Check if postUserData is false and getData is true and there is internet connection, downloads the data from the server
@@ -192,20 +193,20 @@ public class ServerManager : MonoBehaviour
         //if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
         testInternet = status;
 
-        if (!status && panelInternetWarning && isShownOnce)
+        if (!status && panelInternetWarning && !isShownOnce)
         {
-            /*AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
-            AppManager.Instance.uIManager.imgLoading.color = Color.red;*/
+            AppManager.Instance.uIManager.imgLoading.color = Color.red;
             panelInternetWarning = false;
-            isShownOnce = false;
+            isShownOnce = true;
         }
         
         if (status)
         {
             panelInternetWarning = true;
-            isShownOnce = true;
-            //AppManager.Instance.uIManager.imgLoading.color = Color.green;
+            isShownOnce = false;
+            AppManager.Instance.uIManager.imgLoading.color = Color.green;
         }
     }
 
@@ -217,6 +218,7 @@ public class ServerManager : MonoBehaviour
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.imgLoading.color = Color.green;
+            isShownOnce = true;
             //Debug.Log("Check Internet On Check: " + testInternet);
         }
         else
@@ -224,6 +226,7 @@ public class ServerManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
             AppManager.Instance.uIManager.imgLoading.color = Color.red;
+            isShownOnce = false;
             //Debug.Log("Check Internet On Check: " + testInternet);
         }
 
@@ -419,7 +422,7 @@ public class ServerManager : MonoBehaviour
                 {
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     Debug.Log("Uploaded path successfully!");
-                    AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
                     //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
@@ -465,7 +468,7 @@ public class ServerManager : MonoBehaviour
                 {
                     Debug.Log("Uploaded point successfully!");
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
-                    AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
                     //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
@@ -505,6 +508,7 @@ public class ServerManager : MonoBehaviour
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
                     Debug.Log("Deleted area from server successfully!: " + server_area_idToDelete);
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
+                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
                     //AppManager.Instance.uIManager.LoadingScreen("Updating...",1,3);
                     //AppManager.Instance.uIManager.imgLoading.fillAmount -= timeToCount / 10;
                     //Debug.Log("Data length: " + webRequest.downloadHandler.data);
@@ -553,7 +557,7 @@ public class ServerManager : MonoBehaviour
 
         uploadedUserData = true;
         yield return new WaitForSeconds(1.0f);
-        AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 
     IEnumerator DownloadDataFromDiadrasis()
