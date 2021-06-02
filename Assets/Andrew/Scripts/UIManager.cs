@@ -475,7 +475,6 @@ public class UIManager : MonoBehaviour
         if (!string.IsNullOrEmpty(newAreaTitle))
         {
             AppManager.Instance.mapManager.SaveArea(newAreaTitle);
-
             pnlSaveArea.SetActive(false);
             pnlCreateArea.SetActive(false);
             DisplayAreasScreen();
@@ -497,6 +496,7 @@ public class UIManager : MonoBehaviour
             pnlSaveEditArea.SetActive(false);
             pnlEditArea.SetActive(false);
             txtMainName.text = newAreaTitle;
+            DisplayAreasScreen();
         }
         else
         {
