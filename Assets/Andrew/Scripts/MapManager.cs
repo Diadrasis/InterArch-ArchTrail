@@ -187,7 +187,6 @@ public class MapManager : MonoBehaviour
             }*//*
             ++i;
         }*/
-
     }
 
     private void OnDestroy()
@@ -196,7 +195,7 @@ public class MapManager : MonoBehaviour
         //float duration = (float)timeDuration.TotalSeconds;
         //Debug.Log("timeDuration in seconds = " + duration);
 
-        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
@@ -862,6 +861,9 @@ public class MapManager : MonoBehaviour
 
     public void DisplayArea(cArea _areaToDisplay)
     {
+        // Set user marker on top
+        CreateUserMarker();
+
         Vector2[] points = new Vector2[4];
 
         points[0] = _areaToDisplay.areaConstraintsMin;
