@@ -56,6 +56,7 @@ public class MapManager : MonoBehaviour
     private static readonly float AREA_MARKER_SCALE = 0.2f;
     private static readonly float MARKERFORDURATION_SCALE = 0.085f;
     private static readonly float MAX_DURATION = 300f; // 5 min //600f; // 10 min
+    //private OnlineMaps map;
 
     // Create Path
     DateTime previousPointTime;
@@ -93,6 +94,7 @@ public class MapManager : MonoBehaviour
     {
         // Download areas
         AppManager.Instance.serverManager.DownloadAreas();
+        //map = OnlineMaps.instance;
         /*if (AppManager.Instance.serverManager.CheckInternet())
         {
             AppManager.Instance.serverManager.DownloadAreas();
@@ -393,8 +395,49 @@ public class MapManager : MonoBehaviour
         //Interent Events
         //AppManager.Instance.serverManager.OnDownloadData += ReloadAreasScreen;
         //AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
+        //Map Offline
+        //OnlineMapsTileManager.OnStartDownloadTile += OnStartDownloadTile;
     }
+    /*private void OnStartDownloadTile(OnlineMapsTile tile)
+    {
+        // Note: create a texture only when you are sure that the tile exists.
+        // Otherwise, you will get a memory leak.
+        Texture2D tileTexture = new Texture2D(256, 256);
 
+        // Here your code to load tile texture from any source.
+
+        // Note: If the tile will load asynchronously, set
+        // tile.status = OnlineMapsTileStatus.loading;
+        // Otherwise, the map will try to load the tile again and again.
+
+        // Apply your texture in the buffer and redraws the map.
+        if (map.control.resultIsTexture)
+        {
+            // Apply tile texture
+            (tile as OnlineMapsRasterTile).ApplyTexture(tileTexture as Texture2D);
+
+            // Send tile to buffer
+            map.buffer.ApplyTile(tile);
+
+            // Destroy the texture, because it is no longer needed.
+            OnlineMapsUtils.Destroy(tileTexture);
+        }
+        else
+        {
+            // Send tile texture
+            tile.texture = tileTexture;
+
+            // Change tile status
+            tile.status = OnlineMapsTileStatus.loaded;
+        }
+
+        // Note: If the tile does not exist or an error occurred, set
+        // tile.status = OnlineMapsTileStatus.error;
+        // Otherwise, the map will try to load the tile again and again.
+
+        // Redraw map (using best redraw type)
+        map.Redraw();
+    }*/
     public void ReloadAreas()
     {
         // Reload Areas
@@ -490,12 +533,14 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
                 AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
-                
+                AppManager.Instance.uIManager.btnContinue.interactable = false;
+
             }
             else
             {   
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
+                AppManager.Instance.uIManager.btnContinue.interactable = true;
             }
         }
     }
@@ -574,7 +619,6 @@ public class MapManager : MonoBehaviour
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
-            AppManager.Instance.uIManager.btnContinue.interactable = false;
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             /*isRecordingPath = false;
             isPausePath = false;*/
@@ -586,15 +630,15 @@ public class MapManager : MonoBehaviour
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
-           /* Debug.Log("isRecording Path: " + isRecordingPath);
-            Debug.Log("isPause Path: " + isPausePath);*/
+            /* Debug.Log("isRecording Path: " + isRecordingPath);
+             Debug.Log("isPause Path: " + isPausePath);*/
         }
         else if (isRecordingPath && !isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
-           /* Debug.Log("isRecording Path: " + isRecordingPath);
-            Debug.Log("isPause Path: " + isPausePath);*/
+            /* Debug.Log("isRecording Path: " + isRecordingPath);
+             Debug.Log("isPause Path: " + isPausePath);*/
         }
         else if (!isRecordingPath && !isPausePath && IsWithinConstraints())
         {
@@ -603,14 +647,7 @@ public class MapManager : MonoBehaviour
             /*Debug.Log("isRecording Path: " + isRecordingPath);
             Debug.Log("isPause Path: " + isPausePath);*/
         }
-        /*else if(isRecordingPath && !isPausePath && !IsWithinConstraints())
-        {
-            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-            AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
-            Debug.Log("isRecording Path: " + isRecordingPath);
-            Debug.Log("isPause Path: " + isPausePath);
-            //Debug.Log("is not recording is paused and not in constraints");
-        }*/
+       
         //marker.OnPositionChanged += OnMarkerPositionChange;
     }
 
