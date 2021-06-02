@@ -882,7 +882,7 @@ public class MapManager : MonoBehaviour
         polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
 
         //for location services
-        //OnlineMapsLocationService.instance.restoreAfter = 2;
+        OnlineMapsLocationService.instance.restoreAfter = 2;
     }
 
     public void StartEditArea(cArea _areaToEdit)
