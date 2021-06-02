@@ -36,7 +36,7 @@ public class ServerManager : MonoBehaviour
     private float timeToCount = 5f;
     public float timeRemaining = 0f;
 
-    private bool panelInternetWarning, isShownOnce;
+    public bool panelInternetWarning, isShownOnce;
     #endregion
 
     #region UnityMethods
@@ -46,6 +46,7 @@ public class ServerManager : MonoBehaviour
         timeRemaining = 0f;
         uploadedUserData = true;
         getData = true;
+        isShownOnce = true;
 
         //Debug.Log("postUserData = " + postUserData);
         //Debug.Log("getData = " + getData);
@@ -90,7 +91,7 @@ public class ServerManager : MonoBehaviour
     {
         // Check if postUserData is true and there is internet connection, uploads the user's data to the server
         // NOTE: The postUserData bool is set to true when opening the application, when the user saves a new area or when a path is saved.
-        if (postUserData)
+        /*if (postUserData)
         {
             if (!testInternet)
             {
@@ -114,13 +115,40 @@ public class ServerManager : MonoBehaviour
                 postUserData = false;
                 testInternet = false;
             }
+        }*/
 
-            //Debug.Log("Out of test");
-            // For testing
-            //postUserData = false;
-            
+        if (!testInternet)
+        {
+            if (timeRemaining > 0)
+            {
+                timeRemaining -= Time.deltaTime;
+            }
+            else
+            {
+                if (postUserData)
+                {
+                    OnlineMaps.instance.CheckServerConnection(OnCheckConnectionCompleteUpload);
+                }
+                
+                CheckInternet();
+                timeRemaining = timeToCount;
+            }
+            /*testInternet = false;
+            isShownOnce = false;*/
         }
-        
+
+        if (testInternet)
+        {
+            if (postUserData)
+            {
+                StartCoroutine(UploadUserDataToDiadrasis());
+                postUserData = false;
+                
+            }
+
+            testInternet = false;
+        }
+
         // Check if postUserData is false and getData is true and there is internet connection, downloads the data from the server
         /*if (uploadedUserData && getData && CheckInternet())
         {
@@ -193,40 +221,40 @@ public class ServerManager : MonoBehaviour
         //if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
         testInternet = status;
 
-        if (!status && panelInternetWarning && !isShownOnce)
+        if (!status && panelInternetWarning )
         {
-            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-            AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
-            AppManager.Instance.uIManager.imgLoading.color = Color.red;
             panelInternetWarning = false;
-            isShownOnce = true;
         }
         
         if (status)
         {
             panelInternetWarning = true;
-            isShownOnce = false;
-            AppManager.Instance.uIManager.imgLoading.color = Color.green;
+            
         }
     }
 
     public void OnCheckConnectionComplete(bool status)
     {
+        testInternet = status;
         if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
         //testInternet = status;
         if (status)
         {
-            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
             AppManager.Instance.uIManager.imgLoading.color = Color.green;
             isShownOnce = true;
             //Debug.Log("Check Internet On Check: " + testInternet);
         }
         else
         {
-            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-            AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
+            if (isShownOnce)
+            {
+                AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
+                isShownOnce = false;
+            }
             AppManager.Instance.uIManager.imgLoading.color = Color.red;
-            isShownOnce = false;
+            
             //Debug.Log("Check Internet On Check: " + testInternet);
         }
 
