@@ -112,9 +112,7 @@ public class MapManager : MonoBehaviour
         isRecordingPath = false;
         isPausePath = false;
 
-        userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), AppManager.Instance.uIManager.userMarker, "User");
-        userMarker.SetDraggable(false);
-        userMarker.scale = 0.3f;
+        CreateUserMarker();
 
         // Test
         //List<cPath> pathsToTest = GetTestPaths();
@@ -200,7 +198,7 @@ public class MapManager : MonoBehaviour
         //float duration = (float)timeDuration.TotalSeconds;
         //Debug.Log("timeDuration in seconds = " + duration);
 
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
@@ -611,6 +609,9 @@ public class MapManager : MonoBehaviour
                 OnlineMapsDrawingElementManager.RemoveAllItems(e => e != polygon);
                 OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListCurrPath.Select(m => m.position).ToArray(), Color.red, 3)); //OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3) // Average human walk speed is 1.4m/s
 
+                // Set user marker on top
+                CreateUserMarker();
+
                 previousPosition = position;
                 OnlineMaps.instance.Redraw();
             }
@@ -676,15 +677,8 @@ public class MapManager : MonoBehaviour
         currentPath = new cPath(currentArea.local_area_id);
         currentPath.pathPoints.Add(new cPathPoint(currentPath.local_path_id, currentPath.pathPoints.Count, previousPosition, 0f));
 
-        /* TIMESPAN TESTING
-        TimeSpan time = DateTime.Now.TimeOfDay;
-        Debug.Log("Time of day = " + time);
-        string timeString = time.ToString();
-        Debug.Log("timeString = " + time);
-        //Debug.Log("Hours = " + time.Hours);
-        //Debug.Log("Hours = " + time.Hours);
-        TimeSpan dateTime = TimeSpan.Parse(timeString);
-        Debug.Log("Parsed string = " + dateTime);*/
+        // Set user marker on top
+        CreateUserMarker();
     }
 
     public void PauseRecordingPath()
@@ -750,6 +744,10 @@ public class MapManager : MonoBehaviour
 
     public void DisplayPath(cPath _pathToDisplay)
     {
+        // Remove user marker
+        if (userMarker != null)
+            OnlineMapsMarkerManager.instance.items.Remove(userMarker);
+
         // Get displaying path
         pathToDisplay = _pathToDisplay;
 
@@ -971,6 +969,18 @@ public class MapManager : MonoBehaviour
 
         // Redraw Map
         OnlineMaps.instance.Redraw();
+    }
+
+    private void CreateUserMarker()
+    {
+        // Remove Marker
+        if (userMarker != null)
+            OnlineMapsMarkerManager.instance.items.Remove(userMarker);
+
+        // Create Marker
+        userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(OnlineMapsLocationService.instance.position.x, OnlineMapsLocationService.instance.position.y), AppManager.Instance.uIManager.userMarker, "User");
+        userMarker.SetDraggable(false);
+        userMarker.scale = 0.3f;
     }
     #endregion
 
