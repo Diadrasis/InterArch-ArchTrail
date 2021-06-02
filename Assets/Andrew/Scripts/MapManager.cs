@@ -56,6 +56,7 @@ public class MapManager : MonoBehaviour
     private static readonly float AREA_MARKER_SCALE = 0.2f;
     private static readonly float MARKERFORDURATION_SCALE = 0.085f;
     private static readonly float MAX_DURATION = 300f; // 5 min //600f; // 10 min
+    //private OnlineMaps map;
 
     // Create Path
     DateTime previousPointTime;
@@ -64,7 +65,7 @@ public class MapManager : MonoBehaviour
     public Texture2D markerForDurationTexture;
 
     //TimeSpan testTime;
-
+    bool isShown;
     //for markers
     private bool touchedLastUpdate = false;
     int lastTouchCount;
@@ -93,6 +94,8 @@ public class MapManager : MonoBehaviour
     {
         // Download areas
         AppManager.Instance.serverManager.DownloadAreas();
+        isShown = false;
+
         /*if (AppManager.Instance.serverManager.CheckInternet())
         {
             AppManager.Instance.serverManager.DownloadAreas();
@@ -390,8 +393,9 @@ public class MapManager : MonoBehaviour
         //Interent Events
         //AppManager.Instance.serverManager.OnDownloadData += ReloadAreasScreen;
         //AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
+        
     }
-
+    
     public void ReloadAreas()
     {
         // Reload Areas
@@ -482,17 +486,21 @@ public class MapManager : MonoBehaviour
     {
         if(currentArea != null)
         {
-            if (!IsWithinConstraints())
+            if (!IsWithinConstraints() && !isShown)
             {
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
                 AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
-                
+                AppManager.Instance.uIManager.btnContinue.interactable = false;
+                isShown = true;
+
             }
             else
             {   
                 AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
+                AppManager.Instance.uIManager.btnContinue.interactable = true;
+                isShown = false;
             }
         }
     }
@@ -569,13 +577,14 @@ public class MapManager : MonoBehaviour
                 previousPosition = position;
                 OnlineMaps.instance.Redraw();
             }
+            isShown = false;
         }
-        else if ((isRecordingPath || isPausePath) && !IsWithinConstraints())
+        else if ((isRecordingPath || isPausePath) && !IsWithinConstraints() && !isShown)
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
-            AppManager.Instance.uIManager.btnContinue.interactable = false;
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
+            isShown = true;
             /*isRecordingPath = false;
             isPausePath = false;*/
             /*Debug.Log("isRecording Path: " + isRecordingPath);
@@ -586,30 +595,29 @@ public class MapManager : MonoBehaviour
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
-           /* Debug.Log("isRecording Path: " + isRecordingPath);
-            Debug.Log("isPause Path: " + isPausePath);*/
+            isShown = false;
+            /* Debug.Log("isRecording Path: " + isRecordingPath);
+             Debug.Log("isPause Path: " + isPausePath);*/
         }
         else if (isRecordingPath && !isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
-           /* Debug.Log("isRecording Path: " + isRecordingPath);
-            Debug.Log("isPause Path: " + isPausePath);*/
+            isShown = false;
+            /* Debug.Log("isRecording Path: " + isRecordingPath);
+             Debug.Log("isPause Path: " + isPausePath);*/
         }
         else if (!isRecordingPath && !isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(false);
+            isShown = false;
             /*Debug.Log("isRecording Path: " + isRecordingPath);
             Debug.Log("isPause Path: " + isPausePath);*/
         }
-        /*else if(isRecordingPath && !isPausePath && !IsWithinConstraints())
+       /*else if((isRecordingPath || isPausePath) && IsWithinConstraints())
         {
-            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-            AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
-            Debug.Log("isRecording Path: " + isRecordingPath);
-            Debug.Log("isPause Path: " + isPausePath);
-            //Debug.Log("is not recording is paused and not in constraints");
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
         }*/
         //marker.OnPositionChanged += OnMarkerPositionChange;
     }
@@ -874,6 +882,9 @@ public class MapManager : MonoBehaviour
         if (polygon != null)
             OnlineMapsDrawingElementManager.RemoveItem(polygon);
         polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
+
+        //for location services
+        //OnlineMapsLocationService.instance.restoreAfter = 2;
     }
 
     public void StartEditArea(cArea _areaToEdit)
