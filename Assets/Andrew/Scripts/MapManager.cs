@@ -122,6 +122,8 @@ public class MapManager : MonoBehaviour
 
     private void Update()
     {
+        TestTiles();
+
         // Checks the position of the markers.
         if ((createArea || editArea) && polygon != null)
             CheckMarkerPositions();
@@ -958,6 +960,27 @@ public class MapManager : MonoBehaviour
         userMarker.SetDraggable(false);
         userMarker.scale = 0.3f;
     }
+
+    // ============= TILE MANAGER Methods ============= //
+
+    private void TestTiles()
+    {
+        OnlineMapsTileManager onlineMapsTileManager = new OnlineMapsTileManager(OnlineMaps.instance);
+        OnlineMaps.instance.GetTileCorners(out double tlx, out double tly, out double brx, out double bry);
+        Debug.Log("tlx = " + (int)tlx);
+        Debug.Log("tly = " + (int)tly);
+        Debug.Log("brx = " + (int)brx);
+        Debug.Log("bry = " + (int)bry);
+        //OnlineMapsLocationService.instance.position.x, OnlineMapsLocationService.instance.position.y
+        OnlineMapsTile tile = onlineMapsTileManager.GetTile(OnlineMaps.MAXZOOM, (int)tlx, (int)tly);
+        if (tile != null)
+            tile.texture.Resize(0,0);
+        //ulong tileKey = OnlineMapsTileManager.GetTileKey(OnlineMaps.MAXZOOM, 0, 0);
+        //onlineMapsTileManager.dTiles.TryGetValue(tileKey, out OnlineMapsTile tile);
+        //OnlineMapsTileManager.StartDownloadTile(tile);
+    }
+
+
     #endregion
 
     #region Screencapture the path

@@ -414,6 +414,8 @@ MonoBehaviour:
   uploadedUserData: 0
   getData: 0
   timeRemaining: 5
+  panelInternetWarning: 0
+  isShownOnce: 0
 --- !u!4 &95051428
 Transform:
   m_ObjectHideFlags: 0
@@ -18212,7 +18214,7 @@ MonoBehaviour:
   useProxy: 1
   useSoftwareJPEGDecoder: 0
   width: 1024
-  _activeTypeSettings: 12Tile version1513865
+  _activeTypeSettings: 12Tile version1513903
   _zoom: 19
   latitude: 37.1789749651649
   longitude: 21.9215393284267
