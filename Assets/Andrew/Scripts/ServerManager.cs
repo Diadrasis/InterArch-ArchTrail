@@ -221,7 +221,7 @@ public class ServerManager : MonoBehaviour
         //if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
         testInternet = status;
 
-        if (!status && panelInternetWarning )
+        if (!status && panelInternetWarning)
         {
             panelInternetWarning = false;
         }
@@ -240,7 +240,7 @@ public class ServerManager : MonoBehaviour
         //testInternet = status;
         if (status)
         {
-            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
+            AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(false);
             AppManager.Instance.uIManager.imgLoading.color = Color.green;
             isShownOnce = true;
             //Debug.Log("Check Internet On Check: " + testInternet);
@@ -249,8 +249,7 @@ public class ServerManager : MonoBehaviour
         {
             if (isShownOnce)
             {
-                AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                AppManager.Instance.uIManager.txtWarning.text = "Please check your internet connection";
+                AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(true);
                 isShownOnce = false;
             }
             AppManager.Instance.uIManager.imgLoading.color = Color.red;

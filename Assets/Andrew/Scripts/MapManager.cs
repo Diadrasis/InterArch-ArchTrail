@@ -395,7 +395,9 @@ public class MapManager : MonoBehaviour
         //Interent Events
         //AppManager.Instance.serverManager.OnDownloadData += ReloadAreasScreen;
         //AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
-        
+
+        //Position force location services
+        OnlineMapsLocationService.instance.OnLocationInited += CheckUserPosition;
     }
     
     public void ReloadAreas()
@@ -495,7 +497,7 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
                 AppManager.Instance.uIManager.btnContinue.interactable = false;
                 isShown = true;
-
+                Debug.Log("UserPosition on false");
             }
             else
             {   
@@ -503,6 +505,7 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
                 AppManager.Instance.uIManager.btnContinue.interactable = true;
                 isShown = false;
+                Debug.Log("UserPosition on true");
             }
         }
     }
@@ -587,41 +590,27 @@ public class MapManager : MonoBehaviour
             AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             isShown = true;
-            /*isRecordingPath = false;
-            isPausePath = false;*/
-            /*Debug.Log("isRecording Path: " + isRecordingPath);
-            Debug.Log("isPause Path: " + isPausePath);*/
-            //Debug.Log("is recording and not in constraints");
+            
         }
         else if(!isRecordingPath && isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             isShown = false;
-            /* Debug.Log("isRecording Path: " + isRecordingPath);
-             Debug.Log("isPause Path: " + isPausePath);*/
         }
         else if (isRecordingPath && !isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             isShown = false;
-            /* Debug.Log("isRecording Path: " + isRecordingPath);
-             Debug.Log("isPause Path: " + isPausePath);*/
         }
         else if (!isRecordingPath && !isPausePath && IsWithinConstraints())
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(false);
             isShown = false;
-            /*Debug.Log("isRecording Path: " + isRecordingPath);
-            Debug.Log("isPause Path: " + isPausePath);*/
+            
         }
-       /*else if((isRecordingPath || isPausePath) && IsWithinConstraints())
-        {
-            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
-        }*/
-        //marker.OnPositionChanged += OnMarkerPositionChange;
     }
 
     public void StartRecordingPath()
@@ -651,6 +640,7 @@ public class MapManager : MonoBehaviour
 
         // Set user marker on top
         CreateUserMarker();
+
     }
 
     public void PauseRecordingPath()
@@ -884,9 +874,6 @@ public class MapManager : MonoBehaviour
         if (polygon != null)
             OnlineMapsDrawingElementManager.RemoveItem(polygon);
         polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
-
-        //for location services
-        //OnlineMapsLocationService.instance.restoreAfter = 2;
     }
 
     public void StartEditArea(cArea _areaToEdit)

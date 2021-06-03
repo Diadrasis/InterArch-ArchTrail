@@ -89,6 +89,12 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI txtWarningServer;
 
     [Space]
+    [Header("Warning Internet Screen")]
+    public GameObject pnlWarningInternetScreen;
+    public Button btnCloseInternetScreen;
+   
+
+    [Space]
     [Header("Testing Purposes")]
     public Texture2D userMarker;
     public TextMeshProUGUI infoText;
@@ -176,6 +182,9 @@ public class UIManager : MonoBehaviour
 
         //btn for profiler screen
         btnProfiler.onClick.AddListener(() => EnableScreen(pnlProfilerScreen, true));
+
+        //btn for close Internet screen
+        btnCloseInternetScreen.onClick.AddListener(() => CancelInGeneral());
 
 
     }
@@ -412,7 +421,7 @@ public class UIManager : MonoBehaviour
             pnlCreateArea.SetActive(false);
             DisplayAreasScreen();
             AppManager.Instance.serverManager.DownloadAreas();
-            Debug.Log("pnlCreateArea false");
+            //Debug.Log("pnlCreateArea false");
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
@@ -446,7 +455,6 @@ public class UIManager : MonoBehaviour
     void IsInRecordingPath(bool val)
     {
         imgRecord.SetBool("isPlaying", val);
-        Debug.Log("Value of bool: "+val);
     }
 
     private void CreateNewAreaSelected()
@@ -612,6 +620,11 @@ public class UIManager : MonoBehaviour
         if (pnlSaveEditArea.activeInHierarchy)
         {
             pnlSaveEditArea.SetActive(false);
+        }
+
+        if (pnlWarningInternetScreen.activeInHierarchy)
+        {
+            pnlWarningInternetScreen.SetActive(false);
         }
     }
     //final warning on delete
