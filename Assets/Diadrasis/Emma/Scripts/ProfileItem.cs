@@ -10,6 +10,7 @@ public class ProfileItem
     public string Education;
     public string Familiarity;
     public string Technology;
+    public string Ethnicity;
     public int FamiliarityINT, TechnologyINT;
 
 

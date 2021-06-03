@@ -122,7 +122,7 @@ public class MapManager : MonoBehaviour
 
     private void Update()
     {
-        TestTiles();
+        //TestTiles();
 
         // Checks the position of the markers.
         if ((createArea || editArea) && polygon != null)
