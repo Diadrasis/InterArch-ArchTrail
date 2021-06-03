@@ -70,6 +70,9 @@ public class MapManager : MonoBehaviour
     private bool touchedLastUpdate = false;
     int lastTouchCount;
     //private int areaCounter = 0; // TODO: Remove, for testing only
+
+    // Tiles
+    TileDownloader tileDownloader;
     #endregion
 
     #region Unity Functions
@@ -115,6 +118,8 @@ public class MapManager : MonoBehaviour
 
         CreateUserMarker();
 
+        tileDownloader = OnlineMaps.instance.gameObject.GetComponent<TileDownloader>();
+
         // Test
         //List<cPath> pathsToTest = GetTestPaths();
         //DisplayPath(pathsToTest[0]);
@@ -122,8 +127,6 @@ public class MapManager : MonoBehaviour
 
     private void Update()
     {
-        TestTiles();
-
         // Checks the position of the markers.
         if ((createArea || editArea) && polygon != null)
             CheckMarkerPositions();
@@ -200,7 +203,7 @@ public class MapManager : MonoBehaviour
         //float duration = (float)timeDuration.TotalSeconds;
         //Debug.Log("timeDuration in seconds = " + duration);
 
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
@@ -280,9 +283,16 @@ public class MapManager : MonoBehaviour
             // Save area locally and reload areas
             cArea.Save(areaToSave);
             areas = cArea.LoadAreas();
+
             //Debug.Log("Saved new area!");
             AppManager.Instance.serverManager.postUserData = true;
             AppManager.Instance.serverManager.timeRemaining = 0f;
+
+            // Download Tiles 
+            // Check internet
+            tileDownloader.SetValues(areaToSave.areaConstraintsMin.x, areaToSave.areaConstraintsMax.y, areaToSave.areaConstraintsMax.x, areaToSave.areaConstraintsMin.y, 20, 20);
+            tileDownloader.Calculate();
+            tileDownloader.Download();
 
             // Upload user data to server
             /*if (areaCounter >= 2) // TODO: For testing only. Remove.
@@ -947,27 +957,6 @@ public class MapManager : MonoBehaviour
         userMarker.SetDraggable(false);
         userMarker.scale = 0.3f;
     }
-
-    // ============= TILE MANAGER Methods ============= //
-
-    private void TestTiles()
-    {
-        OnlineMapsTileManager onlineMapsTileManager = new OnlineMapsTileManager(OnlineMaps.instance);
-        OnlineMaps.instance.GetTileCorners(out double tlx, out double tly, out double brx, out double bry);
-        Debug.Log("tlx = " + (int)tlx);
-        Debug.Log("tly = " + (int)tly);
-        Debug.Log("brx = " + (int)brx);
-        Debug.Log("bry = " + (int)bry);
-        //OnlineMapsLocationService.instance.position.x, OnlineMapsLocationService.instance.position.y
-        OnlineMapsTile tile = onlineMapsTileManager.GetTile(OnlineMaps.MAXZOOM, (int)tlx, (int)tly);
-        if (tile != null)
-            tile.texture.Resize(0,0);
-        //ulong tileKey = OnlineMapsTileManager.GetTileKey(OnlineMaps.MAXZOOM, 0, 0);
-        //onlineMapsTileManager.dTiles.TryGetValue(tileKey, out OnlineMapsTile tile);
-        //OnlineMapsTileManager.StartDownloadTile(tile);
-    }
-
-
     #endregion
 
     #region Screencapture the path
