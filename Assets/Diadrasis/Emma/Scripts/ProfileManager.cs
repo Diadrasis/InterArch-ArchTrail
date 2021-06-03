@@ -2,34 +2,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ProfileManager : MonoBehaviour
 {
     public delegate void Profile();
     public static Profile OnContinue, OnInternetError;
 
-    public Button btnSubmit, BtnOk;
+    public Button btnSubmit/*, BtnOk*/;
     public GameObject[] demographicOptions;
     public Transform dropdownContainer;
+    public Transform inputContainer;
+    public Transform dropdownContainerOptionA;
+    public Transform toggleContainerOptionA;
+    //public GameObject newIdPanel;
+    //public Text newIdText, btnNextText, btnOkText;
 
-    public GameObject newIdPanel;
-    public Text newIdText, btnNextText, btnOkText;
-
-    public Dropdown[] dropdowns;
+    public TMP_Dropdown[] dropdowns;
+    public TMP_InputField[] inputFields;
+    public Toggle[] toggle;
+    //public Dropdown[] dropdowns;
     int step = 0;
 
     public static string jsonFile;
 
-    public GameObject panelSettings;
+    //public GameObject panelSettings;
 
     //Intro intro;
 
     private void Awake()
     {
-        BtnOk.onClick.AddListener(() => ContinueToSettings());
+        //BtnOk.onClick.AddListener(() => ContinueToSettings());
         //intro = FindObjectOfType<Intro>();
         btnSubmit.onClick.AddListener(() => Submit());
-        dropdowns = dropdownContainer.GetComponentsInChildren<Dropdown>(true);
+        dropdowns = dropdownContainer.GetComponentsInChildren<TMP_Dropdown>(true);
+        inputFields = inputContainer.GetComponentsInChildren<TMP_InputField>(true);
+        dropdowns = dropdownContainerOptionA.GetComponentsInChildren<TMP_Dropdown>(true);
+        toggle = toggleContainerOptionA.GetComponentsInChildren<Toggle>(true);
     }
 
     void Start()
@@ -39,26 +48,26 @@ public class ProfileManager : MonoBehaviour
 
     private void OnEnable()
     {
-        BtnOk.gameObject.SetActive(false);
-        newIdPanel.SetActive(false);
+        //BtnOk.gameObject.SetActive(false);
+        //newIdPanel.SetActive(false);
         btnSubmit.gameObject.SetActive(true);
         step = 0;
         foreach (GameObject gb in demographicOptions) gb.gameObject.SetActive(false);
         demographicOptions[0].SetActive(true);
-        btnNextText.text = "Επόμενο";
+        //btnNextText.text = "Επόμενο";
 
-        Debug.LogWarning("is new = " + StaticData.isNewVisitor);
+        //Debug.LogWarning("is new = " + StaticData.isNewVisitor);
 
         //also reset values?
-        if (StaticData.isNewVisitor)
+        /*if (StaticData.isNewVisitor)
         {
-            foreach (Dropdown dd in dropdowns) dd.value = 0;
+            foreach (TMP_Dropdown dd in dropdowns) dd.value = 0;
         }
         else
         {
             //Load old visitor data
             ProfileItem profileItem = JsonUtility.FromJson<ProfileItem>(StaticData.visitorData);
-            foreach (Dropdown dd in dropdowns)
+            foreach (TMP_Dropdown dd in dropdowns)
             {
                 for (int i = 0; i < dd.options.Count; i++)
                 {
@@ -100,7 +109,7 @@ public class ProfileManager : MonoBehaviour
                     }
                 }
             }
-        }
+        }*/
     }
 
     void Submit()
@@ -109,18 +118,43 @@ public class ProfileManager : MonoBehaviour
 
         if (step < demographicOptions.Length - 1)
         {
-            StopCoroutine("DelayShow");
+            //StopCoroutine("DelayShow");
             StartCoroutine(DelayShow());
             step++;
-            if (step == demographicOptions.Length - 1) { btnNextText.text = "Αποστολή"; }
+            //if (step == demographicOptions.Length - 1) { btnNextText.text = "Αποστολή"; }
             demographicOptions[step].SetActive(true);
+            //CheckValue();
         }
-        else
+        
+        //SaveProfile();
+        /*else
         {
             SaveProfile();
+        }*/
+    }
+    public void CheckValue(int val)
+    {
+        if (val == 0 || val.ToString() == null)
+        {
+            Debug.Log("1st Option");
+            return;
+        }
+        else if (val == 1)
+        {
+            AppManager.Instance.uIManager.pnlOptionA.SetActive(true);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
+            Submit();
+            Debug.Log("2nd Option");
+        }
+        else if (val == 2)
+        {
+            Debug.Log("3rd Option");
+        }
+        else if (val == 3)
+        {
+            Debug.Log("4th Option");
         }
     }
-
     IEnumerator DelayShow()
     {
         btnSubmit.gameObject.SetActive(false);
@@ -129,16 +163,16 @@ public class ProfileManager : MonoBehaviour
         yield break;
     }
 
-    void ContinueToSettings()
+    /*void ContinueToSettings()
     {
         OnContinue?.Invoke();
-    }
+    }*/
 
     void SaveProfile()
     {
         ProfileItem profileItem = new ProfileItem();
 
-        foreach (Dropdown dd in dropdowns)
+        foreach (TMP_Dropdown dd in dropdowns)
         {
             if (dd.transform.parent == demographicOptions[0].transform)//sex
             {
@@ -150,9 +184,10 @@ public class ProfileManager : MonoBehaviour
             }
             else if (dd.transform.parent == demographicOptions[2].transform)//education
             {
-                profileItem.Education = dd.options[dd.value].text;
+                profileItem.VisitReason = dd.options[dd.value].text;
+                
             }
-            else if (dd.transform.parent == demographicOptions[3].transform)//tech familiarity
+            /*else if (dd.transform.parent == demographicOptions[3].transform)//tech familiarity
             {
                 profileItem.Technology = dd.options[dd.value].text;
                 profileItem.TechnologyINT = dd.value + 1;
@@ -166,15 +201,27 @@ public class ProfileManager : MonoBehaviour
             else if (dd.transform.parent == demographicOptions[5].transform)//visit reason
             {
                 profileItem.VisitReason = dd.options[dd.value].text;
-            }
+            }*/
+            //Debug.Log("Here on Save");
         }
 
+        foreach(TMP_InputField fields in inputFields)
+        {
+            if (fields.transform.parent == demographicOptions[0].transform)//education
+            {
+                profileItem.Education = fields.onValueChanged.ToString();
+            }
+            else if (fields.transform.parent == demographicOptions[1].transform)//ethnicity
+            {
+                profileItem.Ethnicity = fields.onValueChanged.ToString();
+            }
+        }
         btnSubmit.gameObject.SetActive(false);
 
-        string pass = Random.Range(100, 999).ToString();
-        string visitorId = SystemInfo.deviceUniqueIdentifier.Substring(0, 3) + pass;
+        /*string pass = Random.Range(100, 999).ToString();
+        string visitorId = SystemInfo.deviceUniqueIdentifier.Substring(0, 3) + pass;*/
 
-        if (StaticData.isNewVisitor)
+        /*if (StaticData.isNewVisitor)
         {
             profileItem.VisitorId = visitorId;
             StaticData.visitorId = visitorId;
@@ -186,9 +233,9 @@ public class ProfileManager : MonoBehaviour
             profileItem.VisitorId = StaticData.visitorId;
             profileItem.VisitorPass = StaticData.visitorPass;
         }
+*/
 
-
-        StopCoroutine("PostVisitorData");
+        //StopCoroutine("PostVisitorData");
         //StartCoroutine(PostVisitorData(profileItem));
     }
 
@@ -234,13 +281,10 @@ public class ProfileManager : MonoBehaviour
         yield break;
     }*/
 
-
-
-
-    public void GetFamiliarity()
+    /*public void GetFamiliarity()
     {
         ProfileItem profileItem = JsonUtility.FromJson<ProfileItem>(StaticData.visitorData);
-        foreach (Dropdown dd in dropdowns)
+        foreach (TMP_Dropdown dd in dropdowns)
         {
             for (int i = 0; i < dd.options.Count; i++)
             {
@@ -250,6 +294,7 @@ public class ProfileManager : MonoBehaviour
                 }
             }
         }
-    }
+    }*/
+
 
 }
