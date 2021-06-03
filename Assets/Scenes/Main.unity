@@ -28550,7 +28550,7 @@ MonoBehaviour:
   resourcesPath: OnlineMapsTiles/{zoom}/{x}/{y}
   streamingAssetsPath: OnlineMapsTiles/{zoom}/{x}/{y}.png
   showMarkerTooltip: 0
-  source: 0
+  source: 4
   stopPlayingWhenScriptsCompile: 1
   texture: {fileID: 2800000, guid: 2accdb18f81ec9546ac6479bc58ea339, type: 3}
   target: 0
@@ -28655,6 +28655,7 @@ GameObject:
   - component: {fileID: 6710081424181877702}
   - component: {fileID: 6710081424181877753}
   - component: {fileID: 6710081424181877752}
+  - component: {fileID: 6710081424181877756}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -28681,6 +28682,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1080, y: 1920}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &6710081424181877756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6710081424181877754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65d31949d32ec7c45877010176a60a67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6710081424296763122
 MonoBehaviour:
   m_ObjectHideFlags: 0

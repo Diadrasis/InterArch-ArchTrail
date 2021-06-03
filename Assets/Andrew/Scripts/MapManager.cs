@@ -294,6 +294,9 @@ public class MapManager : MonoBehaviour
             tileDownloader.Calculate();
             tileDownloader.Download();
 
+            // Clear Cache
+            OnlineMapsCache.instance.ClearAllCaches();
+
             // Upload user data to server
             /*if (areaCounter >= 2) // TODO: For testing only. Remove.
             {
