@@ -408,9 +408,6 @@ public class MapManager : MonoBehaviour
         //Interent Events
         //AppManager.Instance.serverManager.OnDownloadData += ReloadAreasScreen;
         //AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
-
-        //Position force location services
-        OnlineMapsLocationService.instance.OnLocationInited += CheckUserPosition;
     }
     
     public void ReloadAreas()
@@ -510,7 +507,6 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
                 AppManager.Instance.uIManager.btnContinue.interactable = false;
                 isShown = true;
-                Debug.Log("UserPosition on false");
             }
             else
             {   
@@ -518,7 +514,6 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
                 AppManager.Instance.uIManager.btnContinue.interactable = true;
                 isShown = false;
-                Debug.Log("UserPosition on true");
             }
         }
     }
@@ -624,6 +619,7 @@ public class MapManager : MonoBehaviour
             isShown = false;
             
         }
+        
     }
 
     public void StartRecordingPath()
@@ -654,6 +650,8 @@ public class MapManager : MonoBehaviour
         // Set user marker on top
         CreateUserMarker();
 
+        //to restore the location services on path in case the marker hasn't changed
+        OnlineMapsLocationService.instance.restoreAfter = 50;
     }
 
     public void PauseRecordingPath()
