@@ -124,6 +124,11 @@ public class ProfileManager : MonoBehaviour
             //if (step == demographicOptions.Length - 1) { btnNextText.text = "Αποστολή"; }
             demographicOptions[step].SetActive(true);
             //CheckValue();
+            if (CheckValue(1))
+            {
+                AppManager.Instance.uIManager.pnlOptionA.SetActive(true);
+                AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
+            }
         }
         
         //SaveProfile();
@@ -132,28 +137,28 @@ public class ProfileManager : MonoBehaviour
             SaveProfile();
         }*/
     }
-    public void CheckValue(int val)
+    public bool CheckValue(int val)
     {
         if (val == 0 || val.ToString() == null)
         {
             Debug.Log("1st Option");
-            return;
+            return false;
         }
         else if (val == 1)
         {
-            AppManager.Instance.uIManager.pnlOptionA.SetActive(true);
-            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
-            Submit();
             Debug.Log("2nd Option");
         }
         else if (val == 2)
         {
             Debug.Log("3rd Option");
+            
         }
         else if (val == 3)
         {
             Debug.Log("4th Option");
+            
         }
+        return true;
     }
     IEnumerator DelayShow()
     {
