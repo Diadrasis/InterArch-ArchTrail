@@ -114,6 +114,9 @@ public class UIManager : MonoBehaviour
     public GameObject pnlProfilerScreen;
     public GameObject pnlMainQuestions;
     public GameObject pnlOptionA;
+    public GameObject pnlOptionB;
+    public GameObject pnlOptionC1;
+    public GameObject pnlOptionC2;
     public Button btnProfiler;
     #endregion
 

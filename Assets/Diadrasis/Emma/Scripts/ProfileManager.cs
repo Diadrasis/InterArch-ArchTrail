@@ -21,7 +21,7 @@ public class ProfileManager : MonoBehaviour
     public TMP_Dropdown[] dropdowns;
     public TMP_InputField[] inputFields;
     public Toggle[] toggle;
-    //public Dropdown[] dropdowns;
+    public TMP_Dropdown optionDropdown;
     int step = 0;
 
     public static string jsonFile;
@@ -44,6 +44,7 @@ public class ProfileManager : MonoBehaviour
     void Start()
     {
         step = 0;
+        
     }
 
     private void OnEnable()
@@ -120,15 +121,24 @@ public class ProfileManager : MonoBehaviour
         {
             //StopCoroutine("DelayShow");
             StartCoroutine(DelayShow());
-            step++;
+            
             //if (step == demographicOptions.Length - 1) { btnNextText.text = "Αποστολή"; }
-            demographicOptions[step].SetActive(true);
-            //CheckValue();
-            if (CheckValue(1))
+            
+            if (step == 4)
             {
-                AppManager.Instance.uIManager.pnlOptionA.SetActive(true);
-                AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
+                if(optionDropdown.GetComponent<TMP_Dropdown>() != null)
+                {
+                    CheckValue(optionDropdown);
+                    Debug.Log("Here");
+                }
+                
             }
+            else
+            {
+                step++;
+                demographicOptions[step].SetActive(true);
+            }
+            
         }
         
         //SaveProfile();
@@ -137,29 +147,44 @@ public class ProfileManager : MonoBehaviour
             SaveProfile();
         }*/
     }
-    public bool CheckValue(int val)
+    //for the dropdown which will make the different selections and open/close panels
+    public void CheckValue(TMP_Dropdown val)
     {
-        if (val == 0 || val.ToString() == null)
+        if (val.value == 0)
         {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            AppManager.Instance.uIManager.txtWarning.text = "Please enter a valid option";
             Debug.Log("1st Option");
-            return false;
+            return;
         }
-        else if (val == 1)
+        else if (val.value == 1)
         {
+            step = 0;
+            AppManager.Instance.uIManager.pnlOptionA.SetActive(true);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
             Debug.Log("2nd Option");
         }
-        else if (val == 2)
+        else if (val.value == 2)
         {
+            AppManager.Instance.uIManager.pnlOptionB.SetActive(true);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
             Debug.Log("3rd Option");
-            
         }
-        else if (val == 3)
+        else if (val.value == 3)
         {
+            AppManager.Instance.uIManager.pnlOptionC1.SetActive(true);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
             Debug.Log("4th Option");
-            
         }
-        return true;
+        else if (val.value == 4)
+        {
+            AppManager.Instance.uIManager.pnlOptionC2.SetActive(true);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
+            Debug.Log("5th Option");
+        }
+
     }
+    
     IEnumerator DelayShow()
     {
         btnSubmit.gameObject.SetActive(false);
