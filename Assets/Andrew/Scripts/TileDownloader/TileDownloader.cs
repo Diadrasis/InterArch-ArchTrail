@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -17,18 +18,25 @@ public class TileDownloader: MonoBehaviour
     private int maxZoom = 20;
 
     private const int averageSize = 30000;
-    private int countTiles = 0;
+    public int countTiles = 0;
+    public int downloadedTiles = 0;
+    public int deletedTiles = 0;
     private long totalSize = 0;
     private static OnlineMaps map;
     private OnlineMapsDrawingRect rect;
 
     private List<Tile> downloadTiles;
+    private List<Tile> deleteTiles;
+
+    public bool isDownloading;
+    public bool isDeleting;
     #endregion
 
     #region Unity Functions
     private void Start()
     {
         map = OnlineMaps.instance;
+        isDownloading = false;
 
         folder = Application.persistentDataPath + "/Tiles/"; // Application.streamingAssetsPath + "/OnlineMapsTiles/"; //Application.persistentDataPath + "/Tiles/";
 
@@ -153,6 +161,8 @@ public class TileDownloader: MonoBehaviour
     public void Download()
     {
         downloadTiles = new List<Tile>();
+        downloadedTiles = 0;
+        countTiles = 0;
 
         for (int z = minZoom; z <= maxZoom; z++)
         {
@@ -181,7 +191,88 @@ public class TileDownloader: MonoBehaviour
             countTiles += (ibrx - itlx) * (ibry - itly);
         }
 
+        if (downloadTiles.Count > 0)
+            isDownloading = true;
+
         StartNextDownload();
+    }
+
+    public void DeleteTiles(cArea _areaToDelete)
+    {
+        SetValues(_areaToDelete.areaConstraintsMin.x, _areaToDelete.areaConstraintsMax.y, _areaToDelete.areaConstraintsMax.x, _areaToDelete.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
+        //Calculate();
+        StartCoroutine(Delete());
+    }
+
+    IEnumerator Delete()
+    {
+        deleteTiles = new List<Tile>();
+        deletedTiles = 0;
+        countTiles = 0;
+
+        for (int z = minZoom; z <= maxZoom; z++)
+        {
+            double tlx, tly, brx, bry;
+            map.projection.CoordinatesToTile(leftLongitude, topLatitude, z, out tlx, out tly);
+            map.projection.CoordinatesToTile(rightLongitude, bottomLatitude, z, out brx, out bry);
+
+            int itlx = (int)tlx;
+            int itly = (int)tly;
+            int ibrx = (int)Math.Ceiling(brx);
+            int ibry = (int)Math.Ceiling(bry);
+
+            for (int x = itlx; x < ibrx; x++)
+            {
+                for (int y = itly; y < ibry; y++)
+                {
+                    deleteTiles.Add(new Tile
+                    {
+                        x = x,
+                        y = y,
+                        zoom = z
+                    });
+                }
+            }
+
+            countTiles += (ibrx - itlx) * (ibry - itly);
+        }
+
+        if (deleteTiles.Count > 0)
+        {
+            isDeleting = true;
+
+            // Calculate seconds to upload
+            System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+            stopWatch.Start();
+
+            // Activate panel
+            AppManager.Instance.uIManager.txtWarningServer.text = "";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
+            while (deleteTiles.Count > 0)
+            {
+                deletedTiles += 1;
+                
+                // Update panel
+                int percentage = Mathf.RoundToInt((float)(((double)deletedTiles / (double)countTiles) * 100));
+                AppManager.Instance.uIManager.txtWarningServer.text = "Deleting tiles... \n" + percentage + "%";
+
+                Tile tile = deleteTiles[0];
+                deleteTiles.RemoveAt(0);
+                string tilePath = GetTilePath(tile);
+                if (File.Exists(tilePath))
+                    File.Delete(tilePath);
+
+                yield return null;
+            }
+
+            isDeleting = false;
+
+            stopWatch.Stop();
+            TimeSpan ts = stopWatch.Elapsed;
+            yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
+        }
     }
 
     private string GetTilePath(Tile tile)
@@ -285,22 +376,53 @@ public class TileDownloader: MonoBehaviour
 
     private void StartNextDownload()
     {
-        if (downloadTiles == null) return;
+        if (downloadTiles == null)
+        {
+            isDownloading = false;
+            return;
+        }
 
         while (downloadTiles.Count > 0)
         {
+            downloadedTiles += 1;
+
             Tile tile = downloadTiles[0];
             downloadTiles.RemoveAt(0);
             string tilePath = GetTilePath(tile);
             if (File.Exists(tilePath)) continue;
 
             string url = tile.url;
-            Debug.Log(url + "    " + tilePath);
+            //Debug.Log(url + "    " + tilePath);
             OnlineMapsWWW www = new OnlineMapsWWW(url);
             www["path"] = tilePath;
             www.OnComplete += OnTileDownloaded;
             return;
         }
+
+        isDownloading = false;
+    }
+
+    private void StartNextDelete()
+    {
+        if (deleteTiles == null)
+        {
+            isDeleting = false;
+            return;
+        }
+
+        while (deleteTiles.Count > 0)
+        {
+            deletedTiles += 1;
+
+            Tile tile = deleteTiles[0];
+            deleteTiles.RemoveAt(0);
+            string tilePath = GetTilePath(tile);
+            if (File.Exists(tilePath))
+                File.Delete(tilePath);
+            return;
+        }
+
+        isDeleting = false;
     }
 
     /*private void UpdateRect()
