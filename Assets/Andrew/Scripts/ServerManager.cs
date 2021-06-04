@@ -23,10 +23,11 @@ public class ServerManager : MonoBehaviour
     //readonly string diadrasisPathManagerUrl = "http://diadrasis.net/interarch_path_manager.php";
     //private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
     public bool postUserData = false; // true;
-    public bool uploadedUserData = false; // true;
+    //public bool uploadedUserData = false; // true;
     public bool getData = false; // true;
 
-    bool testInternet;
+    bool checkInternet;
+    public bool hasInternet;
     public enum PHPActions { Get_Areas, Save_Area, Delete_Area, Get_Paths, Save_Path, Delete_Path, Get_Points, Save_Point, Delete_Point }
 
     private bool downloadAreas;
@@ -37,6 +38,9 @@ public class ServerManager : MonoBehaviour
     public float timeRemaining = 0f;
 
     public bool panelInternetWarning, isShownOnce;
+
+    // Tiles
+    public TileDownloader tileDownloader;
     #endregion
 
     #region UnityMethods
@@ -44,10 +48,10 @@ public class ServerManager : MonoBehaviour
     {
         postUserData = true;
         timeRemaining = 0f;
-        uploadedUserData = true;
         getData = true;
         isShownOnce = true;
-
+        tileDownloader = OnlineMaps.instance.gameObject.GetComponent<TileDownloader>();
+        hasInternet = false;
         //Debug.Log("postUserData = " + postUserData);
         //Debug.Log("getData = " + getData);
 
@@ -117,7 +121,7 @@ public class ServerManager : MonoBehaviour
             }
         }*/
 
-        if (!testInternet)
+        if (!checkInternet)
         {
             if (timeRemaining > 0)
             {
@@ -137,16 +141,15 @@ public class ServerManager : MonoBehaviour
             isShownOnce = false;*/
         }
 
-        if (testInternet)
+        if (checkInternet)
         {
             if (postUserData)
             {
                 StartCoroutine(UploadUserDataToDiadrasis());
                 postUserData = false;
-                
             }
 
-            testInternet = false;
+            checkInternet = false;
         }
 
         // Check if postUserData is false and getData is true and there is internet connection, downloads the data from the server
@@ -219,7 +222,7 @@ public class ServerManager : MonoBehaviour
     public void OnCheckConnectionCompleteUpload(bool status)
     {
         //if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
-        testInternet = status;
+        checkInternet = status;
 
         if (!status && panelInternetWarning)
         {
@@ -235,7 +238,8 @@ public class ServerManager : MonoBehaviour
 
     public void OnCheckConnectionComplete(bool status)
     {
-        testInternet = status;
+        checkInternet = status;
+        hasInternet = status;
         if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
         //testInternet = status;
         if (status)
@@ -366,19 +370,40 @@ public class ServerManager : MonoBehaviour
     {
         // ============== Upload Areas ============== //
         Debug.Log("Started uploading user data!");
-        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-        AppManager.Instance.uIManager.txtWarningServer.text = "Uploading user data...";
-        yield return new WaitForSeconds(1.0f);
+
+        // Calculate seconds to upload
+        System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+        stopWatch.Start();
 
         // Get areas to upload
         List<cArea> areasToUpload = cArea.GetAreasToUpload();
 
         if (areasToUpload != null && areasToUpload.Count > 0)
         {
+            // Activate panel
+            AppManager.Instance.uIManager.txtWarningServer.text = "";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
             foreach (cArea areaToUpload in areasToUpload)
             {
+                // Download Tiles Locally
+                tileDownloader.SetValues(areaToUpload.areaConstraintsMin.x, areaToUpload.areaConstraintsMax.y, areaToUpload.areaConstraintsMax.x, areaToUpload.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
+                //tileDownloader.Calculate();
+                tileDownloader.Download();
+                while (tileDownloader.isDownloading)
+                {
+                    // Update panel
+                    int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                    
+                    yield return null;
+                }
+
+                // Update panel
+                AppManager.Instance.uIManager.txtWarningServer.text = "Uploading area...";
+
                 // Create a form and add all the fields of the area
-                List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
+                List <IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
                 formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 1))); // Save_Area
                 formToPost.Add(new MultipartFormDataSection("server_area_id", areaToUpload.server_area_id.ToString()));
                 formToPost.Add(new MultipartFormDataSection("title", areaToUpload.title));
@@ -400,9 +425,8 @@ public class ServerManager : MonoBehaviour
                 else
                 {
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
-                    Debug.Log("Uploaded area successfully!");
-                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
-                    Debug.Log("Echo: " + webRequest.downloadHandler.text);
+                    //Debug.Log("Uploaded area successfully!");
+                    //Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
@@ -425,6 +449,10 @@ public class ServerManager : MonoBehaviour
 
         if (pathsToUpload != null && pathsToUpload.Count > 0)
         {
+            // Activate panel
+            AppManager.Instance.uIManager.txtWarningServer.text = "Uploading paths...";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
             foreach (cPath pathToUpload in pathsToUpload)
             {
                 // Create a form and add all the fields of the area
@@ -448,8 +476,7 @@ public class ServerManager : MonoBehaviour
                 else
                 {
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
-                    Debug.Log("Uploaded path successfully!");
-                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
+                    //Debug.Log("Uploaded path successfully!");
                     //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
@@ -469,6 +496,10 @@ public class ServerManager : MonoBehaviour
 
         if (pointsToUpload != null && pointsToUpload.Count > 0)
         {
+            // Activate panel
+            AppManager.Instance.uIManager.txtWarningServer.text = "Uploading points...";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
             foreach (cPathPoint pointToUpload in pointsToUpload)
             {
                 /*Debug.Log("Point to upload: server_path_id = " + pointToUpload.server_path_id.ToString());
@@ -498,9 +529,8 @@ public class ServerManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Uploaded point successfully!");
+                    //Debug.Log("Uploaded point successfully!");
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
-                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
                     //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
@@ -520,7 +550,10 @@ public class ServerManager : MonoBehaviour
 
         if (areasToDelete != null && areasToDelete.Length > 0)
         {
-            Debug.Log("Has areas to delete!");
+            // Activate panel
+            AppManager.Instance.uIManager.txtWarningServer.text = "Deleting areas...";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
             foreach (int server_area_idToDelete in areasToDelete)
             {
                 WWWForm formToPost = new WWWForm();
@@ -540,7 +573,7 @@ public class ServerManager : MonoBehaviour
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
                     Debug.Log("Deleted area from server successfully!: " + server_area_idToDelete);
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
-                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
+                    //AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
                     //AppManager.Instance.uIManager.LoadingScreen("Updating...",1,3);
                     //AppManager.Instance.uIManager.imgLoading.fillAmount -= timeToCount / 10;
                     //Debug.Log("Data length: " + webRequest.downloadHandler.data);
@@ -556,8 +589,12 @@ public class ServerManager : MonoBehaviour
         // Get paths to delete
         int[] pathsToDelete = cPath.GetServerIdsToDelete();
 
-        if (pathsToDelete != null)
+        if (pathsToDelete != null && pathsToDelete.Length > 0)
         {
+            // Activate panel
+            AppManager.Instance.uIManager.txtWarningServer.text = "Deleting paths...";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
             foreach (int server_path_idToDelete in pathsToDelete)
             {
                 WWWForm formToPost = new WWWForm();
@@ -587,8 +624,9 @@ public class ServerManager : MonoBehaviour
             }
         }
 
-        uploadedUserData = true;
-        yield return new WaitForSeconds(1.0f);
+        stopWatch.Stop();
+        TimeSpan ts = stopWatch.Elapsed;
+        yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 

@@ -70,9 +70,6 @@ public class MapManager : MonoBehaviour
     private bool touchedLastUpdate = false;
     int lastTouchCount;
     //private int areaCounter = 0; // TODO: Remove, for testing only
-
-    // Tiles
-    TileDownloader tileDownloader;
     #endregion
 
     #region Unity Functions
@@ -117,8 +114,6 @@ public class MapManager : MonoBehaviour
         isPausePath = false;
 
         CreateUserMarker();
-
-        tileDownloader = OnlineMaps.instance.gameObject.GetComponent<TileDownloader>();
 
         // Test
         //List<cPath> pathsToTest = GetTestPaths();
@@ -229,10 +224,33 @@ public class MapManager : MonoBehaviour
     {
         //if (_areaToView.constraints != null)
         OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(_areaToView.viewConstraintsMin.y, _areaToView.viewConstraintsMin.x, _areaToView.viewConstraintsMax.y, _areaToView.viewConstraintsMax.x);
-        OnlineMaps.instance.zoomRange = new OnlineMapsRange(_areaToView.zoom, OnlineMaps.MAXZOOM);
-        OnlineMaps.instance.SetPositionAndZoom(_areaToView.position.x, _areaToView.position.y, _areaToView.zoom);
+        int zoom = OnlineMaps.MAXZOOM;
+        if (AppManager.Instance.serverManager.hasInternet)
+        {
+            zoom = _areaToView.zoom;
+            OnlineMaps.instance.zoomRange = new OnlineMapsRange(zoom, OnlineMaps.MAXZOOM);
+        }
+        else
+            OnlineMaps.instance.zoomRange = new OnlineMapsRange(OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
+        OnlineMaps.instance.SetPositionAndZoom(_areaToView.position.x, _areaToView.position.y, zoom);
         DisplayArea(_areaToView);
     }
+
+    /*public void SetMapZoom()
+    {
+        if (currentArea != null)
+        {
+            int zoom = OnlineMaps.MAXZOOM;
+            if (AppManager.Instance.serverManager.hasInternet)
+            {
+                zoom = currentArea.zoom;
+                OnlineMaps.instance.zoomRange = new OnlineMapsRange(zoom, OnlineMaps.MAXZOOM);
+            }
+            else
+                OnlineMaps.instance.zoomRange = new OnlineMapsRange(OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
+            OnlineMaps.instance.SetPositionAndZoom(currentArea.position.x, currentArea.position.y, zoom);
+        }
+    }*/
 
     /*public cArea GetAreaByTitle(string _areaTitle)
     {
@@ -288,14 +306,8 @@ public class MapManager : MonoBehaviour
             AppManager.Instance.serverManager.postUserData = true;
             AppManager.Instance.serverManager.timeRemaining = 0f;
 
-            // Download Tiles 
-            // Check internet
-            tileDownloader.SetValues(areaToSave.areaConstraintsMin.x, areaToSave.areaConstraintsMax.y, areaToSave.areaConstraintsMax.x, areaToSave.areaConstraintsMin.y, 20, 20);
-            tileDownloader.Calculate();
-            tileDownloader.Download();
-
             // Clear Cache
-            OnlineMapsCache.instance.ClearAllCaches();
+            //OnlineMapsCache.instance.ClearAllCaches();
 
             //OnlineMaps.instance.resourcesPath = ""; // ????
 
@@ -346,6 +358,9 @@ public class MapManager : MonoBehaviour
         cArea.Delete(areaSelected.local_area_id);
         areas = cArea.LoadAreas();
         Debug.Log("Delete Area, local_area_id = " + areaSelected.local_area_id + "server_area_id = " + areaSelected.server_area_id);
+
+        // DeleteTiles
+        AppManager.Instance.serverManager.tileDownloader.DeleteTiles(areaSelected);
 
         // Delete Area from server
         if (areaSelected.server_area_id != -1)
