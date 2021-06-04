@@ -28550,7 +28550,7 @@ MonoBehaviour:
   resourcesPath: OnlineMapsTiles/{zoom}/{x}/{y}
   streamingAssetsPath: OnlineMapsTiles/{zoom}/{x}/{y}.png
   showMarkerTooltip: 0
-  source: 4
+  source: 2
   stopPlayingWhenScriptsCompile: 1
   texture: {fileID: 2800000, guid: 2accdb18f81ec9546ac6479bc58ea339, type: 3}
   target: 0
@@ -28562,7 +28562,7 @@ MonoBehaviour:
   useProxy: 1
   useSoftwareJPEGDecoder: 0
   width: 1024
-  _activeTypeSettings: 12Tile version1513865
+  _activeTypeSettings: 12Tile version1513903
   _zoom: 19
   latitude: 37.1789749651649
   longitude: 21.9215393284267

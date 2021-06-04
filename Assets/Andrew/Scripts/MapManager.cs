@@ -98,7 +98,7 @@ public class MapManager : MonoBehaviour
         // Download areas
         AppManager.Instance.serverManager.DownloadAreas();
         isShown = false;
-
+        
         /*if (AppManager.Instance.serverManager.CheckInternet())
         {
             AppManager.Instance.serverManager.DownloadAreas();
@@ -296,6 +296,8 @@ public class MapManager : MonoBehaviour
 
             // Clear Cache
             OnlineMapsCache.instance.ClearAllCaches();
+
+            //OnlineMaps.instance.resourcesPath = ""; // ????
 
             // Upload user data to server
             /*if (areaCounter >= 2) // TODO: For testing only. Remove.

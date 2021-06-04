@@ -30,7 +30,7 @@ public class TileDownloader: MonoBehaviour
     {
         map = OnlineMaps.instance;
 
-        folder = Application.streamingAssetsPath + "/OnlineMapsTiles/"; //Application.persistentDataPath + "/Tiles/";
+        folder = Application.persistentDataPath + "/Tiles/"; // Application.streamingAssetsPath + "/OnlineMapsTiles/"; //Application.persistentDataPath + "/Tiles/";
 
         if (OnlineMapsCache.instance != null) OnlineMapsCache.instance.OnStartDownloadTile += OnStartDownloadTile;
         else OnlineMapsTileManager.OnStartDownloadTile += OnStartDownloadTile;
