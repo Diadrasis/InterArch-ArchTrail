@@ -107,7 +107,6 @@ public class UIManager : MonoBehaviour
     [Space]
     [Header("Loading Screen")]
     public Image imgLoading;
-    public TextMeshProUGUI txtLoading;
 
     [Space]
     [Header("Profiler Screen")]
@@ -115,9 +114,13 @@ public class UIManager : MonoBehaviour
     public GameObject pnlMainQuestions;
     public GameObject pnlOptionA;
     public GameObject pnlOptionB;
+    public GameObject pnlOptionB1;
+    public GameObject pnlOptionB2;
+    public GameObject pnlOptionC;
     public GameObject pnlOptionC1;
     public GameObject pnlOptionC2;
     public Button btnProfiler;
+    public Button btnResetQuestionnaire;
     #endregion
 
     #region Unity Functions
@@ -186,17 +189,21 @@ public class UIManager : MonoBehaviour
         //btnEditAreaSave.onClick.AddListener(()=> )
 
         //btn for profiler screen
-        btnProfiler.onClick.AddListener(() => EnableScreen(pnlProfilerScreen, true));
+        btnProfiler.onClick.AddListener(() => DisplayQuestionnaire());
+        btnResetQuestionnaire.onClick.AddListener(() => ResetQuestionnaire());
+
 
         //btn for close Internet screen
         btnCloseInternetScreen.onClick.AddListener(() => CancelInGeneral());
 
 
     }
-    void ActivateButtons(bool valBack, bool valQuit)
+    void ActivateButtons(bool valBack, bool valQuit, bool valReset, bool valProfiler)
     {
         btnBackToAreasScreen.gameObject.SetActive(valBack);
         btnQuit.gameObject.SetActive(valQuit);
+        btnProfiler.gameObject.SetActive(valProfiler);
+        btnResetQuestionnaire.gameObject.SetActive(valReset);
     }
     public void DisplayAreasScreen()
     {
@@ -209,7 +216,7 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, false);
         imgRecord.gameObject.SetActive(false);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths
-        ActivateButtons(false,true);
+        ActivateButtons(false,true, false, true);
         txtMainName.text = DEFAULT_TEXT_NAME;
         pnlWarningDeleteScreen.SetActive(false);
     }
@@ -301,7 +308,7 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, true);
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths can be removed afterwards, for testing purposes
-        ActivateButtons(true,false);
+        ActivateButtons(true,false, false, false);
         AppManager.Instance.mapManager.CheckUserPosition();
     }
 
@@ -342,7 +349,7 @@ public class UIManager : MonoBehaviour
         btnSaveEditArea.interactable = true;
         btnSaveEditArea.onClick.AddListener(() => EnableScreen(pnlSaveEditArea, true));
         inptFldEditArea.text = selectedArea.title;
-        ActivateButtons(true, true);
+        ActivateButtons(true, true, false, false);
 
         // Start edit selected area
         AppManager.Instance.mapManager.StartEditArea(selectedArea);
@@ -448,9 +455,50 @@ public class UIManager : MonoBehaviour
             DisplayAreasScreen();
             AppManager.Instance.serverManager.DownloadAreas();
         }
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
+            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
+            !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath && pnlProfilerScreen.activeSelf &&
+            !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+        {
+            pnlProfilerScreen.SetActive(false);
+            DisplayAreasScreen();
+            AppManager.Instance.serverManager.DownloadAreas();
+        }
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
+           !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
+           !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
+           pnlProfilerScreen.activeSelf && pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+        {
+            pnlProfilerScreen.SetActive(false);
+            DisplayAreasScreen();
+            pnlOptionA.SetActive(false);
+            AppManager.Instance.serverManager.DownloadAreas();
+        }
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
+           !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
+           !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
+           pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+        {
+            pnlProfilerScreen.SetActive(false);
+            DisplayAreasScreen();
+            pnlOptionB.SetActive(false);
+            AppManager.Instance.serverManager.DownloadAreas();
+
+        }
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
+          !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
+          !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
+          pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && pnlOptionC.activeSelf)
+        {
+            pnlProfilerScreen.SetActive(false);
+            DisplayAreasScreen();
+            pnlOptionC.SetActive(false);
+            AppManager.Instance.serverManager.DownloadAreas();
+        }
         else
         {
             DisplayAreasScreen();
+            ResetQuestionnaire();
             AppManager.Instance.serverManager.DownloadAreas();
         }
 
@@ -470,7 +518,7 @@ public class UIManager : MonoBehaviour
 
         inptFldCreateArea.text = "";
 
-        ActivateButtons(true,false);
+        ActivateButtons(true,false, false, false);
         AppManager.Instance.mapManager.CreateNewAreaInitialize();
     }
 
@@ -571,7 +619,7 @@ public class UIManager : MonoBehaviour
         selectPathObjects = InstantiateSelectPathObjects();
         StartCoroutine(ReloadLayout(pnlSavedPaths));
         pnlScrollViewPaths.SetActive(true);
-        ActivateButtons(true,false);
+        ActivateButtons(true,false, false, false);
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
         pnlWarningDeleteScreen.SetActive(false);
     }
@@ -706,6 +754,32 @@ public class UIManager : MonoBehaviour
         }
         
     }*/
+    #endregion
+
+    #region QuestionnairePanel
+    void DisplayQuestionnaire()
+    {
+        pnlProfilerScreen.SetActive(true);
+        pnlMainQuestions.SetActive(true);
+        pnlAreasScreen.SetActive(false);
+        ActivateButtons(true,true, true, true);
+    }
+
+    void ResetQuestionnaire()
+    {
+        pnlProfilerScreen.SetActive(true);
+        pnlMainQuestions.SetActive(true);
+        pnlOptionA.SetActive(false);
+        pnlOptionB.SetActive(false);
+        pnlOptionC.SetActive(false);
+        ActivateButtons(true, true, true, true);
+        AppManager.Instance.profileManager.step = 0;
+        foreach (GameObject gb in AppManager.Instance.profileManager.demographicOptions) gb.SetActive(false);
+        AppManager.Instance.profileManager.demographicOptions[0].SetActive(true);
+        foreach (TMP_Dropdown td in AppManager.Instance.profileManager.dropdownsGeneral) td.value = 0;
+        foreach (TMP_InputField ti in AppManager.Instance.profileManager.inputFieldsGeneral) ti.text = "";
+        AppManager.Instance.profileManager.optionDropdown.value = 0;
+    }
     #endregion
 
     #region NotInUse
