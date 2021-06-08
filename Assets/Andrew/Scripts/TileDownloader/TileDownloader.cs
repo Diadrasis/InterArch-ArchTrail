@@ -17,11 +17,11 @@ public class TileDownloader: MonoBehaviour
     private int minZoom = 3;
     private int maxZoom = 20;
 
-    private const int averageSize = 30000;
+    private const int averageSize = 17; // KB //30000;
     public int countTiles = 0;
     public int downloadedTiles = 0;
     public int deletedTiles = 0;
-    private long totalSize = 0;
+    public long totalSize = 0;
     private static OnlineMaps map;
     private OnlineMapsDrawingRect rect;
 
@@ -140,8 +140,9 @@ public class TileDownloader: MonoBehaviour
 
         totalSize = countTiles * averageSize;
 
-        Debug.Log("countTiles = " + countTiles);
-        Debug.Log("totalSize = " + totalSize);
+        //Debug.Log("countTiles = " + countTiles);
+        //Debug.Log("totalSize = " + totalSize);
+        countTiles = 0;
     }
 
     /*private double DoubleField(string label, double value)

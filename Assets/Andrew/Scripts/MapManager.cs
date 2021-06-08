@@ -194,11 +194,11 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        //TimeSpan timeDuration = (DateTime.Now.TimeOfDay - testTime);
-        //float duration = (float)timeDuration.TotalSeconds;
-        //Debug.Log("timeDuration in seconds = " + duration);
+        // TimeSpan timeDuration = (DateTime.Now.TimeOfDay - testTime);
+        // float duration = (float)timeDuration.TotalSeconds;
+        // Debug.Log("timeDuration in seconds = " + duration);
 
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        // PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
@@ -324,6 +324,11 @@ public class MapManager : MonoBehaviour
     //to save when edits have been made
     public void EditArea(cArea _areaToEdit, string _areaTitle)
     {
+        StartCoroutine(EditEnumerator(_areaToEdit, _areaTitle));
+
+        // DeleteTiles
+        /*AppManager.Instance.serverManager.tileDownloader.DeleteTiles(_areaToEdit);
+
         // Get center point
         OnlineMapsUtils.GetCenterPointAndZoom(markersCreateArea, out Vector2 center, out int zoom);
 
@@ -341,6 +346,45 @@ public class MapManager : MonoBehaviour
         areas = cArea.LoadAreas();
         editArea = false;
 		
+        // Edit area on server
+        if (_areaToEdit.server_area_id != -1)
+        {
+            Debug.Log(_areaToEdit.title + " has server id = " + _areaToEdit.server_area_id);
+            cArea.AddAreaIdToEdit(_areaToEdit.server_area_id);
+            AppManager.Instance.serverManager.postUserData = true;
+            AppManager.Instance.serverManager.timeRemaining = 0f;
+        }*/
+    }
+
+    IEnumerator EditEnumerator(cArea _areaToEdit, string _areaTitle)
+    {
+        TileDownloader tileDownloader = AppManager.Instance.serverManager.tileDownloader;
+
+        // DeleteTiles
+        AppManager.Instance.serverManager.tileDownloader.DeleteTiles(_areaToEdit);
+
+        while (tileDownloader.isDeleting)
+        {
+            yield return null;
+        }
+
+        // Get center point
+        OnlineMapsUtils.GetCenterPointAndZoom(markersCreateArea, out Vector2 center, out int zoom);
+
+        // Edit area values
+        _areaToEdit.title = _areaTitle;
+        _areaToEdit.position = center;
+        _areaToEdit.zoom = zoom;
+        _areaToEdit.areaConstraintsMin = markersCreateArea[0].position;
+        _areaToEdit.areaConstraintsMax = markersCreateArea[1].position;
+        _areaToEdit.viewConstraintsMin = new Vector2((float)OnlineMaps.instance.bounds.left, (float)OnlineMaps.instance.bounds.bottom);
+        _areaToEdit.viewConstraintsMax = new Vector2((float)OnlineMaps.instance.bounds.right, (float)OnlineMaps.instance.bounds.top);
+
+        // Edit area locally and reload areas
+        cArea.Edit(_areaToEdit);
+        areas = cArea.LoadAreas();
+        editArea = false;
+
         // Edit area on server
         if (_areaToEdit.server_area_id != -1)
         {

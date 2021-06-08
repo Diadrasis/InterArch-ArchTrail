@@ -92,7 +92,13 @@ public class UIManager : MonoBehaviour
     [Header("Warning Internet Screen")]
     public GameObject pnlWarningInternetScreen;
     public Button btnCloseInternetScreen;
-   
+
+    [Space]
+    [Header("Warning Tiles Screen")]
+    public GameObject pnlWarningDownloadTilesScreen;
+    public TextMeshProUGUI txtWarningDownloadTiles;
+    public Button btnDownloadTilesYes;
+    public Button btnDownloadTilesNo;
 
     [Space]
     [Header("Testing Purposes")]
@@ -118,6 +124,9 @@ public class UIManager : MonoBehaviour
     public GameObject pnlOptionC1;
     public GameObject pnlOptionC2;
     public Button btnProfiler;
+
+    [HideInInspector]
+    public bool downloadTiles = false;
     #endregion
 
     #region Unity Functions
@@ -176,12 +185,15 @@ public class UIManager : MonoBehaviour
         btnContinue.onClick.AddListener(() => ResumePath());
         btnSaveCancel.onClick.AddListener(() => CancelInGeneral());
 
-        //for testing the saving of paths is happening smoothly
+        // for testing the saving of paths is happening smoothly
         btnPaths.onClick.AddListener(() => DisplaySavedPathsScreen());
         btnCancelShow.onClick.AddListener(() => CancelInGeneral());
 
+        // warning DownloadTiles
+        btnDownloadTilesYes.onClick.AddListener(() => SetDownloadTiles(true));
+        btnDownloadTilesNo.onClick.AddListener(() => SetDownloadTiles(false));
+
         //btn for edit Area
-        
         btnEditAreaCancel.onClick.AddListener(() => CancelInGeneral());
         //btnEditAreaSave.onClick.AddListener(()=> )
 
@@ -193,6 +205,12 @@ public class UIManager : MonoBehaviour
 
 
     }
+    private void SetDownloadTiles(bool _value)
+    {
+        downloadTiles = _value;
+        pnlWarningDownloadTilesScreen.SetActive(false);
+    }
+
     void ActivateButtons(bool valBack, bool valQuit)
     {
         btnBackToAreasScreen.gameObject.SetActive(valBack);

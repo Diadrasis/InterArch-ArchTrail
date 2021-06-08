@@ -274,10 +274,9 @@ public class ServerManager : MonoBehaviour
         if (status)
         {
             // Has connection
-            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-            AppManager.Instance.uIManager.txtWarningServer.text = "Downloading...";
             AppManager.Instance.uIManager.imgLoading.color = Color.green;
-            Debug.Log("Downloading");
+
+            //Debug.Log("Downloading");
             // Download Areas
             if (downloadAreas)
             {
@@ -368,9 +367,9 @@ public class ServerManager : MonoBehaviour
 
     IEnumerator UploadUserDataToDiadrasis()
     {
-        // ============== Upload Areas ============== //
         Debug.Log("Started uploading user data!");
 
+        // ============== Upload Areas ============== //
         // Calculate seconds to upload
         System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
         stopWatch.Start();
@@ -388,15 +387,32 @@ public class ServerManager : MonoBehaviour
             {
                 // Download Tiles Locally
                 tileDownloader.SetValues(areaToUpload.areaConstraintsMin.x, areaToUpload.areaConstraintsMax.y, areaToUpload.areaConstraintsMax.x, areaToUpload.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
-                //tileDownloader.Calculate();
-                tileDownloader.Download();
-                while (tileDownloader.isDownloading)
+                tileDownloader.Calculate();
+
+                // Activate panel warning
+                AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
+                AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
+
+                // Wait for user input
+                while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
                 {
-                    // Update panel
-                    int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
-                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
-                    
                     yield return null;
+                }
+
+                if (AppManager.Instance.uIManager.downloadTiles)
+                {
+                    tileDownloader.Download();
+                    while (tileDownloader.isDownloading)
+                    {
+                        // Update panel
+                        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                        int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
+                        AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+
+                        yield return null;
+                    }
+
+                    AppManager.Instance.uIManager.downloadTiles = false;
                 }
 
                 // Update panel
@@ -624,6 +640,7 @@ public class ServerManager : MonoBehaviour
             }
         }
 
+        // Deactivate warning panel
         stopWatch.Stop();
         TimeSpan ts = stopWatch.Elapsed;
         yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
@@ -984,6 +1001,9 @@ public class ServerManager : MonoBehaviour
 
     IEnumerator GetAreas()
     {
+        // Calculate seconds to Download
+        System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+        stopWatch.Start();
 
         WWWForm formToPostGetAreas = new WWWForm();
         formToPostGetAreas.AddField("action", Enum.GetName(typeof(PHPActions), 0)); // Get_Areas
@@ -1014,8 +1034,12 @@ public class ServerManager : MonoBehaviour
                 // Create a cAreasData from json string
                 cAreaData[] areasDataFromJSON = MethodHelper.FromJson<cAreaData>(MethodHelper.SetupJson(json));
 
-                if (areasDataFromJSON != null)
+                if (areasDataFromJSON != null && areasDataFromJSON.Length > 0)
                 {
+                    // Activate panel
+                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading areas...";
+
                     foreach (cAreaData areaData in areasDataFromJSON)
                     {
                         // Create an area from areaData
@@ -1043,14 +1067,18 @@ public class ServerManager : MonoBehaviour
 
                         // Save to Player Prefs
                         cArea.SaveFromServer(areaToSave);
-                        
                     }
                 }
             }
         }
 
+        // Reload areas
         AppManager.Instance.mapManager.ReloadAreas();
-        yield return new WaitForSeconds(0.5f);
+
+        // Deactivate warning panel
+        stopWatch.Stop();
+        TimeSpan ts = stopWatch.Elapsed;
+        yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 
@@ -1064,6 +1092,62 @@ public class ServerManager : MonoBehaviour
 
     IEnumerator GetPaths(int _server_area_id)
     {
+        // Calculate seconds to Download
+        System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+        stopWatch.Start();
+
+        // Get area
+        cArea selectedArea = AppManager.Instance.mapManager.currentArea;
+
+        if (selectedArea != null)
+        {
+            // Download Area Tiles Locally
+            /*tileDownloader.SetValues(selectedArea.areaConstraintsMin.x, selectedArea.areaConstraintsMax.y, selectedArea.areaConstraintsMax.x, selectedArea.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
+            //tileDownloader.Calculate();
+            tileDownloader.Download();
+
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
+            while (tileDownloader.isDownloading)
+            {
+                // Update panel
+                int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
+                AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+
+                yield return null;
+            }*/
+
+            // Download Tiles Locally
+            tileDownloader.SetValues(selectedArea.areaConstraintsMin.x, selectedArea.areaConstraintsMax.y, selectedArea.areaConstraintsMax.x, selectedArea.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
+            tileDownloader.Calculate();
+
+            // Activate panel warning
+            AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
+            AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
+
+            // Wait for user input
+            while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
+            {
+                yield return null;
+            }
+
+            if (AppManager.Instance.uIManager.downloadTiles)
+            {
+                tileDownloader.Download();
+                while (tileDownloader.isDownloading)
+                {
+                    // Update panel
+                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                    int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+
+                    yield return null;
+                }
+
+                AppManager.Instance.uIManager.downloadTiles = false;
+            }
+        }
+
         WWWForm formToPostGetPaths = new WWWForm();
         formToPostGetPaths.AddField("action", Enum.GetName(typeof(PHPActions), 3)); // Get_Paths
         formToPostGetPaths.AddField("server_area_id", _server_area_id);
@@ -1093,8 +1177,12 @@ public class ServerManager : MonoBehaviour
                 // Create a cAreasData from json string
                 cPathData[] pathsDataFromJSON = MethodHelper.FromJson<cPathData>(MethodHelper.SetupJson(json));
 
-                if (pathsDataFromJSON != null)
+                if (pathsDataFromJSON != null && pathsDataFromJSON.Length > 0)
                 {
+                    // Update panel
+                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading paths...";
+
                     foreach (cPathData pathData in pathsDataFromJSON)
                     {
                         // Fix date
@@ -1122,8 +1210,13 @@ public class ServerManager : MonoBehaviour
             }
         }
 
+        // Reload Paths
         AppManager.Instance.mapManager.ReloadPaths();
-        yield return new WaitForSeconds(0.5f);
+
+        // Deactivate warning panel
+        stopWatch.Stop();
+        TimeSpan ts = stopWatch.Elapsed;
+        yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 
@@ -1143,6 +1236,10 @@ public class ServerManager : MonoBehaviour
 
     IEnumerator GetPoints(int _server_path_id)
     {
+        // Calculate seconds to Download
+        System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+        stopWatch.Start();
+
         WWWForm formToPostGetPoints = new WWWForm();
         formToPostGetPoints.AddField("action", Enum.GetName(typeof(PHPActions), 6)); // Get_Points
         formToPostGetPoints.AddField("server_path_id", _server_path_id);
@@ -1172,8 +1269,12 @@ public class ServerManager : MonoBehaviour
                 // Create a cAreasData from json string
                 cPointData[] pointsDataFromJSON = MethodHelper.FromJson<cPointData>(MethodHelper.SetupJson(json));
 
-                if (pointsDataFromJSON != null)
+                if (pointsDataFromJSON != null && pointsDataFromJSON.Length > 0)
                 {
+                    // Activate panel
+                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading points...";
+
                     foreach (cPointData pointData in pointsDataFromJSON)
                     {
                         // Create a path from pathData
@@ -1198,8 +1299,13 @@ public class ServerManager : MonoBehaviour
             }
         }
 
+        // Reload points
         AppManager.Instance.mapManager.ReloadPoints();
-        yield return new WaitForSeconds(0.5f);
+
+        // Deactivate warning panel
+        stopWatch.Stop();
+        TimeSpan ts = stopWatch.Elapsed;
+        yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 
