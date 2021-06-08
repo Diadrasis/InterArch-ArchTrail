@@ -393,7 +393,7 @@ public class ServerManager : MonoBehaviour
 
                     // Activate panel warning
                     AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
-                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download " + areaToUpload.title + "'s tiles?\nSize: " + tileDownloader.totalSize + " KB";
 
                     // Wait for user input
                     while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
@@ -1042,7 +1042,7 @@ public class ServerManager : MonoBehaviour
                 {
                     // Activate panel
                     AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading areas...";
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Updating areas...";
 
                     foreach (cAreaData areaData in areasDataFromJSON)
                     {
@@ -1188,7 +1188,7 @@ public class ServerManager : MonoBehaviour
                 {
                     // Update panel
                     AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading paths...";
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Updating paths...";
 
                     foreach (cPathData pathData in pathsDataFromJSON)
                     {
@@ -1280,7 +1280,7 @@ public class ServerManager : MonoBehaviour
                 {
                     // Activate panel
                     AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading points...";
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Updating points...";
 
                     foreach (cPointData pointData in pointsDataFromJSON)
                     {

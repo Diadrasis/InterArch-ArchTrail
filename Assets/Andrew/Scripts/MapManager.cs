@@ -222,17 +222,19 @@ public class MapManager : MonoBehaviour
 
     public void SetMapViewToArea(cArea _areaToView)
     {
-        //if (_areaToView.constraints != null)
+        // Set position range
         OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(_areaToView.viewConstraintsMin.y, _areaToView.viewConstraintsMin.x, _areaToView.viewConstraintsMax.y, _areaToView.viewConstraintsMax.x);
+
+        // Set zoom range
+        OnlineMaps.instance.zoomRange = new OnlineMapsRange(_areaToView.zoom, OnlineMaps.MAXZOOM);
+
+        // Set user's position and zoom depending on internet connection
         int zoom = OnlineMaps.MAXZOOM;
         if (AppManager.Instance.serverManager.hasInternet)
-        {
             zoom = _areaToView.zoom;
-            OnlineMaps.instance.zoomRange = new OnlineMapsRange(zoom, OnlineMaps.MAXZOOM);
-        }
-        else
-            OnlineMaps.instance.zoomRange = new OnlineMapsRange(OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
         OnlineMaps.instance.SetPositionAndZoom(_areaToView.position.x, _areaToView.position.y, zoom);
+
+        // Display area
         DisplayArea(_areaToView);
     }
 
@@ -307,7 +309,7 @@ public class MapManager : MonoBehaviour
             AppManager.Instance.serverManager.timeRemaining = 0f;
 
             // Clear Cache
-            //OnlineMapsCache.instance.ClearAllCaches();
+            OnlineMapsCache.instance.ClearAllCaches();
 
             //OnlineMaps.instance.resourcesPath = ""; // ????
 
