@@ -385,34 +385,38 @@ public class ServerManager : MonoBehaviour
 
             foreach (cArea areaToUpload in areasToUpload)
             {
-                // Download Tiles Locally
+                // If the area's tiles are not downloaded ask user and download tiles Locally
                 tileDownloader.SetValues(areaToUpload.areaConstraintsMin.x, areaToUpload.areaConstraintsMax.y, areaToUpload.areaConstraintsMax.x, areaToUpload.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
-                tileDownloader.Calculate();
-
-                // Activate panel warning
-                AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
-                AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
-
-                // Wait for user input
-                while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
+                if (!tileDownloader.HasTiles())
                 {
-                    yield return null;
-                }
+                    tileDownloader.Calculate();
 
-                if (AppManager.Instance.uIManager.downloadTiles)
-                {
-                    tileDownloader.Download();
-                    while (tileDownloader.isDownloading)
+                    // Activate panel warning
+                    AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
+
+                    // Wait for user input
+                    while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
                     {
-                        // Update panel
-                        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                        int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
-                        AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
-
                         yield return null;
                     }
 
-                    AppManager.Instance.uIManager.downloadTiles = false;
+                    // Check user input (yes or no)
+                    if (AppManager.Instance.uIManager.downloadTiles)
+                    {
+                        tileDownloader.Download();
+                        while (tileDownloader.isDownloading)
+                        {
+                            // Update panel
+                            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                            int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+
+                            yield return null;
+                        }
+
+                        AppManager.Instance.uIManager.downloadTiles = false;
+                    }
                 }
 
                 // Update panel
@@ -1119,32 +1123,35 @@ public class ServerManager : MonoBehaviour
 
             // Download Tiles Locally
             tileDownloader.SetValues(selectedArea.areaConstraintsMin.x, selectedArea.areaConstraintsMax.y, selectedArea.areaConstraintsMax.x, selectedArea.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
-            tileDownloader.Calculate();
-
-            // Activate panel warning
-            AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
-            AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
-
-            // Wait for user input
-            while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
+            if (!tileDownloader.HasTiles())
             {
-                yield return null;
-            }
+                tileDownloader.Calculate();
 
-            if (AppManager.Instance.uIManager.downloadTiles)
-            {
-                tileDownloader.Download();
-                while (tileDownloader.isDownloading)
+                // Activate panel warning
+                AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
+                AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
+
+                // Wait for user input
+                while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
                 {
-                    // Update panel
-                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
-                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
-
                     yield return null;
                 }
 
-                AppManager.Instance.uIManager.downloadTiles = false;
+                if (AppManager.Instance.uIManager.downloadTiles)
+                {
+                    tileDownloader.Download();
+                    while (tileDownloader.isDownloading)
+                    {
+                        // Update panel
+                        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                        int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
+                        AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+
+                        yield return null;
+                    }
+
+                    AppManager.Instance.uIManager.downloadTiles = false;
+                }
             }
         }
 
