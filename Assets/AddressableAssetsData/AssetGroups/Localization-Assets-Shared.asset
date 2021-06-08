@@ -24,6 +24,13 @@ MonoBehaviour:
     m_mainAssetType: 
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
+  - m_GUID: c70bdd9c6854a494a86c447b32093907
+    m_Address: Warnings Shared Data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 619a2ec54f5ed454389ea03cfbaa9cba, type: 2}
   m_SchemaSet:
