@@ -145,6 +145,54 @@ public class TileDownloader: MonoBehaviour
         countTiles = 0;
     }
 
+    // Checks the tiles of the area to see if at least one is missing and then returns true or false
+    public bool HasTiles()
+    {
+        List<Tile> areaTiles = new List<Tile>();
+
+        for (int z = minZoom; z <= maxZoom; z++)
+        {
+            double tlx, tly, brx, bry;
+            map.projection.CoordinatesToTile(leftLongitude, topLatitude, z, out tlx, out tly);
+            map.projection.CoordinatesToTile(rightLongitude, bottomLatitude, z, out brx, out bry);
+
+            int itlx = (int)tlx;
+            int itly = (int)tly;
+            int ibrx = (int)Math.Ceiling(brx);
+            int ibry = (int)Math.Ceiling(bry);
+
+            for (int x = itlx; x < ibrx; x++)
+            {
+                for (int y = itly; y < ibry; y++)
+                {
+                    areaTiles.Add(new Tile
+                    {
+                        x = x,
+                        y = y,
+                        zoom = z
+                    });
+                }
+            }
+        }
+
+        if (areaTiles.Count > 0)
+        {
+            while (areaTiles.Count > 0)
+            {
+                Tile tile = areaTiles[0];
+                string tilePath = GetTilePath(tile);
+                if (File.Exists(tilePath))
+                {
+                    areaTiles.RemoveAt(0);
+                }
+                else
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
     /*private double DoubleField(string label, double value)
     {
         GUILayout.BeginHorizontal();
@@ -393,7 +441,7 @@ public class TileDownloader: MonoBehaviour
             if (File.Exists(tilePath)) continue;
 
             string url = tile.url;
-            //Debug.Log(url + "    " + tilePath);
+            Debug.Log(url + "    " + tilePath);
             OnlineMapsWWW www = new OnlineMapsWWW(url);
             www["path"] = tilePath;
             www.OnComplete += OnTileDownloaded;
