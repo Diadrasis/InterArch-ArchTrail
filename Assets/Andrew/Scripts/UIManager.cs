@@ -447,7 +447,9 @@ public class UIManager : MonoBehaviour
         }
         //pnlAreasScreen.SetActive(false);
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
-            pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath)
+            pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && pnlCreateArea.activeSelf && 
+            !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
+          !pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             pnlSaveArea.SetActive(false);
             pnlCreateArea.SetActive(false);
@@ -457,17 +459,23 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
-            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && (AppManager.Instance.mapManager.isRecordingPath || AppManager.Instance.mapManager.isPausePath))
+            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && 
+            (AppManager.Instance.mapManager.isRecordingPath || AppManager.Instance.mapManager.isPausePath) &&
+          !pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             SaveUIButton();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
-            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath)
+            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && 
+            !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
+          !pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             DisplaySavedPathsScreen();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
-            !pnlSaveArea.activeSelf && pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath)
+            !pnlSaveArea.activeSelf && pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
+            !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
+          !pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             //to open edit panel
             pnlEditArea.SetActive(false);
@@ -518,14 +526,14 @@ public class UIManager : MonoBehaviour
         else
         {
             DisplayAreasScreen();
-            ResetQuestionnaire();
+            //ResetQuestionnaire();
             AppManager.Instance.serverManager.DownloadAreas();
         }
 
         //mapScreen.SetActive(false);
     }
 
-    void IsInRecordingPath(bool val)
+    public void IsInRecordingPath(bool val)
     {
         imgRecord.SetBool("isPlaying", val);
     }
@@ -629,6 +637,8 @@ public class UIManager : MonoBehaviour
         pnlMainButtons.SetActive(true);
         IsInRecordingPath(false);
         AppManager.Instance.mapManager.StopRecordingPath();
+        //pnlProfilerScreen.SetActive(true);
+        ResetQuestionnaire();
     }
 
     //opens the saved paths screen (on click event)
