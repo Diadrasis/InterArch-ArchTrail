@@ -198,7 +198,7 @@ public class MapManager : MonoBehaviour
         // float duration = (float)timeDuration.TotalSeconds;
         // Debug.Log("timeDuration in seconds = " + duration);
 
-        // PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
@@ -561,13 +561,23 @@ public class MapManager : MonoBehaviour
     {
         if(currentArea != null)
         {
-            if (!IsWithinConstraints() && !isShown)
+            if (!IsWithinConstraints() /*&& !isShown*/)
             {
-                AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-                AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
+                if (!isShown)
+                {
+                    AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+                    AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
+                }
+                if(isRecordingPath || isPausePath)
+                {
+                    AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
+                    
+                    AppManager.Instance.uIManager.btnContinue.interactable = false;
+                    AppManager.Instance.uIManager.IsInRecordingPath(false);
+                }
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
-                AppManager.Instance.uIManager.btnContinue.interactable = false;
                 isShown = true;
+                Debug.Log("Out of area true");
             }
             else
             {   
@@ -575,6 +585,7 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
                 AppManager.Instance.uIManager.btnContinue.interactable = true;
                 isShown = false;
+                Debug.Log("Out of area false");
             }
         }
     }
@@ -655,9 +666,11 @@ public class MapManager : MonoBehaviour
         }
         else if ((isRecordingPath || isPausePath) && !IsWithinConstraints() && !isShown)
         {
-            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            /*AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
+            Debug.Log("Out of area and recording");*/
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
+            AppManager.Instance.uIManager.btnContinue.interactable = false;
             isShown = true;
             
         }
@@ -711,8 +724,7 @@ public class MapManager : MonoBehaviour
         // Set user marker on top
         CreateUserMarker();
 
-        //to restore the location services on path in case the marker hasn't changed
-        OnlineMapsLocationService.instance.restoreAfter = 50;
+       
     }
 
     public void PauseRecordingPath()
