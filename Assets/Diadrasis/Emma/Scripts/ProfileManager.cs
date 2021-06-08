@@ -3,26 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 public class ProfileManager : MonoBehaviour
 {
     public delegate void Profile();
     public static Profile OnContinue, OnInternetError;
 
-    public Button btnSubmit/*, BtnOk*/;
+    public Button btnSubmit, btnSkip/*, BtnOk*/;
     public GameObject[] demographicOptions;
     public Transform dropdownContainer;
     public Transform inputContainer;
-    public Transform dropdownContainerOptionA;
-    public Transform toggleContainerOptionA;
+    public Transform dropdownContainerOptionA, dropdownContainerOptionB1, dropdownContainerOptionB2, dropdownContainerOptionC1, dropdownContainerOptionC2;
+    public Transform toggleContainerOptionA, toggleContainerOptionB, toggleContainerOptionB1, toggleContainerOptionB2, toggleContainerOptionC, toggleContainerOptionC1, toggleContainerOptionC2;
+
     //public GameObject newIdPanel;
     //public Text newIdText, btnNextText, btnOkText;
 
-    public TMP_Dropdown[] dropdowns;
-    public TMP_InputField[] inputFields;
-    public Toggle[] toggle;
+    public TMP_Dropdown[] dropdownsGeneral, dropdownsOptionA, dropdownsOptionB1, dropdownsOptionB2, dropdownsOptionC1, dropdownsOptionC2;
+    public TMP_InputField[] inputFieldsGeneral;
+    public Toggle[] toggleOptionA, toggleOptionB1, toggleOptionB2,toggleOptionC1,toggleOptionC2;
     public TMP_Dropdown optionDropdown;
-    int step = 0;
+
+    public Toggle groupB1, groupB2, groupC1, groupC2;
+    [HideInInspector] public int step=0;
 
     public static string jsonFile;
 
@@ -35,16 +39,29 @@ public class ProfileManager : MonoBehaviour
         //BtnOk.onClick.AddListener(() => ContinueToSettings());
         //intro = FindObjectOfType<Intro>();
         btnSubmit.onClick.AddListener(() => Submit());
-        dropdowns = dropdownContainer.GetComponentsInChildren<TMP_Dropdown>(true);
-        inputFields = inputContainer.GetComponentsInChildren<TMP_InputField>(true);
-        dropdowns = dropdownContainerOptionA.GetComponentsInChildren<TMP_Dropdown>(true);
-        toggle = toggleContainerOptionA.GetComponentsInChildren<Toggle>(true);
+        btnSkip.onClick.AddListener(() => Skip());
+        dropdownsGeneral = dropdownContainer.GetComponentsInChildren<TMP_Dropdown>(true);
+        inputFieldsGeneral = inputContainer.GetComponentsInChildren<TMP_InputField>(true);
+        dropdownsOptionA = dropdownContainerOptionA.GetComponentsInChildren<TMP_Dropdown>(true);
+        toggleOptionA = toggleContainerOptionA.GetComponentsInChildren<Toggle>(true);
+        dropdownsOptionB1 = dropdownContainerOptionB1.GetComponentsInChildren<TMP_Dropdown>(true);
+        dropdownsOptionB2 = dropdownContainerOptionB2.GetComponentsInChildren<TMP_Dropdown>(true);
+        dropdownsOptionC1 = dropdownContainerOptionC1.GetComponentsInChildren<TMP_Dropdown>(true);
+        dropdownsOptionC2 = dropdownContainerOptionC2.GetComponentsInChildren<TMP_Dropdown>(true);
+        toggleOptionB1 = toggleContainerOptionB1.GetComponentsInChildren<Toggle>(true);
+        toggleOptionB2 = toggleContainerOptionB2.GetComponentsInChildren<Toggle>(true);
+        toggleOptionC1 = toggleContainerOptionC1.GetComponentsInChildren<Toggle>(true);
+        toggleOptionC2 = toggleContainerOptionC2.GetComponentsInChildren<Toggle>(true);
+        groupB1 = toggleContainerOptionB.GetComponentInChildren<Toggle>(true);
+        groupB2 = toggleContainerOptionB.GetComponentInChildren<Toggle>(true);
+        groupC1 = toggleContainerOptionC.GetComponentInChildren<Toggle>(true);
+        groupC2 = toggleContainerOptionC.GetComponentInChildren<Toggle>(true);
     }
 
     void Start()
     {
         step = 0;
-        
+
     }
 
     private void OnEnable()
@@ -121,31 +138,63 @@ public class ProfileManager : MonoBehaviour
         {
             //StopCoroutine("DelayShow");
             StartCoroutine(DelayShow());
-            
+
             //if (step == demographicOptions.Length - 1) { btnNextText.text = "Αποστολή"; }
-            
+
             if (step == 4)
             {
-                if(optionDropdown.GetComponent<TMP_Dropdown>() != null)
+                if (optionDropdown.GetComponent<TMP_Dropdown>() != null)
                 {
                     CheckValue(optionDropdown);
+                    demographicOptions[step].SetActive(true);
                     Debug.Log("Here");
                 }
-                
+                //step = 5;
             }
             else
             {
+
                 step++;
                 demographicOptions[step].SetActive(true);
             }
-            
+            Debug.Log("Step: " + step);
         }
-        
+
         //SaveProfile();
         /*else
         {
             SaveProfile();
         }*/
+    }
+
+    //because we don't want to save in case user skips a step. Does the same as Submit() but in submit we will save the answers...
+    void Skip()
+    {
+        demographicOptions[step].SetActive(false);
+
+        if (step < demographicOptions.Length - 1)
+        {
+            //StopCoroutine("DelayShow");
+            StartCoroutine(DelayShow());
+        }
+        if (step == 4)
+        {
+            if (optionDropdown.GetComponent<TMP_Dropdown>() != null)
+            {
+                CheckValue(optionDropdown);
+                demographicOptions[step].SetActive(true);
+                Debug.Log("Here");
+            }
+            //step = 5;
+        }
+        else
+        {
+
+            step++;
+            demographicOptions[step].SetActive(true);
+        }
+        Debug.Log("Step: " + step);
+
     }
     //for the dropdown which will make the different selections and open/close panels
     public void CheckValue(TMP_Dropdown val)
@@ -159,32 +208,69 @@ public class ProfileManager : MonoBehaviour
         }
         else if (val.value == 1)
         {
-            step = 0;
+            //step = 0;
             AppManager.Instance.uIManager.pnlOptionA.SetActive(true);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
+            step = 5;
             Debug.Log("2nd Option");
         }
         else if (val.value == 2)
         {
             AppManager.Instance.uIManager.pnlOptionB.SetActive(true);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
-            Debug.Log("3rd Option");
+            //step = 6;
+            CheckToggle();
+            Debug.Log("3rd Option" + step);
         }
         else if (val.value == 3)
         {
-            AppManager.Instance.uIManager.pnlOptionC1.SetActive(true);
+            AppManager.Instance.uIManager.pnlOptionC.SetActive(true);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
+            //step = 7;
+            CheckToggle();
             Debug.Log("4th Option");
-        }
-        else if (val.value == 4)
-        {
-            AppManager.Instance.uIManager.pnlOptionC2.SetActive(true);
-            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
-            Debug.Log("5th Option");
         }
 
     }
-    
+
+
+    //for testing I'll remove Toggle from parenthesis and leave it as is
+    void CheckToggle()
+    {
+        if (/*id.isOn == */groupB1.isOn)
+        {
+            AppManager.Instance.uIManager.pnlOptionB1.SetActive(true);
+            AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
+            toggleContainerOptionB.gameObject.SetActive(false);
+            step = 7;
+            Debug.Log("groupB1 will be on");
+        }
+        else if (/*id.isOn ==*/ groupB2.isOn)
+        {
+            AppManager.Instance.uIManager.pnlOptionB2.SetActive(true);
+            AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
+            toggleContainerOptionB.gameObject.SetActive(false);
+            step = 7;
+            Debug.Log("groupB2 will be on");
+        }
+        else if (/*id.isOn ==*/ groupC1.isOn)
+        {
+            AppManager.Instance.uIManager.pnlOptionC1.SetActive(true);
+            AppManager.Instance.uIManager.pnlOptionC2.SetActive(false);
+            toggleContainerOptionC.gameObject.SetActive(false);
+            step = 7;
+            Debug.Log("groupC1 will be on");
+        }
+        else if (/*id.isOn == */groupC2.isOn)
+        {
+            AppManager.Instance.uIManager.pnlOptionC2.SetActive(true);
+            AppManager.Instance.uIManager.pnlOptionC1.SetActive(false);
+            toggleContainerOptionC.gameObject.SetActive(false);
+            step = 7;
+            Debug.Log("groupC2 will be on");
+        }
+    }
+
     IEnumerator DelayShow()
     {
         btnSubmit.gameObject.SetActive(false);
@@ -202,7 +288,7 @@ public class ProfileManager : MonoBehaviour
     {
         ProfileItem profileItem = new ProfileItem();
 
-        foreach (TMP_Dropdown dd in dropdowns)
+        foreach (TMP_Dropdown dd in dropdownsGeneral)
         {
             if (dd.transform.parent == demographicOptions[0].transform)//sex
             {
@@ -215,7 +301,7 @@ public class ProfileManager : MonoBehaviour
             else if (dd.transform.parent == demographicOptions[2].transform)//education
             {
                 profileItem.VisitReason = dd.options[dd.value].text;
-                
+
             }
             /*else if (dd.transform.parent == demographicOptions[3].transform)//tech familiarity
             {
@@ -235,7 +321,7 @@ public class ProfileManager : MonoBehaviour
             //Debug.Log("Here on Save");
         }
 
-        foreach(TMP_InputField fields in inputFields)
+        foreach (TMP_InputField fields in inputFieldsGeneral)
         {
             if (fields.transform.parent == demographicOptions[0].transform)//education
             {
