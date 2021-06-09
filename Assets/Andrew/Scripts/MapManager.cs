@@ -362,12 +362,15 @@ public class MapManager : MonoBehaviour
     {
         TileDownloader tileDownloader = AppManager.Instance.serverManager.tileDownloader;
 
-        // DeleteTiles
-        AppManager.Instance.serverManager.tileDownloader.DeleteTiles(_areaToEdit);
-
-        while (tileDownloader.isDeleting)
+        if (AppManager.Instance.serverManager.hasInternet)
         {
-            yield return null;
+            // DeleteTiles
+            AppManager.Instance.serverManager.tileDownloader.DeleteTiles(_areaToEdit);
+
+            while (tileDownloader.isDeleting)
+            {
+                yield return null;
+            }
         }
 
         // Get center point
@@ -561,7 +564,7 @@ public class MapManager : MonoBehaviour
 
     public void CheckUserPosition()
     {
-        if(currentArea != null)
+        if (currentArea != null)
         {
             if (!IsWithinConstraints() /*&& !isShown*/)
             {
@@ -606,13 +609,16 @@ public class MapManager : MonoBehaviour
     #region Path
     public void OnLocationChanged(Vector2 position)
     {
+        // Set user marker to user's location
         SetMarkerOnUserPosition(position);
+
+        // Check constraints
         CheckUserPosition();
 
         if (isRecordingPath && !isPausePath && IsWithinConstraints())
         {
+            // Set map view to to user's location with max zoom
             OnlineMaps.instance.SetPositionAndZoom(position.x, position.y, OnlineMaps.MAXZOOM);
-            // OnlineMapsLocationService.instance.UpdatePosition();
 
             float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
             
@@ -907,10 +913,8 @@ public class MapManager : MonoBehaviour
 
     private void SetMarkerOnUserPosition(Vector2 position)
     {
-        //CheckMyLocation();
         userMarker.position = position;
         OnlineMaps.instance.Redraw();
-        SetMapViewToLocation();
     }
 
     private void CheckMarkerPositions()
