@@ -9,7 +9,7 @@ public class AppManager : Singleton<AppManager>
     public UIManager uIManager;
     public AndroidManager androidManager;
     public ServerManager serverManager;
-    public ProfileManager profileManager;
+    public QuestionnaireManager questionnaireManager;
     #endregion
 
     #region Unity Functions

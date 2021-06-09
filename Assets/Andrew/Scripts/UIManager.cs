@@ -526,6 +526,7 @@ public class UIManager : MonoBehaviour
         else
         {
             DisplayAreasScreen();
+            EnableScreen(pnlProfilerScreen, false);
             //ResetQuestionnaire();
             AppManager.Instance.serverManager.DownloadAreas();
         }
@@ -803,12 +804,15 @@ public class UIManager : MonoBehaviour
         pnlOptionB.SetActive(false);
         pnlOptionC.SetActive(false);
         ActivateButtons(true, true, true, true);
-        AppManager.Instance.profileManager.step = 0;
-        foreach (GameObject gb in AppManager.Instance.profileManager.demographicOptions) gb.SetActive(false);
-        AppManager.Instance.profileManager.demographicOptions[0].SetActive(true);
-        foreach (TMP_Dropdown td in AppManager.Instance.profileManager.dropdownsGeneral) td.value = 0;
-        foreach (TMP_InputField ti in AppManager.Instance.profileManager.inputFieldsGeneral) ti.text = "";
-        AppManager.Instance.profileManager.optionDropdown.value = 0;
+        AppManager.Instance.questionnaireManager.step = 0;
+        foreach (GameObject gb in AppManager.Instance.questionnaireManager.demographicOptions) gb.SetActive(false);
+        AppManager.Instance.questionnaireManager.demographicOptions[0].SetActive(true);
+        foreach (TMP_Dropdown td in AppManager.Instance.questionnaireManager.dropdownsGeneral) td.value = 0;
+        foreach (TMP_InputField ti in AppManager.Instance.questionnaireManager.inputFieldsGeneral) ti.text = "";
+        foreach (TMP_InputField tiA in AppManager.Instance.questionnaireManager.inputFieldOptionA) tiA.text = "";
+        foreach (Toggle toA in AppManager.Instance.questionnaireManager.toggleOptionA) toA.isOn = false;
+        AppManager.Instance.questionnaireManager.optionDropdown.value = 0;
+
     }
     #endregion
 

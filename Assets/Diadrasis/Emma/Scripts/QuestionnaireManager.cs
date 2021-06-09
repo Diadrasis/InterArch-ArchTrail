@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq;
 
-public class ProfileManager : MonoBehaviour
+public class QuestionnaireManager : MonoBehaviour
 {
     public delegate void Profile();
     public static Profile OnContinue, OnInternetError;
@@ -13,7 +13,7 @@ public class ProfileManager : MonoBehaviour
     public Button btnSubmit, btnSkip/*, BtnOk*/;
     public GameObject[] demographicOptions;
     public Transform dropdownContainer;
-    public Transform inputContainer;
+    public Transform inputContainer, inputContainerOptionA;
     public Transform dropdownContainerOptionA, dropdownContainerOptionB1, dropdownContainerOptionB2, dropdownContainerOptionC1, dropdownContainerOptionC2;
     public Transform toggleContainerOptionA, toggleContainerOptionB, toggleContainerOptionB1, toggleContainerOptionB2, toggleContainerOptionC, toggleContainerOptionC1, toggleContainerOptionC2;
 
@@ -21,8 +21,8 @@ public class ProfileManager : MonoBehaviour
     //public Text newIdText, btnNextText, btnOkText;
 
     public TMP_Dropdown[] dropdownsGeneral, dropdownsOptionA, dropdownsOptionB1, dropdownsOptionB2, dropdownsOptionC1, dropdownsOptionC2;
-    public TMP_InputField[] inputFieldsGeneral;
-    public Toggle[] toggleOptionA, toggleOptionB1, toggleOptionB2,toggleOptionC1,toggleOptionC2;
+    public TMP_InputField[] inputFieldsGeneral, inputFieldOptionA;
+    public Toggle[] toggleOptionA, toggleOptionB1, toggleOptionB2,toggleOptionC1,toggleOptionC2, questionToggle;
     public TMP_Dropdown optionDropdown;
 
     public Toggle groupB1, groupB2, groupC1, groupC2;
@@ -52,6 +52,8 @@ public class ProfileManager : MonoBehaviour
         toggleOptionB2 = toggleContainerOptionB2.GetComponentsInChildren<Toggle>(true);
         toggleOptionC1 = toggleContainerOptionC1.GetComponentsInChildren<Toggle>(true);
         toggleOptionC2 = toggleContainerOptionC2.GetComponentsInChildren<Toggle>(true);
+        inputFieldOptionA = inputContainerOptionA.GetComponentsInChildren<TMP_InputField>(true);
+
         groupB1 = toggleContainerOptionB.GetComponentInChildren<Toggle>(true);
         groupB2 = toggleContainerOptionB.GetComponentInChildren<Toggle>(true);
         groupC1 = toggleContainerOptionC.GetComponentInChildren<Toggle>(true);
@@ -151,6 +153,11 @@ public class ProfileManager : MonoBehaviour
                 }
                 //step = 5;
             }
+            else if (step == 9 || step == 14)
+            {
+                Debug.Log("Step for toggleCheck" + step);
+                CheckIfUserHasSelectedOtherOption();
+            }
             else
             {
 
@@ -234,10 +241,10 @@ public class ProfileManager : MonoBehaviour
     }
 
 
-    //for testing I'll remove Toggle from parenthesis and leave it as is
+    //when selecting the panels with the options, to see which option is selected and then activate the coresponding panel
     void CheckToggle()
     {
-        if (/*id.isOn == */groupB1.isOn)
+        if (groupB1.isOn)
         {
             AppManager.Instance.uIManager.pnlOptionB1.SetActive(true);
             AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
@@ -245,7 +252,7 @@ public class ProfileManager : MonoBehaviour
             step = 7;
             Debug.Log("groupB1 will be on");
         }
-        else if (/*id.isOn ==*/ groupB2.isOn)
+        else if (groupB2.isOn)
         {
             AppManager.Instance.uIManager.pnlOptionB2.SetActive(true);
             AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
@@ -253,7 +260,7 @@ public class ProfileManager : MonoBehaviour
             step = 7;
             Debug.Log("groupB2 will be on");
         }
-        else if (/*id.isOn ==*/ groupC1.isOn)
+        else if (groupC1.isOn)
         {
             AppManager.Instance.uIManager.pnlOptionC1.SetActive(true);
             AppManager.Instance.uIManager.pnlOptionC2.SetActive(false);
@@ -261,7 +268,7 @@ public class ProfileManager : MonoBehaviour
             step = 7;
             Debug.Log("groupC1 will be on");
         }
-        else if (/*id.isOn == */groupC2.isOn)
+        else if (groupC2.isOn)
         {
             AppManager.Instance.uIManager.pnlOptionC2.SetActive(true);
             AppManager.Instance.uIManager.pnlOptionC1.SetActive(false);
@@ -269,6 +276,59 @@ public class ProfileManager : MonoBehaviour
             step = 7;
             Debug.Log("groupC2 will be on");
         }
+    }
+
+    void CheckIfUserHasSelectedOtherOption()
+    {
+
+        foreach(Toggle to in questionToggle)
+        {
+            if(step == 9 && to.isOn)
+            {
+                step = 10;
+                demographicOptions[step].SetActive(true);
+            } 
+            else if(step == 9 && !to.isOn)
+            {
+                step = 11;
+                demographicOptions[step].SetActive(true);
+            }
+            if (step == 14 && to.isOn)
+            {
+                step = 15;
+                demographicOptions[step].SetActive(true);
+            }
+            else if (step == 14 && !to.isOn)
+            {
+                //put here the save method
+                
+            }
+        }
+        /*if (step == 9)
+        {
+            if (questionToggle[step].isOn)
+            {
+                step = 10;
+                demographicOptions[step].SetActive(true);
+            }
+            else
+            {
+                step = 11;
+                demographicOptions[step].SetActive(true);
+            }
+        }
+        if (step == 14)
+        {
+            if (questionToggle[step].isOn && demographicOptions[step])
+            {
+                step = 15;
+                demographicOptions[step].SetActive(true);
+
+            }
+            else
+            {
+                AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            }*/
     }
 
     IEnumerator DelayShow()
