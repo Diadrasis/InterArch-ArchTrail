@@ -534,8 +534,8 @@ public class QuestionnaireManager : MonoBehaviour
         cQuestionnaire.Save(questionnaireToSave);
 
         // Upload to server
-        AppManager.Instance.serverManager.postUserData = true;
-        AppManager.Instance.serverManager.timeRemaining = 0f;
+        //AppManager.Instance.serverManager.postUserData = true;
+        //AppManager.Instance.serverManager.timeRemaining = 0f;
     }
 
     /*IEnumerator PostVisitorData(ProfileItem profileItem)
