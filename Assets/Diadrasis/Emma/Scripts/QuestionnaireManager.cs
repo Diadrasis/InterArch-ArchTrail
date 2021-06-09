@@ -30,6 +30,8 @@ public class QuestionnaireManager : MonoBehaviour
 
     public static string jsonFile;
 
+    public cPath currentPath;
+
     //public GameObject panelSettings;
 
     //Intro intro;
@@ -461,6 +463,69 @@ public class QuestionnaireManager : MonoBehaviour
 
         //StopCoroutine("PostVisitorData");
         //StartCoroutine(PostVisitorData(profileItem));
+    }
+
+    public void SaveQuestionnaire()
+    {
+        // Initialize a list of answers
+        List<string> answers = new List<string>();
+
+        // Get answers
+        foreach (GameObject gO in demographicOptions)
+        {
+            // Input Container
+            TMP_InputField inputField = gO.GetComponentInChildren<TMP_InputField>();
+            if (inputField != null)
+            {
+                answers.Add(inputField.text);
+                continue;
+            }
+
+            // Dropdown Container
+            TMP_Dropdown dropdown = gO.GetComponentInChildren<TMP_Dropdown>();
+            if (dropdown != null)
+            {
+                answers.Add(dropdown.captionText.text);
+                continue;
+            }
+
+            // Get Toggle Group
+            ToggleGroup toggleGroup = gO.GetComponentInChildren<ToggleGroup>();
+
+            // Toggle Container
+            Toggle[] toggles = gO.GetComponentsInChildren<Toggle>();
+            if (toggles != null && toggles.Length > 0)
+            {
+                string text = string.Empty;
+
+                foreach (Toggle toggle in toggles)
+                {
+                    if (toggle.isOn)
+                    {
+                        if (toggleGroup != null)
+                        {
+                            text = toggle.GetComponentInChildren<TMP_Text>().text;
+                            break;
+                        }
+                        
+                        if (text.Length <= 0)
+                            text = toggle.GetComponentInChildren<TMP_Text>().text;
+                        else
+                            text += ", " + toggle.GetComponentInChildren<TMP_Text>().text;
+                    }
+                }
+
+                answers.Add(text);
+            }
+        }
+
+        // Save Questionnaire
+        cQuestionnaire questionnaireToSave = new cQuestionnaire(currentPath.server_path_id, currentPath.local_area_id, answers);
+        cQuestionnaire.Save(questionnaireToSave);
+
+        // Upload to server
+        AppManager.Instance.serverManager.postUserData = true;
+        AppManager.Instance.serverManager.timeRemaining = 0f;
     }
 
     /*IEnumerator PostVisitorData(ProfileItem profileItem)
