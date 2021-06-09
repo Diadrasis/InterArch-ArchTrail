@@ -152,7 +152,7 @@ public class QuestionnaireManager : MonoBehaviour
                 }
                 //step = 5;
             }
-            else if (step == 9 || step == 14 || step == 20 || step == 22)
+            else if (step == 9 || step == 14 || step == 20 || step == 22 || step == 30)
             {
                 Debug.Log("Step for toggleCheck" + step);
                 CheckIfUserHasSelectedOtherOption();
@@ -314,27 +314,37 @@ public class QuestionnaireManager : MonoBehaviour
             demographicOptions[step].SetActive(true);
 
         }
-        foreach (Toggle to in questionToggleB1)
+        foreach (Toggle toB in questionToggleB1)
         {
-            if (step == 20 && to.isOn)
+            if (step == 20 && toB.isOn)
             {
                 step = 21;
+                Debug.Log("step 22: " + toB.name);
             }
-            else if(step == 20 && !to.isOn)
+            else if(step == 20 && !toB.isOn)
             {
                 step = 22;
-                Debug.Log("step 22: " + to.name);
+                Debug.Log("step 22: " + toB.name);
             }
 
-            if(step == 22 && to.isOn)
+            if(step == 22 && toB.isOn)
             {
                 step = 23;
             }
-            else if (step == 22 && !to.isOn)
+            else if (step == 22 && !toB.isOn)
             {
                 step = 24;
             }
-            demographicOptions[step].SetActive(true);
+
+            if(step == 30 && toB.isOn)
+            {
+                step = 31;
+            }
+            else if (step == 30 && !toB.isOn)
+            {
+                //save
+            }
+                demographicOptions[step].SetActive(true);
         }
             
 
