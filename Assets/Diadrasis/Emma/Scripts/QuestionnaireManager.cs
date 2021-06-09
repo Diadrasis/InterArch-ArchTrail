@@ -13,20 +13,20 @@ public class QuestionnaireManager : MonoBehaviour
     public Button btnSubmit, btnSkip/*, BtnOk*/;
     public GameObject[] demographicOptions;
     public Transform dropdownContainer;
-    public Transform inputContainer, inputContainerOptionA;
-    public Transform dropdownContainerOptionA, dropdownContainerOptionB1, dropdownContainerOptionB2, dropdownContainerOptionC1, dropdownContainerOptionC2;
+    public Transform inputContainer, inputContainerOptionA, inputContainerOptionB1;
+    public Transform dropdownContainerOptionB2, dropdownContainerOptionC1, dropdownContainerOptionC2;
     public Transform toggleContainerOptionA, toggleContainerOptionB, toggleContainerOptionB1, toggleContainerOptionB2, toggleContainerOptionC, toggleContainerOptionC1, toggleContainerOptionC2;
 
     //public GameObject newIdPanel;
     //public Text newIdText, btnNextText, btnOkText;
-
-    public TMP_Dropdown[] dropdownsGeneral, dropdownsOptionA, dropdownsOptionB1, dropdownsOptionB2, dropdownsOptionC1, dropdownsOptionC2;
-    public TMP_InputField[] inputFieldsGeneral, inputFieldOptionA;
-    public Toggle[] toggleOptionA, toggleOptionB1, toggleOptionB2,toggleOptionC1,toggleOptionC2, questionToggle;
+    public TextMeshProUGUI textB;
+    public TMP_Dropdown[] dropdownsGeneral, dropdownsOptionB2, dropdownsOptionC1, dropdownsOptionC2;
+    public TMP_InputField[] inputFieldsGeneral, inputFieldOptionA, inputFieldOptionB1;
+    public Toggle[] toggleOptionA, toggleOptionB1, toggleOptionB2, toggleOptionC1, toggleOptionC2, questionToggleA, questionToggleB1;
     public TMP_Dropdown optionDropdown;
 
     public Toggle groupB1, groupB2, groupC1, groupC2;
-    [HideInInspector] public int step=0;
+    [HideInInspector] public int step = 0;
 
     public static string jsonFile;
 
@@ -42,9 +42,7 @@ public class QuestionnaireManager : MonoBehaviour
         btnSkip.onClick.AddListener(() => Skip());
         dropdownsGeneral = dropdownContainer.GetComponentsInChildren<TMP_Dropdown>(true);
         inputFieldsGeneral = inputContainer.GetComponentsInChildren<TMP_InputField>(true);
-        dropdownsOptionA = dropdownContainerOptionA.GetComponentsInChildren<TMP_Dropdown>(true);
         toggleOptionA = toggleContainerOptionA.GetComponentsInChildren<Toggle>(true);
-        dropdownsOptionB1 = dropdownContainerOptionB1.GetComponentsInChildren<TMP_Dropdown>(true);
         dropdownsOptionB2 = dropdownContainerOptionB2.GetComponentsInChildren<TMP_Dropdown>(true);
         dropdownsOptionC1 = dropdownContainerOptionC1.GetComponentsInChildren<TMP_Dropdown>(true);
         dropdownsOptionC2 = dropdownContainerOptionC2.GetComponentsInChildren<TMP_Dropdown>(true);
@@ -53,6 +51,7 @@ public class QuestionnaireManager : MonoBehaviour
         toggleOptionC1 = toggleContainerOptionC1.GetComponentsInChildren<Toggle>(true);
         toggleOptionC2 = toggleContainerOptionC2.GetComponentsInChildren<Toggle>(true);
         inputFieldOptionA = inputContainerOptionA.GetComponentsInChildren<TMP_InputField>(true);
+        inputFieldOptionB1 = inputContainerOptionB1.GetComponentsInChildren<TMP_InputField>(true);
 
         groupB1 = toggleContainerOptionB.GetComponentInChildren<Toggle>(true);
         groupB2 = toggleContainerOptionB.GetComponentInChildren<Toggle>(true);
@@ -153,11 +152,16 @@ public class QuestionnaireManager : MonoBehaviour
                 }
                 //step = 5;
             }
-            else if (step == 9 || step == 14)
+            else if (step == 9 || step == 14 || step == 20 || step == 22)
             {
                 Debug.Log("Step for toggleCheck" + step);
                 CheckIfUserHasSelectedOtherOption();
             }
+            /*else if(step == 22)
+            {
+                Debug.Log("Step for toggleCheck step22 " + step);
+                CheckIfUserHasSelectedOtherOption();
+            }*/
             else
             {
 
@@ -225,7 +229,7 @@ public class QuestionnaireManager : MonoBehaviour
         {
             AppManager.Instance.uIManager.pnlOptionB.SetActive(true);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
-            //step = 6;
+            //step =5;
             CheckToggle();
             Debug.Log("3rd Option" + step);
         }
@@ -244,21 +248,26 @@ public class QuestionnaireManager : MonoBehaviour
     //when selecting the panels with the options, to see which option is selected and then activate the coresponding panel
     void CheckToggle()
     {
-        if (groupB1.isOn)
+        if (groupB1.isOn && (step == 4 || step == 5))
         {
             AppManager.Instance.uIManager.pnlOptionB1.SetActive(true);
             AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
             toggleContainerOptionB.gameObject.SetActive(false);
-            step = 7;
-            Debug.Log("groupB1 will be on");
+            textB.gameObject.SetActive(false);
+            step = 16;
+            demographicOptions[step].SetActive(true);
+            Debug.Log("groupB1 will be on and demographic option" + demographicOptions[step].name);
+            /*Debug.Log("groupB1 will be on" + step);
+            Debug.Log("groupB1 will be on and demographic option" + demographicOptions[step].name);*/
         }
-        else if (groupB2.isOn)
+        else if (groupB2.isOn && (step == 4 || step == 5))
         {
             AppManager.Instance.uIManager.pnlOptionB2.SetActive(true);
             AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
             toggleContainerOptionB.gameObject.SetActive(false);
-            step = 7;
+            step = 22;
             Debug.Log("groupB2 will be on");
+            Debug.Log("groupB2 will be on and demographic option" + demographicOptions[step].name);
         }
         else if (groupC1.isOn)
         {
@@ -281,29 +290,68 @@ public class QuestionnaireManager : MonoBehaviour
     void CheckIfUserHasSelectedOtherOption()
     {
 
-        foreach(Toggle to in questionToggle)
+        foreach (Toggle to in questionToggleA)
         {
-            if(step == 9 && to.isOn)
+            if (step == 9 && to.isOn)
             {
                 step = 10;
-                demographicOptions[step].SetActive(true);
-            } 
-            else if(step == 9 && !to.isOn)
+
+            }
+            else if (step == 9 && !to.isOn)
             {
                 step = 11;
-                demographicOptions[step].SetActive(true);
             }
             if (step == 14 && to.isOn)
             {
                 step = 15;
-                demographicOptions[step].SetActive(true);
+
             }
             else if (step == 14 && !to.isOn)
             {
                 //put here the save method
-                
+
             }
+            demographicOptions[step].SetActive(true);
+
         }
+        foreach (Toggle to in questionToggleB1)
+        {
+            if (step == 20 && to.isOn)
+            {
+                step = 21;
+            }
+            else if(step == 20 && !to.isOn)
+            {
+                step = 22;
+                Debug.Log("step 22: " + to.name);
+            }
+
+            if(step == 22 && to.isOn)
+            {
+                step = 23;
+            }
+            else if (step == 22 && !to.isOn)
+            {
+                step = 24;
+            }
+            demographicOptions[step].SetActive(true);
+        }
+            
+
+            /*if (step == 22)
+            {
+                if(to.isOn)step = 23;
+                Debug.Log("step 23");
+            }
+            else 
+            {
+                step = 24;
+                Debug.Log("step 24");
+            }*/
+
+
+            
+        
         /*if (step == 9)
         {
             if (questionToggle[step].isOn)
