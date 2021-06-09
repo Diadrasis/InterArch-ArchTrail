@@ -22,7 +22,7 @@ public class QuestionnaireManager : MonoBehaviour
     public TextMeshProUGUI textB;
     public TMP_Dropdown[] dropdownsGeneral, dropdownsOptionB2, dropdownsOptionC1, dropdownsOptionC2;
     public TMP_InputField[] inputFieldsGeneral, inputFieldOptionA, inputFieldOptionB1;
-    public Toggle[] toggleOptionA, toggleOptionB1, toggleOptionB2, toggleOptionC1, toggleOptionC2, questionToggleA, questionToggleB1;
+    public Toggle[] toggleOptionA, toggleOptionB1, toggleOptionB2, toggleOptionC1, toggleOptionC2, questionToggleA/*, questionToggleB1*/;
     public TMP_Dropdown optionDropdown;
 
     public Toggle groupB1, groupB2, groupC1, groupC2;
@@ -152,16 +152,39 @@ public class QuestionnaireManager : MonoBehaviour
                 }
                 //step = 5;
             }
-            else if (step == 9 || step == 14 || step == 20 || step == 22 || step == 30)
+            /*else if (step == 9 || step == 11|| step == 14 || step == 21 || step == 23 || step == 31)
             {
                 Debug.Log("Step for toggleCheck" + step);
                 CheckIfUserHasSelectedOtherOption();
-            }
-            /*else if(step == 22)
-            {
-                Debug.Log("Step for toggleCheck step22 " + step);
-                CheckIfUserHasSelectedOtherOption();
             }*/
+            else if (step == 21)
+            {
+                Toggle[] toggles = demographicOptions[step].GetComponentsInChildren<Toggle>();
+                Toggle specific = toggles[toggles.Length - 1];
+                if (specific.isOn)
+                {
+                    step = 22;
+                }
+                else
+                {
+                    step = 23;
+                }
+            }
+
+            else if (step == 23)
+            {
+                Toggle[] toggles = demographicOptions[step].GetComponentsInChildren<Toggle>();
+                Toggle specific = toggles[toggles.Length - 1];
+                if (specific.isOn)
+                {
+                    step = 24;
+                }
+                else
+                {
+                    step = 25;
+                }
+            }
+
             else
             {
 
@@ -254,7 +277,7 @@ public class QuestionnaireManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
             toggleContainerOptionB.gameObject.SetActive(false);
             textB.gameObject.SetActive(false);
-            step = 16;
+            step = 17;
             demographicOptions[step].SetActive(true);
             Debug.Log("groupB1 will be on and demographic option" + demographicOptions[step].name);
             /*Debug.Log("groupB1 will be on" + step);
@@ -265,7 +288,7 @@ public class QuestionnaireManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlOptionB2.SetActive(true);
             AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
             toggleContainerOptionB.gameObject.SetActive(false);
-            step = 22;
+            step = 35;
             Debug.Log("groupB2 will be on");
             Debug.Log("groupB2 will be on and demographic option" + demographicOptions[step].name);
         }
@@ -301,6 +324,14 @@ public class QuestionnaireManager : MonoBehaviour
             {
                 step = 11;
             }
+            if (step == 11 && to.isOn)
+            {
+                step = 12;
+            }
+            else if (step == 11 && !to.isOn)
+            {
+                step = 13;
+            }
             if (step == 14 && to.isOn)
             {
                 step = 15;
@@ -311,41 +342,42 @@ public class QuestionnaireManager : MonoBehaviour
                 //put here the save method
 
             }
-            demographicOptions[step].SetActive(true);
-
-        }
-        foreach (Toggle toB in questionToggleB1)
-        {
-            if (step == 20 && toB.isOn)
-            {
-                step = 21;
-                Debug.Log("step 22: " + toB.name);
-            }
-            else if(step == 20 && !toB.isOn)
+            if (step == 21 && to.isOn)
             {
                 step = 22;
-                Debug.Log("step 22: " + toB.name);
+                Debug.Log("step 22: " + to.name);
             }
-
-            if(step == 22 && toB.isOn)
+            else if (step == 21 && !to.isOn)
             {
                 step = 23;
+                Debug.Log("step 23: " + to.name);
             }
-            else if (step == 22 && !toB.isOn)
+
+            if (step == 23 && to.isOn)
             {
                 step = 24;
             }
-
-            if(step == 30 && toB.isOn)
+            else if (step == 23 && !to.isOn)
             {
-                step = 31;
+                step = 25;
             }
-            else if (step == 30 && !toB.isOn)
+
+            if (step == 31 && to.isOn)
+            {
+                step = 32;
+            }
+            else if (step == 30 && !to.isOn)
             {
                 //save
             }
-                demographicOptions[step].SetActive(true);
+            demographicOptions[step].SetActive(true);
+
         }
+        /*foreach (Toggle toB in questionToggleB1)
+        {
+            
+                demographicOptions[step].SetActive(true);
+        }*/
             
 
             /*if (step == 22)
