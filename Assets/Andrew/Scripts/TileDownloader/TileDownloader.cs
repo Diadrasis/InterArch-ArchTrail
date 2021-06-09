@@ -250,7 +250,8 @@ public class TileDownloader: MonoBehaviour
     {
         SetValues(_areaToDelete.areaConstraintsMin.x, _areaToDelete.areaConstraintsMax.y, _areaToDelete.areaConstraintsMax.x, _areaToDelete.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
         //Calculate();
-        StartCoroutine(Delete());
+        if (HasTiles())
+            StartCoroutine(Delete());
     }
 
     IEnumerator Delete()
@@ -290,7 +291,7 @@ public class TileDownloader: MonoBehaviour
         {
             isDeleting = true;
 
-            // Calculate seconds to upload
+            // Calculate seconds to delete
             System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
             stopWatch.Start();
 
