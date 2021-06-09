@@ -118,6 +118,16 @@ public class MapManager : MonoBehaviour
         // Test
         //List<cPath> pathsToTest = GetTestPaths();
         //DisplayPath(pathsToTest[0]);
+        List<string> answers = new List<string> { "answer0", "answer1", "answer2"};
+        cQuestionnaire questionnaire = new cQuestionnaire(0, 0, answers);
+        cQuestionnaire.Save(questionnaire);
+        cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(0);
+
+        Debug.Log("Answers:");
+        foreach (string answer in loadedQuestionnaire.answers)
+        {
+            Debug.Log(answer);
+        }
     }
 
     private void Update()
@@ -198,7 +208,7 @@ public class MapManager : MonoBehaviour
         // float duration = (float)timeDuration.TotalSeconds;
         // Debug.Log("timeDuration in seconds = " + duration);
 
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {

@@ -28,7 +28,7 @@ public class ServerManager : MonoBehaviour
 
     bool checkInternet;
     public bool hasInternet;
-    public enum PHPActions { Get_Areas, Save_Area, Delete_Area, Get_Paths, Save_Path, Delete_Path, Get_Points, Save_Point, Delete_Point }
+    public enum PHPActions { Get_Areas, Save_Area, Delete_Area, Get_Paths, Save_Path, Delete_Path, Get_Points, Save_Point, Delete_Point, Save_Questionnaire }
 
     private bool downloadAreas;
     private int downloadAreaId = -1;
@@ -440,7 +440,7 @@ public class ServerManager : MonoBehaviour
 
                 if (webRequest.isNetworkError || webRequest.isHttpError)
                 {
-                    Debug.Log("Test failed. Error #" + webRequest.error);
+                    Debug.Log("Web request failed. Error #" + webRequest.error);
                 }
                 else
                 {
@@ -491,7 +491,7 @@ public class ServerManager : MonoBehaviour
 
                 if (webRequest.isNetworkError || webRequest.isHttpError)
                 {
-                    Debug.Log("Test failed. Error #" + webRequest.error);
+                    Debug.Log("Web request failed. Error #" + webRequest.error);
                 }
                 else
                 {
@@ -504,7 +504,10 @@ public class ServerManager : MonoBehaviour
                     //string server_path_idString = cleanString.Replace(" ", "");
                     //Debug.Log("databaseId = " + server_path_idString);
                     if (int.TryParse(server_path_idString, out int server_path_id))
+                    {
                         cPath.SetServerAreaAndPathId(pathToUpload.server_area_id, server_path_id, pathToUpload.local_path_id);
+                        cQuestionnaire.SetServerPathId(server_path_id, pathToUpload.local_path_id);
+                    }
                 }
             }
         }
@@ -545,7 +548,7 @@ public class ServerManager : MonoBehaviour
 
                 if (webRequest.isNetworkError || webRequest.isHttpError)
                 {
-                    Debug.Log("Test failed. Error #" + webRequest.error);
+                    Debug.Log("Web request failed. Error #" + webRequest.error);
                 }
                 else
                 {
@@ -559,6 +562,47 @@ public class ServerManager : MonoBehaviour
                     //Debug.Log("databaseId = " + server_path_idString);
                     if (int.TryParse(server_point_idString, out int server_point_id))
                         cPathPoint.SetServerPathAndPointId(pointToUpload.server_path_id, server_point_id, pointToUpload.index);
+                }
+            }
+        }
+
+        // ============== Upload Questionnaires ============== //
+
+        // Get questionnaires to upload
+        List<cQuestionnaire> questionnairesToUpload = cQuestionnaire.GetQuestionnairesToUpload();
+
+        if (questionnairesToUpload != null && questionnairesToUpload.Count > 0)
+        {
+            // Activate panel
+            AppManager.Instance.uIManager.txtWarningServer.text = "Uploading questionnaires...";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
+            foreach (cQuestionnaire questionnaireToUpload in questionnairesToUpload)
+            {
+                // Create a form and add all the fields of the area
+                List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
+                formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 9))); // Save_Questionnaire
+                formToPost.Add(new MultipartFormDataSection("server_path_id", questionnaireToUpload.server_path_id.ToString()));
+                //formToPost.Add(new MultipartFormDataSection("title", pathToUpload.title));
+
+                UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
+
+                yield return webRequest.SendWebRequest();
+
+                if (webRequest.isNetworkError || webRequest.isHttpError)
+                {
+                    Debug.Log("Web request failed. Error #" + webRequest.error);
+                }
+                else
+                {
+                    //Debug.Log("Uploaded point successfully!");
+                    Debug.Log("Echo: " + webRequest.downloadHandler.text);
+                    //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
+                    // Get database id and set it
+                    //string echo = webRequest.downloadHandler.text;
+
+                    // Delete questionnaire
+                    cQuestionnaire.Delete(questionnaireToUpload.local_path_id);
                 }
             }
         }

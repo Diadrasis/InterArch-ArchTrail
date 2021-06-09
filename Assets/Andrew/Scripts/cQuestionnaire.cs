@@ -3,30 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class cQuestionnaire : MonoBehaviour
+public class cQuestionnaire
 {
     #region Variables
+    public int server_path_id;
     public int local_path_id;
-    /*public string Age;
-    public string Sex;
-    public string VisitReason;
-    public string Education;
-    public string Familiarity;
-    public string Technology;
-    public string Ethnicity;*/
+    public List<string> answers;
 
     public static readonly string PREFS_KEY = "questionnaires";
     public static readonly string QUESTIONNAIRES = "questionnaires";
 
     public static readonly string QUESTIONNAIRE = "questionnaire";
-    public static readonly string LOCAL_PATH_ID = "local_area_id";
+    public static readonly string SERVER_PATH_ID = "server_path_id";
+    public static readonly string LOCAL_PATH_ID = "local_path_id";
+    public static readonly string ANSWERS = "answers";
+    public static readonly string ANSWER = "answer";
     #endregion
 
     #region Methods
     // Constructor for Loading from Player Prefs and creating a new questionnaire
-    private cQuestionnaire(int _local_path_id)
+    public cQuestionnaire(int _server_path_id, int _local_path_id, List<string> _answers)
     {
+        server_path_id = _server_path_id; // Probably always equals -1
         local_path_id = _local_path_id;
+        answers = _answers;
     }
 
     public static OnlineMapsXML GetXML()
@@ -59,8 +59,46 @@ public class cQuestionnaire : MonoBehaviour
 
         // Create a new area node
         OnlineMapsXML questionnaireNode = xml.Create(QUESTIONNAIRE);
+        questionnaireNode.Create(SERVER_PATH_ID, _questionnaireToSave.server_path_id);
         questionnaireNode.Create(LOCAL_PATH_ID, _questionnaireToSave.local_path_id);
+        OnlineMapsXML answersNode = questionnaireNode.Create(ANSWERS);
+        foreach (string answer in _questionnaireToSave.answers)
+        {
+            answersNode.Create(ANSWER, answer);
+        }
 
+        Debug.Log(xml.outerXml);
+        // Save xml string to PlayerPrefs
+        PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
+        PlayerPrefs.Save();
+    }
+
+    public static void SetServerPathId(int _server_path_id, int _local_path_id)
+    {
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = GetXML();
+
+        // Find questionnaire
+        OnlineMapsXML questionnaireNode = xml.Find("/" + QUESTIONNAIRES + "/" + QUESTIONNAIRE + "[" + LOCAL_PATH_ID + "=" + _local_path_id + "]");
+
+        // Load questionnaire
+        cQuestionnaire loadedQuestionnaire = Load(questionnaireNode);
+        loadedQuestionnaire.server_path_id = _server_path_id;
+
+        // Edit path
+        EditServerPathId(loadedQuestionnaire);
+    }
+
+    private static void EditServerPathId(cQuestionnaire _questionnaireToEdit)
+    {
+        // Load xml document, if null create new
+        OnlineMapsXML xml = GetXML();
+
+        // Create a new path
+        OnlineMapsXML questionnaireNode = xml.Find("/" + QUESTIONNAIRES + "/" + QUESTIONNAIRE + "[" + LOCAL_PATH_ID + "=" + _questionnaireToEdit.local_path_id + "]");
+        questionnaireNode.Remove(SERVER_PATH_ID);
+        questionnaireNode.Create(SERVER_PATH_ID, _questionnaireToEdit.server_path_id);
+        Debug.Log("Edited xml = " + xml.outerXml);
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
@@ -84,10 +122,18 @@ public class cQuestionnaire : MonoBehaviour
 
     private static cQuestionnaire Load(OnlineMapsXML _questionnaireNode)
     {
+        int server_path_id = _questionnaireNode.Get<int>(SERVER_PATH_ID);
         int local_path_id = _questionnaireNode.Get<int>(LOCAL_PATH_ID);
-        //string title = _questionnaireNode.Get<string>(TITLE);
 
-        cQuestionnaire loadedQuestionnaire = new cQuestionnaire(local_path_id);
+        OnlineMapsXMLList answerNodes = _questionnaireNode.FindAll("/" + QUESTIONNAIRES + "/" + QUESTIONNAIRE + "[" + LOCAL_PATH_ID + "=" + local_path_id + "]/" + ANSWERS + "/" + ANSWER);
+        List<string> answers = new List<string>();
+        foreach (OnlineMapsXML answerNode in answerNodes)
+        {
+            string answer = answerNode.Get<string>(answerNode.element);
+            answers.Add(answer);
+        }
+
+        cQuestionnaire loadedQuestionnaire = new cQuestionnaire(server_path_id, local_path_id, answers);
         return loadedQuestionnaire;
     }
 
@@ -100,21 +146,21 @@ public class cQuestionnaire : MonoBehaviour
         OnlineMapsXML questionnaireToDelete = xml.Find("/" + QUESTIONNAIRES + "/" + QUESTIONNAIRE + "[" + LOCAL_PATH_ID + "=" + _local_path_id + "]");
         if (!questionnaireToDelete.isNull)
             questionnaireToDelete.Remove();
-        Debug.Log("XML after deleting area: " + xml.outerXml);
+
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
     }
 
     public static List<cQuestionnaire> GetQuestionnairesToUpload()
     {
-        // List of areas
+        // List of questionnaires
         List<cQuestionnaire> questionnairesToUpload = new List<cQuestionnaire>();
 
         // Load xml document, if null creates new
         OnlineMapsXML xml = GetXML();
 
-        // Get paths with server_area_id = -1
-        OnlineMapsXMLList questionnaireNodes = xml.FindAll("/" + QUESTIONNAIRES + "/" + QUESTIONNAIRE);
+        // Get questionnaires with server_path_id != -1
+        OnlineMapsXMLList questionnaireNodes = xml.FindAll("/" + QUESTIONNAIRES + "/" + QUESTIONNAIRE + "[" + SERVER_PATH_ID + "!=" + (-1) + "]");
 
         foreach (OnlineMapsXML questionnaireNode in questionnaireNodes)
         {
