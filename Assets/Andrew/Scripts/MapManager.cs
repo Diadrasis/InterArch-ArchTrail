@@ -116,7 +116,7 @@ public class MapManager : MonoBehaviour
         CreateUserMarker();
 
         // Test
-        //List<cPath> pathsToTest = GetTestPaths();
+        /*//List<cPath> pathsToTest = GetTestPaths();
         //DisplayPath(pathsToTest[0]);
         /*List<string> answers = new List<string> { "answer0", "answer1", "answer2"};
         cQuestionnaire questionnaire = new cQuestionnaire(0, 0, answers);
