@@ -195,6 +195,28 @@ public class QuestionnaireManager : MonoBehaviour
             }
             Debug.Log("Step: " + step);
         }
+        else
+        {
+            //currentPath = new cPath(5);
+            //if (currentPath != null)
+            {
+                int local_path_id = 0;
+                Debug.Log("local_path_id = " + local_path_id);
+                SaveQuestionnaire();
+
+                cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(local_path_id);
+
+                if (loadedQuestionnaire != null)
+                {
+                    Debug.Log("Answers:");
+                    Debug.Log("loadedQuestionnaire.answers.Count" + loadedQuestionnaire.answers.Count);
+                    foreach (string answer in loadedQuestionnaire.answers)
+                    {
+                        Debug.Log(answer);
+                    }
+                }
+            }
+        }
 
         //SaveProfile();
         /*else
@@ -562,7 +584,7 @@ public class QuestionnaireManager : MonoBehaviour
         }
 
         // Save Questionnaire
-        cQuestionnaire questionnaireToSave = new cQuestionnaire(currentPath.server_path_id, currentPath.local_area_id, answers);
+        cQuestionnaire questionnaireToSave = new cQuestionnaire(-1, 0, answers); // currentPath.server_path_id, currentPath.local_area_id,
         cQuestionnaire.Save(questionnaireToSave);
 
         // Upload to server

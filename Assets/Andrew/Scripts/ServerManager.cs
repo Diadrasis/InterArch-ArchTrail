@@ -28,7 +28,7 @@ public class ServerManager : MonoBehaviour
 
     bool checkInternet;
     public bool hasInternet;
-    public enum PHPActions { Get_Areas, Save_Area, Delete_Area, Get_Paths, Save_Path, Delete_Path, Get_Points, Save_Point, Delete_Point, Save_Questionnaire }
+    public enum PHPActions { Get_Areas, Save_Area, Delete_Area, Get_Paths, Save_Path, Delete_Path, Get_Points, Save_Point, Delete_Point, Save_Survey }
 
     private bool downloadAreas;
     private int downloadAreaId = -1;
@@ -581,9 +581,12 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a form and add all the fields of the area
                 List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
-                formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 9))); // Save_Questionnaire
+                formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 9))); // Save_Survey
                 formToPost.Add(new MultipartFormDataSection("server_path_id", questionnaireToUpload.server_path_id.ToString()));
-                //formToPost.Add(new MultipartFormDataSection("title", pathToUpload.title));
+                for (int i = 0; i < questionnaireToUpload.answers.Count; i++)
+                {
+                    formToPost.Add(new MultipartFormDataSection("answer" + i, questionnaireToUpload.answers[i]));
+                }
 
                 UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
 
