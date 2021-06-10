@@ -129,7 +129,7 @@ public class MapManager : MonoBehaviour
             Debug.Log(answer);
         }*/
 
-        AppManager.Instance.questionnaireManager.currentPath = new cPath(5);
+        /*AppManager.Instance.questionnaireManager.currentPath = new cPath(5);
         if (AppManager.Instance.questionnaireManager.currentPath != null)
         {
             int local_path_id = AppManager.Instance.questionnaireManager.currentPath.local_path_id;
@@ -139,12 +139,12 @@ public class MapManager : MonoBehaviour
             cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(local_path_id);
 
             Debug.Log("Answers:");
-            Debug.Log("loadedQuestionnaire.answers.Count" + loadedQuestionnaire.answers.Count);
+            //Debug.Log("loadedQuestionnaire.answers.Count" + loadedQuestionnaire.answers.Count);
             foreach (string answer in loadedQuestionnaire.answers)
             {
                 Debug.Log(answer);
             }
-        }
+        }*/
     }
 
     private void Update()

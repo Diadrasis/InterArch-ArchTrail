@@ -202,7 +202,7 @@ public class UIManager : MonoBehaviour
 
         //btn for profiler screen
         btnProfiler.onClick.AddListener(() => DisplayQuestionnaire());
-        btnResetQuestionnaire.onClick.AddListener(() => ResetQuestionnaire());
+        btnResetQuestionnaire.onClick.AddListener(() => AppManager.Instance.questionnaireManager.ResetValues());
 
 
         //btn for close Internet screen
@@ -490,6 +490,7 @@ public class UIManager : MonoBehaviour
         {
             pnlProfilerScreen.SetActive(false);
             DisplayAreasScreen();
+            AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
@@ -500,6 +501,7 @@ public class UIManager : MonoBehaviour
             pnlProfilerScreen.SetActive(false);
             DisplayAreasScreen();
             pnlOptionA.SetActive(false);
+            AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
@@ -510,6 +512,7 @@ public class UIManager : MonoBehaviour
             pnlProfilerScreen.SetActive(false);
             DisplayAreasScreen();
             pnlOptionB.SetActive(false);
+            AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
 
         }
@@ -521,13 +524,25 @@ public class UIManager : MonoBehaviour
             pnlProfilerScreen.SetActive(false);
             DisplayAreasScreen();
             pnlOptionC.SetActive(false);
+            AppManager.Instance.questionnaireManager.ResetValues();
+            AppManager.Instance.serverManager.DownloadAreas();
+        }
+        else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
+         !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
+         !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
+         pnlProfilerScreen.activeSelf && pnlMainQuestions.activeSelf&& !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+        {
+            pnlProfilerScreen.SetActive(false);
+            DisplayAreasScreen();
+            pnlMainQuestions.SetActive(false);
+            AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
         }
         else
         {
             DisplayAreasScreen();
             EnableScreen(pnlProfilerScreen, false);
-            //ResetQuestionnaire();
+            AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
         }
 
@@ -639,7 +654,7 @@ public class UIManager : MonoBehaviour
         IsInRecordingPath(false);
         AppManager.Instance.mapManager.StopRecordingPath();
         //pnlProfilerScreen.SetActive(true);
-        ResetQuestionnaire();
+        OpenQuestionnaire();
     }
 
     //opens the saved paths screen (on click event)
@@ -796,23 +811,15 @@ public class UIManager : MonoBehaviour
         ActivateButtons(true,true, true, true);
     }
 
-    void ResetQuestionnaire()
+    void OpenQuestionnaire()
     {
         pnlProfilerScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
         pnlOptionA.SetActive(false);
         pnlOptionB.SetActive(false);
         pnlOptionC.SetActive(false);
+        pnlPathScreen.SetActive(false);
         ActivateButtons(true, true, true, true);
-        AppManager.Instance.questionnaireManager.step = 0;
-        foreach (GameObject gb in AppManager.Instance.questionnaireManager.demographicOptions) gb.SetActive(false);
-        AppManager.Instance.questionnaireManager.demographicOptions[0].SetActive(true);
-        foreach (TMP_Dropdown td in AppManager.Instance.questionnaireManager.dropdownsGeneral) td.value = 0;
-        foreach (TMP_InputField ti in AppManager.Instance.questionnaireManager.inputFieldsGeneral) ti.text = "";
-        foreach (TMP_InputField tiA in AppManager.Instance.questionnaireManager.inputFieldOptionA) tiA.text = "";
-        foreach (Toggle toA in AppManager.Instance.questionnaireManager.toggleOptionA) toA.isOn = false;
-        AppManager.Instance.questionnaireManager.optionDropdown.value = 0;
-
     }
     #endregion
 
