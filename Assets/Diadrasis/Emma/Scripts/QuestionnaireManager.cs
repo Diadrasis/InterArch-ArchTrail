@@ -162,6 +162,9 @@ public class QuestionnaireManager : MonoBehaviour
             {
                 Debug.Log("Step for toggleCheck Second method: " + step);
                 CheckIfUserHasSelectedOtherOptionSecond();
+            }else if (step == 41)
+            {
+                step = demographicOptions.Length;
             }
             else
             {
@@ -227,6 +230,11 @@ public class QuestionnaireManager : MonoBehaviour
 
             step++;
             demographicOptions[step].SetActive(true);
+        }
+        if(step == 15 || step ==16 || step==31 || step == 32 || step == 41 || step == 52 || step == 53
+            || step == 69 || step == 70)
+        {
+            btnSkip.gameObject.SetActive(false);
         }
         Debug.Log("Step: " + step);
 
@@ -330,8 +338,7 @@ public class QuestionnaireManager : MonoBehaviour
         }
         else if (step == 15 && !questionToggle[2].isOn)
         {
-            //put here the save method
-            demographicOptions[step].SetActive(true);
+            step = 71;
         }
 
         if (step == 21 && questionToggle[3].isOn)
@@ -364,7 +371,7 @@ public class QuestionnaireManager : MonoBehaviour
         }
         else if (step == 30 && !questionToggle[6].isOn)
         {
-            //save
+            step = 71;
         }
 
         if(step == 33 && questionToggle[7].isOn)
@@ -414,6 +421,10 @@ public class QuestionnaireManager : MonoBehaviour
             step = 53;
             demographicOptions[step].SetActive(true);
         }
+        else if (step == 52 && !questionToggle[14].isOn)
+        {
+            step = 71;
+        }
 
         if (step == 57 && questionToggle[15].isOn)
         {
@@ -452,6 +463,10 @@ public class QuestionnaireManager : MonoBehaviour
         {
             step = 70;
             demographicOptions[step].SetActive(true);
+        }
+        else if (step == 69 && !questionToggle[20].isOn)
+        {
+            step = 71;
         }
         
     }
