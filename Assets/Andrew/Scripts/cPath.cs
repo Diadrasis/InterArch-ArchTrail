@@ -250,6 +250,28 @@ public class cPath
         PlayerPrefs.Save();
     }
 
+    public static cPath Reload(cPath _pathToReload)
+    {
+        // Load xml document, if null create new
+        OnlineMapsXML xml = cArea.GetXML();
+
+        // Get path from xml and Edit values
+        OnlineMapsXML pathNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "[" + cArea.LOCAL_AREA_ID + "=" + _pathToReload.local_area_id + "]/" + cArea.PATHS + "/" + PATH + "[" + LOCAL_PATH_ID + "=" + _pathToReload.local_path_id + "]");
+        int server_area_id = pathNode.Get<int>(cArea.SERVER_AREA_ID);
+        int local_area_id = pathNode.Get<int>(LOCAL_AREA_ID);
+        int server_path_id = pathNode.Get<int>(SERVER_PATH_ID);
+        int local_path_id = pathNode.Get<int>(LOCAL_PATH_ID);
+        string title = pathNode.Get<string>(TITLE);
+        //string dateString = _pathNode.Get<string>(DATE);
+        //DateTime date = DateTime.Parse(dateString);
+        string date = pathNode.Get<string>(DATE);
+        List<cPathPoint> pathPoints = cPathPoint.LoadPathPointsOfPath(pathNode[PATH_POINTS]);
+
+        // Create cArea and add it to loadedAreas list
+        cPath reloadedPath = new cPath(server_area_id, server_path_id, local_area_id, local_path_id, title, date, pathPoints);
+        return reloadedPath;
+    }
+
     private static cPath Load(OnlineMapsXML _pathNode)
     {
         int server_area_id = _pathNode.Get<int>(cArea.SERVER_AREA_ID);
