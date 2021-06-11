@@ -126,6 +126,8 @@ public class QuestionnaireManager : MonoBehaviour
                 }
             }
         }*/
+
+        
     }
 
     void Submit()
@@ -162,16 +164,28 @@ public class QuestionnaireManager : MonoBehaviour
             {
                 Debug.Log("Step for toggleCheck Second method: " + step);
                 CheckIfUserHasSelectedOtherOptionSecond();
-            }else if (step == 41)
+            }
+            else if (step == 41)
             {
                 step = demographicOptions.Length;
+                btnSkip.gameObject.SetActive(false);
             }
             else
             {
                 step++;
                 demographicOptions[step].SetActive(true);
             }
-            Debug.Log("Step: " + step);
+            
+            if (step==4 ||step == 15 || step == 16 || step == 31 || step == 32 || step == 41 || step == 52 || step == 53
+            || step == 69 || step == 70)
+            {
+                btnSkip.gameObject.SetActive(false);
+            }
+            else
+            {
+                btnSkip.gameObject.SetActive(true);
+            }
+            
         }
 
         // Save step
@@ -196,7 +210,7 @@ public class QuestionnaireManager : MonoBehaviour
                 }
             }
         }
-
+        
         //SaveProfile();
         /*else
         {
@@ -231,11 +245,13 @@ public class QuestionnaireManager : MonoBehaviour
             step++;
             demographicOptions[step].SetActive(true);
         }
-        if(step == 15 || step ==16 || step==31 || step == 32 || step == 41 || step == 52 || step == 53
+
+        if(step==4 || step == 15 || step == 16 || step == 31 || step == 32 || step == 41 || step == 52 || step == 53
             || step == 69 || step == 70)
         {
             btnSkip.gameObject.SetActive(false);
         }
+        
         Debug.Log("Step: " + step);
 
     }
@@ -246,7 +262,6 @@ public class QuestionnaireManager : MonoBehaviour
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
             AppManager.Instance.uIManager.txtWarning.text = "Please enter a valid option";
-            Debug.Log("1st Option");
             return;
         }
         else if (val.value == 1)
@@ -255,7 +270,6 @@ public class QuestionnaireManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlOptionA.SetActive(true);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
             step = 5;
-            Debug.Log("2nd Option");
         }
         else if (val.value == 2)
         {
@@ -263,7 +277,6 @@ public class QuestionnaireManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
             //step = 5;
             CheckToggle();
-            Debug.Log("3rd Option" + step);
         }
         else if (val.value == 3)
         {
@@ -271,13 +284,13 @@ public class QuestionnaireManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
             //step = 7;
             CheckToggle();
-            Debug.Log("4th Option");
         }
 
     }
     //when selecting the panels with the options, to see which option is selected and then activate the coresponding panel
     void CheckToggle()
     {
+        btnSkip.gameObject.SetActive(false);
         if (choiceToggles[0].isOn)
         {
             AppManager.Instance.uIManager.pnlOptionB1.SetActive(true);
@@ -297,7 +310,7 @@ public class QuestionnaireManager : MonoBehaviour
             textB.gameObject.SetActive(false);
             step = 33;
             demographicOptions[step].SetActive(true);
-            
+
         }
         if (choiceToggles[2].isOn)
         {
@@ -328,7 +341,6 @@ public class QuestionnaireManager : MonoBehaviour
         else if (step == 9 && !questionToggle[0].isOn)
         {
             step = 11;
-            Debug.Log("On step 9 and not toggle On!: "+ demographicOptions[step].name);
             demographicOptions[step].SetActive(true);
         }
         if (step == 15 && questionToggle[2].isOn)
@@ -339,19 +351,18 @@ public class QuestionnaireManager : MonoBehaviour
         else if (step == 15 && !questionToggle[2].isOn)
         {
             step = 71;
+            btnSkip.gameObject.SetActive(false);
         }
 
         if (step == 21 && questionToggle[3].isOn)
         {
             step = 22;
-            //demographicOptions[step].SetActive(true);
-            Debug.Log("step 22: " + questionToggle[3].name);
+            demographicOptions[step].SetActive(true);
         }
         else if (step == 21 && !questionToggle[3].isOn)
         {
             step = 23;
             demographicOptions[step].SetActive(true);
-            Debug.Log("step 23: " + questionToggle[3].name);
         }
 
         if(step == 25 && questionToggle[4].isOn)
@@ -372,6 +383,7 @@ public class QuestionnaireManager : MonoBehaviour
         else if (step == 30 && !questionToggle[6].isOn)
         {
             step = 71;
+            btnSkip.gameObject.SetActive(false);
         }
 
         if(step == 33 && questionToggle[7].isOn)
@@ -424,6 +436,7 @@ public class QuestionnaireManager : MonoBehaviour
         else if (step == 52 && !questionToggle[14].isOn)
         {
             step = 71;
+            btnSkip.gameObject.SetActive(false);
         }
 
         if (step == 57 && questionToggle[15].isOn)
@@ -467,6 +480,7 @@ public class QuestionnaireManager : MonoBehaviour
         else if (step == 69 && !questionToggle[20].isOn)
         {
             step = 71;
+            btnSkip.gameObject.SetActive(false);
         }
         
     }
@@ -783,5 +797,14 @@ public class QuestionnaireManager : MonoBehaviour
         foreach (Toggle toQ in questionToggle) toQ.isOn = false;
         foreach (Toggle toCH in choiceToggles) toCH.isOn = false;
         optionDropdown.value = 0;
+        toggleContainerOptionB.gameObject.SetActive(true);
+        toggleContainerOptionC.gameObject.SetActive(true);
+        if (AppManager.Instance.uIManager.pnlOptionA.activeSelf) AppManager.Instance.uIManager.pnlOptionA.SetActive(false);
+        if (AppManager.Instance.uIManager.pnlOptionB1.activeSelf) AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
+        if (AppManager.Instance.uIManager.pnlOptionB2.activeSelf) AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
+        if (AppManager.Instance.uIManager.pnlOptionC1.activeSelf) AppManager.Instance.uIManager.pnlOptionC1.SetActive(false);
+        if (AppManager.Instance.uIManager.pnlOptionC2.activeSelf) AppManager.Instance.uIManager.pnlOptionC2.SetActive(false);
+        Debug.Log("Reset "+ choiceToggles.Length.ToString() +" can we see it "+choiceToggles[0].gameObject.activeSelf);
+
     }
 }
