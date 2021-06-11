@@ -677,7 +677,7 @@ public class QuestionnaireManager : MonoBehaviour
             TMP_Dropdown dropdown = gO.GetComponentInChildren<TMP_Dropdown>();
             if (dropdown != null)
             {
-                answers.Add(string.IsNullOrEmpty(dropdown.captionText.text) ? "no answer" : dropdown.captionText.text);
+                answers.Add(dropdown.captionText.text.Equals("&lt;Επιλέξτε από τα παρακάτω&gt;") ? "no answer" : dropdown.captionText.text);
                 continue;
             }
 
