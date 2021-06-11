@@ -116,7 +116,7 @@ public class UIManager : MonoBehaviour
 
     [Space]
     [Header("Profiler Screen")]
-    public GameObject pnlProfilerScreen;
+    public GameObject pnlQuestionnaireScreen;
     public GameObject pnlMainQuestions;
     public GameObject pnlOptionA;
     public GameObject pnlOptionB;
@@ -144,7 +144,7 @@ public class UIManager : MonoBehaviour
 
         pnlWarningScreen.SetActive(false);
         pnlWarningSavePathScreen.SetActive(false);
-        pnlProfilerScreen.SetActive(false);
+        pnlQuestionnaireScreen.SetActive(false);
         txtMainName.text = DEFAULT_TEXT_NAME;
         imgPauseRecording.gameObject.SetActive(false);
         btnBackToAreasScreen.interactable = true;
@@ -239,6 +239,7 @@ public class UIManager : MonoBehaviour
         ActivateButtons(false,true, false, true);
         txtMainName.text = DEFAULT_TEXT_NAME;
         pnlWarningDeleteScreen.SetActive(false);
+        AppManager.Instance.questionnaireManager.ResetValues();
     }
 
     public void EnableScreen(GameObject _screenToEnable, bool _valid) // CURRENTLY IN USE
@@ -449,7 +450,7 @@ public class UIManager : MonoBehaviour
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
             pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && pnlCreateArea.activeSelf && 
             !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
-          !pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+          !pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             pnlSaveArea.SetActive(false);
             pnlCreateArea.SetActive(false);
@@ -461,21 +462,21 @@ public class UIManager : MonoBehaviour
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
             !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && 
             (AppManager.Instance.mapManager.isRecordingPath || AppManager.Instance.mapManager.isPausePath) &&
-          !pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+          !pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             SaveUIButton();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
             !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && 
             !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
-          !pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+          !pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             DisplaySavedPathsScreen();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
             !pnlSaveArea.activeSelf && pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
             !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
-          !pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+          !pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             //to open edit panel
             pnlEditArea.SetActive(false);
@@ -485,10 +486,10 @@ public class UIManager : MonoBehaviour
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
             !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
-            !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath && pnlProfilerScreen.activeSelf &&
+            !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath && pnlQuestionnaireScreen.activeSelf &&
             !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
-            pnlProfilerScreen.SetActive(false);
+            pnlQuestionnaireScreen.SetActive(false);
             DisplayAreasScreen();
             AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
@@ -496,9 +497,9 @@ public class UIManager : MonoBehaviour
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
            !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
-           pnlProfilerScreen.activeSelf && pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+           pnlQuestionnaireScreen.activeSelf && pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
-            pnlProfilerScreen.SetActive(false);
+            pnlQuestionnaireScreen.SetActive(false);
             DisplayAreasScreen();
             pnlOptionA.SetActive(false);
             AppManager.Instance.questionnaireManager.ResetValues();
@@ -507,9 +508,9 @@ public class UIManager : MonoBehaviour
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
            !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
-           pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+           pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
-            pnlProfilerScreen.SetActive(false);
+            pnlQuestionnaireScreen.SetActive(false);
             DisplayAreasScreen();
             pnlOptionB.SetActive(false);
             AppManager.Instance.questionnaireManager.ResetValues();
@@ -519,9 +520,9 @@ public class UIManager : MonoBehaviour
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
           !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
           !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
-          pnlProfilerScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && pnlOptionC.activeSelf)
+          pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && pnlOptionC.activeSelf)
         {
-            pnlProfilerScreen.SetActive(false);
+            pnlQuestionnaireScreen.SetActive(false);
             DisplayAreasScreen();
             pnlOptionC.SetActive(false);
             AppManager.Instance.questionnaireManager.ResetValues();
@@ -530,9 +531,9 @@ public class UIManager : MonoBehaviour
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
          !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
          !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
-         pnlProfilerScreen.activeSelf && pnlMainQuestions.activeSelf&& !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+         pnlQuestionnaireScreen.activeSelf && pnlMainQuestions.activeSelf&& !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
-            pnlProfilerScreen.SetActive(false);
+            pnlQuestionnaireScreen.SetActive(false);
             DisplayAreasScreen();
             pnlMainQuestions.SetActive(false);
             AppManager.Instance.questionnaireManager.ResetValues();
@@ -541,7 +542,7 @@ public class UIManager : MonoBehaviour
         else
         {
             DisplayAreasScreen();
-            EnableScreen(pnlProfilerScreen, false);
+            EnableScreen(pnlQuestionnaireScreen, false);
             AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
         }
@@ -805,7 +806,7 @@ public class UIManager : MonoBehaviour
     #region QuestionnairePanel
     void DisplayQuestionnaire()
     {
-        pnlProfilerScreen.SetActive(true);
+        pnlQuestionnaireScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
         pnlAreasScreen.SetActive(false);
         ActivateButtons(true,true, true, true);
@@ -813,7 +814,7 @@ public class UIManager : MonoBehaviour
 
     void OpenQuestionnaire()
     {
-        pnlProfilerScreen.SetActive(true);
+        pnlQuestionnaireScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
         pnlOptionA.SetActive(false);
         pnlOptionB.SetActive(false);

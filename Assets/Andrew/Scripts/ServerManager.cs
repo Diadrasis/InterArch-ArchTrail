@@ -21,7 +21,7 @@ public class ServerManager : MonoBehaviour
     readonly string postDiadrasisUrl = "http://diadrasis.net/test_upload.php"; //"http://diadrasis.net/test_form.php"; //"http://diadrasis.net/test_upload.php"
     readonly string diadrasisAreaManagerUrl = "http://diadrasis.net/interarch_area_manager.php";
     readonly string diadrasisSurveyManagerUrl = "http://diadrasis.net/interarch_survey_manager.php";
-    readonly string questionnaireUrl = "http://diadrasis.net/interarch_area_managerEmma.php";
+    readonly string emmaUrl = "http://diadrasis.net/interarch_area_managerEmma.php";
     //private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
     public bool postUserData = false; // true;
     //public bool uploadedUserData = false; // true;
@@ -312,7 +312,7 @@ public class ServerManager : MonoBehaviour
     }
     #endregion
 
-    // ============= Andrew ============= //
+    // ============= Test Questionnaire Andrew ============= //
     /*public void UploadArea(cArea _areaToUpload)
     {
         // Create a form and add all the fields of the area
@@ -365,8 +365,8 @@ public class ServerManager : MonoBehaviour
         // Uploading data
         StartCoroutine(PostPointToDiadrasis(formToPost, _pointToUpload.server_path_id, _pointToUpload.index));
     }*/
-	
-    /*public void PostAndrewTest()
+
+   /* public void PostAndrewTest()
     {
         StartCoroutine(AndrewTest());
     }
@@ -390,12 +390,14 @@ public class ServerManager : MonoBehaviour
                 List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
                 formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 9))); // Save_Survey
                 formToPost.Add(new MultipartFormDataSection("server_path_id", questionnaireToUpload.server_path_id.ToString()));
-                for (int i = 0; i < questionnaireToUpload.answers.Count; i++)
+                formToPost.Add(new MultipartFormDataSection("answer6", "Koita"));
+                formToPost.Add(new MultipartFormDataSection("answer9","Edw"));
+                *//*for (int i = 0; i < questionnaireToUpload.answers.Count; i++)
                 {
                     formToPost.Add(new MultipartFormDataSection("answer" + i, questionnaireToUpload.answers[i]));
-                }
+                }*//*
 
-                UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisSurveyManagerUrl, formToPost);
+                UnityWebRequest webRequest = UnityWebRequest.Post(emmaUrl, formToPost);
 
                 yield return webRequest.SendWebRequest();
 
@@ -417,8 +419,8 @@ public class ServerManager : MonoBehaviour
                 }
             }
         }
-    }*/
-	
+    }
+*/
     IEnumerator UploadUserDataToDiadrasis()
     {
         Debug.Log("Started uploading user data!");

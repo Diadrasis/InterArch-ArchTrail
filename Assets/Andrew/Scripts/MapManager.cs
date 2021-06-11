@@ -146,7 +146,7 @@ public class MapManager : MonoBehaviour
             }*/
 
             // Upload to server
-            AppManager.Instance.serverManager.PostAndrewTest();
+            //AppManager.Instance.serverManager.PostAndrewTest();
         }
     }
 

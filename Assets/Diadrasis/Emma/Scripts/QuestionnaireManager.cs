@@ -165,10 +165,13 @@ public class QuestionnaireManager : MonoBehaviour
                 Debug.Log("Step for toggleCheck Second method: " + step);
                 CheckIfUserHasSelectedOtherOptionSecond();
             }
-            else if (step == 41)
+            else if (step == 41 || step == 16 || step == 32 || step == 53 || step == 70)
             {
                 step = demographicOptions.Length;
                 btnSkip.gameObject.SetActive(false);
+                //close questionnairePanel and go to DisplayAreas
+                AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
+                AppManager.Instance.uIManager.DisplayAreasScreen();
             }
             else
             {
@@ -210,12 +213,12 @@ public class QuestionnaireManager : MonoBehaviour
                 }
             }
         }
-        
+
         //SaveProfile();
-        /*else
+        else
         {
-            SaveProfile();
-        }*/
+            Debug.Log("Sto else tou submit");
+        }
     }
 
     //because we don't want to save in case user skips a step. Does the same as Submit() but in submit we will save the answers...
@@ -351,6 +354,9 @@ public class QuestionnaireManager : MonoBehaviour
         else if (step == 15 && !questionToggle[2].isOn)
         {
             step = 71;
+            //close questionnairePanel and go to DisplayAreas
+            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
+            AppManager.Instance.uIManager.DisplayAreasScreen();
             btnSkip.gameObject.SetActive(false);
         }
 
@@ -383,6 +389,9 @@ public class QuestionnaireManager : MonoBehaviour
         else if (step == 30 && !questionToggle[6].isOn)
         {
             step = 71;
+            //close questionnairePanel and go to DisplayAreas
+            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
+            AppManager.Instance.uIManager.DisplayAreasScreen();
             btnSkip.gameObject.SetActive(false);
         }
 
@@ -436,6 +445,9 @@ public class QuestionnaireManager : MonoBehaviour
         else if (step == 52 && !questionToggle[14].isOn)
         {
             step = 71;
+            //close questionnairePanel and go to DisplayAreas
+            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
+            AppManager.Instance.uIManager.DisplayAreasScreen();
             btnSkip.gameObject.SetActive(false);
         }
 
@@ -480,6 +492,9 @@ public class QuestionnaireManager : MonoBehaviour
         else if (step == 69 && !questionToggle[20].isOn)
         {
             step = 71;
+            //close questionnairePanel and go to DisplayAreas
+            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
+            AppManager.Instance.uIManager.DisplayAreasScreen();
             btnSkip.gameObject.SetActive(false);
         }
         
