@@ -67,7 +67,7 @@ public class cQuestionnaire
             answersNode.Create(ANSWER, answer);
         }
 
-        Debug.Log(xml.outerXml);
+        //Debug.Log(xml.outerXml);
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();

@@ -26,6 +26,9 @@ public class ServerManager : MonoBehaviour
     //public bool uploadedUserData = false; // true;
     public bool getData = false; // true;
 
+    // Test
+    readonly string postAndrewTestUrl = "http://diadrasis.net/interarch_area_manager_andrew.php";
+
     bool checkInternet;
     public bool hasInternet;
     public enum PHPActions { Get_Areas, Save_Area, Delete_Area, Get_Paths, Save_Path, Delete_Path, Get_Points, Save_Point, Delete_Point, Save_Survey }
@@ -145,7 +148,7 @@ public class ServerManager : MonoBehaviour
         {
             if (postUserData)
             {
-                StartCoroutine(UploadUserDataToDiadrasis());
+                //StartCoroutine(UploadUserDataToDiadrasis());
                 postUserData = false;
             }
 
@@ -364,6 +367,63 @@ public class ServerManager : MonoBehaviour
         // Uploading data
         StartCoroutine(PostPointToDiadrasis(formToPost, _pointToUpload.server_path_id, _pointToUpload.index));
     }*/
+
+    public void PostAndrewTest()
+    {
+        StartCoroutine(AndrewTest());
+    }
+
+    IEnumerator AndrewTest()
+    {
+        // ============== Upload Questionnaires ============== //
+
+        // Get questionnaires to upload
+        List<cQuestionnaire> questionnairesToUpload = cQuestionnaire.GetQuestionnairesToUpload();
+
+        if (questionnairesToUpload != null && questionnairesToUpload.Count > 0)
+        {
+            // Activate panel
+            AppManager.Instance.uIManager.txtWarningServer.text = "Uploading questionnaires...";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
+            foreach (cQuestionnaire questionnaireToUpload in questionnairesToUpload)
+            {
+                // Create a form and add all the fields of the area
+                List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
+                formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 9))); // Save_Survey
+                formToPost.Add(new MultipartFormDataSection("server_path_id", questionnaireToUpload.server_path_id.ToString()));
+                formToPost.Add(new MultipartFormDataSection("answer0", "Test successful"));
+                /*for (int i = 0; i < questionnaireToUpload.answers.Count; i++)
+                {
+                    Debug.Log(string.IsNullOrEmpty(questionnaireToUpload.answers[i]) ? "no answer" : questionnaireToUpload.answers[i]);
+                    string answer = string.IsNullOrEmpty(questionnaireToUpload.answers[i]) ? "no answer" : questionnaireToUpload.answers[i];
+
+                    formToPost.Add(new MultipartFormDataSection("answer" + i, answer));
+                }*/
+
+                UnityWebRequest webRequest = UnityWebRequest.Post(postAndrewTestUrl, formToPost);
+
+                yield return webRequest.SendWebRequest();
+
+                if (webRequest.isNetworkError || webRequest.isHttpError)
+                {
+                    Debug.Log("Web request failed. Error #" + webRequest.error);
+                }
+                else
+                {
+                    //Debug.Log("Uploaded point successfully!");
+                    Debug.Log("Echo: " + webRequest.downloadHandler.text);
+                    //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
+                    // Get database id and set it
+                    string echo = webRequest.downloadHandler.text;
+
+                    // Delete questionnaire
+                    if (echo.Equals("uploaded survey successfully"))
+                        cQuestionnaire.Delete(questionnaireToUpload.local_path_id);
+                }
+            }
+        }
+    }
 
     IEnumerator UploadUserDataToDiadrasis()
     {
@@ -585,7 +645,10 @@ public class ServerManager : MonoBehaviour
                 formToPost.Add(new MultipartFormDataSection("server_path_id", questionnaireToUpload.server_path_id.ToString()));
                 for (int i = 0; i < questionnaireToUpload.answers.Count; i++)
                 {
-                    formToPost.Add(new MultipartFormDataSection("answer" + i, questionnaireToUpload.answers[i]));
+                    //Debug.Log(string.IsNullOrEmpty(questionnaireToUpload.answers[i]) ? "no answer" : questionnaireToUpload.answers[i]);
+                    string answer = string.IsNullOrEmpty(questionnaireToUpload.answers[i]) ? "no answer" : questionnaireToUpload.answers[i];
+                    
+                    formToPost.Add(new MultipartFormDataSection("answer" + i, answer));
                 }
 
                 UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPost);
@@ -602,10 +665,11 @@ public class ServerManager : MonoBehaviour
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
                     // Get database id and set it
-                    //string echo = webRequest.downloadHandler.text;
+                    string echo = webRequest.downloadHandler.text;
 
                     // Delete questionnaire
-                    cQuestionnaire.Delete(questionnaireToUpload.local_path_id);
+                    if (echo.Equals("uploaded survey successfully"))
+                        cQuestionnaire.Delete(questionnaireToUpload.local_path_id);
                 }
             }
         }
@@ -1065,7 +1129,7 @@ public class ServerManager : MonoBehaviour
 
         if (webRequest.isNetworkError || webRequest.isHttpError)
         {
-            Debug.Log("Test failed. Error #" + webRequest.error);
+            Debug.Log("Web request failed. Error #" + webRequest.error);
         }
         else
         {
@@ -1080,7 +1144,7 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(areasData);
-                Debug.Log("areas --> Json string = " + json);
+                //Debug.Log("areas --> Json string = " + json);
                 
                 // Create a cAreasData from json string
                 cAreaData[] areasDataFromJSON = MethodHelper.FromJson<cAreaData>(MethodHelper.SetupJson(json));
@@ -1212,7 +1276,7 @@ public class ServerManager : MonoBehaviour
 
         if (webRequestPaths.isNetworkError || webRequestPaths.isHttpError)
         {
-            Debug.Log("Test failed. Error #" + webRequestPaths.error);
+            Debug.Log("Web request failed. Error #" + webRequestPaths.error);
         }
         else
         {
@@ -1304,7 +1368,7 @@ public class ServerManager : MonoBehaviour
 
         if (webRequestPoints.isNetworkError || webRequestPoints.isHttpError)
         {
-            Debug.Log("Test failed. Error #" + webRequestPoints.error);
+            Debug.Log("Web request failed. Error #" + webRequestPoints.error);
         }
         else
         {

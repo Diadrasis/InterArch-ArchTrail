@@ -174,7 +174,7 @@ public class QuestionnaireManager : MonoBehaviour
             Debug.Log("Step: " + step);
         }
 
-
+        // Save step
         if (step >= demographicOptions.Length)
         {
             if (currentPath != null)
@@ -655,7 +655,7 @@ public class QuestionnaireManager : MonoBehaviour
             TMP_InputField inputField = gO.GetComponentInChildren<TMP_InputField>();
             if (inputField != null)
             {
-                answers.Add(inputField.text);
+                answers.Add(string.IsNullOrEmpty(inputField.text) ? "no answer" : inputField.text);
                 continue;
             }
 
@@ -663,7 +663,7 @@ public class QuestionnaireManager : MonoBehaviour
             TMP_Dropdown dropdown = gO.GetComponentInChildren<TMP_Dropdown>();
             if (dropdown != null)
             {
-                answers.Add(dropdown.captionText.text);
+                answers.Add(string.IsNullOrEmpty(dropdown.captionText.text) ? "no answer" : dropdown.captionText.text);
                 continue;
             }
 
@@ -693,17 +693,17 @@ public class QuestionnaireManager : MonoBehaviour
                     }
                 }
 
-                answers.Add(text);
+                answers.Add(string.IsNullOrEmpty(text) ? "no answer" : text);
             }
         }
 
         // Save Questionnaire
-        cQuestionnaire questionnaireToSave = new cQuestionnaire(-1, 0, answers); // currentPath.server_path_id, currentPath.local_area_id,
+        cQuestionnaire questionnaireToSave = new cQuestionnaire(0, 0, answers); // currentPath.server_path_id, currentPath.local_area_id,
         cQuestionnaire.Save(questionnaireToSave);
 
         // Upload to server
-        //AppManager.Instance.serverManager.postUserData = true;
-        //AppManager.Instance.serverManager.timeRemaining = 0f;
+        AppManager.Instance.serverManager.postUserData = true;
+        AppManager.Instance.serverManager.timeRemaining = 0f;
     }
 
     /*IEnumerator PostVisitorData(ProfileItem profileItem)
