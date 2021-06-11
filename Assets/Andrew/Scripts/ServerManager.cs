@@ -146,7 +146,7 @@ public class ServerManager : MonoBehaviour
         {
             if (postUserData)
             {
-                //StartCoroutine(UploadUserDataToDiadrasis());
+                StartCoroutine(UploadUserDataToDiadrasis());
                 postUserData = false;
             }
 

@@ -209,6 +209,8 @@ public class QuestionnaireManager : MonoBehaviour
                     }
                 }
             }
+
+            btnSkip.gameObject.SetActive(false);
         }
         
         //SaveProfile();
@@ -659,6 +661,9 @@ public class QuestionnaireManager : MonoBehaviour
 
     public void SaveQuestionnaire()
     {
+        // Reload current path
+        currentPath = cPath.Reload(currentPath);
+
         // Initialize a list of answers
         List<string> answers = new List<string>();
 
@@ -677,7 +682,7 @@ public class QuestionnaireManager : MonoBehaviour
             TMP_Dropdown dropdown = gO.GetComponentInChildren<TMP_Dropdown>();
             if (dropdown != null)
             {
-                answers.Add(dropdown.captionText.text.Equals("&lt;Επιλέξτε από τα παρακάτω&gt;") ? "no answer" : dropdown.captionText.text);
+                answers.Add(dropdown.captionText.text.Equals("<Επιλέξτε από τα παρακάτω>") ? "no answer" : dropdown.captionText.text);
                 continue;
             }
 
@@ -712,7 +717,7 @@ public class QuestionnaireManager : MonoBehaviour
         }
 
         // Save Questionnaire
-        cQuestionnaire questionnaireToSave = new cQuestionnaire(0, 0, answers); // currentPath.server_path_id, currentPath.local_area_id,
+        cQuestionnaire questionnaireToSave = new cQuestionnaire(currentPath.server_path_id, currentPath.local_area_id, answers);
         cQuestionnaire.Save(questionnaireToSave);
 
         // Upload to server
