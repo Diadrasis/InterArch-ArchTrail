@@ -165,22 +165,22 @@ public class QuestionnaireManager : MonoBehaviour
             }
             else
             {
-
                 step++;
                 demographicOptions[step].SetActive(true);
             }
             Debug.Log("Step: " + step);
         }
-        else
+
+
+        if (step >= demographicOptions.Length)
         {
-            //currentPath = new cPath(5);
-            //if (currentPath != null)
+            if (currentPath != null)
             {
-                int local_path_id = 0;
-                Debug.Log("local_path_id = " + local_path_id);
+                //int local_path_id = 0;
+                Debug.Log("currentPath.local_path_id = " + currentPath.local_path_id);
                 SaveQuestionnaire();
 
-                cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(local_path_id);
+                cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(currentPath.local_path_id);
 
                 if (loadedQuestionnaire != null)
                 {
