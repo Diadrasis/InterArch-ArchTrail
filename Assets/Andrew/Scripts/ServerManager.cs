@@ -20,6 +20,7 @@ public class ServerManager : MonoBehaviour
     // URL to Post
     readonly string postDiadrasisUrl = "http://diadrasis.net/test_upload.php"; //"http://diadrasis.net/test_form.php"; //"http://diadrasis.net/test_upload.php"
     readonly string diadrasisAreaManagerUrl = "http://diadrasis.net/interarch_area_manager.php";
+    readonly string questionnaireUrl = "http://diadrasis.net/interarch_area_managerEmma.php";
     //readonly string diadrasisPathManagerUrl = "http://diadrasis.net/interarch_path_manager.php";
     //private string testXMLFileName = "C:/Users/Andrew Xeroudakis/Desktop/testXMLFile.xml";
     public bool postUserData = false; // true;
@@ -364,7 +365,7 @@ public class ServerManager : MonoBehaviour
         // Uploading data
         StartCoroutine(PostPointToDiadrasis(formToPost, _pointToUpload.server_path_id, _pointToUpload.index));
     }*/
-
+   
     IEnumerator UploadUserDataToDiadrasis()
     {
         Debug.Log("Started uploading user data!");
@@ -900,7 +901,7 @@ public class ServerManager : MonoBehaviour
         }
 
         // Get paths to upload
-        *//*List<cPath> pathsToUpload = cPath.GetPathsToUpload();
+        List<cPath> pathsToUpload = cPath.GetPathsToUpload();
 
         if (pathsToUpload != null && pathsToUpload.Count > 0)
         {
@@ -919,7 +920,7 @@ public class ServerManager : MonoBehaviour
             {
                 UploadPoint(pointToUpload);
             }
-        }*//*
+        }
 
         // Get areas to delete
         int[] areasToDelete = cArea.GetServerIdsToDelete();
@@ -934,7 +935,7 @@ public class ServerManager : MonoBehaviour
         }
 
         // Get paths to delete ??????
-        *//*int[] pathsToDelete = cPath.GetServerIdsToDelete();
+        int[] pathsToDelete = cPath.GetServerIdsToDelete();
 
         if (pathsToDelete != null)
         {
@@ -942,7 +943,7 @@ public class ServerManager : MonoBehaviour
             {
                 DeletePathFromServer(pathToDelete);
             }
-        }*//*
+        }
     }
 
     IEnumerator PostAreaToDiadrasis(List<IMultipartFormSection> _formToPost, int _local_area_id)
@@ -971,12 +972,12 @@ public class ServerManager : MonoBehaviour
                 cArea.SetServerAreaId(_local_area_id, server_area_id);
             }
                 
-            *//*string echo = webRequest.downloadHandler.text;
+            string echo = webRequest.downloadHandler.text;
             string cleanString = echo.Substring(echo.LastIndexOf('=') + 1);
             string databaseIdString = cleanString.Replace(" ", "");
             Debug.Log("databaseId = " + databaseIdString);
             if (int.TryParse(databaseIdString, out int databaseId))
-                cArea.SetDatabaseId(_areaId, databaseId);*//*
+                cArea.SetDatabaseId(_areaId, databaseId);
             //cArea.RemoveIdToUpload(result);
         }
     }
@@ -1048,7 +1049,6 @@ public class ServerManager : MonoBehaviour
         }*/
     }
 
-    public 
 
     IEnumerator GetAreas()
     {

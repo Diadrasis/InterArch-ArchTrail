@@ -128,11 +128,11 @@ public class MapManager : MonoBehaviour
         {
             Debug.Log(answer);
         }*/
-        
-        /*AppManager.Instance.questionnaireManager.currentPath = new cPath(5);
-        if (AppManager.Instance.questionnaireManager.currentPath != null)
+
+        /*AppManager.Instance.questionnaireManager.currentPath = new cPath(5);*/
+        //if (AppManager.Instance.questionnaireManager.currentPath != null)
         {
-            int local_path_id = AppManager.Instance.questionnaireManager.currentPath.local_path_id;
+            int local_path_id = 0;//AppManager.Instance.questionnaireManager.currentPath.local_path_id;
             Debug.Log("local_path_id = " + local_path_id);
             AppManager.Instance.questionnaireManager.SaveQuestionnaire();
 
@@ -144,7 +144,9 @@ public class MapManager : MonoBehaviour
             {
                 Debug.Log(answer);
             }
-        }*/
+        }
+
+        
     }
 
     private void Update()
