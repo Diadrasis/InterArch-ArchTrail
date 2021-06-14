@@ -562,7 +562,7 @@ public class ServerManager : MonoBehaviour
                     if (int.TryParse(server_path_idString, out int server_path_id))
                     {
                         cPath.SetServerAreaAndPathId(pathToUpload.server_area_id, server_path_id, pathToUpload.local_path_id);
-                        cQuestionnaire.SetServerPathId(server_path_id, pathToUpload.local_path_id); // for offline
+                        cSurvey.SetServerPathId(server_path_id, pathToUpload.local_path_id); // for offline
                     }
                 }
             }
@@ -625,7 +625,7 @@ public class ServerManager : MonoBehaviour
         // ============== Upload Questionnaires ============== //
 
         // Get questionnaires to upload
-        List<cQuestionnaire> questionnairesToUpload = cQuestionnaire.GetQuestionnairesToUpload();
+        List<cSurvey> questionnairesToUpload = cSurvey.GetSurveysToUpload();
 
         if (questionnairesToUpload != null && questionnairesToUpload.Count > 0)
         {
@@ -633,7 +633,7 @@ public class ServerManager : MonoBehaviour
             AppManager.Instance.uIManager.txtWarningServer.text = "Uploading surveys...";
             AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
 
-            foreach (cQuestionnaire questionnaireToUpload in questionnairesToUpload)
+            foreach (cSurvey questionnaireToUpload in questionnairesToUpload)
             {
                 // Create a form and add all the fields of the area
                 List<IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
@@ -662,7 +662,7 @@ public class ServerManager : MonoBehaviour
 
                     // Delete questionnaire
                     if (echo.Equals("uploaded survey successfully"))
-                        cQuestionnaire.Delete(questionnaireToUpload.local_path_id);
+                        cSurvey.Delete(questionnaireToUpload.local_path_id);
                 }
             }
         }

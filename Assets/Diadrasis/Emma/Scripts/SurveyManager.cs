@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq;
 
-public class QuestionnaireManager : MonoBehaviour
+public class SurveyManager : MonoBehaviour
 {
     public delegate void Profile();
     public static Profile OnContinue, OnInternetError;
@@ -193,22 +193,22 @@ public class QuestionnaireManager : MonoBehaviour
         {
             if (currentPath != null)
             {
-                SaveQuestionnaire();
+                SaveSurvey();
 
                 // Test
-                /*cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(currentPath.local_path_id);
+                /*cSurvey loadedSurvey = cSurvey.Load(currentPath.local_path_id);
 
-                if (loadedQuestionnaire != null)
+                if (loadedSurvey != null)
                 {
                     //Debug.Log("Answers:");
-                    //Debug.Log("loadedQuestionnaire.answers.Count" + loadedQuestionnaire.answers.Count);
-                    foreach (string answer in loadedQuestionnaire.answers)
+                    //Debug.Log("loadedSurvey.answers.Count" + loadedSurvey.answers.Count);
+                    foreach (string answer in loadedSurvey.answers)
                     {
                         Debug.Log(answer);
                     }
                 }*/
             }
-			
+
             //close questionnairePanel and go to DisplayAreas and reset questionnaire for new user
             AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
             ResetValues();
@@ -649,7 +649,7 @@ public class QuestionnaireManager : MonoBehaviour
         //StartCoroutine(PostVisitorData(profileItem));
     }*/
 
-    public void SaveQuestionnaire()
+    public void SaveSurvey()
     {
         // Reload current path to get server path id if it was uploaded
         currentPath = cPath.Reload(currentPath);
@@ -706,9 +706,9 @@ public class QuestionnaireManager : MonoBehaviour
             }
         }
 
-        // Save Questionnaire
-        cQuestionnaire questionnaireToSave = new cQuestionnaire(currentPath.server_path_id, currentPath.local_area_id, answers);
-        cQuestionnaire.Save(questionnaireToSave);
+        // Save Survey
+        cSurvey surveyToSave = new cSurvey(currentPath.server_path_id, currentPath.local_area_id, answers);
+        cSurvey.Save(surveyToSave);
 
         // Upload to server
         AppManager.Instance.serverManager.postUserData = true;
