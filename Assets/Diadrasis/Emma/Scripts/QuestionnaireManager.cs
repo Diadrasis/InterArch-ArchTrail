@@ -169,7 +169,6 @@ public class QuestionnaireManager : MonoBehaviour
             {
                 step = demographicOptions.Length;
                 btnSkip.gameObject.SetActive(false);
-                //close questionnairePanel and go to DisplayAreas
             }
             else
             {
@@ -209,10 +208,11 @@ public class QuestionnaireManager : MonoBehaviour
                     }
                 }*/
             }
-
+			
+            //close questionnairePanel and go to DisplayAreas and reset questionnaire for new user
             AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
-            AppManager.Instance.uIManager.DisplayAreasScreen();
             ResetValues();
+            AppManager.Instance.uIManager.DisplayAreasScreen();
         }
     }
 
@@ -799,28 +799,38 @@ public class QuestionnaireManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlOptionA.SetActive(false);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
         }
-        if (AppManager.Instance.uIManager.pnlOptionB1.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
+        else if (AppManager.Instance.uIManager.pnlOptionB1.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
         {
             AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
             AppManager.Instance.uIManager.pnlOptionB.SetActive(false);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
         }
 
-        if (AppManager.Instance.uIManager.pnlOptionB2.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
+        else if (AppManager.Instance.uIManager.pnlOptionB2.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
         {
             AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
             AppManager.Instance.uIManager.pnlOptionB.SetActive(false);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
         }
-        if (AppManager.Instance.uIManager.pnlOptionC1.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
+        else if (AppManager.Instance.uIManager.pnlOptionC1.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
         {
             AppManager.Instance.uIManager.pnlOptionC1.SetActive(false);
             AppManager.Instance.uIManager.pnlOptionC.SetActive(false);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
         }
-        if (AppManager.Instance.uIManager.pnlOptionC2.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
+        else if (AppManager.Instance.uIManager.pnlOptionC2.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
         {
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
+            AppManager.Instance.uIManager.pnlOptionC.SetActive(false);
+            AppManager.Instance.uIManager.pnlOptionC2.SetActive(false);
+        }
+        else
+        {
+            AppManager.Instance.uIManager.pnlOptionA.SetActive(false);
+            AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
+            AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
+            AppManager.Instance.uIManager.pnlOptionB.SetActive(false);
+            AppManager.Instance.uIManager.pnlOptionC1.SetActive(false);
             AppManager.Instance.uIManager.pnlOptionC.SetActive(false);
             AppManager.Instance.uIManager.pnlOptionC2.SetActive(false);
         }

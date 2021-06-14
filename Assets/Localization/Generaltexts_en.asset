@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Generaltexts_en
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 6989a28cf3990064cbc2756a90b88016, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 120596381696
+    m_Localized: Select an Area
+    m_Metadata:
+      m_Items: []
+  - m_Id: 277182332928
+    m_Localized: Create new area on map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 484301258752
+    m_Localized: Add New Path
+    m_Metadata:
+      m_Items: []
+  - m_Id: 584947777536
+    m_Localized: Saved Paths
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2391862329344
+    m_Localized: Give a name to the area
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2624306462720
+    m_Localized: Enter name...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3200566083584
+    m_Localized: Save Area
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3435258363904
+    m_Localized: Give a new name to the area
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5153144619008
+    m_Localized: Press the <b>GPS</b> button to <color=#149414>enable</color> your
+      <b>location services</b>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7575166435328
+    m_Localized: Save New Area
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 1
