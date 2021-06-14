@@ -201,7 +201,7 @@ public class UIManager : MonoBehaviour
         //btnEditAreaSave.onClick.AddListener(()=> )
 
         //btn for profiler screen
-        btnProfiler.onClick.AddListener(() => DisplayQuestionnaire());
+        //btnProfiler.onClick.AddListener(() => DisplayQuestionnaire());
         btnResetQuestionnaire.onClick.AddListener(() => AppManager.Instance.questionnaireManager.ResetValues());
 
 
@@ -236,7 +236,7 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, false);
         imgRecord.gameObject.SetActive(false);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths
-        ActivateButtons(false,true, false, true);
+        ActivateButtons(false,true, false, false);
         txtMainName.text = DEFAULT_TEXT_NAME;
         pnlWarningDeleteScreen.SetActive(false);
         AppManager.Instance.questionnaireManager.ResetValues();
@@ -804,13 +804,13 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region QuestionnairePanel
-    void DisplayQuestionnaire()
+    /*void DisplayQuestionnaire()
     {
         pnlQuestionnaireScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
         pnlAreasScreen.SetActive(false);
         ActivateButtons(true,true, true, true);
-    }
+    }*/
 
     void OpenQuestionnaire()
     {
@@ -820,7 +820,7 @@ public class UIManager : MonoBehaviour
         pnlOptionB.SetActive(false);
         pnlOptionC.SetActive(false);
         pnlPathScreen.SetActive(false);
-        ActivateButtons(true, true, true, true);
+        ActivateButtons(true, true, true, false);
     }
     #endregion
 

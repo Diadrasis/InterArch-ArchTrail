@@ -147,7 +147,7 @@ public class QuestionnaireManager : MonoBehaviour
                 {
                     CheckValue(optionDropdown);
                     demographicOptions[step].SetActive(true);
-                    Debug.Log("Here");
+                    //Debug.Log("Here");
                 }
                 //step = 5;
                 
@@ -156,13 +156,13 @@ public class QuestionnaireManager : MonoBehaviour
                 || step == 33 || step == 37 || step == 45 || step == 49 || step == 52 || step == 57
                 || step == 61 || step == 66 || step == 69)
             {
-                Debug.Log("Step for toggleCheck" + step);
+                //Debug.Log("Step for toggleCheck" + step);
                 CheckIfUserHasSelectedOtherOption();
             }
             else if (step == 11 || step == 23 || step == 27 || step == 35 || step == 39
                 || step == 47 || step == 59 || step == 64)
             {
-                Debug.Log("Step for toggleCheck Second method: " + step);
+                //Debug.Log("Step for toggleCheck Second method: " + step);
                 CheckIfUserHasSelectedOtherOptionSecond();
             }
             else if (step == 41 || step == 16 || step == 32 || step == 53 || step == 70)
@@ -197,15 +197,15 @@ public class QuestionnaireManager : MonoBehaviour
             if (currentPath != null)
             {
                 //int local_path_id = 0;
-                Debug.Log("currentPath.local_path_id = " + currentPath.local_path_id);
+                //Debug.Log("currentPath.local_path_id = " + currentPath.local_path_id);
                 SaveQuestionnaire();
 
                 cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(currentPath.local_path_id);
 
                 if (loadedQuestionnaire != null)
                 {
-                    Debug.Log("Answers:");
-                    Debug.Log("loadedQuestionnaire.answers.Count" + loadedQuestionnaire.answers.Count);
+                    //Debug.Log("Answers:");
+                    //Debug.Log("loadedQuestionnaire.answers.Count" + loadedQuestionnaire.answers.Count);
                     foreach (string answer in loadedQuestionnaire.answers)
                     {
                         Debug.Log(answer);
@@ -217,10 +217,10 @@ public class QuestionnaireManager : MonoBehaviour
         }
 
         //SaveProfile();
-        else
+        /*else
         {
             Debug.Log("Sto else tou submit");
-        }
+        }*/
     }
 
     //because we don't want to save in case user skips a step. Does the same as Submit() but in submit we will save the answers...
@@ -239,7 +239,7 @@ public class QuestionnaireManager : MonoBehaviour
             {
                 CheckValue(optionDropdown);
                 demographicOptions[step].SetActive(true);
-                Debug.Log("Here");
+                //Debug.Log("Here");
             }
             
             //step = 5;
@@ -257,7 +257,7 @@ public class QuestionnaireManager : MonoBehaviour
             btnSkip.gameObject.SetActive(false);
         }
         
-        Debug.Log("Step: " + step);
+        //Debug.Log("Step: " + step);
 
     }
     //for the dropdown which will make the different selections and open/close panels
@@ -819,12 +819,37 @@ public class QuestionnaireManager : MonoBehaviour
         optionDropdown.value = 0;
         toggleContainerOptionB.gameObject.SetActive(true);
         toggleContainerOptionC.gameObject.SetActive(true);
-        if (AppManager.Instance.uIManager.pnlOptionA.activeSelf) AppManager.Instance.uIManager.pnlOptionA.SetActive(false);
-        if (AppManager.Instance.uIManager.pnlOptionB1.activeSelf) AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
-        if (AppManager.Instance.uIManager.pnlOptionB2.activeSelf) AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
-        if (AppManager.Instance.uIManager.pnlOptionC1.activeSelf) AppManager.Instance.uIManager.pnlOptionC1.SetActive(false);
-        if (AppManager.Instance.uIManager.pnlOptionC2.activeSelf) AppManager.Instance.uIManager.pnlOptionC2.SetActive(false);
-        Debug.Log("Reset "+ choiceToggles.Length.ToString() +" can we see it "+choiceToggles[0].gameObject.activeSelf);
+        if (AppManager.Instance.uIManager.pnlOptionA.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
+        {
+            AppManager.Instance.uIManager.pnlOptionA.SetActive(false);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
+        }
+        if (AppManager.Instance.uIManager.pnlOptionB1.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
+        {
+            AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
+            AppManager.Instance.uIManager.pnlOptionB.SetActive(false);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
+        }
+
+        if (AppManager.Instance.uIManager.pnlOptionB2.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
+        {
+            AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
+            AppManager.Instance.uIManager.pnlOptionB.SetActive(false);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
+        }
+        if (AppManager.Instance.uIManager.pnlOptionC1.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
+        {
+            AppManager.Instance.uIManager.pnlOptionC1.SetActive(false);
+            AppManager.Instance.uIManager.pnlOptionC.SetActive(false);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
+        }
+        if (AppManager.Instance.uIManager.pnlOptionC2.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)
+        {
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
+            AppManager.Instance.uIManager.pnlOptionC.SetActive(false);
+            AppManager.Instance.uIManager.pnlOptionC2.SetActive(false);
+        }
+        //Debug.Log("Reset "+ choiceToggles.Length.ToString() +" can we see it "+choiceToggles[0].gameObject.activeSelf);
 
     }
 }
