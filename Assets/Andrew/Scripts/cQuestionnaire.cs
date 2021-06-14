@@ -67,7 +67,7 @@ public class cQuestionnaire
             answersNode.Create(ANSWER, answer);
         }
 
-        //Debug.Log(xml.outerXml);
+        Debug.Log(xml.outerXml);
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
@@ -81,12 +81,19 @@ public class cQuestionnaire
         // Find questionnaire
         OnlineMapsXML questionnaireNode = xml.Find("/" + QUESTIONNAIRES + "/" + QUESTIONNAIRE + "[" + LOCAL_PATH_ID + "=" + _local_path_id + "]");
 
-        // Load questionnaire
-        cQuestionnaire loadedQuestionnaire = Load(questionnaireNode);
-        loadedQuestionnaire.server_path_id = _server_path_id;
+        if (!questionnaireNode.isNull)
+        {
+            // Load questionnaire
+            cQuestionnaire loadedQuestionnaire = Load(questionnaireNode);
 
-        // Edit path
-        EditServerPathId(loadedQuestionnaire);
+            if (loadedQuestionnaire != null)
+            {
+                loadedQuestionnaire.server_path_id = _server_path_id;
+
+                // Edit path
+                EditServerPathId(loadedQuestionnaire);
+            }
+        }
     }
 
     private static void EditServerPathId(cQuestionnaire _questionnaireToEdit)

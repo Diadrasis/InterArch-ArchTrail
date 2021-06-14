@@ -614,7 +614,7 @@ public class MapManager : MonoBehaviour
                 }
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
                 isShown = true;
-                Debug.Log("Out of area true");
+                //Debug.Log("Out of area true");
             }
             else
             {   
@@ -622,7 +622,7 @@ public class MapManager : MonoBehaviour
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
                 AppManager.Instance.uIManager.btnContinue.interactable = true;
                 isShown = false;
-                Debug.Log("Out of area false");
+                //Debug.Log("Out of area false");
             }
         }
     }

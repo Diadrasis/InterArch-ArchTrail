@@ -170,8 +170,6 @@ public class QuestionnaireManager : MonoBehaviour
                 step = demographicOptions.Length;
                 btnSkip.gameObject.SetActive(false);
                 //close questionnairePanel and go to DisplayAreas
-                AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
-                AppManager.Instance.uIManager.DisplayAreasScreen();
             }
             else
             {
@@ -191,16 +189,15 @@ public class QuestionnaireManager : MonoBehaviour
             
         }
 
-        // Save step
+        // End survey and save
         if (step >= demographicOptions.Length)
         {
             if (currentPath != null)
             {
-                //int local_path_id = 0;
-                //Debug.Log("currentPath.local_path_id = " + currentPath.local_path_id);
                 SaveQuestionnaire();
 
-                cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(currentPath.local_path_id);
+                // Test
+                /*cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(currentPath.local_path_id);
 
                 if (loadedQuestionnaire != null)
                 {
@@ -210,17 +207,13 @@ public class QuestionnaireManager : MonoBehaviour
                     {
                         Debug.Log(answer);
                     }
-                }
+                }*/
             }
 
-            btnSkip.gameObject.SetActive(false);
+            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
+            AppManager.Instance.uIManager.DisplayAreasScreen();
+            ResetValues();
         }
-
-        //SaveProfile();
-        /*else
-        {
-            Debug.Log("Sto else tou submit");
-        }*/
     }
 
     //because we don't want to save in case user skips a step. Does the same as Submit() but in submit we will save the answers...
@@ -333,7 +326,6 @@ public class QuestionnaireManager : MonoBehaviour
             textC.gameObject.SetActive(false);
             step = 54;
         }
-
     }
 
     void CheckIfUserHasSelectedOtherOption()
@@ -355,11 +347,7 @@ public class QuestionnaireManager : MonoBehaviour
         }
         else if (step == 15 && !questionToggle[2].isOn)
         {
-            step = 71;
-            //close questionnairePanel and go to DisplayAreas
-            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
-            AppManager.Instance.uIManager.DisplayAreasScreen();
-            btnSkip.gameObject.SetActive(false);
+            step = demographicOptions.Length;
         }
 
         if (step == 21 && questionToggle[3].isOn)
@@ -388,13 +376,9 @@ public class QuestionnaireManager : MonoBehaviour
             step = 32;
             demographicOptions[step].SetActive(true);
         }
-        else if (step == 30 && !questionToggle[6].isOn)
+        else if (step == 31 && !questionToggle[6].isOn)
         {
-            step = 71;
-            //close questionnairePanel and go to DisplayAreas
-            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
-            AppManager.Instance.uIManager.DisplayAreasScreen();
-            btnSkip.gameObject.SetActive(false);
+            step = demographicOptions.Length;
         }
 
         if(step == 33 && questionToggle[7].isOn)
@@ -446,11 +430,7 @@ public class QuestionnaireManager : MonoBehaviour
         }
         else if (step == 52 && !questionToggle[14].isOn)
         {
-            step = 71;
-            //close questionnairePanel and go to DisplayAreas
-            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
-            AppManager.Instance.uIManager.DisplayAreasScreen();
-            btnSkip.gameObject.SetActive(false);
+            step = demographicOptions.Length;
         }
 
         if (step == 57 && questionToggle[15].isOn)
@@ -493,13 +473,8 @@ public class QuestionnaireManager : MonoBehaviour
         }
         else if (step == 69 && !questionToggle[20].isOn)
         {
-            step = 71;
-            //close questionnairePanel and go to DisplayAreas
-            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
-            AppManager.Instance.uIManager.DisplayAreasScreen();
-            btnSkip.gameObject.SetActive(false);
+            step = demographicOptions.Length;
         }
-        
     }
 
     void CheckIfUserHasSelectedOtherOptionSecond() 
@@ -603,7 +578,7 @@ public class QuestionnaireManager : MonoBehaviour
         OnContinue?.Invoke();
     }*/
 
-    void SaveProfile()
+    /*void SaveProfile()
     {
         ProfileItem profileItem = new ProfileItem();
 
@@ -622,7 +597,7 @@ public class QuestionnaireManager : MonoBehaviour
                 profileItem.VisitReason = dd.options[dd.value].text;
 
             }
-            /*else if (dd.transform.parent == demographicOptions[3].transform)//tech familiarity
+            *//*else if (dd.transform.parent == demographicOptions[3].transform)//tech familiarity
             {
                 profileItem.Technology = dd.options[dd.value].text;
                 profileItem.TechnologyINT = dd.value + 1;
@@ -636,7 +611,7 @@ public class QuestionnaireManager : MonoBehaviour
             else if (dd.transform.parent == demographicOptions[5].transform)//visit reason
             {
                 profileItem.VisitReason = dd.options[dd.value].text;
-            }*/
+            }*//*
             //Debug.Log("Here on Save");
         }
 
@@ -653,7 +628,7 @@ public class QuestionnaireManager : MonoBehaviour
         }
         btnSubmit.gameObject.SetActive(false);
 
-        /*string pass = Random.Range(100, 999).ToString();
+        *//*string pass = Random.Range(100, 999).ToString();
         string visitorId = SystemInfo.deviceUniqueIdentifier.Substring(0, 3) + pass;*/
 
         /*if (StaticData.isNewVisitor)
@@ -668,15 +643,15 @@ public class QuestionnaireManager : MonoBehaviour
             profileItem.VisitorId = StaticData.visitorId;
             profileItem.VisitorPass = StaticData.visitorPass;
         }
-*/
+*//*
 
         //StopCoroutine("PostVisitorData");
         //StartCoroutine(PostVisitorData(profileItem));
-    }
+    }*/
 
     public void SaveQuestionnaire()
     {
-        // Reload current path
+        // Reload current path to get server path id if it was uploaded
         currentPath = cPath.Reload(currentPath);
 
         // Initialize a list of answers
@@ -689,7 +664,7 @@ public class QuestionnaireManager : MonoBehaviour
             TMP_InputField inputField = gO.GetComponentInChildren<TMP_InputField>();
             if (inputField != null)
             {
-                answers.Add(string.IsNullOrEmpty(inputField.text) ? "no answer" : inputField.text);
+                answers.Add(string.IsNullOrEmpty(inputField.text) ? null : inputField.text);
                 continue;
             }
 
@@ -697,7 +672,7 @@ public class QuestionnaireManager : MonoBehaviour
             TMP_Dropdown dropdown = gO.GetComponentInChildren<TMP_Dropdown>();
             if (dropdown != null)
             {
-                answers.Add(dropdown.captionText.text.Equals("<Επιλέξτε από τα παρακάτω>") ? "no answer" : dropdown.captionText.text);
+                answers.Add(dropdown.captionText.text.Equals("<Επιλέξτε από τα παρακάτω>") || dropdown.captionText.text.Equals("<Select>") ? null : dropdown.captionText.text); // TODO: Check for translated
                 continue;
             }
 
@@ -727,7 +702,7 @@ public class QuestionnaireManager : MonoBehaviour
                     }
                 }
 
-                answers.Add(string.IsNullOrEmpty(text) ? "no answer" : text);
+                answers.Add(string.IsNullOrEmpty(text) ? null : text);
             }
         }
 

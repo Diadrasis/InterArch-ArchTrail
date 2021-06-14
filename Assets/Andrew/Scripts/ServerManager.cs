@@ -562,7 +562,7 @@ public class ServerManager : MonoBehaviour
                     if (int.TryParse(server_path_idString, out int server_path_id))
                     {
                         cPath.SetServerAreaAndPathId(pathToUpload.server_area_id, server_path_id, pathToUpload.local_path_id);
-                        cQuestionnaire.SetServerPathId(server_path_id, pathToUpload.local_path_id);
+                        cQuestionnaire.SetServerPathId(server_path_id, pathToUpload.local_path_id); // for offline
                     }
                 }
             }
@@ -641,7 +641,7 @@ public class ServerManager : MonoBehaviour
                 formToPost.Add(new MultipartFormDataSection("server_path_id", questionnaireToUpload.server_path_id.ToString()));
                 for (int i = 0; i < questionnaireToUpload.answers.Count; i++)
                 {
-                    formToPost.Add(new MultipartFormDataSection("answer" + i, questionnaireToUpload.answers[i]));
+                    formToPost.Add(new MultipartFormDataSection("answer" + i, questionnaireToUpload.answers[i] == null ? "null" : questionnaireToUpload.answers[i]));
                 }
 
                 UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisSurveyManagerUrl, formToPost);
@@ -767,7 +767,7 @@ public class ServerManager : MonoBehaviour
 
         if (webRequest.isNetworkError || webRequest.isHttpError)
         {
-            Debug.Log("Test failed. Error #" + webRequest.error);
+            Debug.Log("Download areas failed. Error #" + webRequest.error);
         }
         else
         {
@@ -782,7 +782,7 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(areasData);
-                Debug.Log("areas --> Json string = " + json);
+                //Debug.Log("areas --> Json string = " + json);
 
                 // Create a cAreasData from json string
                 cAreaData[] areasDataFromJSON = MethodHelper.FromJson<cAreaData>(MethodHelper.SetupJson(json));
@@ -1283,7 +1283,7 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(pathsData);
-                Debug.Log("paths --> Json string = " + json);
+                //Debug.Log("paths --> Json string = " + json);
                 // Create a cAreasData from json string
                 cPathData[] pathsDataFromJSON = MethodHelper.FromJson<cPathData>(MethodHelper.SetupJson(json));
 
@@ -1375,7 +1375,7 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(pointsData);
-                Debug.Log("points --> Json string = " + json);
+                //Debug.Log("points --> Json string = " + json);
                 // Create a cAreasData from json string
                 cPointData[] pointsDataFromJSON = MethodHelper.FromJson<cPointData>(MethodHelper.SetupJson(json));
 
