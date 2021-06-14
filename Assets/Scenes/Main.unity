@@ -29979,7 +29979,7 @@ GameObject:
   - component: {fileID: 589936711}
   - component: {fileID: 589936712}
   m_Layer: 5
-  m_Name: Toggle (1)
+  m_Name: Toggle B1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -56456,7 +56456,7 @@ GameObject:
   - component: {fileID: 1046430363}
   - component: {fileID: 1046430364}
   m_Layer: 5
-  m_Name: Toggle (2)
+  m_Name: Toggle B2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61323,7 +61323,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1138509592}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7eef11eeef443f5498bde4fc46c2ec14, type: 3}
+  m_Script: {fileID: 11500000, guid: 32cdd337ab4d5624b9892a142def6f45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   btnSubmit: {fileID: 134373156}
@@ -61346,6 +61346,7 @@ MonoBehaviour:
   - {fileID: 1035083987}
   - {fileID: 1257876064}
   - {fileID: 802892613}
+  - {fileID: 1913784731}
   - {fileID: 1842649751}
   - {fileID: 34335974}
   - {fileID: 1128660334}
@@ -61371,6 +61372,7 @@ MonoBehaviour:
   - {fileID: 245581504}
   - {fileID: 2059077715}
   - {fileID: 1225090655}
+  - {fileID: 1971933818}
   - {fileID: 80915403}
   - {fileID: 1418124166}
   - {fileID: 1990718438}
@@ -61610,9 +61612,10 @@ MonoBehaviour:
   - {fileID: 1380727008}
   - {fileID: 376947860}
   optionDropdown: {fileID: 1125462649}
-  choiceToggles:
+  choiceTogglesB:
   - {fileID: 589936712}
   - {fileID: 1046430364}
+  choiceTogglesC:
   - {fileID: 606439474}
   - {fileID: 293447982}
   step: 0
@@ -112129,7 +112132,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 2250}
+  m_AnchoredPosition: {x: 0, y: 150}
   m_SizeDelta: {x: 550, y: 250}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &2147045312
