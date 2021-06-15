@@ -137,7 +137,7 @@ public class SurveyManager : MonoBehaviour
     {
         demographicOptions[step].SetActive(false);
 
-        if (step < demographicOptions.Length - 1)
+        if (step < demographicOptions.Length)
         {
             //StopCoroutine("DelayShow");
             StartCoroutine(DelayShow());
@@ -157,18 +157,18 @@ public class SurveyManager : MonoBehaviour
             }
             else if (step == 9 || step == 15 || step == 22 || step == 26 || step == 32
                 || step == 34 || step == 38 || step == 47 || step == 51 || step == 54 || step == 59
-                || step == 63 || step == 68 || step == 71)
+                || step == 63 || step == 67 || step == 72)
             {
                 //Debug.Log("Step for toggleCheck" + step);
                 CheckIfUserHasSelectedOtherOption();
             }
             else if (step == 11 || step == 24 || step == 28 || step == 36 || step == 40
-                || step == 49 || step == 61 || step == 66)
+                || step == 49 || step == 61 || step == 65 || step == 69)
             {
                 //Debug.Log("Step for toggleCheck Second method: " + step);
                 CheckIfUserHasSelectedOtherOptionSecond();
             }
-            else if (step == 16 || step == 42 || step == 33 || step == 55 || step == 72)
+            else if (step == 16 || step == 42 || step == 33 || step == 55 || step == 73)
             {
                 step = demographicOptions.Length;
                 btnSkip.gameObject.SetActive(false);
@@ -185,7 +185,7 @@ public class SurveyManager : MonoBehaviour
             }
             
             if (step==4 ||step == 15 || step == 16 || step == 32 || step == 33 || step == 42 || step == 41 || step == 43 || step == 54 || step == 55 
-            || step == 69 || step == 72)
+            || step == 69 || step == 72 || step == 73)
             {
                 btnSkip.gameObject.SetActive(false);
             }
@@ -232,7 +232,7 @@ public class SurveyManager : MonoBehaviour
     {
         demographicOptions[step].SetActive(false);
 
-        if (step < demographicOptions.Length - 1)
+        if (step < demographicOptions.Length)
         {
             //StopCoroutine("DelayShow");
             StartCoroutine(DelayShow());
@@ -250,7 +250,6 @@ public class SurveyManager : MonoBehaviour
         }
         else
         {
-
             step++;
             demographicOptions[step].SetActive(true);
         }
@@ -473,26 +472,25 @@ public class SurveyManager : MonoBehaviour
             step = 65;
             demographicOptions[step].SetActive(true);
         }
-
-        if (step == 68 && questionToggle[19].isOn)
+        if (step == 67 && questionToggle[18].isOn)
+        {
+            step = 68;
+            demographicOptions[step].SetActive(true);
+        }
+        else if (step == 67 && !questionToggle[18].isOn)
         {
             step = 69;
             demographicOptions[step].SetActive(true);
         }
-        else if (step == 68 && !questionToggle[19].isOn)
+        if (step == 72 && questionToggle[20].isOn)
         {
-            step = 70;
+            step = 73;
             demographicOptions[step].SetActive(true);
         }
-
-        if (step == 71 && questionToggle[20].isOn)
-        {
-            step = 72;
-            demographicOptions[step].SetActive(true);
-        }
-        else if (step == 71 && !questionToggle[20].isOn)
+        else if (step == 72 && !questionToggle[20].isOn)
         {
             step = demographicOptions.Length;
+            Debug.Log("step on 72: " + step);
         }
     }
 
@@ -572,17 +570,27 @@ public class SurveyManager : MonoBehaviour
             step = 63;
             demographicOptions[step].SetActive(true);
         }
-
-        if (step == 66 && questionToggle[18].isOn)
+        if(step == 65 && questionToggle[22].isOn)
+        {
+            step = 66;
+            demographicOptions[step].SetActive(true);
+        }
+        else if (step == 65 && !questionToggle[22].isOn)
         {
             step = 67;
             demographicOptions[step].SetActive(true);
         }
-        else if (step == 66 && !questionToggle[18].isOn)
+        if (step == 69 && questionToggle[19].isOn)
         {
-            step = 68;
+            step = 70;
             demographicOptions[step].SetActive(true);
         }
+        else if (step == 69 && !questionToggle[19].isOn)
+        {
+            step = 71;
+            demographicOptions[step].SetActive(true);
+        }
+
     }
     IEnumerator DelayShow()
     {
