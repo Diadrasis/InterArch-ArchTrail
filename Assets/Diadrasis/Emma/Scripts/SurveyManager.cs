@@ -366,12 +366,12 @@ public class SurveyManager : MonoBehaviour
             step = demographicOptions.Length;
         }
 
-        if (step == 22 && questionToggle[3].isOn)
+        if (step == 22 && questionToggle[21].isOn)
         {
             step = 23;
             demographicOptions[step].SetActive(true);
         }
-        else if (step == 22 && !questionToggle[3].isOn)
+        else if (step == 22 && !questionToggle[21].isOn)
         {
             step = 24;
             demographicOptions[step].SetActive(true);

@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: MainQuestions_el
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: el
+  m_SharedData: {fileID: 11400000, guid: 1dccfd93a162d7a4d87530e1a4b6f6dd, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 9879339008
+    m_Localized: "\u03A6\u03CD\u03BB\u03BF"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 92968501248
+    m_Localized: "\u0386\u03C1\u03C1\u03B5\u03BD"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 199105363968
+    m_Localized: "\u0398\u03AE\u03BB\u03C5"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3196153675776
+    m_Localized: "<\u0395\u03C0\u03B9\u03BB\u03AD\u03BE\u03C4\u03B5 \u03B1\u03C0\u03CC
+      \u03C4\u03B1 \u03C0\u03B1\u03C1\u03B1\u03BA\u03AC\u03C4\u03C9>"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3580096069632
+    m_Localized: "<\u0395\u03C0\u03B9\u03BB\u03AD\u03BE\u03C4\u03B5 \u03B1\u03C0\u03CC
+      \u03C4\u03B1 \u03C0\u03B1\u03C1\u03B1\u03BA\u03AC\u03C4\u03C9>\n\u0386\u03C1\u03C1\u03B5\u03BD\n\u0398\u03AE\u03BB\u03C5"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 1
