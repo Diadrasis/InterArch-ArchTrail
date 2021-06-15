@@ -168,7 +168,7 @@ public class SurveyManager : MonoBehaviour
                 //Debug.Log("Step for toggleCheck Second method: " + step);
                 CheckIfUserHasSelectedOtherOptionSecond();
             }
-            else if (step == 15 || step == 42 || step == 33 || step == 55 || step == 72)
+            else if (step == 16 || step == 42 || step == 33 || step == 55 || step == 72)
             {
                 step = demographicOptions.Length;
                 btnSkip.gameObject.SetActive(false);
