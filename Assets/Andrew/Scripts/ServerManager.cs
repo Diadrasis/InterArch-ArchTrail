@@ -42,6 +42,9 @@ public class ServerManager : MonoBehaviour
 
     // Tiles
     public TileDownloader tileDownloader;
+
+    private float secondsToWaitBeforeWarning = 0f;
+    private float minSecondsToDisplayWarning = 1f;
     #endregion
 
     #region UnityMethods
@@ -298,7 +301,6 @@ public class ServerManager : MonoBehaviour
                 StartCoroutine(GetPoints(downloadPathId));
                 downloadPathId = -1;
             }
-
         }
         else
         {
@@ -435,10 +437,6 @@ public class ServerManager : MonoBehaviour
 
         if (areasToUpload != null && areasToUpload.Count > 0)
         {
-            // Activate panel
-            AppManager.Instance.uIManager.txtWarningServer.text = "";
-            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-
             foreach (cArea areaToUpload in areasToUpload)
             {
                 // If the area's tiles are not downloaded ask user and download tiles Locally
@@ -463,10 +461,13 @@ public class ServerManager : MonoBehaviour
                         tileDownloader.Download();
                         while (tileDownloader.isDownloading)
                         {
-                            // Update panel
-                            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                            int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
-                            AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                            // Show warning panel
+                            if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+                            {
+                                int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
+                                AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                                AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                            }
 
                             yield return null;
                         }
@@ -475,8 +476,12 @@ public class ServerManager : MonoBehaviour
                     }
                 }
 
-                // Update panel
-                AppManager.Instance.uIManager.txtWarningServer.text = "Uploading area...";
+                // Show warning panel
+                if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+                {
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Uploading area...";
+                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                }
 
                 // Create a form and add all the fields of the area
                 List <IMultipartFormSection> formToPost = new List<IMultipartFormSection>();
@@ -525,9 +530,12 @@ public class ServerManager : MonoBehaviour
 
         if (pathsToUpload != null && pathsToUpload.Count > 0)
         {
-            // Activate panel
-            AppManager.Instance.uIManager.txtWarningServer.text = "Uploading paths...";
-            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            // Show warning panel
+            if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+            {
+                AppManager.Instance.uIManager.txtWarningServer.text = "Uploading paths...";
+                AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            }
 
             foreach (cPath pathToUpload in pathsToUpload)
             {
@@ -575,9 +583,12 @@ public class ServerManager : MonoBehaviour
 
         if (pointsToUpload != null && pointsToUpload.Count > 0)
         {
-            // Activate panel
-            AppManager.Instance.uIManager.txtWarningServer.text = "Uploading points...";
-            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            // Show warning panel
+            if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+            {
+                AppManager.Instance.uIManager.txtWarningServer.text = "Uploading points...";
+                AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            }
 
             foreach (cPathPoint pointToUpload in pointsToUpload)
             {
@@ -629,9 +640,12 @@ public class ServerManager : MonoBehaviour
 
         if (questionnairesToUpload != null && questionnairesToUpload.Count > 0)
         {
-            // Activate panel
-            AppManager.Instance.uIManager.txtWarningServer.text = "Uploading surveys...";
-            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            // Show warning panel
+            if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+            {
+                AppManager.Instance.uIManager.txtWarningServer.text = "Uploading surveys...";
+                AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            }
 
             foreach (cSurvey questionnaireToUpload in questionnairesToUpload)
             {
@@ -674,9 +688,12 @@ public class ServerManager : MonoBehaviour
 
         if (areasToDelete != null && areasToDelete.Length > 0)
         {
-            // Activate panel
-            AppManager.Instance.uIManager.txtWarningServer.text = "Deleting areas...";
-            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            // Show warning panel
+            if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+            {
+                AppManager.Instance.uIManager.txtWarningServer.text = "Deleting areas...";
+                AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            }
 
             foreach (int server_area_idToDelete in areasToDelete)
             {
@@ -715,9 +732,12 @@ public class ServerManager : MonoBehaviour
 
         if (pathsToDelete != null && pathsToDelete.Length > 0)
         {
-            // Activate panel
-            AppManager.Instance.uIManager.txtWarningServer.text = "Deleting paths...";
-            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            // Show warning panel
+            if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+            {
+                AppManager.Instance.uIManager.txtWarningServer.text = "Deleting paths...";
+                AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+            }
 
             foreach (int server_path_idToDelete in pathsToDelete)
             {
@@ -750,9 +770,16 @@ public class ServerManager : MonoBehaviour
 
         // Deactivate warning panel
         stopWatch.Stop();
-        TimeSpan ts = stopWatch.Elapsed;
-        yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
+        TimeSpan timeSpan = stopWatch.Elapsed;
+        float secondsToWait = ((secondsToWaitBeforeWarning + minSecondsToDisplayWarning) - (float)timeSpan.TotalSeconds);
+        yield return new WaitForSeconds(timeSpan.TotalSeconds > (secondsToWaitBeforeWarning + minSecondsToDisplayWarning) ? 0f : secondsToWait);
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
+
+        // Test
+        // stopWatch.Stop();
+        /*Debug.Log("total seconds = " + stopWatch.Elapsed.TotalSeconds);
+        Debug.Log("secondsToWait = " + secondsToWait);
+        Debug.Log("seconds = " + (secondsToWaitBeforeWarning + minSecondsToDisplayWarning));*/
     }
 
     IEnumerator DownloadDataFromDiadrasis()
@@ -1143,9 +1170,12 @@ public class ServerManager : MonoBehaviour
 
                 if (areasDataFromJSON != null && areasDataFromJSON.Length > 0)
                 {
-                    // Activate panel
-                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    AppManager.Instance.uIManager.txtWarningServer.text = "Updating areas...";
+                    // Show warning panel
+                    if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+                    {
+                        AppManager.Instance.uIManager.txtWarningServer.text = "Updating areas...";
+                        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                    }
 
                     foreach (cAreaData areaData in areasDataFromJSON)
                     {
@@ -1184,8 +1214,8 @@ public class ServerManager : MonoBehaviour
 
         // Deactivate warning panel
         stopWatch.Stop();
-        TimeSpan ts = stopWatch.Elapsed;
-        yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
+        TimeSpan timeSpan = stopWatch.Elapsed;
+        yield return new WaitForSeconds(timeSpan.TotalSeconds > (secondsToWaitBeforeWarning + minSecondsToDisplayWarning) ? 0f : ((secondsToWaitBeforeWarning + minSecondsToDisplayWarning) - (float)timeSpan.TotalSeconds));
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 
@@ -1289,9 +1319,12 @@ public class ServerManager : MonoBehaviour
 
                 if (pathsDataFromJSON != null && pathsDataFromJSON.Length > 0)
                 {
-                    // Update panel
-                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    AppManager.Instance.uIManager.txtWarningServer.text = "Updating paths...";
+                    // Show warning panel
+                    if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+                    {
+                        AppManager.Instance.uIManager.txtWarningServer.text = "Updating paths...";
+                        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                    }
 
                     foreach (cPathData pathData in pathsDataFromJSON)
                     {
@@ -1325,8 +1358,8 @@ public class ServerManager : MonoBehaviour
 
         // Deactivate warning panel
         stopWatch.Stop();
-        TimeSpan ts = stopWatch.Elapsed;
-        yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
+        TimeSpan timeSpan = stopWatch.Elapsed;
+        yield return new WaitForSeconds(timeSpan.TotalSeconds > (secondsToWaitBeforeWarning + minSecondsToDisplayWarning) ? 0f : ((secondsToWaitBeforeWarning + minSecondsToDisplayWarning) - (float)timeSpan.TotalSeconds));
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 
@@ -1381,9 +1414,12 @@ public class ServerManager : MonoBehaviour
 
                 if (pointsDataFromJSON != null && pointsDataFromJSON.Length > 0)
                 {
-                    // Activate panel
-                    AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    AppManager.Instance.uIManager.txtWarningServer.text = "Updating points...";
+                    // Show warning panel
+                    if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+                    {
+                        AppManager.Instance.uIManager.txtWarningServer.text = "Updating points...";
+                        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                    }
 
                     foreach (cPointData pointData in pointsDataFromJSON)
                     {
@@ -1414,8 +1450,8 @@ public class ServerManager : MonoBehaviour
 
         // Deactivate warning panel
         stopWatch.Stop();
-        TimeSpan ts = stopWatch.Elapsed;
-        yield return new WaitForSeconds(ts.TotalSeconds > 1f ? 0f : (1f - (float)ts.TotalSeconds));
+        TimeSpan timeSpan = stopWatch.Elapsed;
+        yield return new WaitForSeconds(timeSpan.TotalSeconds > (secondsToWaitBeforeWarning + minSecondsToDisplayWarning) ? 0f : ((secondsToWaitBeforeWarning + minSecondsToDisplayWarning) - (float)timeSpan.TotalSeconds));
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 

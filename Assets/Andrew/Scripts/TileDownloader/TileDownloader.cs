@@ -442,7 +442,7 @@ public class TileDownloader: MonoBehaviour
             if (File.Exists(tilePath)) continue;
 
             string url = tile.url;
-            Debug.Log(url + "    " + tilePath);
+            //Debug.Log(url + "    " + tilePath);
             OnlineMapsWWW www = new OnlineMapsWWW(url);
             www["path"] = tilePath;
             www.OnComplete += OnTileDownloaded;
