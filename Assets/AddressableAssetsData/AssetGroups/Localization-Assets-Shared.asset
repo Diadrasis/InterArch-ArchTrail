@@ -17,11 +17,19 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: bad8189f9f0bd764288bfc325af14fa6
   m_SerializeEntries:
+  - m_GUID: 1dccfd93a162d7a4d87530e1a4b6f6dd
+    m_Address: MainQuestions Shared Data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   - m_GUID: 6989a28cf3990064cbc2756a90b88016
     m_Address: Generaltexts Shared Data
     m_ReadOnly: 0
     m_SerializedLabels: []
-    m_mainAssetType: 
+    m_mainAssetType: UnityEngine.Localization.Tables.SharedTableData, Unity.Localization,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   - m_GUID: b7c589f76f114e74fa959165b7c8aecb
