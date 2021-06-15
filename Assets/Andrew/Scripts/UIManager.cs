@@ -661,6 +661,11 @@ public class UIManager : MonoBehaviour
     //opens the saved paths screen (on click event)
     void DisplaySavedPathsScreen()
     {
+        /*// Download Paths of Area
+        if (AppManager.Instance.mapManager.currentArea.server_area_id != -1)
+        {
+            AppManager.Instance.serverManager.DownloadPaths(AppManager.Instance.mapManager.currentArea.server_area_id);
+        }*/
         pnlSavedPaths.SetActive(true);
         DestroySelectAreaObjects(selectPathObjects);
         selectPathObjects = InstantiateSelectPathObjects();
