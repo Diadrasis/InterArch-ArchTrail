@@ -641,7 +641,7 @@ public class ServerManager : MonoBehaviour
                 formToPost.Add(new MultipartFormDataSection("server_path_id", questionnaireToUpload.server_path_id.ToString()));
                 for (int i = 0; i < questionnaireToUpload.answers.Count; i++)
                 {
-                    formToPost.Add(new MultipartFormDataSection("answer" + i, questionnaireToUpload.answers[i] == null ? "null" : questionnaireToUpload.answers[i]));
+                    formToPost.Add(new MultipartFormDataSection("answer" + i, questionnaireToUpload.answers[i] == null ? " " : questionnaireToUpload.answers[i]));
                 }
 
                 UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisSurveyManagerUrl, formToPost);

@@ -196,6 +196,9 @@ public class SurveyManager : MonoBehaviour
             
         }
 
+        Debug.Log("step = " + step);
+        SaveSurvey();
+
         // End survey and save
         if (step >= demographicOptions.Length)
         {
@@ -300,8 +303,8 @@ public class SurveyManager : MonoBehaviour
     void CheckToggle()
     {
         btnSkip.gameObject.SetActive(false);
-        Debug.Log("Check Toggle");
-        Debug.Log("Step on toggle "+step);
+        //Debug.Log("Check Toggle");
+        //Debug.Log("Step on toggle "+step);
         if (step == 17 && choiceTogglesB[0].isOn)
         {
             AppManager.Instance.uIManager.pnlOptionB1.SetActive(true);
@@ -310,7 +313,7 @@ public class SurveyManager : MonoBehaviour
             textB.gameObject.SetActive(false);
             step = 18;
             demographicOptions[step].SetActive(true);
-            Debug.Log("Is first toggle on: "+choiceTogglesB[0].isOn);
+            //Debug.Log("Is first toggle on: "+choiceTogglesB[0].isOn);
            
         }
         else if (step == 17 && choiceTogglesB[1].isOn)
@@ -668,7 +671,7 @@ public class SurveyManager : MonoBehaviour
     public void SaveSurvey()
     {
         // Reload current path to get server path id if it was uploaded
-        currentPath = cPath.Reload(currentPath);
+        //currentPath = cPath.Reload(currentPath);
 
         // Initialize a list of answers
         List<string> answers = new List<string>();
@@ -722,13 +725,21 @@ public class SurveyManager : MonoBehaviour
             }
         }
 
+        Debug.Log("answers count = " + answers.Count);
+        Debug.Log("demographicOptions count = " + demographicOptions.Length);
+        for (int i = 0; i < answers.Count; i++)
+        {
+            Debug.Log("demographicOptions " + i + " = " + demographicOptions[i].name);
+            Debug.Log("answer " + i + " = " + answers[i]);
+        }
+
         // Save Survey
-        cSurvey surveyToSave = new cSurvey(currentPath.server_path_id, currentPath.local_area_id, answers);
+        /*cSurvey surveyToSave = new cSurvey(currentPath.server_path_id, currentPath.local_area_id, answers);
         cSurvey.Save(surveyToSave);
 
         // Upload to server
         AppManager.Instance.serverManager.postUserData = true;
-        AppManager.Instance.serverManager.timeRemaining = 0f;
+        AppManager.Instance.serverManager.timeRemaining = 0f;*/
     }
 
     /*IEnumerator PostVisitorData(ProfileItem profileItem)
