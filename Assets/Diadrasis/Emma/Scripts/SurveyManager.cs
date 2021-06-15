@@ -168,7 +168,7 @@ public class SurveyManager : MonoBehaviour
                 //Debug.Log("Step for toggleCheck Second method: " + step);
                 CheckIfUserHasSelectedOtherOptionSecond();
             }
-            else if (step == 42 || step == 33 || step == 55 || step == 72)
+            else if (step == 15 || step == 42 || step == 33 || step == 55 || step == 72)
             {
                 step = demographicOptions.Length;
                 btnSkip.gameObject.SetActive(false);
@@ -589,10 +589,10 @@ public class SurveyManager : MonoBehaviour
         yield break;
     }
 
-    /*void ContinueToSettings()
+    void ChangeLanguage()
     {
-        OnContinue?.Invoke();
-    }*/
+        
+    }
 
     /*void SaveProfile()
     {
@@ -647,18 +647,18 @@ public class SurveyManager : MonoBehaviour
         *//*string pass = Random.Range(100, 999).ToString();
         string visitorId = SystemInfo.deviceUniqueIdentifier.Substring(0, 3) + pass;*/
 
-        /*if (StaticData.isNewVisitor)
-        {
-            profileItem.VisitorId = visitorId;
-            StaticData.visitorId = visitorId;
-            profileItem.VisitorPass = pass;
-            StaticData.visitorPass = pass;
-        }
-        else
-        {
-            profileItem.VisitorId = StaticData.visitorId;
-            profileItem.VisitorPass = StaticData.visitorPass;
-        }
+    /*if (StaticData.isNewVisitor)
+    {
+        profileItem.VisitorId = visitorId;
+        StaticData.visitorId = visitorId;
+        profileItem.VisitorPass = pass;
+        StaticData.visitorPass = pass;
+    }
+    else
+    {
+        profileItem.VisitorId = StaticData.visitorId;
+        profileItem.VisitorPass = StaticData.visitorPass;
+    }
 *//*
 
         //StopCoroutine("PostVisitorData");
