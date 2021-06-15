@@ -10,41 +10,49 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
-  m_Name: MainQuestions Shared Data
+  m_Name: OptionAQuestions Shared Data
   m_EditorClassIdentifier: 
-  m_TableCollectionName: MainQuestions
-  m_TableCollectionNameGuidString: 1dccfd93a162d7a4d87530e1a4b6f6dd
+  m_TableCollectionName: OptionAQuestions
+  m_TableCollectionNameGuidString: f8ea650f700f15549912130f603cbbb1
   m_Entries:
-  - m_Id: 9879339008
-    m_Key: sex_key
+  - m_Id: 58315161600
+    m_Key: mainText_key
     m_Metadata:
       m_Items: []
-  - m_Id: 92968501248
-    m_Key: sex_key_dropdown
+  - m_Id: 270077181952
+    m_Key: q1_key
     m_Metadata:
       m_Items: []
-  - m_Id: 199105363968
-    m_Key: sex_key_dropdown_female
+  - m_Id: 397340753920
+    m_Key: q1_answer1_key
     m_Metadata:
       m_Items: []
-  - m_Id: 3196153675776
-    m_Key: sex_dropdown_choose
+  - m_Id: 547232595968
+    m_Key: q1_answer2_key
     m_Metadata:
       m_Items: []
-  - m_Id: 64500142882816
-    m_Key: age_key
+  - m_Id: 629067661312
+    m_Key: q1_answer3_key
     m_Metadata:
       m_Items: []
-  - m_Id: 64585102704640
-    m_Key: work_key
+  - m_Id: 1384939962368
+    m_Key: q2_key
     m_Metadata:
       m_Items: []
-  - m_Id: 64876543918080
-    m_Key: ethinicity_key
+  - m_Id: 1810842173440
+    m_Key: q2_answer1_key
     m_Metadata:
       m_Items: []
-  - m_Id: 65094467371008
-    m_Key: visit_key
+  - m_Id: 1941419245568
+    m_Key: q2_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2483474317312
+    m_Key: q3_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3022178140160
+    m_Key: q4_key
     m_Metadata:
       m_Items: []
   m_Metadata:
@@ -57,4 +65,4 @@ MonoBehaviour:
       type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables,
         asm: Unity.Localization}
       data:
-        m_CustomEpoch: 1623745046342
+        m_CustomEpoch: 1623761392185
