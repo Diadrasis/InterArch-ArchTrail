@@ -153,7 +153,6 @@ public class SurveyManager : MonoBehaviour
                     //Debug.Log("Here");
                 }
                 //step = 5;
-                
             }
             else if (step == 9 || step == 15 || step == 22 || step == 26 || step == 32
                 || step == 34 || step == 38 || step == 47 || step == 51 || step == 54 || step == 59
@@ -193,11 +192,7 @@ public class SurveyManager : MonoBehaviour
             {
                 btnSkip.gameObject.SetActive(true);
             }
-            
         }
-
-        Debug.Log("step = " + step);
-        SaveSurvey();
 
         // End survey and save
         if (step >= demographicOptions.Length)
@@ -679,7 +674,7 @@ public class SurveyManager : MonoBehaviour
     public void SaveSurvey()
     {
         // Reload current path to get server path id if it was uploaded
-        //currentPath = cPath.Reload(currentPath);
+        currentPath = cPath.Reload(currentPath);
 
         // Initialize a list of answers
         List<string> answers = new List<string>();
@@ -742,12 +737,12 @@ public class SurveyManager : MonoBehaviour
         }
 
         // Save Survey
-        /*cSurvey surveyToSave = new cSurvey(currentPath.server_path_id, currentPath.local_area_id, answers);
+        cSurvey surveyToSave = new cSurvey(currentPath.server_path_id, currentPath.local_area_id, answers);
         cSurvey.Save(surveyToSave);
 
         // Upload to server
         AppManager.Instance.serverManager.postUserData = true;
-        AppManager.Instance.serverManager.timeRemaining = 0f;*/
+        AppManager.Instance.serverManager.timeRemaining = 0f;
     }
 
     /*IEnumerator PostVisitorData(ProfileItem profileItem)
