@@ -261,10 +261,10 @@ public class MapManager : MonoBehaviour
         OnlineMaps.instance.zoomRange = new OnlineMapsRange(_areaToView.zoom, OnlineMaps.MAXZOOM);
 
         // Set user's position and zoom depending on internet connection
-        int zoom = OnlineMaps.MAXZOOM;
-        if (AppManager.Instance.serverManager.hasInternet)
-            zoom = _areaToView.zoom;
-        OnlineMaps.instance.SetPositionAndZoom(_areaToView.position.x, _areaToView.position.y, zoom);
+        if (AppManager.Instance.serverManager.hasInternet || !IsWithinConstraints())
+            OnlineMaps.instance.SetPositionAndZoom(_areaToView.position.x, _areaToView.position.y, _areaToView.zoom);
+        else
+            OnlineMaps.instance.SetPositionAndZoom(OnlineMapsLocationService.instance.position.x, OnlineMapsLocationService.instance.position.y, OnlineMaps.MAXZOOM);
 
         // Display area
         DisplayArea(_areaToView);
@@ -988,6 +988,9 @@ public class MapManager : MonoBehaviour
 
     public void DisplayArea(cArea _areaToDisplay)
     {
+        // Remove Paths
+        RemoveMarkersAndLine(); // Does this create any problems?
+
         // Set user marker on top
         CreateUserMarker();
 
