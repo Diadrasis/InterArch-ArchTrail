@@ -694,7 +694,7 @@ public class SurveyManager : MonoBehaviour
             TMP_Dropdown dropdown = gO.GetComponentInChildren<TMP_Dropdown>();
             if (dropdown != null)
             {
-                answers.Add(dropdown.captionText.text.Equals("<Επιλέξτε από τα παρακάτω>") || dropdown.captionText.text.Equals("<Select>") ? null : dropdown.captionText.text); // TODO: Check for translated
+                answers.Add(dropdown.captionText.text.Equals("<Επιλέξτε από τα παρακάτω>") || dropdown.captionText.text.Equals("<Choose Below>") ? null : dropdown.captionText.text);
                 continue;
             }
 
