@@ -448,9 +448,9 @@ public class ServerManager : MonoBehaviour
                     // Activate panel warning
                     AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
                     if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download " + areaToUpload.title + "'s tiles?\nSize: " + tileDownloader.totalSize + " KB";
+                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download " + areaToUpload.title + "'s tiles?\nSize: " + (tileDownloader.totalSize / 1000) + " ΜB";
                     else
-                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nΘα θέλατε να κατεβάσετε το χάρτη της περιοχής \"" + areaToUpload.title + "\";\nΜέγεθος: " + tileDownloader.totalSize + " KB";
+                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Θα θέλατε να κατεβάσετε το χάρτη της περιοχής \"" + areaToUpload.title + "\";\nΜέγεθος: " + (tileDownloader.totalSize / 1000) + " ΜB";
 
                     // Wait for user input
                     while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
@@ -1290,9 +1290,9 @@ public class ServerManager : MonoBehaviour
                 // Activate panel warning
                 AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
                 if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download the area's tiles?\nSize: " + (tileDownloader.totalSize / 1000) + " ΜB";
                 else
-                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nΘα θέλατε να κατεβάσετε το χάρτη της περιοχής;\nΜέγεθος: " + tileDownloader.totalSize + " KB";
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Θα θέλατε να κατεβάσετε το χάρτη της περιοχής;\nΜέγεθος: " + (tileDownloader.totalSize / 1000) + " ΜB";
 
                 // Wait for user input
                 while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
