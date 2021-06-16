@@ -23,21 +23,6 @@ MonoBehaviour:
     m_Localized: "\u03A6\u03CD\u03BB\u03BF"
     m_Metadata:
       m_Items: []
-  - m_Id: 92968501248
-    m_Localized: "<\u0395\u03C0\u03B9\u03BB\u03AD\u03BE\u03C4\u03B5 \u03B1\u03C0\u03CC
-      \u03C4\u03B1 \u03C0\u03B1\u03C1\u03B1\u03BA\u03AC\u03C4\u03C9>\n\u0386\u03C1\u03C1\u03B5\u03BD\n\u0398\u03AE\u03BB\u03C5"
-    m_Metadata:
-      m_Items:
-      - id: 0
-  - m_Id: 199105363968
-    m_Localized: "\u0398\u03AE\u03BB\u03C5"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 3196153675776
-    m_Localized: "<\u0395\u03C0\u03B9\u03BB\u03AD\u03BE\u03C4\u03B5 \u03B1\u03C0\u03CC
-      \u03C4\u03B1 \u03C0\u03B1\u03C1\u03B1\u03BA\u03AC\u03C4\u03C9>"
-    m_Metadata:
-      m_Items: []
   - m_Id: 64500142882816
     m_Localized: "\u0397\u03BB\u03B9\u03BA\u03AF\u03B1"
     m_Metadata:

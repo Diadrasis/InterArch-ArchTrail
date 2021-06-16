@@ -23,23 +23,6 @@ MonoBehaviour:
     m_Localized: Sex
     m_Metadata:
       m_Items: []
-  - m_Id: 92968501248
-    m_Localized: '<Choose below>
-
-      Male
-
-      Female'
-    m_Metadata:
-      m_Items:
-      - id: 0
-  - m_Id: 199105363968
-    m_Localized: Female
-    m_Metadata:
-      m_Items: []
-  - m_Id: 3196153675776
-    m_Localized: <Choose below>
-    m_Metadata:
-      m_Items: []
   - m_Id: 64500142882816
     m_Localized: Age
     m_Metadata:
