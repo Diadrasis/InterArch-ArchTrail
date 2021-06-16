@@ -134,11 +134,14 @@ public class UIManager : MonoBehaviour
     public GameObject pnlOptionC2;
     public Button btnProfiler;
     public Button btnResetQuestionnaire;
-    public TMP_Dropdown sexDropdown;
+    public TMP_Dropdown sexDropdown,ageDropdown;
     readonly List<string> sexValuesEN = new List<string> { "<Choose Below>", "Male", "Female" };
     readonly List<string> sexValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "Άρρεν", "Θήλυ" };
     readonly List<string> optionValuesΕΝ = new List<string> { "<Choose Below>", "Individual (or small indepented group)", "Organised visit with guide/leader", "School visit" };
     readonly List<string> optionValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "Ατομικής επίσκεψης (ή μικρή ανεξάρτητη ομάδα) ", "Οργανωμένης επίσκεψης, με ξεναγό / αρχηγό ομάδας", "Σχολικής επίσκεψης" };
+    readonly List<string> ageValuesEN = new List<string> {"<Choose Below>","0-12", "13-18", "19-25", "26-30", "31-40", "41-50", "51-60","61+" };
+    readonly List<string> ageValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "0-12", "13-18", "19-25", "26-30", "31-40", "41-50", "51-60", "61+" };
+
 
     [HideInInspector]
     public bool downloadTiles = false;
@@ -255,7 +258,7 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, false);
         imgRecord.gameObject.SetActive(false);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths
-        ActivateButtons(false, true, false, true);
+        ActivateButtons(false, true, false, false);
         txtMainName.text = DEFAULT_TEXT_NAME;
         pnlWarningDeleteScreen.SetActive(false);
         AppManager.Instance.questionnaireManager.ResetValues();
@@ -814,6 +817,8 @@ public class UIManager : MonoBehaviour
         if (LocalizationSettings.SelectedLocale.name == ENGLISH)
         {
             sexDropdown.ClearOptions();
+            ageDropdown.ClearOptions();
+            ageDropdown.AddOptions(ageValuesEN);
             sexDropdown.AddOptions(sexValuesEN);
             AppManager.Instance.questionnaireManager.optionDropdown.ClearOptions();
             AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesΕΝ);
@@ -822,6 +827,8 @@ public class UIManager : MonoBehaviour
         else if (LocalizationSettings.SelectedLocale.name == GREEK)
         {
             sexDropdown.ClearOptions();
+            ageDropdown.ClearOptions();
+            ageDropdown.AddOptions(ageValuesGR);
             AppManager.Instance.questionnaireManager.optionDropdown.ClearOptions();
             AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesGR);
             sexDropdown.AddOptions(sexValuesGR);
@@ -857,7 +864,7 @@ public class UIManager : MonoBehaviour
         pnlQuestionnaireScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
         pnlAreasScreen.SetActive(false);
-        ActivateButtons(true, true, true, true);
+        ActivateButtons(true, true, true, false);
     }
 
     void OpenQuestionnaire()

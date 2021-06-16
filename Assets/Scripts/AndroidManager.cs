@@ -6,7 +6,6 @@ using TMPro;
 public class AndroidManager : MonoBehaviour
 {
     private OnlineMapsLocationService locationService;
-
     // Start is called before the first frame update
     private void Start()
     {
@@ -17,25 +16,27 @@ public class AndroidManager : MonoBehaviour
     void Init()
     {
         locationService = OnlineMapsLocationService.instance;
-        
+
         if (locationService == null)
         {
             Debug.LogError(
                 "Location Service not found.\nAdd Location Service Component (Component / Infinity Code / Online Maps / Plugins / Location Service).");
             return;
         }
-        
+
 #if PLATFORM_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
 
             Debug.Log("Please grant your gps location");
             Permission.RequestUserPermission(Permission.FineLocation);
-            
+
         }
 #endif
         //locationService.OnLocationChanged += AppManager.Instance.mapManager.OnLocationChanged;
         if (CheckForLocationServices()) return;
+
+        
     }
 
     //check if location services are active either with gpsemulator or on android

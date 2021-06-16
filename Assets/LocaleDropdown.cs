@@ -13,8 +13,8 @@ public class LocaleDropdown : MonoBehaviour
     {
         // Wait for the localization system to initialize, loading Locales, preloading etc.
         yield return LocalizationSettings.InitializationOperation;
-       
 
+        
         // Generate list of available Locales
         var options = new List<TMP_Dropdown.OptionData>();
         int selected = 0;
@@ -45,6 +45,18 @@ public class LocaleDropdown : MonoBehaviour
 
         //buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = selected.ToString();
         buttonUI.onValueChanged.AddListener(LocaleSelected);
+        if (Application.systemLanguage == SystemLanguage.Greek)
+        {
+            
+            //Outputs into console that the system is French
+            Debug.Log("This system is in Greek. ");
+        }
+        //Otherwise, if the system is English, output the message in the console
+        else if (Application.systemLanguage == SystemLanguage.English)
+        {
+            Debug.Log("This system is in English. ");
+        }
+
     }
 
     public void LocaleSelected(int index)
