@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class LocaleDropdown : MonoBehaviour
 {
     public TMP_Dropdown buttonUI;
+    //public Button buttonUI;
     IEnumerator Start()
     {
         // Wait for the localization system to initialize, loading Locales, preloading etc.
@@ -23,21 +24,22 @@ public class LocaleDropdown : MonoBehaviour
             if (LocalizationSettings.SelectedLocale == locale)
             {
                 selected = i;
-                
+
                 /*if (locale.Identifier.Code == "en")
                 {
                     buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = locale.Identifier.Code.ToUpper();
+                    buttonUI.onClick.AddListener(()=>LocaleSelected(selected));
                 }
-                else if(locale.Identifier.Code == "el")
+                else if (locale.Identifier.Code == "el")
                 {
                     buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = locale.Identifier.Code.ToUpper();
+                    buttonUI.onClick.AddListener(() => LocaleSelected(selected));
                 }*/
                 //Debug.Log("Locale identifier = "+locale.Identifier.Code);
-                
-            }
-            
 
-            options.Add(new TMP_Dropdown.OptionData(locale.Identifier.Code.ToUpper()));
+            }
+
+           options.Add(new TMP_Dropdown.OptionData(locale.Identifier.Code.ToUpper()));
         }
        buttonUI.options = options;
 
