@@ -152,6 +152,7 @@ public class SurveyManager : MonoBehaviour
                     demographicOptions[step].SetActive(true);
                     //Debug.Log("Here");
                 }
+                //btnSkip.gameObject.SetActive(false);
                 //step = 5;
             }
             else if (step == 9 || step == 15 || step == 22 || step == 26 || step == 32
@@ -181,10 +182,11 @@ public class SurveyManager : MonoBehaviour
             {
                 step++;
                 demographicOptions[step].SetActive(true);
+                btnSkip.gameObject.SetActive(true);
             }
             
-            if (step == 4 ||step == 15 || step == 16 || step == 17 || step == 32 || step == 33 || step == 42 || step == 41 || step == 43 || step == 54 || step == 55 
-            || step == 69 || step == 72 || step == 73)
+            if (step == 4 /*||step == 15 || step == 16 || step == 17 || step == 32 || step == 33 || step == 42 || step == 41 || step == 43 || step == 54 || step == 55 
+            || step == 69 || step == 72 || step == 73*/)
             {
                 btnSkip.gameObject.SetActive(false);
             }
@@ -240,8 +242,24 @@ public class SurveyManager : MonoBehaviour
                 demographicOptions[step].SetActive(true);
                 //Debug.Log("Here");
             }
-            
+
             //step = 5;
+        }
+        else if (step == 9 || step == 15 || step == 22 || step == 26 || step == 32
+                || step == 34 || step == 38 || step == 47 || step == 51 || step == 54 || step == 59
+                || step == 63 || step == 67 || step == 72)
+        {
+            //Debug.Log("Step for toggleCheck" + step);
+            CheckIfUserHasSelectedOtherOption();
+        }
+        else if (step == 11 || step == 24 || step == 28 || step == 36 || step == 40
+            || step == 49 || step == 61 || step == 65 || step == 69)
+        {
+            //Debug.Log("Step for toggleCheck Second method: " + step);
+            CheckIfUserHasSelectedOtherOptionSecond();
+
+            //Debug.Log("Step: " + step);
+
         }
         else
         {
@@ -249,13 +267,6 @@ public class SurveyManager : MonoBehaviour
             demographicOptions[step].SetActive(true);
         }
 
-        if(step==4 || step == 15 || step == 16 || step == 32 || step == 33 || step == 42 || step == 41 || step == 43 || step == 52 || step == 53
-            || step == 69 || step == 70)
-        {
-            btnSkip.gameObject.SetActive(false);
-        }
-        
-        //Debug.Log("Step: " + step);
 
     }
     //for the dropdown which will make the different selections and open/close panels
