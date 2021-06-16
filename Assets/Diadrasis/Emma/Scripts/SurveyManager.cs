@@ -152,7 +152,6 @@ public class SurveyManager : MonoBehaviour
                     demographicOptions[step].SetActive(true);
                     //Debug.Log("Here");
                 }
-                //btnSkip.gameObject.SetActive(false);
                 //step = 5;
             }
             else if (step == 9 || step == 15 || step == 22 || step == 26 || step == 32
@@ -171,7 +170,7 @@ public class SurveyManager : MonoBehaviour
             else if (step == 16 || step == 42 || step == 33 || step == 55 || step == 73)
             {
                 step = demographicOptions.Length;
-                btnSkip.gameObject.SetActive(false);
+                //btnSkip.gameObject.SetActive(false);
             }
             else if (step == 17 || step == 43)
             {
@@ -185,7 +184,7 @@ public class SurveyManager : MonoBehaviour
                 btnSkip.gameObject.SetActive(true);
             }
             
-            if (step == 4 /*||step == 15 || step == 16 || step == 17 || step == 32 || step == 33 || step == 42 || step == 41 || step == 43 || step == 54 || step == 55 
+            if (step == 4 || step == 17 || step == 43/*||step == 15 || step == 16 || step == 17 || step == 32 || step == 33 || step == 42 || step == 41 || step == 43 || step == 54 || step == 55 
             || step == 69 || step == 72 || step == 73*/)
             {
                 btnSkip.gameObject.SetActive(false);
@@ -240,16 +239,24 @@ public class SurveyManager : MonoBehaviour
             //Debug.Log("Step: " + step);
 
         }
+        else if (/*step == 16 ||*/ step == 42 /*|| step == 33 || step == 55 || step == 73*/)
+        {
+            step = demographicOptions.Length;
+        }
         else
         {
             step++;
             demographicOptions[step].SetActive(true);
         }
 
-        if(step==4 || step == 15 || step == 16 || step == 32 || step == 33 || step == 42 || step == 41 || step == 43 || step == 52 || step == 53
-            || step == 69 || step == 70)
+        if(step==4 || step == 17 || step == 43/*|| step == 15 || step == 16 || step == 32 || step == 33 || step == 42 || step == 41 || step == 43 || step == 52 || step == 53
+            || step == 69 || step == 70*/)
         {
             btnSkip.gameObject.SetActive(false);
+        }
+        else
+        {
+            btnSkip.gameObject.SetActive(true);
         }
 
         // End survey and save

@@ -66,6 +66,10 @@ MonoBehaviour:
     m_Localized: No
     m_Metadata:
       m_Items: []
+  - m_Id: 2189204425195520
+    m_Localized: Thank you for answering our survey!
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:
