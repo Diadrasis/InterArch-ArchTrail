@@ -118172,7 +118172,7 @@ MonoBehaviour:
   updatePosition: 0
   useCompassForMarker: 0
   useGPSEmulator: 1
-  desiredAccuracy: 10
+  desiredAccuracy: 5
   requestPermissionRuntime: 1
   updateDistance: 10
 --- !u!114 &6710081424181877703
