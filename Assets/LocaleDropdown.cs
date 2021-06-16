@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class LocaleDropdown : MonoBehaviour
 {
-    public Button buttonUI;
+    public TMP_Dropdown buttonUI;
     IEnumerator Start()
     {
         // Wait for the localization system to initialize, loading Locales, preloading etc.
@@ -15,7 +15,7 @@ public class LocaleDropdown : MonoBehaviour
        
 
         // Generate list of available Locales
-        //var options = new List<TMP_Dropdown.OptionData>();
+        var options = new List<TMP_Dropdown.OptionData>();
         int selected = 0;
         for (int i = 0; i < LocalizationSettings.AvailableLocales.Locales.Count; ++i)
         {
@@ -24,31 +24,31 @@ public class LocaleDropdown : MonoBehaviour
             {
                 selected = i;
                 
-                if (locale.Identifier.Code == "en")
+                /*if (locale.Identifier.Code == "en")
                 {
                     buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = locale.Identifier.Code.ToUpper();
                 }
                 else if(locale.Identifier.Code == "el")
                 {
                     buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = locale.Identifier.Code.ToUpper();
-                }
+                }*/
                 //Debug.Log("Locale identifier = "+locale.Identifier.Code);
                 
             }
             
 
-            //options.Add(new TMP_Dropdown.OptionData(locale.Identifier.Code.ToUpper()));
+            options.Add(new TMP_Dropdown.OptionData(locale.Identifier.Code.ToUpper()));
         }
-       // buttonUI.options = options;
+       buttonUI.options = options;
 
         //buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = selected.ToString();
-        buttonUI.onClick.AddListener(()=>LocaleSelected(selected));
+        buttonUI.onValueChanged.AddListener(LocaleSelected);
     }
 
-    static void LocaleSelected(int index)
+    public void LocaleSelected(int index)
     {
         LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[index];
-        
+        AppManager.Instance.uIManager.CheckLanguage();
         Debug.Log("Index num: "+index);
     }
 }
