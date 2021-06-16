@@ -136,6 +136,9 @@ public class UIManager : MonoBehaviour
 
     [HideInInspector]
     public bool downloadTiles = false;
+
+    readonly string ENGLISH = "English (en)";
+    readonly string GREEK = "Greek (el)";
     #endregion
 
     #region Unity Functions
@@ -799,7 +802,7 @@ public class UIManager : MonoBehaviour
 
     public void CheckLanguage()
     {
-        if (LocalizationSettings.SelectedLocale.name == "English (en)")
+        if (LocalizationSettings.SelectedLocale.name == ENGLISH)
         {
             sexDropdown.ClearOptions();
             sexDropdown.AddOptions(sexValuesEN);
@@ -807,7 +810,7 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesΕΝ);
             Debug.Log("English");
         }
-        else if (LocalizationSettings.SelectedLocale.name == "Greek (el)")
+        else if (LocalizationSettings.SelectedLocale.name == GREEK)
         {
             sexDropdown.ClearOptions();
             AppManager.Instance.questionnaireManager.optionDropdown.ClearOptions();
@@ -815,6 +818,11 @@ public class UIManager : MonoBehaviour
             sexDropdown.AddOptions(sexValuesGR);
             Debug.Log("Greek");
         }
+    }
+
+    public bool LanguageIsEnglish()
+    {
+        return (LocalizationSettings.SelectedLocale.name == ENGLISH);
     }
     //when uploading/loading or updating from and to server, to show info (needs fixing)
     /*public void LoadingScreen(string txtMessage, float timeAmount, float speedAmount)

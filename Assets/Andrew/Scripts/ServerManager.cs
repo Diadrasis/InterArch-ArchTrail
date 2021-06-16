@@ -425,7 +425,7 @@ public class ServerManager : MonoBehaviour
 */
     IEnumerator UploadUserDataToDiadrasis()
     {
-        Debug.Log("Started uploading user data!");
+        //Debug.Log("Started uploading user data!");
 
         // ============== Upload Areas ============== //
         // Calculate seconds to upload
@@ -447,7 +447,10 @@ public class ServerManager : MonoBehaviour
 
                     // Activate panel warning
                     AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
-                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download " + areaToUpload.title + "'s tiles?\nSize: " + tileDownloader.totalSize + " KB";
+                    if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download " + areaToUpload.title + "'s tiles?\nSize: " + tileDownloader.totalSize + " KB";
+                    else
+                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nΘα θέλατε να κατεβάσετε το χάρτη της περιοχής \"" + areaToUpload.title + "\";\nΜέγεθος: " + tileDownloader.totalSize + " KB";
 
                     // Wait for user input
                     while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
@@ -465,7 +468,10 @@ public class ServerManager : MonoBehaviour
                             if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
                             {
                                 int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
-                                AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                                else
+                                    AppManager.Instance.uIManager.txtWarningServer.text = "Λήψη χάρτη... \n" + percentage + "%";
                                 AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
                             }
 
@@ -479,7 +485,10 @@ public class ServerManager : MonoBehaviour
                 // Show warning panel
                 if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
                 {
-                    AppManager.Instance.uIManager.txtWarningServer.text = "Uploading area...";
+                    if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                        AppManager.Instance.uIManager.txtWarningServer.text = "Uploading area...";
+                    else
+                        AppManager.Instance.uIManager.txtWarningServer.text = "Μεταφόρτωση περιοχής...";
                     AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
                 }
 
@@ -533,7 +542,10 @@ public class ServerManager : MonoBehaviour
             // Show warning panel
             if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
             {
-                AppManager.Instance.uIManager.txtWarningServer.text = "Uploading paths...";
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Uploading paths...";
+                else
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Μεταφόρτωση διαδρομών...";
                 AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
             }
 
@@ -586,7 +598,10 @@ public class ServerManager : MonoBehaviour
             // Show warning panel
             if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
             {
-                AppManager.Instance.uIManager.txtWarningServer.text = "Uploading points...";
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Uploading points...";
+                else
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Μεταφόρτωση σημείων...";
                 AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
             }
 
@@ -643,7 +658,10 @@ public class ServerManager : MonoBehaviour
             // Show warning panel
             if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
             {
-                AppManager.Instance.uIManager.txtWarningServer.text = "Uploading surveys...";
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Uploading surveys...";
+                else
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Μεταφόρτωση ερωτηματολογίων...";
                 AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
             }
 
@@ -691,7 +709,10 @@ public class ServerManager : MonoBehaviour
             // Show warning panel
             if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
             {
-                AppManager.Instance.uIManager.txtWarningServer.text = "Deleting areas...";
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Deleting areas...";
+                else
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Διαγραφή περιοχών...";
                 AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
             }
 
@@ -735,7 +756,10 @@ public class ServerManager : MonoBehaviour
             // Show warning panel
             if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
             {
-                AppManager.Instance.uIManager.txtWarningServer.text = "Deleting paths...";
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Deleting paths...";
+                else
+                    AppManager.Instance.uIManager.txtWarningServer.text = "Διαγραφή διαδρομών...";
                 AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
             }
 
@@ -1173,7 +1197,10 @@ public class ServerManager : MonoBehaviour
                     // Show warning panel
                     if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
                     {
-                        AppManager.Instance.uIManager.txtWarningServer.text = "Updating areas...";
+                        if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Updating areas...";
+                        else
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Ενημέρωση περιοχών...";
                         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
                     }
 
@@ -1262,7 +1289,10 @@ public class ServerManager : MonoBehaviour
 
                 // Activate panel warning
                 AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
-                AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nWould you like to download the area's tiles?\nSize: " + tileDownloader.totalSize + " KB";
+                else
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "\nΘα θέλατε να κατεβάσετε το χάρτη της περιοχής;\nΜέγεθος: " + tileDownloader.totalSize + " KB";
 
                 // Wait for user input
                 while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
@@ -1278,7 +1308,10 @@ public class ServerManager : MonoBehaviour
                         // Update panel
                         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
                         int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
-                        AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                        if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                        else
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Λήψη χάρτη... \n" + percentage + "%";
 
                         yield return null;
                     }
@@ -1322,7 +1355,10 @@ public class ServerManager : MonoBehaviour
                     // Show warning panel
                     if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
                     {
-                        AppManager.Instance.uIManager.txtWarningServer.text = "Updating paths...";
+                        if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Updating paths...";
+                        else
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Ενημέρωση διαδρομών...";
                         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
                     }
 
@@ -1417,7 +1453,10 @@ public class ServerManager : MonoBehaviour
                     // Show warning panel
                     if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
                     {
-                        AppManager.Instance.uIManager.txtWarningServer.text = "Updating points...";
+                        if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Updating points...";
+                        else
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Ενημέρωση σημείων...";
                         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
                     }
 
