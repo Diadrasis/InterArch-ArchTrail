@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Localization.Settings;
 using TMPro;
 using UnityEngine.UI;
+using System.Globalization;
 
 public class LocaleDropdown : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class LocaleDropdown : MonoBehaviour
         // Wait for the localization system to initialize, loading Locales, preloading etc.
         yield return LocalizationSettings.InitializationOperation;
 
-        
+        LocalizationSettings.SelectedLocale.name = "English (en)";
         // Generate list of available Locales
         var options = new List<TMP_Dropdown.OptionData>();
         int selected = 0;
@@ -38,25 +39,14 @@ public class LocaleDropdown : MonoBehaviour
                 //Debug.Log("Locale identifier = "+locale.Identifier.Code);
 
             }
-
-           options.Add(new TMP_Dropdown.OptionData(locale.Identifier.Code.ToUpper()));
+            options.Add(new TMP_Dropdown.OptionData(locale.Identifier.Code.ToUpper()));
+            
         }
        buttonUI.options = options;
 
         //buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = selected.ToString();
         buttonUI.onValueChanged.AddListener(LocaleSelected);
-        if (Application.systemLanguage == SystemLanguage.Greek)
-        {
-            
-            //Outputs into console that the system is French
-            Debug.Log("This system is in Greek. ");
-        }
-        //Otherwise, if the system is English, output the message in the console
-        else if (Application.systemLanguage == SystemLanguage.English)
-        {
-            Debug.Log("This system is in English. ");
-        }
-
+        
     }
 
     public void LocaleSelected(int index)
