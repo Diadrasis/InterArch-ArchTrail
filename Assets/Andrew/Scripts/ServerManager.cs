@@ -43,7 +43,7 @@ public class ServerManager : MonoBehaviour
     // Tiles
     public TileDownloader tileDownloader;
 
-    private float secondsToWaitBeforeWarning = 0f;
+    private float secondsToWaitBeforeWarning = 1f;
     private float minSecondsToDisplayWarning = 1f;
     #endregion
 
