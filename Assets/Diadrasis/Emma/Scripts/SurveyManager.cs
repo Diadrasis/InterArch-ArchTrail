@@ -249,8 +249,7 @@ public class SurveyManager : MonoBehaviour
             demographicOptions[step].SetActive(true);
         }
 
-        if(step==4 || step == 17 || step == 43/*|| step == 15 || step == 16 || step == 32 || step == 33 || step == 42 || step == 41 || step == 43 || step == 52 || step == 53
-            || step == 69 || step == 70*/)
+        if(step==4 || step == 17 || step == 43)
         {
             btnSkip.gameObject.SetActive(false);
         }
