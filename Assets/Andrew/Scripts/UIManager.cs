@@ -102,6 +102,12 @@ public class UIManager : MonoBehaviour
     public Button btnDownloadTilesNo;
 
     [Space]
+    [Header("Warning Thank You Screen")]
+    public GameObject pnlWarningThankYouScreen;
+    public TextMeshProUGUI txtWarningThankYou;
+    public Button btnThankYouContinue;
+
+    [Space]
     [Header("Testing Purposes")]
     public Texture2D userMarker;
     public TextMeshProUGUI infoText;
@@ -205,6 +211,9 @@ public class UIManager : MonoBehaviour
         // warning DownloadTiles
         btnDownloadTilesYes.onClick.AddListener(() => SetDownloadTiles(true));
         btnDownloadTilesNo.onClick.AddListener(() => SetDownloadTiles(false));
+
+        // warning ThankYou
+        btnThankYouContinue.onClick.AddListener(() => EnableScreen(pnlWarningThankYouScreen, false));
 
         //btn for edit Area
         btnEditAreaCancel.onClick.AddListener(() => CancelInGeneral());

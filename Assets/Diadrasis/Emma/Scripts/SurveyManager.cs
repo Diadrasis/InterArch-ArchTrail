@@ -197,28 +197,7 @@ public class SurveyManager : MonoBehaviour
         // End survey and save
         if (step >= demographicOptions.Length)
         {
-            if (currentPath != null)
-            {
-                SaveSurvey();
-
-                // Test
-                /*cSurvey loadedSurvey = cSurvey.Load(currentPath.local_path_id);
-
-                if (loadedSurvey != null)
-                {
-                    //Debug.Log("Answers:");
-                    //Debug.Log("loadedSurvey.answers.Count" + loadedSurvey.answers.Count);
-                    foreach (string answer in loadedSurvey.answers)
-                    {
-                        Debug.Log(answer);
-                    }
-                }*/
-            }
-
-            //close questionnairePanel and go to DisplayAreas and reset questionnaire for new user
-            AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
-            ResetValues();
-            AppManager.Instance.uIManager.DisplayAreasScreen();
+            EndSurvey();
         }
     }
 
@@ -254,10 +233,40 @@ public class SurveyManager : MonoBehaviour
         {
             btnSkip.gameObject.SetActive(false);
         }
-        
-        //Debug.Log("Step: " + step);
 
+        // End survey and save
+        if (step >= demographicOptions.Length)
+        {
+            EndSurvey();
+        }
     }
+    private void EndSurvey()
+    {
+        if (currentPath != null)
+        {
+            SaveSurvey();
+
+            // Test
+            /*cSurvey loadedSurvey = cSurvey.Load(currentPath.local_path_id);
+
+            if (loadedSurvey != null)
+            {
+                //Debug.Log("Answers:");
+                //Debug.Log("loadedSurvey.answers.Count" + loadedSurvey.answers.Count);
+                foreach (string answer in loadedSurvey.answers)
+                {
+                    Debug.Log(answer);
+                }
+            }*/
+        }
+
+        //close questionnairePanel and go to DisplayAreas and reset questionnaire for new user
+        AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
+        ResetValues();
+        AppManager.Instance.uIManager.DisplayAreasScreen();
+        AppManager.Instance.uIManager.pnlWarningThankYouScreen.SetActive(true);
+    }
+
     //for the dropdown which will make the different selections and open/close panels
     public void CheckValue(TMP_Dropdown val)
     {
