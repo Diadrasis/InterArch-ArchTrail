@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using System.Linq;
+using UnityEngine.Localization.Settings;
 
 public class UIManager : MonoBehaviour
 {
@@ -126,8 +127,13 @@ public class UIManager : MonoBehaviour
     public GameObject pnlOptionC1;
     public GameObject pnlOptionC2;
     public Button btnProfiler;
-	public Button btnResetQuestionnaire;
-	
+    public Button btnResetQuestionnaire;
+    public TMP_Dropdown sexDropdown;
+    readonly List<string> sexValuesEN = new List<string> { "<Choose Below>", "Male", "Female" };
+    readonly List<string> sexValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "Άρρεν", "Θήλυ" };
+    readonly List<string> optionValuesΕΝ = new List<string> { "<Choose Below>", "Individual (or small indepented group)", "Organised visit with guide/leader", "School visit" };
+    readonly List<string> optionValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "Ατομικής επίσκεψης (ή μικρή ανεξάρτητη ομάδα) ", "Οργανωμένης επίσκεψης, με ξεναγό / αρχηγό ομάδας", "Σχολικής επίσκεψης" };
+
     [HideInInspector]
     public bool downloadTiles = false;
     #endregion
@@ -149,6 +155,7 @@ public class UIManager : MonoBehaviour
         imgPauseRecording.gameObject.SetActive(false);
         btnBackToAreasScreen.interactable = true;
         //imgRecord = GetComponent<Animator>();
+        //sexDropdown = GetComponent<TMP_Dropdown>();
     }
 
     #endregion
@@ -174,7 +181,7 @@ public class UIManager : MonoBehaviour
         //btn Path and stop record
         btnAddNewPath.onClick.AddListener(() => AddNewPath());
         btnStopRecording.onClick.AddListener(() => SaveUIButton());
-        btnResumeRecording.onClick.AddListener(()=> ResumePath());
+        btnResumeRecording.onClick.AddListener(() => ResumePath());
 
         //btn warning on area
         btnCancel.onClick.AddListener(() => CloseScreenPanels());
@@ -184,7 +191,7 @@ public class UIManager : MonoBehaviour
         btnDeleteFinal.onClick.AddListener(() => DeleteFinal());
 
         //btn warning panel for save or cancel a path
-        btnSave.onClick.AddListener(() =>SavePath());
+        btnSave.onClick.AddListener(() => SavePath());
         btnContinue.onClick.AddListener(() => ResumePath());
         btnSaveCancel.onClick.AddListener(() => CancelInGeneral());
 
@@ -210,13 +217,13 @@ public class UIManager : MonoBehaviour
 
 
     }
-	
+
     private void SetDownloadTiles(bool _value)
     {
         downloadTiles = _value;
         pnlWarningDownloadTilesScreen.SetActive(false);
     }
-	
+
     void ActivateButtons(bool valBack, bool valQuit, bool valReset, bool valProfiler)
     {
         btnBackToAreasScreen.gameObject.SetActive(valBack);
@@ -224,7 +231,7 @@ public class UIManager : MonoBehaviour
         btnProfiler.gameObject.SetActive(valProfiler);
         btnResetQuestionnaire.gameObject.SetActive(valReset);
     }
-	
+
     public void DisplayAreasScreen()
     {
         pnlAreasScreen.SetActive(true);
@@ -236,7 +243,7 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, false);
         imgRecord.gameObject.SetActive(false);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths
-        ActivateButtons(false,true, false, true);
+        ActivateButtons(false, true, false, true);
         txtMainName.text = DEFAULT_TEXT_NAME;
         pnlWarningDeleteScreen.SetActive(false);
         AppManager.Instance.questionnaireManager.ResetValues();
@@ -329,7 +336,7 @@ public class UIManager : MonoBehaviour
         EnableScreen(pnlPathScreen, true);
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths can be removed afterwards, for testing purposes
-        ActivateButtons(true,false, false, false);
+        ActivateButtons(true, false, false, false);
         AppManager.Instance.mapManager.CheckUserPosition();
     }
 
@@ -348,7 +355,7 @@ public class UIManager : MonoBehaviour
                 areaTitle = btnSelectAreaText.text;
             }
         }*/
-        
+
         //Debug.Log(areaTitle);
         //AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlSelectArea.gameObject)); // areaTitle
         //DisplayAreasScreen();
@@ -407,7 +414,7 @@ public class UIManager : MonoBehaviour
         //AppManager.Instance.mapManager.DeletePath(selectPathObjects.IndexOf(pnlSelectArea.gameObject));
     }
 
-    
+
     private void DestroySelectAreaObjects(List<GameObject> _selectObjects)
     {
         if (_selectObjects != null)
@@ -448,7 +455,7 @@ public class UIManager : MonoBehaviour
         }
         //pnlAreasScreen.SetActive(false);
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
-            pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && pnlCreateArea.activeSelf && 
+            pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && pnlCreateArea.activeSelf &&
             !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
           !pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
@@ -460,14 +467,14 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
-            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && 
+            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
             (AppManager.Instance.mapManager.isRecordingPath || AppManager.Instance.mapManager.isPausePath) &&
           !pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             SaveUIButton();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
-            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && 
+            !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
             !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
           !pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
@@ -531,7 +538,7 @@ public class UIManager : MonoBehaviour
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
          !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf &&
          !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath &&
-         pnlQuestionnaireScreen.activeSelf && pnlMainQuestions.activeSelf&& !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
+         pnlQuestionnaireScreen.activeSelf && pnlMainQuestions.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             pnlQuestionnaireScreen.SetActive(false);
             DisplayAreasScreen();
@@ -563,7 +570,7 @@ public class UIManager : MonoBehaviour
 
         inptFldCreateArea.text = "";
 
-        ActivateButtons(true,false, false, false);
+        ActivateButtons(true, false, false, false);
         AppManager.Instance.mapManager.CreateNewAreaInitialize();
     }
 
@@ -616,11 +623,11 @@ public class UIManager : MonoBehaviour
     private void AddNewPath()
     {
         //check if user or app for some reason location services are off, enable appropriate panel(when build remove comments)
-       /* if (AppManager.Instance.androidManager.CheckForLocationServices())
-        {
-            EnableScreen(pnlGPSScreen, true);
-            return;
-        }*/
+        /* if (AppManager.Instance.androidManager.CheckForLocationServices())
+         {
+             EnableScreen(pnlGPSScreen, true);
+             return;
+         }*/
 
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
         AppManager.Instance.mapManager.StartRecordingPath();
@@ -641,14 +648,14 @@ public class UIManager : MonoBehaviour
         imgPauseRecording.gameObject.SetActive(true);
         IsInRecordingPath(false);
         AppManager.Instance.mapManager.PauseRecordingPath();
-        
+
     }
 
     //when save button is pressed on warning screen and recording, pausing goes to false. Same with anim recording
     private void SavePath()
     {
         AppManager.Instance.mapManager.SavePath();
-               
+
         EnableScreen(pnlWarningSavePathScreen, false);
         pnlRecordButton.SetActive(false);
         pnlMainButtons.SetActive(true);
@@ -671,7 +678,7 @@ public class UIManager : MonoBehaviour
         selectPathObjects = InstantiateSelectPathObjects();
         StartCoroutine(ReloadLayout(pnlSavedPaths));
         pnlScrollViewPaths.SetActive(true);
-        ActivateButtons(true,false, false, false);
+        ActivateButtons(true, false, false, false);
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
         pnlWarningDeleteScreen.SetActive(false);
     }
@@ -702,7 +709,7 @@ public class UIManager : MonoBehaviour
             pnlWarningDeleteScreen.SetActive(false);
             pnlForDelete = null;
         }
-            
+
     }
 
     //to close path save plus remove everything from the map
@@ -745,14 +752,14 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlForDelete.gameObject));
             DisplayAreasScreen();
         }
-        
+
     }
     //instantiating paths
     private List<GameObject> InstantiateSelectPathObjects()
     {
         List<GameObject> newPathPrefab = new List<GameObject>();
         List<cPath> paths = AppManager.Instance.mapManager.GetPaths();
-        
+
         foreach (cPath path in paths)
         {
             GameObject newSelectPath = Instantiate(btnShowPath, Vector3.zero, Quaternion.identity, pnlScrollViewPaths.GetComponent<RectTransform>());
@@ -790,6 +797,25 @@ public class UIManager : MonoBehaviour
 
     }
 
+    public void CheckLanguage()
+    {
+        if (LocalizationSettings.SelectedLocale.name == "English (en)")
+        {
+            sexDropdown.ClearOptions();
+            sexDropdown.AddOptions(sexValuesEN);
+            AppManager.Instance.questionnaireManager.optionDropdown.ClearOptions();
+            AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesΕΝ);
+            Debug.Log("English");
+        }
+        else if (LocalizationSettings.SelectedLocale.name == "Greek (el)")
+        {
+            sexDropdown.ClearOptions();
+            AppManager.Instance.questionnaireManager.optionDropdown.ClearOptions();
+            AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesGR);
+            sexDropdown.AddOptions(sexValuesGR);
+            Debug.Log("Greek");
+        }
+    }
     //when uploading/loading or updating from and to server, to show info (needs fixing)
     /*public void LoadingScreen(string txtMessage, float timeAmount, float speedAmount)
     {

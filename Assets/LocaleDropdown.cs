@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
 using TMPro;
+using UnityEngine.UI;
 
 public class LocaleDropdown : MonoBehaviour
 {
-    public TMP_Dropdown dropdown;
-
+    public TMP_Dropdown buttonUI;
     IEnumerator Start()
     {
         // Wait for the localization system to initialize, loading Locales, preloading etc.
@@ -21,17 +21,34 @@ public class LocaleDropdown : MonoBehaviour
         {
             var locale = LocalizationSettings.AvailableLocales.Locales[i];
             if (LocalizationSettings.SelectedLocale == locale)
+            {
                 selected = i;
-            options.Add(new TMP_Dropdown.OptionData(locale.name));
-        }
-        dropdown.options = options;
+                
+                /*if (locale.Identifier.Code == "en")
+                {
+                    buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = locale.Identifier.Code.ToUpper();
+                }
+                else if(locale.Identifier.Code == "el")
+                {
+                    buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = locale.Identifier.Code.ToUpper();
+                }*/
+                //Debug.Log("Locale identifier = "+locale.Identifier.Code);
+                
+            }
+            
 
-        dropdown.value = selected;
-        dropdown.onValueChanged.AddListener(LocaleSelected);
+            options.Add(new TMP_Dropdown.OptionData(locale.Identifier.Code.ToUpper()));
+        }
+       buttonUI.options = options;
+
+        //buttonUI.GetComponentInChildren<TextMeshProUGUI>().text = selected.ToString();
+        buttonUI.onValueChanged.AddListener(LocaleSelected);
     }
 
-    static void LocaleSelected(int index)
+    public void LocaleSelected(int index)
     {
         LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[index];
+        AppManager.Instance.uIManager.CheckLanguage();
+        Debug.Log("Index num: "+index);
     }
 }

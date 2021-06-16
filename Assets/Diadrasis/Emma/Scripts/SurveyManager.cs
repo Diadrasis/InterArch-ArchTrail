@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Localization.Settings;
 using System.Linq;
 
 public class SurveyManager : MonoBehaviour
@@ -62,7 +63,6 @@ public class SurveyManager : MonoBehaviour
     void Start()
     {
         step = 0;
-
     }
 
     private void OnEnable()
@@ -593,11 +593,6 @@ public class SurveyManager : MonoBehaviour
         yield return new WaitForSeconds(0.25f);
         btnSubmit.gameObject.SetActive(true);
         yield break;
-    }
-
-    void ChangeLanguage()
-    {
-        
     }
 
     /*void SaveProfile()

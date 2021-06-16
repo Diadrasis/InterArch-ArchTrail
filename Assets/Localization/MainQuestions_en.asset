@@ -16,16 +16,22 @@ MonoBehaviour:
     m_Code: en
   m_SharedData: {fileID: 11400000, guid: 1dccfd93a162d7a4d87530e1a4b6f6dd, type: 2}
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - id: 0
   m_TableData:
   - m_Id: 9879339008
     m_Localized: Sex
     m_Metadata:
       m_Items: []
   - m_Id: 92968501248
-    m_Localized: Male
+    m_Localized: '<Choose below>
+
+      Male
+
+      Female'
     m_Metadata:
-      m_Items: []
+      m_Items:
+      - id: 0
   - m_Id: 199105363968
     m_Localized: Female
     m_Metadata:
@@ -34,13 +40,25 @@ MonoBehaviour:
     m_Localized: <Choose below>
     m_Metadata:
       m_Items: []
-  - m_Id: 3580096069632
-    m_Localized: '<Choose below>
-
-      Male
-
-      Female'
+  - m_Id: 64500142882816
+    m_Localized: Age
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64585102704640
+    m_Localized: Occupation
+    m_Metadata:
+      m_Items: []
+  - m_Id: 64876543918080
+    m_Localized: Ethnicity
+    m_Metadata:
+      m_Items: []
+  - m_Id: 65094467371008
+    m_Localized: Visit reason
     m_Metadata:
       m_Items: []
   references:
     version: 1
+    00000000:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 00c05aa515000000
