@@ -13,7 +13,6 @@ public class AppManager : Singleton<AppManager>
     #endregion
 
     #region Unity Functions
-    
     #endregion
 
     #region Methods

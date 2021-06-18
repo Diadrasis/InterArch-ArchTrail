@@ -13,7 +13,6 @@ public class cPath
     public int local_path_id { get; private set; }
     public string title;
     public string date;
-    //public DateTime date;
     public List<cPathPoint> pathPoints;
 
     public static readonly string PATHS_TO_DELETE_PREFS_KEY = "pathsToDelete";
@@ -73,17 +72,6 @@ public class cPath
         date = _date;
         pathPoints = null; // _pathPoints;
     }
-
-    //add a path point which will happen associated with cRoutePoints.cs
-    /*public void AddPathPoint(cPathPoint _pathPointToAdd)
-    {
-        pathPoints.Add(_pathPointToAdd);
-    }
-
-    public void RemovePathPoint(cPathPoint _pathPointToRemove)
-    {
-        pathPoints.Remove(_pathPointToRemove);
-    }*/
 
     private static int GetAvailablePathID()
     {

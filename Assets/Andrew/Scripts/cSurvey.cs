@@ -67,7 +67,6 @@ public class cSurvey
             answersNode.Create(ANSWER, answer);
         }
 
-        Debug.Log(xml.outerXml);
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
@@ -105,7 +104,7 @@ public class cSurvey
         OnlineMapsXML surveyNode = xml.Find("/" + SURVEYS + "/" + SURVEY + "[" + LOCAL_PATH_ID + "=" + _surveyToEdit.local_path_id + "]");
         surveyNode.Remove(SERVER_PATH_ID);
         surveyNode.Create(SERVER_PATH_ID, _surveyToEdit.server_path_id);
-        Debug.Log("Edited xml = " + xml.outerXml);
+        
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();

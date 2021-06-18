@@ -11,33 +11,30 @@ public class cPathPoint
     public int local_path_id;
     public int index;
     public Vector2 position; // longitude, latitude (x, y)
-    //public TimeSpan time;
-    public float duration; // time duartion in seconds
+    public float duration; // time duration in seconds
 
     private static readonly string PATHPOINT = "pathPoint";
 
     private static readonly string SERVER_POINT_ID = "server_point_id";
     private static readonly string INDEX = "index";
     private static readonly string POSITION = "position";
-    //private static readonly string TIME = "time";
     private static readonly string DURATION = "duration";
     #endregion
 
     #region Methods
     // Constructor for creating locally
-    public cPathPoint(int _local_path_id, int _index, Vector2 _position, float _duration) //TimeSpan _time
+    public cPathPoint(int _local_path_id, int _index, Vector2 _position, float _duration)
     {
         server_path_id = -1;
         local_path_id = _local_path_id;
         server_point_id = -1;
         index = _index;
         position = _position;
-        //time = _time;
         duration = _duration;
     }
 
     // Constructor for loading from Player Prefs
-    public cPathPoint(int _server_path_id, int _local_path_id, int _server_point_id, int _index, Vector2 _position, float _duration) // TimeSpan _time
+    public cPathPoint(int _server_path_id, int _local_path_id, int _server_point_id, int _index, Vector2 _position, float _duration)
     {
         server_path_id = _server_path_id;
         local_path_id = _local_path_id;
@@ -45,7 +42,6 @@ public class cPathPoint
         index = _index;
         position = _position;
         duration = _duration;
-        //time = _time;
     }
 
     // Constructor for downloading from server
@@ -57,7 +53,6 @@ public class cPathPoint
         index = _index;
         position = _position;
         duration = _duration;
-        //time = _time;
     }
 
     /*public static void Delete(cPathPoint _pathPointToDelete)
@@ -183,7 +178,7 @@ public class cPathPoint
         pointNode.Create(cPath.SERVER_PATH_ID, _pointToEdit.server_path_id);
         pointNode.Remove(SERVER_POINT_ID);
         pointNode.Create(SERVER_POINT_ID, _pointToEdit.server_point_id);
-        Debug.Log("Edited xml = " + xml.outerXml);
+        //Debug.Log("Edited xml = " + xml.outerXml);
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
@@ -304,11 +299,6 @@ public class cPathPoint
 
     public static void SetServerPathAndPointId(int _server_path_id, int _server_point_id, int _index)
     {
-        /*Debug.Log("SetServerPathAndPointId");
-        Debug.Log("_server_path_id = " + _server_path_id);
-        Debug.Log("_server_point_id = " + _server_point_id);
-        Debug.Log("_index = " + _index);*/
-
         // Load xml document, if null creates new
         OnlineMapsXML xml = cArea.GetXML();
 

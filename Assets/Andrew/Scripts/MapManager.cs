@@ -10,8 +10,6 @@ public class MapManager : MonoBehaviour
     #region Variables
     [HideInInspector]
     public List<cArea> areas = new List<cArea>();
-    //[HideInInspector]
-    //public List<cPath> paths = new List<cPath>();
     [HideInInspector]
     public cArea currentArea;
     public cPath currentPath;
@@ -29,7 +27,6 @@ public class MapManager : MonoBehaviour
     // Create a list of markers to draw the path lines
     [HideInInspector]
     public List<OnlineMapsMarker> markerListCurrPath = new List<OnlineMapsMarker>();
-    //public List<OnlineMapsMarker> markersForDuration = new List<OnlineMapsMarker>();
     public cPath pathToDisplay;
 
     // createMarker on user position
@@ -39,7 +36,7 @@ public class MapManager : MonoBehaviour
     public float time = 10;
 
     // Move direction
-    private int direction = 1, moveZoom;
+    private int moveZoom;
 
     //maybe can be deleted later, for now testing purposes
     private Vector2 fromPosition, toPosition;
@@ -56,7 +53,6 @@ public class MapManager : MonoBehaviour
     private static readonly float AREA_MARKER_SCALE = 0.2f;
     private static readonly float MARKERFORDURATION_SCALE = 0.085f;
     private static readonly float MAX_DURATION = 300f; // 5 min //600f; // 10 min
-    //private OnlineMaps map;
 
     // Create Path
     DateTime previousPointTime;
@@ -64,12 +60,10 @@ public class MapManager : MonoBehaviour
     float pausedDuration = 0f;
     public Texture2D markerForDurationTexture;
 
-    //TimeSpan testTime;
     bool isShown;
     //for markers
     private bool touchedLastUpdate = false;
     int lastTouchCount;
-    //private int areaCounter = 0; // TODO: Remove, for testing only
     #endregion
 
     #region Unity Functions
@@ -77,17 +71,6 @@ public class MapManager : MonoBehaviour
     {
         areas = new List<cArea>();
         areas = cArea.LoadAreas();
-
-        //List<cArea> areasToTestSave = GetTestAreas();
-        //cArea.SaveAreas(areasToTestSave);
-
-        //cArea.PrintData("/areas/area/id"); // /areas/area[title='Sarri']
-
-        //Debug.Log(cArea.GetInfoFromXML("/areas/Μεσσήνη/title"));
-
-        //testTime = DateTime.Now.TimeOfDay;
-        //Debug.Log("Awake, testTime = " + testTime);
-        //cPath.Delete(new cPath(1, 0));
     }
 
     private void Start()
@@ -95,17 +78,6 @@ public class MapManager : MonoBehaviour
         // Download areas
         AppManager.Instance.serverManager.DownloadAreas();
         isShown = false;
-        
-        /*if (AppManager.Instance.serverManager.CheckInternet())
-        {
-            AppManager.Instance.serverManager.DownloadAreas();
-            AppManager.Instance.serverManager.DownloadPaths();
-            AppManager.Instance.serverManager.DownloadPoints();
-        }
-        areas = new List<cArea>();
-        areas = cArea.LoadAreas();*/
-
-        //AppManager.Instance.uIManager.DisplayAreasScreen();
 
         SubscribeToEvents();
         fromPosition = OnlineMaps.instance.position;
@@ -114,42 +86,6 @@ public class MapManager : MonoBehaviour
         isPausePath = false;
 
         CreateUserMarker();
-
-        // ========= Tests ========= //
-        //List<cPath> pathsToTest = GetTestPaths();
-        //DisplayPath(pathsToTest[0]);
-        /*List<string> answers = new List<string> { "answer0", "answer1", "answer2"};
-        cQuestionnaire questionnaire = new cQuestionnaire(0, 0, answers);
-        cQuestionnaire.Save(questionnaire);
-        cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(0);
-
-        Debug.Log("Answers:");
-        foreach (string answer in loadedQuestionnaire.answers)
-        {
-            Debug.Log(answer);
-        }*/
-        
-        //AppManager.Instance.questionnaireManager.currentPath = new cPath(5);
-        //if (AppManager.Instance.questionnaireManager.currentPath != null)
-        /*{
-            int local_path_id = 0; //AppManager.Instance.questionnaireManager.currentPath.local_path_id;
-            //Debug.Log("local_path_id = " + local_path_id);
-            AppManager.Instance.questionnaireManager.SaveQuestionnaire();
-
-            cQuestionnaire loadedQuestionnaire = cQuestionnaire.Load(local_path_id);
-
-            Debug.Log("Answers:");
-            Debug.Log("loadedQuestionnaire.answers.Count" + loadedQuestionnaire.answers.Count);
-            foreach (string answer in loadedQuestionnaire.answers)
-            {
-                Debug.Log(answer);
-            }
-
-            // Upload to server
-            //AppManager.Instance.serverManager.PostAndrewTest();
-
-        }*/
-
     }
 
     private void Update()
@@ -226,10 +162,6 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        // TimeSpan timeDuration = (DateTime.Now.TimeOfDay - testTime);
-        // float duration = (float)timeDuration.TotalSeconds;
-        // Debug.Log("timeDuration in seconds = " + duration);
-
         //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
@@ -270,48 +202,6 @@ public class MapManager : MonoBehaviour
         DisplayArea(_areaToView);
     }
 
-    /*public void SetMapZoom()
-    {
-        if (currentArea != null)
-        {
-            int zoom = OnlineMaps.MAXZOOM;
-            if (AppManager.Instance.serverManager.hasInternet)
-            {
-                zoom = currentArea.zoom;
-                OnlineMaps.instance.zoomRange = new OnlineMapsRange(zoom, OnlineMaps.MAXZOOM);
-            }
-            else
-                OnlineMaps.instance.zoomRange = new OnlineMapsRange(OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
-            OnlineMaps.instance.SetPositionAndZoom(currentArea.position.x, currentArea.position.y, zoom);
-        }
-    }*/
-
-    /*public cArea GetAreaByTitle(string _areaTitle)
-    {
-        foreach (cArea area in areas)
-        {
-            if (area.title.Equals(_areaTitle))
-                return area;
-        }
-        return null;
-    }
-
-    public cPath GetPathByTitle(string _pathTitle)
-    {
-        foreach (cPath path in currentArea.paths)
-        {
-            if (path.title.Equals(_pathTitle))
-            {
-                //path.pathPoints = cPathPoint.GetPointsOfPath(path.local_path_id);
-                //Debug.Log("GetPathByTitle, path.local_path_id = " + path.local_path_id);
-                //Debug.Log("GetPathByTitle, path.pathPoints = " + path.pathPoints.Count);
-                return path;
-            }
-        }
-
-        return null;
-    }*/
-
     public cPath GetPathByIndex(int _index)
     {
         return currentArea.paths[_index];
@@ -330,64 +220,22 @@ public class MapManager : MonoBehaviour
         // Create a new cArea
         cArea areaToSave = new cArea(_areaTitle, center, markersCreateArea[0].position, markersCreateArea[1].position);
 
-        //if (areas != null && !areas.Contains(_areaToSave))
-        {
-            // Save area locally and reload areas
-            cArea.Save(areaToSave);
-            areas = cArea.LoadAreas();
+        // Save area locally and reload areas
+        cArea.Save(areaToSave);
+        areas = cArea.LoadAreas();
 
-            //Debug.Log("Saved new area!");
-            AppManager.Instance.serverManager.postUserData = true;
-            AppManager.Instance.serverManager.timeRemaining = 0f;
+        //Debug.Log("Saved new area!");
+        AppManager.Instance.serverManager.postUserData = true;
+        AppManager.Instance.serverManager.timeRemaining = 0f;
 
-            // Clear Cache
-            OnlineMapsCache.instance.ClearAllCaches();
-
-            //OnlineMaps.instance.resourcesPath = ""; // ????
-
-            // Upload user data to server
-            /*if (areaCounter >= 2) // TODO: For testing only. Remove.
-            {
-                AppManager.Instance.serverManager.postUserData = true;
-                areaCounter = 0;
-            }
-            else
-                areaCounter += 1;*/
-        }
+        // Clear Cache (For testing)
+        //OnlineMapsCache.instance.ClearAllCaches();
     }
+
     //to save when edits have been made
     public void EditArea(cArea _areaToEdit, string _areaTitle)
     {
         StartCoroutine(EditEnumerator(_areaToEdit, _areaTitle));
-
-        // DeleteTiles
-        /*AppManager.Instance.serverManager.tileDownloader.DeleteTiles(_areaToEdit);
-
-        // Get center point
-        OnlineMapsUtils.GetCenterPointAndZoom(markersCreateArea, out Vector2 center, out int zoom);
-
-        // Edit area values
-        _areaToEdit.title = _areaTitle;
-        _areaToEdit.position = center;
-        _areaToEdit.zoom = zoom;
-        _areaToEdit.areaConstraintsMin = markersCreateArea[0].position;
-        _areaToEdit.areaConstraintsMax = markersCreateArea[1].position;
-        _areaToEdit.viewConstraintsMin = new Vector2((float)OnlineMaps.instance.bounds.left, (float)OnlineMaps.instance.bounds.bottom);
-        _areaToEdit.viewConstraintsMax = new Vector2((float)OnlineMaps.instance.bounds.right, (float)OnlineMaps.instance.bounds.top);
-
-        // Edit area locally and reload areas
-        cArea.Edit(_areaToEdit);
-        areas = cArea.LoadAreas();
-        editArea = false;
-		
-        // Edit area on server
-        if (_areaToEdit.server_area_id != -1)
-        {
-            Debug.Log(_areaToEdit.title + " has server id = " + _areaToEdit.server_area_id);
-            cArea.AddAreaIdToEdit(_areaToEdit.server_area_id);
-            AppManager.Instance.serverManager.postUserData = true;
-            AppManager.Instance.serverManager.timeRemaining = 0f;
-        }*/
     }
 
     IEnumerator EditEnumerator(cArea _areaToEdit, string _areaTitle)
@@ -438,7 +286,7 @@ public class MapManager : MonoBehaviour
         cArea areaSelected = areas[_selectAreaObjectIndex];
         cArea.Delete(areaSelected.local_area_id);
         areas = cArea.LoadAreas();
-        Debug.Log("Delete Area, local_area_id = " + areaSelected.local_area_id + "server_area_id = " + areaSelected.server_area_id);
+        //Debug.Log("Delete Area, local_area_id = " + areaSelected.local_area_id + "server_area_id = " + areaSelected.server_area_id);
 
         // DeleteTiles
         AppManager.Instance.serverManager.tileDownloader.DeleteTiles(areaSelected);
@@ -446,25 +294,11 @@ public class MapManager : MonoBehaviour
         // Delete Area from server
         if (areaSelected.server_area_id != -1)
         {
-            Debug.Log("AddIdToDelete, area's server id: " + areaSelected.server_area_id);
+            //Debug.Log("AddIdToDelete, area's server id: " + areaSelected.server_area_id);
             cArea.AddIdToDelete(areaSelected.server_area_id);
             AppManager.Instance.serverManager.postUserData = true;
             AppManager.Instance.serverManager.timeRemaining = 0f;
         }
-
-        // TODO: For testing only. Remove.
-        /*if (areaSelected.server_area_id != -1)
-        {
-            cArea.AddIdToDelete(areaSelected.server_area_id);
-        }
-
-        if (areaCounter >= 2)
-        {
-            AppManager.Instance.serverManager.postUserData = true;
-            areaCounter = 0;
-        }
-        else
-            areaCounter += 1;*/
     }
 
     public void DeletePath(int _selectPathObjectIndex)
@@ -472,12 +306,12 @@ public class MapManager : MonoBehaviour
         cPath pathSelected = currentArea.paths[_selectPathObjectIndex];
         //Debug.Log(pathSelected.title);
         cPath.Delete(pathSelected);
-        Debug.Log("Deleted Path, local_path_id = " + pathSelected.local_area_id + "server_path_id = " + pathSelected.server_area_id);
+        //Debug.Log("Deleted Path, local_path_id = " + pathSelected.local_area_id + "server_path_id = " + pathSelected.server_area_id);
 
         // Delete Path from server
         if (pathSelected.server_path_id != -1)
         {
-            Debug.Log("AddIdToDelete, path's server id: " + pathSelected.server_area_id);
+            //Debug.Log("AddIdToDelete, path's server id: " + pathSelected.server_area_id);
             cPath.AddIdToDelete(pathSelected.server_path_id);
             AppManager.Instance.serverManager.postUserData = true;
             AppManager.Instance.serverManager.timeRemaining = 0f;
@@ -503,7 +337,7 @@ public class MapManager : MonoBehaviour
         //Changed Location Event
         OnlineMapsLocationService.instance.OnLocationChanged += OnLocationChanged;
 
-        //Interent Events
+        //Internet Events
         //AppManager.Instance.serverManager.OnDownloadData += ReloadAreasScreen;
         //AppManager.Instance.serverManager.OnCheckInternetCheckComplete += AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
     }
@@ -731,9 +565,7 @@ public class MapManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(false);
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(false);
             isShown = false;
-            
         }
-        
     }
 
     public void StartRecordingPath()
@@ -763,8 +595,6 @@ public class MapManager : MonoBehaviour
 
         // Set user marker on top
         CreateUserMarker();
-
-       
     }
 
     public void PauseRecordingPath()
@@ -915,12 +745,9 @@ public class MapManager : MonoBehaviour
         currentArea.paths = cPath.LoadPathsOfArea(currentArea.local_area_id);
         return currentArea.paths;
     }
-
-
     #endregion
 
     #region Marker
-
     private void OnMarkerLongPress(OnlineMapsMarkerBase marker)
     {
         int touchCount = OnlineMapsControlBase.instance.GetTouchCount();
@@ -940,7 +767,6 @@ public class MapManager : MonoBehaviour
         }
     }
         
-
     public void RemoveMarkersAndLine()
     {
         OnlineMapsMarkerManager.RemoveAllItems(m => m != userMarker);
@@ -1003,6 +829,7 @@ public class MapManager : MonoBehaviour
 
         if (polygon != null)
             OnlineMapsDrawingElementManager.RemoveItem(polygon);
+        
         polygon = CreatePolygon(points); // OnlineMapsDrawingPoly polygonToDisplay = 
     }
 
@@ -1079,46 +906,6 @@ public class MapManager : MonoBehaviour
     }
     #endregion
 
-    #region Screencapture the path
-    /*void RecMyPath()
-    {
-        if (isRecPath)
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                ScreenCapture.CaptureScreenshot(Application.persistentDataPath + "/" + System.DateTime.Now.ToString("yy'-'MM'-'dd'-'hh'-'mm") + ".png");
-                Debug.Log(Application.persistentDataPath + "/" + System.DateTime.Now.ToString("yy'-'MM'-'dd'-'hh'-'mm") + ".png");
-                //OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3));
-            }
-
-            StartCoroutine(TakeScreenShot(currentPath));
-
-        }
-
-    }
-    IEnumerator TakeScreenShot(string pathname)
-    {
-        *//*if (!serverManager.useScreenShots) { yield break; }
-        MarkersManager.CenterZoomOnMarkers();*//*
-
-        yield return new WaitForEndOfFrame();
-        int width = Screen.width;
-        int height = Screen.height;
-        Texture2D tex = new Texture2D(width, height, TextureFormat.RGB24, false);
-        tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-        tex.Apply();
-
-        byte[] bytes = tex.EncodeToJPG(); //Can also encode to jpg, just make sure to change the file extensions down below
-        Destroy(tex);
-        OnLocationChanged(OnlineMapsLocationService.instance.position);
-        yield return new WaitForEndOfFrame();
-
-        //Stathis.File_Manager.saveImage(bytes, pathname, Stathis.File_Manager.Ext.JPG);
-
-        yield break;
-    }*/
-    #endregion
-
     #region NotInUse
     private void OnMarkerPositionChange(OnlineMapsMarkerBase marker)
     {
@@ -1143,104 +930,7 @@ public class MapManager : MonoBehaviour
 
         return areasFromDatabase;
     }
-
-    /*private List<cPath> GetTestPaths()
-    {
-        List<cPathPoint> pathPointsToTest0 = new List<cPathPoint>()
-        {
-            new cPathPoint(0, 0, new Vector2(23.724021164280998f, 37.979955135461715f), DateTime.Now.TimeOfDay),
-            new cPathPoint(0, 1, new Vector2(23.7242f, 37.979955135461715f), DateTime.Now.TimeOfDay),
-            new cPathPoint(0, 2, new Vector2(23.7244f, 37.9801f), DateTime.Now.TimeOfDay)
-        };
-
-        List<cPathPoint> pathPointsToTest1 = new List<cPathPoint>()
-        {
-            new cPathPoint(1, 0, Vector2.zero, DateTime.Now.TimeOfDay)
-        };
-
-        List<cPathPoint> pathPointsToTest2 = new List<cPathPoint>()
-        {
-            new cPathPoint(2, 0, Vector2.zero, DateTime.Now.TimeOfDay),
-            new cPathPoint(2, 1, Vector2.zero, DateTime.Now.TimeOfDay)
-        };
-
-        List <cPath> pathsToTest = new List<cPath>()
-        {
-            new cPath(0, 0, pathPointsToTest0),
-            new cPath(0, 1, pathPointsToTest1),
-            new cPath(1, 2, pathPointsToTest2)
-        };
-
-        return pathsToTest;
-    }*/
-    private List<cPathPoint> GetTestPathPoints()
-    {
-        List<cPathPoint> pathPointsToTest = new List<cPathPoint>()
-        {
-            //new cPathPoint("path_0", ),
-            //new cPathPoint("Μεσσήνη", "path_1"),
-            //new cPathPoint("Κνωσός", "path_0")
-        };
-
-        return pathPointsToTest;
-    }
-
-    private void DisplayAreaDebug(cArea _area)
-    {
-        // ID
-        Debug.Log("Id = " + _area.local_area_id);
-
-        // Title
-        Debug.Log("Title = " + _area.title);
-
-        // Position
-        Debug.Log("Longitude = " + _area.position.x);
-        Debug.Log("Latitude = " + _area.position.y);
-
-        // Zoom
-        Debug.Log("Zoom = " + _area.zoom);
-
-        // Constraints
-        Debug.Log("minLongitude = " + _area.areaConstraintsMin.x);
-        Debug.Log("minLatitude = " + _area.areaConstraintsMin.y);
-        Debug.Log("maxLongitude = " + _area.areaConstraintsMax.x);
-        Debug.Log("maxLatitude = " + _area.areaConstraintsMax.y);
-    }
-    //can be removed?
-    /* public void CheckMyLocation()
-     {
-         //Debug.Log("CheckMyLocation");
-         //CreateMarkerOnUserPosition();
-         fromPosition = OnlineMaps.instance.position;
-         toPosition = OnlineMapsLocationService.instance.position;
-
-         // calculates tile positions
-         moveZoom = OnlineMaps.instance.zoom;
-         OnlineMaps.instance.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
-         OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
-
-         // if tile offset < 4, then start smooth movement
-         if (OnlineMapsUtils.Magnitude(fromTileX, fromTileY, toTileX, toTileY) < 4)
-         {
-             // set relative position 0
-             angle = 0;
-
-             // start movement
-             isMovement = true;
-         }
-         else // too far
-         {
-             OnlineMaps.instance.position = toPosition;
-         }
-     }*/
-
-    /*public List<cPathPoint> GetPoints()
-    {
-        currentPath.pathPoints = cPathPoint.GetPointsOfPath(currentPath.local_path_id);
-        return currentPath.pathPoints;
-    }*/
     #endregion
-
     #endregion
 }
 

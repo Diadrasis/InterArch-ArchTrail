@@ -16,7 +16,6 @@ public class cArea
     public Vector2 areaConstraintsMax; // maxLongitude, maxLatitude (x, y)
     public Vector2 viewConstraintsMin; // minLongitude, minLatitude (x, y)
     public Vector2 viewConstraintsMax; // maxLongitude, maxLatitude (x, y)
-    //public Vector4 constraints; // minLongitude, minLatitude, maxLongitude, maxLatitude (x, y, z, w)
     public List<cPath> paths = new List<cPath>();
 
     public static readonly string PREFS_KEY = "areas";
@@ -149,7 +148,7 @@ public class cArea
         OnlineMapsXML areaToDelete = xml.Find("/" + AREAS + "/" + AREA + "[" + LOCAL_AREA_ID + "=" + _areaId + "]");
         if (!areaToDelete.isNull)
             areaToDelete.Remove();
-        Debug.Log("XML after deleting area: " + xml.outerXml);
+        //Debug.Log("XML after deleting area: " + xml.outerXml);
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
     }
@@ -231,7 +230,7 @@ public class cArea
             {
                 // Create a new int array based on the loaded ids array
                 int[] idsToEdit = new int[loadedIdsToEdit.Length - 1];
-                Debug.Log("RemoveAreaIdToEdit, idsToEdit length = " + idsToEdit.Length);
+                //Debug.Log("RemoveAreaIdToEdit, idsToEdit length = " + idsToEdit.Length);
                 // Insert all loaded ids to the new ids array except the _idToRemove
                 int i = 0;
                 foreach (int id in loadedIdsToEdit)
@@ -243,7 +242,7 @@ public class cArea
                     }
 
                     idsToEdit[i] = id;
-                    Debug.Log("id to edit = " + idsToEdit[i]);
+                    //Debug.Log("id to edit = " + idsToEdit[i]);
                     i++;
                 }
 
@@ -271,17 +270,17 @@ public class cArea
 
         // Create a new int array based on the loaded ids array
         int[] idsToEdit = new int[loadedIdsToEdit.Length + 1];
-        Debug.Log("AddAreaIdToEdit, idsToEdit length = " + idsToEdit.Length);
+        //Debug.Log("AddAreaIdToEdit, idsToEdit length = " + idsToEdit.Length);
         // Insert all loaded ids to the new ids array
         for (int i = 0; i < loadedIdsToEdit.Length; i++)
         {
             idsToEdit[i] = loadedIdsToEdit[i];
-            Debug.Log("id to edit = " + idsToEdit[i]);
+            //Debug.Log("id to edit = " + idsToEdit[i]);
         }
 
         // Insert the new id
         idsToEdit[idsToEdit.Length - 1] = _idToAdd;
-        Debug.Log("id to edit = " + idsToEdit[idsToEdit.Length - 1]);
+        //Debug.Log("id to edit = " + idsToEdit[idsToEdit.Length - 1]);
         // Save new ids array
         PlayerPrefsX.SetIntArray(EDITED_AREAS_TO_UPLOAD_PREFS_KEY, idsToEdit);
         PlayerPrefs.Save();
