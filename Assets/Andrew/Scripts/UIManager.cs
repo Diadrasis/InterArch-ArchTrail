@@ -251,7 +251,7 @@ public class UIManager : MonoBehaviour
     {
         pnlAreasScreen.SetActive(true);
         pnlCreateArea.SetActive(false);
-        DestroySelectAreaObjects(selectAreaObjects);
+        DestroySelectObjects(selectAreaObjects);
         selectAreaObjects = InstantiateSelectAreaObjects();
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
         AppManager.Instance.mapManager.CreateNewAreaFinalize();
@@ -262,6 +262,19 @@ public class UIManager : MonoBehaviour
         txtMainName.text = DEFAULT_TEXT_NAME;
         pnlWarningDeleteScreen.SetActive(false);
         AppManager.Instance.questionnaireManager.ResetValues();
+    }
+
+    public void DisplayPathsScreen()
+    {
+        pnlPathScreen.SetActive(true);
+        pnlSavedPaths.SetActive(true);
+        DestroySelectObjects(selectPathObjects);
+        selectPathObjects = InstantiateSelectPathObjects();
+        StartCoroutine(ReloadLayout(pnlSavedPaths));
+        pnlScrollViewPaths.SetActive(true);
+        ActivateButtons(true, false, false, false);
+        AppManager.Instance.mapManager.RemoveMarkersAndLine();
+        pnlWarningDeleteScreen.SetActive(false);
     }
 
     public void EnableScreen(GameObject _screenToEnable, bool _valid) // CURRENTLY IN USE
@@ -338,10 +351,13 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.currentArea = selectedArea;
 
             // Download Paths of Area
-            if (selectedArea.server_area_id != -1)
+            /*if (selectedArea.server_area_id != -1)
             {
                 AppManager.Instance.serverManager.DownloadPaths(selectedArea.server_area_id);
-            }
+            }*/
+
+            // Download Tiles
+            AppManager.Instance.serverManager.DownloadTiles();
 
             txtMainName.text = selectedArea.title; // selectAreaText.text;
             pnlAreasScreen.SetActive(false);
@@ -430,13 +446,13 @@ public class UIManager : MonoBehaviour
     }
 
 
-    private void DestroySelectAreaObjects(List<GameObject> _selectObjects)
+    private void DestroySelectObjects(List<GameObject> _selectObjects)
     {
         if (_selectObjects != null)
         {
-            foreach (GameObject selectArea in _selectObjects)
+            foreach (GameObject selectObject in _selectObjects)
             {
-                Destroy(selectArea);
+                Destroy(selectObject);
             }
 
             _selectObjects.Clear();
@@ -681,21 +697,23 @@ public class UIManager : MonoBehaviour
     }
 
     //opens the saved paths screen (on click event)
-    void DisplaySavedPathsScreen()
+    public void DisplaySavedPathsScreen()
     {
-        /*// Download Paths of Area
+        // Download Paths of Area
         if (AppManager.Instance.mapManager.currentArea.server_area_id != -1)
         {
             AppManager.Instance.serverManager.DownloadPaths(AppManager.Instance.mapManager.currentArea.server_area_id);
-        }*/
-        pnlSavedPaths.SetActive(true);
-        DestroySelectAreaObjects(selectPathObjects);
+        }
+
+        DisplayPathsScreen();
+        /*pnlSavedPaths.SetActive(true);
+        DestroySelectObjects(selectPathObjects);
         selectPathObjects = InstantiateSelectPathObjects();
         StartCoroutine(ReloadLayout(pnlSavedPaths));
         pnlScrollViewPaths.SetActive(true);
         ActivateButtons(true, false, false, false);
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
-        pnlWarningDeleteScreen.SetActive(false);
+        pnlWarningDeleteScreen.SetActive(false);*/
     }
 
     //when you pause the path and you resume the recording of the path

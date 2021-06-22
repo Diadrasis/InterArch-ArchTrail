@@ -162,7 +162,7 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {
@@ -357,7 +357,7 @@ public class MapManager : MonoBehaviour
         currentArea.paths = cPath.LoadPathsOfArea(currentArea.local_area_id);
 
         // Display Paths
-        //AppManager.Instance.uIManager.DisplayPathsScreen();
+        AppManager.Instance.uIManager.DisplayPathsScreen();
     }
 
     public void ReloadPoints()

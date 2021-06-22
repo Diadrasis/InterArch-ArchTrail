@@ -21,6 +21,7 @@ public class ServerManager : MonoBehaviour
     public bool postUserData = false; // true;
     public bool getData = false; // true;
     private bool downloadAreas;
+    private bool downloadTiles;
     private int downloadAreaId = -1;
     private int downloadPathId = -1;
 
@@ -37,7 +38,7 @@ public class ServerManager : MonoBehaviour
 
     // Ui warning
     public bool panelInternetWarning, isShownOnce;
-    private float secondsToWaitBeforeWarning = 1f;
+    private float secondsToWaitBeforeWarning = 0f; //1f;
     private float minSecondsToDisplayWarning = 1f;
     #endregion
 
@@ -161,6 +162,13 @@ public class ServerManager : MonoBehaviour
             {
                 StartCoroutine(GetPoints(downloadPathId));
                 downloadPathId = -1;
+            }
+
+            // Download Tiles
+            if (downloadTiles)
+            {
+                StartCoroutine(GetTiles());
+                downloadTiles = false;
             }
         }
         else
@@ -655,26 +663,10 @@ public class ServerManager : MonoBehaviour
         stopWatch.Start();
 
         // Get area
-        cArea selectedArea = AppManager.Instance.mapManager.currentArea;
+        /*cArea selectedArea = AppManager.Instance.mapManager.currentArea;
 
         if (selectedArea != null)
         {
-            // Download Area Tiles Locally
-            /*tileDownloader.SetValues(selectedArea.areaConstraintsMin.x, selectedArea.areaConstraintsMax.y, selectedArea.areaConstraintsMax.x, selectedArea.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
-            //tileDownloader.Calculate();
-            tileDownloader.Download();
-
-            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-
-            while (tileDownloader.isDownloading)
-            {
-                // Update panel
-                int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
-                AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
-
-                yield return null;
-            }*/
-
             // Download Tiles Locally
             tileDownloader.SetValues(selectedArea.areaConstraintsMin.x, selectedArea.areaConstraintsMax.y, selectedArea.areaConstraintsMax.x, selectedArea.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
             if (!tileDownloader.HasTiles())
@@ -713,7 +705,7 @@ public class ServerManager : MonoBehaviour
                     AppManager.Instance.uIManager.downloadTiles = false;
                 }
             }
-        }
+        }*/
 
         WWWForm formToPostGetPaths = new WWWForm();
         formToPostGetPaths.AddField("action", Enum.GetName(typeof(PHPActions), 3)); // Get_Paths
@@ -872,6 +864,70 @@ public class ServerManager : MonoBehaviour
 
         // Reload points
         AppManager.Instance.mapManager.ReloadPoints();
+
+        // Deactivate warning panel
+        stopWatch.Stop();
+        TimeSpan timeSpan = stopWatch.Elapsed;
+        yield return new WaitForSeconds(timeSpan.TotalSeconds > (secondsToWaitBeforeWarning + minSecondsToDisplayWarning) ? 0f : ((secondsToWaitBeforeWarning + minSecondsToDisplayWarning) - (float)timeSpan.TotalSeconds));
+        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
+    }
+
+    public void DownloadTiles()
+    {
+        downloadTiles = true;
+        OnlineMaps.instance.CheckServerConnection(OnCheckConnectionCompleteDownload);
+    }
+
+    IEnumerator GetTiles()
+    {
+        // Calculate seconds to Download
+        System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+        stopWatch.Start();
+
+        // Get area
+        cArea selectedArea = AppManager.Instance.mapManager.currentArea;
+
+        if (selectedArea != null)
+        {
+            // Download Tiles Locally
+            tileDownloader.SetValues(selectedArea.areaConstraintsMin.x, selectedArea.areaConstraintsMax.y, selectedArea.areaConstraintsMax.x, selectedArea.areaConstraintsMin.y, OnlineMaps.MAXZOOM, OnlineMaps.MAXZOOM);
+            if (!tileDownloader.HasTiles())
+            {
+                tileDownloader.Calculate();
+
+                // Activate panel warning
+                AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download the area's tiles?\nSize: " + (tileDownloader.totalSize / 1000) + " ΜB";
+                else
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Θα θέλατε να κατεβάσετε το χάρτη της περιοχής;\nΜέγεθος: " + (tileDownloader.totalSize / 1000) + " ΜB";
+
+                // Wait for user input
+                while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
+                {
+                    yield return null;
+                }
+
+                if (AppManager.Instance.uIManager.downloadTiles)
+                {
+                    tileDownloader.Download();
+                    while (tileDownloader.isDownloading)
+                    {
+                        // Update panel
+                        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+                        int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
+                        if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                        else
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Λήψη χάρτη... \n" + percentage + "%";
+
+                        yield return null;
+                    }
+
+                    AppManager.Instance.uIManager.downloadTiles = false;
+                }
+            }
+        }
 
         // Deactivate warning panel
         stopWatch.Stop();
