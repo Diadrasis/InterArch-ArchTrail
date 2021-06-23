@@ -38,7 +38,7 @@ public class ServerManager : MonoBehaviour
 
     // Ui warning
     public bool panelInternetWarning, isShownOnce;
-    private float secondsToWaitBeforeWarning = 0f; //1f;
+    private float secondsToWaitBeforeWarning = 1f;
     private float minSecondsToDisplayWarning = 1f;
     #endregion
 
