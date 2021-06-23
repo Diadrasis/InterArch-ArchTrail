@@ -162,7 +162,7 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
     }
     private void OnDisable()
     {

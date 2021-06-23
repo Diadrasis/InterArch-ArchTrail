@@ -57,6 +57,12 @@ public class UIManager : MonoBehaviour
     public Button btnGPSPermission;
 
     [Space]
+    [Header("Admin Screen")]
+    public GameObject pnlWarningsAdminScreen;
+    public Button btnAdminYes;
+    public Button btnAdminNo;
+
+    [Space]
     [Header("Path Screen")]
     //PathScreen
     public GameObject pnlPathScreen, pnlRecordButton, pnlMainButtons;
@@ -145,6 +151,8 @@ public class UIManager : MonoBehaviour
 
     [HideInInspector]
     public bool downloadTiles = false;
+    [HideInInspector]
+    public bool isAdmin;
 
     readonly string ENGLISH = "English (en)";
     readonly string GREEK = "Greek (el)";
@@ -153,13 +161,19 @@ public class UIManager : MonoBehaviour
     #region Unity Functions
     public void Start()
     {
+        // Initialize variables
         selectAreaObjects = new List<GameObject>();
-
         selectPathObjects = new List<GameObject>();
+        isAdmin = false;
+
+        // Subscribe Buttons
         SubscribeButtons();
-
         DisplayAreasScreen();
+        
+        // Display Admin
+        pnlWarningsAdminScreen.SetActive(true);
 
+        // Initialize panels
         pnlWarningScreen.SetActive(false);
         pnlWarningSavePathScreen.SetActive(false);
         pnlQuestionnaireScreen.SetActive(false);
@@ -169,7 +183,6 @@ public class UIManager : MonoBehaviour
         //imgRecord = GetComponent<Animator>();
         //sexDropdown = GetComponent<TMP_Dropdown>();
     }
-
     #endregion
 
     #region Methods
@@ -189,6 +202,10 @@ public class UIManager : MonoBehaviour
 
         //btn GPS
         btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeAndroidSettings());
+
+        // Admin
+        btnAdminYes.onClick.AddListener(() => SetAdmin(true));
+        btnAdminNo.onClick.AddListener(() => SetAdmin(false));
 
         //btn Path and stop record
         btnAddNewPath.onClick.AddListener(() => AddNewPath());
@@ -229,8 +246,6 @@ public class UIManager : MonoBehaviour
 
         //btn for close Internet screen
         btnCloseInternetScreen.onClick.AddListener(() => CancelInGeneral());
-
-
     }
 
     private void SetDownloadTiles(bool _value)
@@ -251,6 +266,12 @@ public class UIManager : MonoBehaviour
     {
         pnlAreasScreen.SetActive(true);
         pnlCreateArea.SetActive(false);
+
+        if (isAdmin)
+            btnCreateArea.gameObject.SetActive(true);
+        else
+            btnCreateArea.gameObject.SetActive(false);
+
         DestroySelectObjects(selectAreaObjects);
         selectAreaObjects = InstantiateSelectAreaObjects();
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
@@ -318,14 +339,24 @@ public class UIManager : MonoBehaviour
 
                     if (child.name.Equals("btnDeleteArea"))
                     {
-                        btnDeleteArea = child.GetComponent<Button>();
-                        btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
+                        if (isAdmin)
+                        {
+                            btnDeleteArea = child.GetComponent<Button>();
+                            btnDeleteArea.onClick.AddListener(OnAreaDeletePressed);
+                        }
+                        else
+                            child.gameObject.SetActive(false);
                     }
 
                     if (child.name.Equals("btnEditArea"))
                     {
-                        btnEditArea = child.GetComponent<Button>();
-                        btnEditArea.onClick.AddListener(OnEditSelect);
+                        if (isAdmin)
+                        {
+                            btnEditArea = child.GetComponent<Button>();
+                            btnEditArea.onClick.AddListener(OnEditSelect);
+                        }
+                        else
+                            child.gameObject.SetActive(false);
                     }
                 }
 
@@ -874,6 +905,17 @@ public class UIManager : MonoBehaviour
         }
         
     }*/
+
+    public void SetAdmin(bool _value)
+    {
+        isAdmin = _value;
+        pnlWarningsAdminScreen.SetActive(false);
+        if (isAdmin)
+            btnPaths.gameObject.SetActive(true);
+        else
+            btnPaths.gameObject.SetActive(false);
+        DisplayAreasScreen();
+    }
     #endregion
 
     #region QuestionnairePanel
