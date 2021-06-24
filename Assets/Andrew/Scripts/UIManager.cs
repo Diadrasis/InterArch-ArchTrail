@@ -141,9 +141,9 @@ public class UIManager : MonoBehaviour
     public Button btnProfiler;
     public Button btnResetQuestionnaire;
     public TMP_Dropdown sexDropdown,ageDropdown;
-    readonly List<string> sexValuesEN = new List<string> { "<Choose Below>", "Male", "Female" };
-    readonly List<string> sexValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "Άρρεν", "Θήλυ" };
-    readonly List<string> optionValuesΕΝ = new List<string> { "<Choose Below>", "Individual (or small indepented group)", "Organised visit with guide/leader", "School visit" };
+    readonly List<string> sexValuesEN = new List<string> { "<Choose Below>", "Male", "Female","Other" };
+    readonly List<string> sexValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "Άρρεν", "Θήλυ","Άλλο" };
+    readonly List<string> optionValuesΕΝ = new List<string> { "<Choose Below>", "An Individual visit (member of a small group of friends or Family)", "An Organized group visit accompanied by a Tour Guide/ Group Leader.", "A School visit" };
     readonly List<string> optionValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "Ατομικής επίσκεψης (ή μικρή ανεξάρτητη ομάδα) ", "Οργανωμένης επίσκεψης, με ξεναγό / αρχηγό ομάδας", "Σχολικής επίσκεψης" };
     readonly List<string> ageValuesEN = new List<string> {"<Choose Below>","0-12", "13-18", "19-25", "26-30", "31-40", "41-50", "51-60","61+" };
     readonly List<string> ageValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "0-12", "13-18", "19-25", "26-30", "31-40", "41-50", "51-60", "61+" };
