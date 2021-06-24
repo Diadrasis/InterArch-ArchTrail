@@ -239,7 +239,7 @@ public class SurveyManager : MonoBehaviour
             //Debug.Log("Step: " + step);
 
         }
-        else if (/*step == 16 ||*/ step == 42 /*|| step == 33 || step == 55 || step == 73*/)
+        else if (step == 42)
         {
             step = demographicOptions.Length;
         }
@@ -309,20 +309,17 @@ public class SurveyManager : MonoBehaviour
         }
         else if (val.value == 2)
         {
-            step = 17;
+            step = 22;
             AppManager.Instance.uIManager.pnlOptionB.SetActive(true);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
             btnSkip.gameObject.SetActive(false);
-            //demographicOptions[step].SetActive(true);
         }
         else if (val.value == 3)
         {
-            step = 43;
+            step = 56;
             AppManager.Instance.uIManager.pnlOptionC.SetActive(true);
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
             btnSkip.gameObject.SetActive(false);
-            //step = 7;
-            //CheckToggle();
         }
 
     }
@@ -330,8 +327,7 @@ public class SurveyManager : MonoBehaviour
     void CheckToggle()
     {
         btnSkip.gameObject.SetActive(false);
-        //Debug.Log("Check Toggle");
-        //Debug.Log("Step on toggle "+step);
+
         if (step == 17 && choiceTogglesB[0].isOn)
         {
             AppManager.Instance.uIManager.pnlOptionB1.SetActive(true);
