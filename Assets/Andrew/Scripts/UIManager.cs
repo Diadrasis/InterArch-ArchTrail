@@ -63,6 +63,13 @@ public class UIManager : MonoBehaviour
     public Button btnAdminNo;
 
     [Space]
+    [Header("Password Screen")]
+    public GameObject pnlWarningsPasswordScreen;
+    public TMP_InputField inptFldPasswordScreen;
+    public Button btnPasswordContinue;
+    //public Button btnPasswordScreenClose;
+
+    [Space]
     [Header("Path Screen")]
     //PathScreen
     public GameObject pnlPathScreen, pnlRecordButton, pnlMainButtons;
@@ -153,6 +160,7 @@ public class UIManager : MonoBehaviour
     public bool downloadTiles = false;
     [HideInInspector]
     public bool isAdmin;
+    private string passwordAdmin = "0000";
 
     readonly string ENGLISH = "English (en)";
     readonly string GREEK = "Greek (el)";
@@ -204,8 +212,13 @@ public class UIManager : MonoBehaviour
         btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeAndroidSettings());
 
         // Admin
-        btnAdminYes.onClick.AddListener(() => SetAdmin(true));
+        btnAdminYes.onClick.AddListener(() => DisplayPasswordScreen());
         btnAdminNo.onClick.AddListener(() => SetAdmin(false));
+
+        // Password
+        inptFldPasswordScreen.characterLimit = 4;
+        btnPasswordContinue.onClick.AddListener(() => CheckPassword(inptFldPasswordScreen.text));
+        //btnPasswordScreenClose.onClick.AddListener(() => SetAdmin(false));
 
         //btn Path and stop record
         btnAddNewPath.onClick.AddListener(() => AddNewPath());
@@ -905,15 +918,42 @@ public class UIManager : MonoBehaviour
         }
         
     }*/
+    public void DisplayPasswordScreen()
+    {
+        pnlWarningsAdminScreen.SetActive(false);
+        pnlWarningsPasswordScreen.SetActive(true);
+    }
+
+    /*public void ClosePasswordScreen()
+    {
+        pnlWarningsPasswordScreen.SetActive(false);
+    }*/
+
+    public void CheckPassword(string _input)
+    {
+        if (_input.Equals(passwordAdmin))
+        {
+            SetAdmin(true);
+        }
+        else
+        {
+            inptFldPasswordScreen.text = "";
+            pnlWarningsPasswordScreen.SetActive(false);
+            pnlWarningsAdminScreen.SetActive(true);
+        }
+    } 
 
     public void SetAdmin(bool _value)
     {
         isAdmin = _value;
-        pnlWarningsAdminScreen.SetActive(false);
+        
         if (isAdmin)
             btnPaths.gameObject.SetActive(true);
         else
             btnPaths.gameObject.SetActive(false);
+
+        pnlWarningsPasswordScreen.SetActive(false);
+        pnlWarningsAdminScreen.SetActive(false);
         DisplayAreasScreen();
     }
     #endregion
