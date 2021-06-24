@@ -34,7 +34,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3882203398144
-    m_Localized: "Would you like to download the areas' tiles? \nSize {totalSize}KB"
+    m_Localized: "Would you like to download the areas' tiles? \nSize {totalSize}
+      MB"
     m_Metadata:
       m_Items:
       - id: 0
