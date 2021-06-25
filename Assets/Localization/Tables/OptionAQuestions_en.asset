@@ -19,39 +19,186 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 58315161600
-    m_Localized: Individual visit (or small independent group)
+    m_Localized: Individual Visit (or small individual group)
     m_Metadata:
       m_Items: []
   - m_Id: 270077181952
-    m_Localized: Do you visit archaeological sites?
+    m_Localized: How often do you visit Archaeological Sites?
     m_Metadata:
       m_Items: []
   - m_Id: 397340753920
-    m_Localized: Rarely
+    m_Localized: Rarely.
     m_Metadata:
       m_Items: []
   - m_Id: 547232595968
-    m_Localized: Many times
+    m_Localized: Sometimes.
     m_Metadata:
       m_Items: []
   - m_Id: 629067661312
-    m_Localized: Frequently
+    m_Localized: Quite Often.
     m_Metadata:
       m_Items: []
   - m_Id: 1384939962368
-    m_Localized: Before your <u> first time</u> visit, did you know it's existence?
+    m_Localized: Before visiting Ancient Messene for the first time, were you informed
+      of its existence?
     m_Metadata:
       m_Items: []
   - m_Id: 1810842173440
-    m_Localized: Yes
+    m_Localized: Yes.
     m_Metadata:
       m_Items: []
   - m_Id: 1941419245568
-    m_Localized: No
+    m_Localized: No.
     m_Metadata:
       m_Items: []
   - m_Id: 2483474317312
-    m_Localized: Have you visit <u>before</u>the Ancient Messini?
+    m_Localized: Have you visited Ancient Messene before?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3022178140160
+    m_Localized: 'What was the purpose of your visit:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 307468682575872
+    m_Localized: Recreational.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 307828377698304
+    m_Localized: Holidays.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 308005008228352
+    m_Localized: Work / Educational / Instructional.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 308241323704320
+    m_Localized: Other...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 309315761782784
+    m_Localized: During your stay on the archaeological site was there any lack of
+      facilities?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3609819698593792
+    m_Localized: I would like to receive more information about the monuments.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3609943736745984
+    m_Localized: Adequate provision for more shade.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3609955766009856
+    m_Localized: Adequate provision for more resting places.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3610007779573760
+    m_Localized: Access to improved sanitary facilities.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3610121675898880
+    m_Localized: My stay was very enjoyable. I am completely satisfied.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3610148708188160
+    m_Localized: Other...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3611490843525120
+    m_Localized: What impressed you the most about the archaeological site?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3611549404397568
+    m_Localized: The monuments of the ancient city.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3611591087390720
+    m_Localized: The natural landscape.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3611616005750784
+    m_Localized: Other...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3612440941461504
+    m_Localized: You would have liked to receive more information about a monument?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3612475397668864
+    m_Localized: The Theatre.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3612520708734976
+    m_Localized: The Stadium.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3612542296817664
+    m_Localized: The Gymnasium.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3612556855246848
+    m_Localized: The Ancient Agora.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3612570721615872
+    m_Localized: The Sanctuaries.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3612587792433152
+    m_Localized: The Fortified Wall.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3612602724155392
+    m_Localized: Other...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3613445863145472
+    m_Localized: Would you like to visit Ancient Messene again?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3613562599014400
+    m_Localized: Yes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3613651451150336
+    m_Localized: Probably yes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3613670774308864
+    m_Localized: Maybe.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3613687773822976
+    m_Localized: Probably not.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3613706543333376
+    m_Localized: No.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3614584075616256
+    m_Localized: "If you could travel back in time to live a day in peoples\u2019
+      lives in Ancient Messene, what would you like to\r\nexperience?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3614751247990784
+    m_Localized: A theatrical performance at the Ancient Theatre.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3614791672692736
+    m_Localized: A public event (sports/spectacle) at the Ancient Stadium.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3614814019944448
+    m_Localized: A day in the everyday lives of the people of Ancient Messene.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3614853874221056
+    m_Localized: An ancient ritual.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3614867820281856
+    m_Localized: Other...
     m_Metadata:
       m_Items: []
   references:
