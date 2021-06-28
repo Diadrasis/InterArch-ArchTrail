@@ -55,6 +55,10 @@ MonoBehaviour:
     m_Key: btnSaveArea
     m_Metadata:
       m_Items: []
+  - m_Id: 5156705429520384
+    m_Key: inpFldPlaceholder
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -25,6 +25,14 @@ MonoBehaviour:
     m_mainAssetType: 
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
+  - m_GUID: 176a50071d985aa47956ce5fb4f5219d
+    m_Address: OptionCQuestions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   - m_GUID: 1dbd9def7c3d75445b68305bf5852b7e
     m_Address: MainQuestions_en
     m_ReadOnly: 1
@@ -43,8 +51,24 @@ MonoBehaviour:
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
+  - m_GUID: 2bec2cc0e1495b047977cf0e697726b3
+    m_Address: GeneralQuestions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   - m_GUID: 36b0c4d72468b60469930cf01d88301a
     m_Address: OptionB1Questions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 40d9a5d74264a624383c968821f9c3c6
+    m_Address: OptionC2Questions_en
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale-en
@@ -67,6 +91,14 @@ MonoBehaviour:
     - Locale-en
     m_mainAssetType: UnityEngine.Localization.Tables.StringTable, Unity.Localization,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 7a097fe706c603a4a9d3de71d3c9e39c
+    m_Address: OptionC1Questions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+    m_mainAssetType: 
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   - m_GUID: 859e5b0b977876c4080943a2ac4e81ad
@@ -111,6 +143,22 @@ MonoBehaviour:
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
+  - m_GUID: c09bf29e20c23214d85c2b51e6cafe4d
+    m_Address: OptionC1Questions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: ce4b7a27055d2f7488b9ae3a7bae655c
+    m_Address: OptionCQuestions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   - m_GUID: d054a99d640cb1a4282b2b3d14ef43e5
     m_Address: Warnings_el
     m_ReadOnly: 1
@@ -135,6 +183,22 @@ MonoBehaviour:
     - Locale-el
     m_mainAssetType: UnityEngine.Localization.Tables.StringTable, Unity.Localization,
       Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: df0c204cd7b74b2438d4d37b84b84a9d
+    m_Address: OptionC2Questions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+    m_mainAssetType: 
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: e288d5f72676ccb4d81b3d2cfd6982a6
+    m_Address: GeneralQuestions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+    m_mainAssetType: 
     m_MainAsset: {fileID: 0}
     m_TargetAsset: {fileID: 0}
   - m_GUID: ecb8e9935b9cf8b41ba92c590bd873b3

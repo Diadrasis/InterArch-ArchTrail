@@ -59,5 +59,9 @@ MonoBehaviour:
     m_Localized: Save New Area
     m_Metadata:
       m_Items: []
+  - m_Id: 5156705429520384
+    m_Localized: Fill in here...
+    m_Metadata:
+      m_Items: []
   references:
     version: 1

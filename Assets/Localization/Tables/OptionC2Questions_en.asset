@@ -1,0 +1,207 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: OptionC2Questions_en
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 87a0db3148326be4ba754411f3d5005e, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 13486161920
+    m_Localized: Teacher.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 88807473152
+    m_Localized: How often do you visit archaeological sites?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 146911166464
+    m_Localized: Rarely.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 184391467008
+    m_Localized: Sometimes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 595399704576
+    m_Localized: "Quite \u03BFften."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 859988983808
+    m_Localized: Before visiting Ancient Messene for the first time, were you informed
+      of its existence?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 898861793280
+    m_Localized: Yes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 928062537728
+    m_Localized: No.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2074437124096
+    m_Localized: Have you visited Ancient Messene before?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2100525694976
+    m_Localized: Yes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2122466099200
+    m_Localized: No.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2968146837504
+    m_Localized: Other...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2659437674496
+    m_Localized: I would like more information about the monuments..
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2161036918784
+    m_Localized: During your stay on the archaeological site was there any lack of
+      facilities?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2692727865344
+    m_Localized: Adequate provision for more shade.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2878820745216
+    m_Localized: Adequate provision for more resting places.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2896743006208
+    m_Localized: Access to improved sanitary facilities.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2919081869312
+    m_Localized: My stay was very enjoyable. I am completely satisfied.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3518405967872
+    m_Localized: What impressed you the most about the archaeological site?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3553348714496
+    m_Localized: The monuments of the ancient city.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3583962939392
+    m_Localized: The natural landscape.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4354318172160
+    m_Localized: Other...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4386689810432
+    m_Localized: Are children motivated to learn more about the ancient city during
+      their visit?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4421452201984
+    m_Localized: No.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4983195336704
+    m_Localized: "Yes.\r (Please Specify)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6282397777920
+    m_Localized: Other...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5881678168064
+    m_Localized: 'The guided tour becomes more interesting for children when:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5907380862976
+    m_Localized: "The process of storytelling is engaged in the monuments\u2019 descriptions."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5935017132032
+    m_Localized: There is an open discussion about the historical site and its monuments.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6260503511040
+    m_Localized: Learning game based on historical descriptions.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7044586700800
+    m_Localized: Do children feel the need to explore the archaeological site on
+      their own?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7160433377280
+    m_Localized: No.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7198744150016
+    m_Localized: "Yes.\r (Please Specify)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7594443177984
+    m_Localized: Would you like to visit Ancient Messene again?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7634687524864
+    m_Localized: Yes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7659647827968
+    m_Localized: Probably yes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7710130470912
+    m_Localized: Maybe.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7731068436480
+    m_Localized: Probably not.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7748336386048
+    m_Localized: No.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8158900027392
+    m_Localized: "If you could travel back in time and live a day in peoples\u2019
+      lives in Ancient Messene, what would you\r\nlike to experience?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8190067900416
+    m_Localized: A theatrical performance at the Ancient Theatre.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8219839070208
+    m_Localized: A public event (sports/spectacle) at the Ancient Stadium.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8413972430848
+    m_Localized: A day in the everyday lives of the people of Ancient Messene.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8432079241216
+    m_Localized: An ancient ritual.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 9200257630208
+    m_Localized: Other...
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 1

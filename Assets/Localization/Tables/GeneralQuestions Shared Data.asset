@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: GeneralQuestions Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: GeneralQuestions
+  m_TableCollectionNameGuidString: 6d2d58a1fdcd83840a5c351fdcb300aa
+  m_Entries:
+  - m_Id: 358937427968
+    m_Key: gQ_q1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 428046974976
+    m_Key: gQ_q1_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 475664908288
+    m_Key: gQ_q1_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1134220967936
+    m_Key: gQ_q2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1173970386944
+    m_Key: gQ_q2_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1191884259328
+    m_Key: gQ_q2_answer2_key
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    id: 0
+  references:
+    version: 1
+    00000000:
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables,
+        asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1624869208407
