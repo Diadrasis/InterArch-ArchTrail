@@ -76,8 +76,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 309315761782784
-    m_Localized: "During your stay on the archaeological site was there any lack
-      of facilities? (\rmultiple choice)"
+    m_Localized: During your stay on the archaeological site was there any lack of
+      facilities? (multiple choice)
     m_Metadata:
       m_Items: []
   - m_Id: 3609819698593792
@@ -177,9 +177,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3614584075616256
-    m_Localized: "If you could travel back in time to live a day in peoples\u2019
-      lives in Ancient Messene, what would you like to\r\nexperience? (\rmultiple
-      choice)"
+    m_Localized: If you could travel back in time to live a day in people's lives
+      in Ancient Messene, what would you like to experience? (multiple choice)
     m_Metadata:
       m_Items: []
   - m_Id: 3614751247990784
