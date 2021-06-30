@@ -437,7 +437,7 @@ public class MapManager : MonoBehaviour
                 if (!isShown)
                 {
                     AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-                    AppManager.Instance.uIManager.txtWarning.text = "You are out of the Active Area";
+                    AppManager.Instance.uIManager.SetWarningTxtOnCheckUserPosition();
                 }
                 if(isRecordingPath || isPausePath)
                 {
