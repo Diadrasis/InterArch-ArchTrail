@@ -953,7 +953,7 @@ public class UIManager : MonoBehaviour
 
     public void CheckLanguage()
     {
-        if (LocalizationSettings.SelectedLocale.name == ENGLISH)
+        if (LocalizationSettings.SelectedLocale.Identifier=="en")
         {
             sexDropdown.ClearOptions();
             ageDropdown.ClearOptions();
@@ -963,7 +963,7 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesΕΝ);
             Debug.Log("English");
         }
-        else if (LocalizationSettings.SelectedLocale.name == GREEK)
+        if (LocalizationSettings.SelectedLocale.Identifier == "el")
         {
             sexDropdown.ClearOptions();
             ageDropdown.ClearOptions();
