@@ -301,7 +301,7 @@ public class SurveyManager : MonoBehaviour
         if (val.value == 0)
         {
             AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
-            AppManager.Instance.uIManager.txtWarning.text = "Please enter a valid option";
+            AppManager.Instance.uIManager.SetWarningTxtOnCheckValue();
             return;
         }
         else if (val.value == 1)

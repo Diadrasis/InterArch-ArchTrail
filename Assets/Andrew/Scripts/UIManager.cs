@@ -670,7 +670,11 @@ public class UIManager : MonoBehaviour
         else
         {
             pnlWarningScreen.SetActive(true);
-            txtWarning.text = "Please enter a valid name";
+
+            if (LanguageIsEnglish())
+                txtWarning.text = "Please enter a valid name";
+            else
+                txtWarning.text = "Παρακαλώ εισάγετε ένα έγκυρο όνομα";
         }
     }
 
@@ -689,7 +693,11 @@ public class UIManager : MonoBehaviour
         else
         {
             pnlWarningScreen.SetActive(true);
-            txtWarning.text = "Please enter a valid name";
+
+            if (LanguageIsEnglish())
+                txtWarning.text = "Please enter a valid name";
+            else
+                txtWarning.text = "Παρακαλώ εισάγετε ένα έγκυρο όνομα";
         }
     }
 
@@ -977,7 +985,24 @@ public class UIManager : MonoBehaviour
 
     public bool LanguageIsEnglish()
     {
-        return (LocalizationSettings.SelectedLocale.name == ENGLISH);
+        //Debug.Log(LocalizationSettings.SelectedLocale.Identifier == "en");//.name == ENGLISH);
+        return (LocalizationSettings.SelectedLocale.Identifier == "en");//.name == ENGLISH);
+    }
+
+    public void SetWarningTxtOnCheckUserPosition()
+    {
+        if (LanguageIsEnglish())
+            txtWarning.text = "You are out of the Active Area";
+        else
+            txtWarning.text = "Βρίσκεστε εκτός ενεργής περιοχής";
+    }
+
+    public void SetWarningTxtOnCheckValue()
+    {
+        if (LanguageIsEnglish())
+            txtWarning.text = "Please enter a valid option";
+        else
+            txtWarning.text = "Παρακαλώ εισάγετε μία έγκυρη επιλογή";
     }
     #endregion
 
