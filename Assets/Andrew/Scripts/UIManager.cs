@@ -874,34 +874,7 @@ public class UIManager : MonoBehaviour
 
     }
 
-    public void CheckLanguage()
-    {
-        if (LocalizationSettings.SelectedLocale.name == ENGLISH)
-        {
-            sexDropdown.ClearOptions();
-            ageDropdown.ClearOptions();
-            ageDropdown.AddOptions(ageValuesEN);
-            sexDropdown.AddOptions(sexValuesEN);
-            AppManager.Instance.questionnaireManager.optionDropdown.ClearOptions();
-            AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesΕΝ);
-            Debug.Log("English");
-        }
-        else if (LocalizationSettings.SelectedLocale.name == GREEK)
-        {
-            sexDropdown.ClearOptions();
-            ageDropdown.ClearOptions();
-            ageDropdown.AddOptions(ageValuesGR);
-            AppManager.Instance.questionnaireManager.optionDropdown.ClearOptions();
-            AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesGR);
-            sexDropdown.AddOptions(sexValuesGR);
-            Debug.Log("Greek");
-        }
-    }
-
-    public bool LanguageIsEnglish()
-    {
-        return (LocalizationSettings.SelectedLocale.name == ENGLISH);
-    }
+    
     //when uploading/loading or updating from and to server, to show info (needs fixing)
     /*public void LoadingScreen(string txtMessage, float timeAmount, float speedAmount)
     {
@@ -976,6 +949,35 @@ public class UIManager : MonoBehaviour
         pnlOptionC.SetActive(false);
         pnlPathScreen.SetActive(false);
         ActivateButtons(true, true, true, false);
+    }
+
+    public void CheckLanguage()
+    {
+        if (LocalizationSettings.SelectedLocale.name == ENGLISH)
+        {
+            sexDropdown.ClearOptions();
+            ageDropdown.ClearOptions();
+            ageDropdown.AddOptions(ageValuesEN);
+            sexDropdown.AddOptions(sexValuesEN);
+            AppManager.Instance.questionnaireManager.optionDropdown.ClearOptions();
+            AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesΕΝ);
+            Debug.Log("English");
+        }
+        else if (LocalizationSettings.SelectedLocale.name == GREEK)
+        {
+            sexDropdown.ClearOptions();
+            ageDropdown.ClearOptions();
+            ageDropdown.AddOptions(ageValuesGR);
+            AppManager.Instance.questionnaireManager.optionDropdown.ClearOptions();
+            AppManager.Instance.questionnaireManager.optionDropdown.AddOptions(optionValuesGR);
+            sexDropdown.AddOptions(sexValuesGR);
+            Debug.Log("Greek");
+        }
+    }
+
+    public bool LanguageIsEnglish()
+    {
+        return (LocalizationSettings.SelectedLocale.name == ENGLISH);
     }
     #endregion
 
