@@ -1,0 +1,160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: OptionB1Questions Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: OptionB1Questions
+  m_TableCollectionNameGuidString: a9cfd9e3c2069454ba9078bfe1dd81f5
+  m_Entries:
+  - m_Id: 87192666112
+    m_Key: oB1_mainText_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 118033383424
+    m_Key: oB1_q1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 208965894144
+    m_Key: oB1_q1_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 262640402432
+    m_Key: oB1_q1_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 271490383872
+    m_Key: oB1_q1_answer3_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 855870177280
+    m_Key: oB1_q2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 868608278528
+    m_Key: oB1_q2_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1017417990144
+    m_Key: oB1_q2_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1335363010560
+    m_Key: oB1_q3_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1430489825280
+    m_Key: oB1_q3_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1481568059392
+    m_Key: oB1_q3_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1734652362752
+    m_Key: oB1_q4_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1766982057984
+    m_Key: oB1_q4_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2299880964096
+    m_Key: oB1_q4_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2339722657792
+    m_Key: oB1_q4_answer3_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2358836101120
+    m_Key: oB1_q4_answer4_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17785205194752
+    m_Key: oB1_q5_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17908513538048
+    m_Key: oB1_q5_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17946744619008
+    m_Key: oB1_q5_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 17971566510080
+    m_Key: oB1_q5_answer3_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18029313687552
+    m_Key: oB1_q5_answer4_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18043976974336
+    m_Key: oB1_q5_answer5_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 18066408112128
+    m_Key: oB1_q5_answer6_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19023279849472
+    m_Key: oB1_q6_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19169417789440
+    m_Key: oB1_q6_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19690497146880
+    m_Key: oB1_q6_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19709086302208
+    m_Key: oB1_q6_answer3_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19728745005056
+    m_Key: oB1_q6_answer4_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19748550508544
+    m_Key: oB1_q6_answer5_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 19767533928448
+    m_Key: oB1_q6_answer6_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21687774380032
+    m_Key: oB1_q7_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21789238788096
+    m_Key: oB1_q7_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21830905004032
+    m_Key: oB1_q7_answer2_key
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    id: 0
+  references:
+    version: 1
+    00000000:
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables,
+        asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1624624967750

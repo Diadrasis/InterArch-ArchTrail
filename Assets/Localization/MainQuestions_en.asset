@@ -18,30 +18,36 @@ MonoBehaviour:
   m_Metadata:
     m_Items:
     - id: 0
+    - id: 1
   m_TableData:
   - m_Id: 9879339008
-    m_Localized: Sex
+    m_Localized: Gender.
     m_Metadata:
       m_Items: []
   - m_Id: 64500142882816
-    m_Localized: Age
+    m_Localized: Age.
     m_Metadata:
       m_Items: []
   - m_Id: 64585102704640
-    m_Localized: Occupation
+    m_Localized: Profession.
     m_Metadata:
       m_Items: []
   - m_Id: 64876543918080
-    m_Localized: Ethnicity
+    m_Localized: The location of the principal residence.
     m_Metadata:
       m_Items: []
   - m_Id: 65094467371008
-    m_Localized: Visit reason
+    m_Localized: 'Your visit to Ancient Messene is:'
     m_Metadata:
-      m_Items: []
+      m_Items:
+      - id: 1
   references:
     version: 1
     00000000:
       type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_Entries: 00c05aa515000000
+    00000001:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 00c09afc333b0000

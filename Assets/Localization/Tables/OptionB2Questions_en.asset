@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: OptionB2Questions_en
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: b60b7c73d1d1d7b41af79ee82874d3c4, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 84617363456
+    m_Localized: Tour guide / group leader.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 225353039872
+    m_Localized: Are visitors engaged in learning more about the archaeological site
+      during the guided tour?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 270232092672
+    m_Localized: No.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 777990340608
+    m_Localized: "Yes.\r (Please Specify)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1223861633024
+    m_Localized: 'During the guided tour, do visitors remain in the group, or they
+      do feel the need to separate themselves
+
+      from it and explore the archaeological
+      site on their own?'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1249895677952
+    m_Localized: No.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1296762830848
+    m_Localized: Yes. (Please Specify)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 979191622696960
+    m_Localized: 'In your opinion is there anything that could be improved regarding
+      the visiting conditions of the
+
+      archaeological site?'
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 1

@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: OptionB2Questions Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: OptionB2Questions
+  m_TableCollectionNameGuidString: b60b7c73d1d1d7b41af79ee82874d3c4
+  m_Entries:
+  - m_Id: 84617363456
+    m_Key: oB2_mainText_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 225353039872
+    m_Key: oB2_q1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 270232092672
+    m_Key: oB2_q1_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 777990340608
+    m_Key: oB2_q1_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1223861633024
+    m_Key: oB2_q2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1249895677952
+    m_Key: oB2_q2_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1296762830848
+    m_Key: oB2_q2_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 979191622696960
+    m_Key: oB2_q6_key
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    id: 0
+  references:
+    version: 1
+    00000000:
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables,
+        asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1624631149121
