@@ -40,7 +40,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 855870177280
     m_Localized: Before vising Ancient Messene for the first time, were you informed
-      on its existence?
+      of its existence?
     m_Metadata:
       m_Items: []
   - m_Id: 868608278528
@@ -76,16 +76,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2339722657792
-    m_Localized: Working / Educational / Instructional.
+    m_Localized: Working / educational / instructional.
     m_Metadata:
       m_Items: []
   - m_Id: 2358836101120
-    m_Localized: Other...
+    m_Localized: Other.
     m_Metadata:
       m_Items: []
   - m_Id: 17785205194752
-    m_Localized: During your stay on the archaeological site was there any lack of
-      facilities?
+    m_Localized: "During your stay on the archaeological site was there any lack
+      of facilities? (\rmultiple choice)"
     m_Metadata:
       m_Items: []
   - m_Id: 17908513538048
@@ -97,7 +97,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 19023279849472
-    m_Localized: Was the guided tour satisfactory?
+    m_Localized: "Was the guided tour satisfactory? (\rmultiple choice)"
     m_Metadata:
       m_Items: []
   - m_Id: 18066408112128
@@ -144,10 +144,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 21687774380032
-    m_Localized: 'During the guided tour did you feel the need to separate yourself
-      from the group and explore the site on
-
-      your own?'
+    m_Localized: During the guided tour did you feel the need to separate yourself
+      from the group and explore the site on your own?
     m_Metadata:
       m_Items: []
   - m_Id: 21789238788096
@@ -155,7 +153,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 21830905004032
-    m_Localized: Yes. (Please Specify)
+    m_Localized: Yes. (Please specify)
     m_Metadata:
       m_Items: []
   references:

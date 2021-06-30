@@ -19,15 +19,15 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 9157640192
-    m_Localized: School Visit.
+    m_Localized: School visit.
     m_Metadata:
       m_Items: []
   - m_Id: 118616391680
-    m_Localized: Are you a pupil/ a high school student or a teacher?
+    m_Localized: Are you a pupil / high school student or a teacher?
     m_Metadata:
       m_Items: []
   - m_Id: 425891102720
-    m_Localized: Pupil / High School student.
+    m_Localized: Pupil / high school student.
     m_Metadata:
       m_Items: []
   - m_Id: 510741872640

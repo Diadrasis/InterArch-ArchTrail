@@ -32,15 +32,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 777990340608
-    m_Localized: "Yes.\r (Please Specify)"
+    m_Localized: "Yes.\r (Please specify)"
     m_Metadata:
       m_Items: []
   - m_Id: 1223861633024
-    m_Localized: 'During the guided tour, do visitors remain in the group, or they
-      do feel the need to separate themselves
-
-      from it and explore the archaeological
-      site on their own?'
+    m_Localized: During the guided tour, do visitors remain in the group, or they
+      do feel the need to separate themselves from it and explore the archaeological
+      site on their own?
     m_Metadata:
       m_Items: []
   - m_Id: 1249895677952
@@ -48,14 +46,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1296762830848
-    m_Localized: Yes. (Please Specify)
+    m_Localized: Yes. (Please specify)
     m_Metadata:
       m_Items: []
   - m_Id: 979191622696960
-    m_Localized: 'In your opinion is there anything that could be improved regarding
-      the visiting conditions of the
-
-      archaeological site?'
+    m_Localized: In your opinion is there anything that could be improved regarding
+      the visiting conditions of the archaeological site?
     m_Metadata:
       m_Items: []
   references:

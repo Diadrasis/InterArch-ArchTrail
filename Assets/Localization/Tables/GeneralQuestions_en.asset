@@ -27,7 +27,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 475664908288
-    m_Localized: No. (Please Specify)
+    m_Localized: No. (Please specify)
     m_Metadata:
       m_Items: []
   - m_Id: 1134220967936
@@ -40,7 +40,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1191884259328
-    m_Localized: No. (Please Specify)
+    m_Localized: No. (Please specify)
     m_Metadata:
       m_Items: []
   references:

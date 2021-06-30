@@ -72,8 +72,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2161036918784
-    m_Localized: During your stay on the archaeological site was there any lack of
-      facilities?
+    m_Localized: "During your stay on the archaeological site was there any lack
+      of facilities? (\rmultiple choice)"
     m_Metadata:
       m_Items: []
   - m_Id: 2692727865344
@@ -118,7 +118,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 4983195336704
-    m_Localized: "Yes.\r (Please Specify)"
+    m_Localized: "Yes.\r (Please specify)"
     m_Metadata:
       m_Items: []
   - m_Id: 6282397777920
@@ -126,7 +126,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5881678168064
-    m_Localized: 'The guided tour becomes more interesting for children when:'
+    m_Localized: "The guided tour becomes more interesting for children when: (\rmultiple
+      choice)"
     m_Metadata:
       m_Items: []
   - m_Id: 5907380862976
@@ -151,7 +152,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 7198744150016
-    m_Localized: "Yes.\r (Please Specify)"
+    m_Localized: "Yes.\r (Please specify)"
     m_Metadata:
       m_Items: []
   - m_Id: 7594443177984
@@ -180,7 +181,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8158900027392
     m_Localized: "If you could travel back in time and live a day in peoples\u2019
-      lives in Ancient Messene, what would you\r\nlike to experience?"
+      lives in Ancient Messene, what would you\r\nlike to experience? (\rmultiple
+      choice)"
     m_Metadata:
       m_Items: []
   - m_Id: 8190067900416
@@ -188,7 +190,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8219839070208
-    m_Localized: A public event (sports/spectacle) at the Ancient Stadium.
+    m_Localized: A public event (sports / spectacle) at the Ancient Stadium.
     m_Metadata:
       m_Items: []
   - m_Id: 8413972430848

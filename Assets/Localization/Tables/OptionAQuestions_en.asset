@@ -19,11 +19,11 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 58315161600
-    m_Localized: Individual Visit (or small individual group)
+    m_Localized: Individual visit (or small individual group)
     m_Metadata:
       m_Items: []
   - m_Id: 270077181952
-    m_Localized: How often do you visit Archaeological Sites?
+    m_Localized: How often do you visit archaeological sites?
     m_Metadata:
       m_Items: []
   - m_Id: 397340753920
@@ -35,7 +35,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 629067661312
-    m_Localized: Quite Often.
+    m_Localized: Quite often.
     m_Metadata:
       m_Items: []
   - m_Id: 1384939962368
@@ -72,12 +72,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 308241323704320
-    m_Localized: Other...
+    m_Localized: Other.
     m_Metadata:
       m_Items: []
   - m_Id: 309315761782784
-    m_Localized: During your stay on the archaeological site was there any lack of
-      facilities?
+    m_Localized: "During your stay on the archaeological site was there any lack
+      of facilities? (\rmultiple choice)"
     m_Metadata:
       m_Items: []
   - m_Id: 3609819698593792
@@ -178,7 +178,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 3614584075616256
     m_Localized: "If you could travel back in time to live a day in peoples\u2019
-      lives in Ancient Messene, what would you like to\r\nexperience?"
+      lives in Ancient Messene, what would you like to\r\nexperience? (\rmultiple
+      choice)"
     m_Metadata:
       m_Items: []
   - m_Id: 3614751247990784

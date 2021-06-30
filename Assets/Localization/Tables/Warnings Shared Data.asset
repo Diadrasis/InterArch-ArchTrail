@@ -63,6 +63,18 @@ MonoBehaviour:
     m_Key: warningThankYouScreenText
     m_Metadata:
       m_Items: []
+  - m_Id: 7706424462704640
+    m_Key: warningVisitor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7706655258476544
+    m_Key: warningAdmin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7708748346195968
+    m_Key: warningPassword
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
