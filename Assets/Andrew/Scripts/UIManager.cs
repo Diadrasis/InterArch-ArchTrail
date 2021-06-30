@@ -953,7 +953,7 @@ public class UIManager : MonoBehaviour
 
     public void CheckLanguage()
     {
-        if (LocalizationSettings.SelectedLocale.Identifier=="en")
+        if (LocalizationSettings.SelectedLocale.Identifier == "en")
         {
             sexDropdown.ClearOptions();
             ageDropdown.ClearOptions();

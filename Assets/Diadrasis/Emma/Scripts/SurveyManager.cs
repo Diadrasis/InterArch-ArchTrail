@@ -178,6 +178,10 @@ public class SurveyManager : MonoBehaviour
             {
                 btnSkip.gameObject.SetActive(false);
                 CheckToggle();
+            }else if(step == 85)
+            {
+                step = 88;
+                demographicOptions[step].SetActive(true);
             }
             else
             {
@@ -558,7 +562,7 @@ public class SurveyManager : MonoBehaviour
         }
         else if (step == 84 && !questionToggle[18].isOn)
         {
-            step = 86;
+            step = 88;
             demographicOptions[step].SetActive(true);
         }
         if (step == 89 && questionToggle[20].isOn)
