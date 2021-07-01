@@ -84,8 +84,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 17785205194752
-    m_Localized: "During your stay on the archaeological site was there any lack
-      of facilities? (\rmultiple choice)"
+    m_Localized: During your stay on the archaeological site was there any lack of
+      facilities? (multiple choice)
     m_Metadata:
       m_Items: []
   - m_Id: 17908513538048
@@ -97,7 +97,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 19023279849472
-    m_Localized: "Was the guided tour satisfactory? (\rmultiple choice)"
+    m_Localized: Was the guided tour satisfactory? (multiple choice)
     m_Metadata:
       m_Items: []
   - m_Id: 18066408112128
