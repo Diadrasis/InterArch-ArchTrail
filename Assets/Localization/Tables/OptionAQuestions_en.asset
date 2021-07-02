@@ -19,7 +19,7 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 58315161600
-    m_Localized: Individual visit (or small individual group)
+    m_Localized: An individual visit (member of a small group of friends or family).
     m_Metadata:
       m_Items: []
   - m_Id: 270077181952

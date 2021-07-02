@@ -35,6 +35,30 @@ MonoBehaviour:
     m_Key: visit_key
     m_Metadata:
       m_Items: []
+  - m_Id: 6146741339848704
+    m_Key: sex_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6146818217246720
+    m_Key: sex_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6146833283186688
+    m_Key: sex_answer3_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6147777853030400
+    m_Key: visit_answer1_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6147812875468800
+    m_Key: visit_answer2_key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 6147829262614528
+    m_Key: visit_answer3_key
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -52,7 +52,7 @@ public class LocaleDropdown : MonoBehaviour
     public void LocaleSelected(int index)
     {
         LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[index];
-        AppManager.Instance.uIManager.CheckLanguage();
+        //AppManager.Instance.uIManager.CheckLanguage();
         Debug.Log("Index num: "+index);
     }
 }

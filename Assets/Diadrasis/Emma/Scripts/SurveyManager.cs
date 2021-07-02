@@ -13,17 +13,16 @@ public class SurveyManager : MonoBehaviour
 
     public Button btnSubmit, btnSkip/*, BtnOk*/;
     public GameObject[] demographicOptions;
-    public Transform dropdownContainer;
+    public Transform toggleContainerGeneral;
     public Transform inputContainer, inputContainerOptionA, inputContainerOptionB1, inputContainerOptionB2, inputContainerOptionC1, inputContainerOptionC2;
     public Transform toggleContainerOptionA, toggleContainerOptionB, toggleContainerOptionB1, toggleContainerOptionB2, toggleContainerOptionC, toggleContainerOptionC1, toggleContainerOptionC2;
 
     //public GameObject newIdPanel;
     //public Text newIdText, btnNextText, btnOkText;
     public TextMeshProUGUI textB, textC;
-    public TMP_Dropdown[] dropdownsGeneral;
     public TMP_InputField[] inputFieldsGeneral, inputFieldOptionA, inputFieldOptionB1, inputFieldOptionB2, inputFieldOptionC1, inputFieldOptionC2;
-    public Toggle[] toggleOptionA, toggleOptionB1, toggleOptionB2, toggleOptionC1, toggleOptionC2, questionToggle/*, questionToggleB1*/;
-    public TMP_Dropdown optionDropdown;
+    public Toggle[] toggleOptionA, toggleOptionB1, toggleOptionB2, toggleOptionC1, toggleOptionC2, questionToggle, togglesGeneral;
+    //public TMP_Dropdown optionDropdown;
 
     public Toggle[] choiceTogglesB, choiceTogglesC/*groupB1, groupB2, groupC1, groupC2*/;
     [HideInInspector] public int step = 0;
@@ -42,7 +41,7 @@ public class SurveyManager : MonoBehaviour
         //intro = FindObjectOfType<Intro>();
         btnSubmit.onClick.AddListener(() => Submit());
         btnSkip.onClick.AddListener(() => Skip());
-        dropdownsGeneral = dropdownContainer.GetComponentsInChildren<TMP_Dropdown>(true);
+        togglesGeneral = toggleContainerGeneral.GetComponentsInChildren<Toggle>(true);
         inputFieldsGeneral = inputContainer.GetComponentsInChildren<TMP_InputField>(true);
         toggleOptionA = toggleContainerOptionA.GetComponentsInChildren<Toggle>(true);
         
@@ -146,13 +145,8 @@ public class SurveyManager : MonoBehaviour
 
             if (step == 4)
             {
-                if (optionDropdown.GetComponent<TMP_Dropdown>() != null)
-                {
-                    CheckValue(optionDropdown);
-                    demographicOptions[step].SetActive(true);
-                    //Debug.Log("Here");
-                }
-                //step = 5;
+                CheckValue();
+                demographicOptions[step].SetActive(true);
             }
             else if (step == 9 || step == 13 || step == 16 || step == 20 || step == 27 || step == 31
                 || step == 37 || step == 41 || step == 43 || step == 47 || step == 51 || step == 60 || step == 65
@@ -216,12 +210,8 @@ public class SurveyManager : MonoBehaviour
         }
         if (step == 4)
         {
-            if (optionDropdown.GetComponent<TMP_Dropdown>() != null)
-            {
-                CheckValue(optionDropdown);
-                demographicOptions[step].SetActive(true);
-                //Debug.Log("Here");
-            }
+            CheckValue();
+            demographicOptions[step].SetActive(true);
 
             //step = 5;
         }
@@ -293,7 +283,38 @@ public class SurveyManager : MonoBehaviour
     }
 
     //for the dropdown which will make the different selections and open/close panels
-    public void CheckValue(TMP_Dropdown val)
+    public void CheckValue()
+    {
+        if (step == 4 && !questionToggle[32].isOn && !questionToggle[33].isOn && !questionToggle[34].isOn)
+        {
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            AppManager.Instance.uIManager.SetWarningTxtOnCheckValue();
+            return;
+        }
+        else if (step == 4 && questionToggle[32].isOn)
+        {
+            //step = 0;
+            AppManager.Instance.uIManager.pnlOptionA.SetActive(true);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
+            step = 5;
+        }
+        else if (step == 4 && questionToggle[33].isOn)
+        {
+            step = 22;
+            AppManager.Instance.uIManager.pnlOptionB.SetActive(true);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
+            btnSkip.gameObject.SetActive(false);
+        }
+        else if (step == 4 && questionToggle[34].isOn)
+        {
+            step = 54;
+            AppManager.Instance.uIManager.pnlOptionC.SetActive(true);
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
+            btnSkip.gameObject.SetActive(false);
+        }
+    }
+
+    /*public void CheckValue(TMP_Dropdown val)
     {
         if (val.value == 0)
         {
@@ -323,7 +344,7 @@ public class SurveyManager : MonoBehaviour
             btnSkip.gameObject.SetActive(false);
         }
 
-    }
+    }*/
     //when selecting the panels with the options, to see which option is selected and then activate the coresponding panel
     void CheckToggle()
     {
@@ -925,7 +946,7 @@ public class SurveyManager : MonoBehaviour
         step = 0;
         foreach (GameObject gb in demographicOptions) gb.SetActive(false);
         demographicOptions[0].SetActive(true);
-        foreach (TMP_Dropdown td in dropdownsGeneral) td.value = 0;
+        foreach (Toggle td in togglesGeneral) td.isOn = false;
         foreach (TMP_InputField ti in inputFieldsGeneral) ti.text = "";
         foreach (TMP_InputField tiA in inputFieldOptionA) tiA.text = "";
         foreach (Toggle toA in toggleOptionA) toA.isOn = false;
@@ -940,7 +961,7 @@ public class SurveyManager : MonoBehaviour
         foreach (Toggle toQ in questionToggle) toQ.isOn = false;
         foreach (Toggle toCHB in choiceTogglesB) toCHB.isOn = false;
         foreach (Toggle toCHC in choiceTogglesC) toCHC.isOn = false;
-        optionDropdown.value = 0;
+        //optionDropdown.value = 0;
         toggleContainerOptionB.gameObject.SetActive(true);
         toggleContainerOptionC.gameObject.SetActive(true);
         if (AppManager.Instance.uIManager.pnlOptionA.activeSelf && AppManager.Instance.uIManager.pnlQuestionnaireScreen.activeSelf)

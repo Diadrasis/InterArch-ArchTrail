@@ -959,7 +959,7 @@ public class UIManager : MonoBehaviour
         ActivateButtons(true, true, true, false);
     }
 
-    public void CheckLanguage()
+    /*public void CheckLanguage()
     {
         if (LocalizationSettings.SelectedLocale.Identifier == "en")
         {
@@ -981,7 +981,7 @@ public class UIManager : MonoBehaviour
             sexDropdown.AddOptions(sexValuesGR);
             Debug.Log("Greek");
         }
-    }
+    }*/
 
     public bool LanguageIsEnglish()
     {
