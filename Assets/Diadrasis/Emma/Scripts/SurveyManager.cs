@@ -17,7 +17,7 @@ public class SurveyManager : MonoBehaviour
     public Transform inputContainer, inputContainerOptionA, inputContainerOptionB1, inputContainerOptionB2, inputContainerOptionC1, inputContainerOptionC2;
     public Transform toggleContainerOptionA, toggleContainerOptionB, toggleContainerOptionB1, toggleContainerOptionB2, toggleContainerOptionC, toggleContainerOptionC1, toggleContainerOptionC2;
 
-    //public GameObject newIdPanel;
+    public GameObject newIdPanel;
     //public Text newIdText, btnNextText, btnOkText;
     public TextMeshProUGUI textB, textC;
     public TMP_InputField[] inputFieldsGeneral, inputFieldOptionA, inputFieldOptionB1, inputFieldOptionB2, inputFieldOptionC1, inputFieldOptionC2;
