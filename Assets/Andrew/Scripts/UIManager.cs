@@ -121,6 +121,12 @@ public class UIManager : MonoBehaviour
     public Button btnThankYouContinue;
 
     [Space]
+    [Header("Warning Survey Intro Screen")]
+    public GameObject pnlWarningSurveyIntroScreen;
+    //public TextMeshProUGUI txtWarningThankYou;
+    public Button btnSurveyIntroContinue;
+
+    [Space]
     [Header("Testing Purposes")]
     public Texture2D userMarker;
     public TextMeshProUGUI infoText;
@@ -247,6 +253,9 @@ public class UIManager : MonoBehaviour
 
         // warning ThankYou
         btnThankYouContinue.onClick.AddListener(() => EnableScreen(pnlWarningThankYouScreen, false));
+
+        // warning Survey Intro
+        btnSurveyIntroContinue.onClick.AddListener(() => EnableScreen(pnlWarningSurveyIntroScreen, false));
 
         //btn for edit Area
         btnEditAreaCancel.onClick.AddListener(() => CancelInGeneral());
@@ -942,6 +951,7 @@ public class UIManager : MonoBehaviour
     #region QuestionnairePanel
     void DisplayQuestionnaire()
     {
+        pnlWarningSurveyIntroScreen.SetActive(true);
         pnlQuestionnaireScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
         pnlAreasScreen.SetActive(false);
@@ -950,6 +960,7 @@ public class UIManager : MonoBehaviour
 
     void OpenQuestionnaire()
     {
+        pnlWarningSurveyIntroScreen.SetActive(true);
         pnlQuestionnaireScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
         pnlOptionA.SetActive(false);
