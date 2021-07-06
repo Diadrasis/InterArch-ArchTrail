@@ -201,6 +201,9 @@ public class SurveyManager : MonoBehaviour
     //because we don't want to save in case user skips a step. Does the same as Submit() but in submit we will save the answers...
     void Skip()
     {
+        // Reset value
+        ResetValue(demographicOptions[step]);
+
         demographicOptions[step].SetActive(false);
 
         if (step < demographicOptions.Length)
@@ -255,6 +258,9 @@ public class SurveyManager : MonoBehaviour
             EndSurvey();
         }
     }
+
+    
+
     private void EndSurvey()
     {
         if (currentPath != null)
@@ -728,9 +734,8 @@ public class SurveyManager : MonoBehaviour
             step = 89;
             demographicOptions[step].SetActive(true);
         }
-        
-
     }
+
     IEnumerator DelayShow()
     {
         btnSubmit.gameObject.SetActive(false);
@@ -829,13 +834,13 @@ public class SurveyManager : MonoBehaviour
                 continue;
             }
 
-            // Dropdown Container
+            /*// Dropdown Container
             TMP_Dropdown dropdown = gO.GetComponentInChildren<TMP_Dropdown>();
             if (dropdown != null)
             {
                 answers.Add(dropdown.captionText.text.Equals("<Επιλέξτε από τα παρακάτω>") || dropdown.captionText.text.Equals("<Choose Below>") ? null : dropdown.captionText.text);
                 continue;
-            }
+            }*/
 
             // Get Toggle Group
             ToggleGroup toggleGroup = gO.GetComponentInChildren<ToggleGroup>();
@@ -940,6 +945,37 @@ public class SurveyManager : MonoBehaviour
             }
         }
     }*/
+
+    private void ResetValue(GameObject _surveyQuestion)
+    {
+        // Input Container
+        TMP_InputField inputField = _surveyQuestion.GetComponentInChildren<TMP_InputField>();
+        if (inputField != null)
+        {
+            inputField.text = string.Empty;
+            return;
+        }
+
+        // Get Toggle Group
+        ToggleGroup toggleGroup = _surveyQuestion.GetComponentInChildren<ToggleGroup>();
+
+        // Toggle Container
+        Toggle[] toggles = _surveyQuestion.GetComponentsInChildren<Toggle>();
+        if (toggles != null && toggles.Length > 0)
+        {
+            foreach (Toggle toggle in toggles)
+            {
+                if (toggle.isOn)
+                {
+                    toggle.isOn = false;
+
+                    if (toggleGroup != null)
+                        return;
+                }
+            }
+        }
+    }
+
 
     public void ResetValues()
     {

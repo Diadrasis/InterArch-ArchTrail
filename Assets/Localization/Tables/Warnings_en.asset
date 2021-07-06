@@ -87,6 +87,14 @@ MonoBehaviour:
     m_Localized: Please take a moment to fill out our survey.
     m_Metadata:
       m_Items: []
+  - m_Id: 10234482524585984
+    m_Localized: Are you sure you want to exit the application?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10251549738958848
+    m_Localized: Are you sure you want to restart the survey?
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:

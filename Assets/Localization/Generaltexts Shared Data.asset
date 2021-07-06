@@ -59,6 +59,18 @@ MonoBehaviour:
     m_Key: inpFldPlaceholder
     m_Metadata:
       m_Items: []
+  - m_Id: 8001338501136384
+    m_Key: btnSubmit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8001477642977280
+    m_Key: btnReset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8001653761802240
+    m_Key: btnSkip
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

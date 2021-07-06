@@ -63,5 +63,17 @@ MonoBehaviour:
     m_Localized: Fill in here...
     m_Metadata:
       m_Items: []
+  - m_Id: 8001338501136384
+    m_Localized: Submit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8001477642977280
+    m_Localized: Reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8001653761802240
+    m_Localized: Skip
+    m_Metadata:
+      m_Items: []
   references:
     version: 1

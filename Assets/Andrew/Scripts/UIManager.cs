@@ -85,6 +85,18 @@ public class UIManager : MonoBehaviour
     public Button btnCancel;
 
     [Space]
+    [Header("Warning Escape Screen")]
+    public GameObject pnlWarningEscapeScreen;
+    public Button btnEscapeYes;
+    public Button btnEscapeNo;
+
+    [Space]
+    [Header("Warning ResetSurvey Screen")]
+    public GameObject pnlWarningResetSurveyScreen;
+    public Button btnResetSurveyYes;
+    public Button btnResetSurveyNo;
+
+     [Space]
     [Header("Warning Save Path Screen")]
     //WarningScreen when user is about to save the path
     public GameObject pnlWarningSavePathScreen;
@@ -204,7 +216,7 @@ public class UIManager : MonoBehaviour
     {
         // Map Screen
         btnBackToAreasScreen.onClick.AddListener(() => BackToAreasScreen());
-        btnQuit.onClick.AddListener(() => Escape());
+        btnQuit.onClick.AddListener(() => EnableScreen(pnlWarningEscapeScreen, true));
 
         // Areas Screen
         btnCreateArea.onClick.AddListener(() => CreateNewAreaSelected());
@@ -233,6 +245,14 @@ public class UIManager : MonoBehaviour
 
         //btn warning on area
         btnCancel.onClick.AddListener(() => CloseScreenPanels());
+
+        // escape
+        btnEscapeYes.onClick.AddListener(() => Escape());
+        btnEscapeNo.onClick.AddListener(() => EnableScreen(pnlWarningEscapeScreen, false));
+
+        // reset survey
+        btnResetSurveyYes.onClick.AddListener(() => ResetSurvey());
+        btnResetSurveyNo.onClick.AddListener(() => EnableScreen(pnlWarningResetSurveyScreen, false));
 
         //btn on delete warning cancel or final delete
         btnDeleteCancel.onClick.AddListener(() => CloseScreenPanels());
@@ -263,11 +283,16 @@ public class UIManager : MonoBehaviour
 
         //btn for profiler screen
         btnProfiler.onClick.AddListener(() => DisplayQuestionnaire());
-        btnResetQuestionnaire.onClick.AddListener(() => AppManager.Instance.questionnaireManager.ResetValues());
-
+        btnResetQuestionnaire.onClick.AddListener(() => EnableScreen(pnlWarningResetSurveyScreen, true));
 
         //btn for close Internet screen
         btnCloseInternetScreen.onClick.AddListener(() => CancelInGeneral());
+    }
+
+    public void ResetSurvey()
+    {
+        AppManager.Instance.questionnaireManager.ResetValues();
+        pnlWarningResetSurveyScreen.SetActive(false);
     }
 
     private void SetDownloadTiles(bool _value)

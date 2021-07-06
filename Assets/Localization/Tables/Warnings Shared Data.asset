@@ -79,6 +79,14 @@ MonoBehaviour:
     m_Key: warningSurveyIntro
     m_Metadata:
       m_Items: []
+  - m_Id: 10234482524585984
+    m_Key: warningEscape
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10251549738958848
+    m_Key: warningResetSurvey
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
