@@ -95,6 +95,10 @@ MonoBehaviour:
     m_Localized: Are you sure you want to restart the survey?
     m_Metadata:
       m_Items: []
+  - m_Id: 10517594718502912
+    m_Localized: "\u039F\u03BA"
+    m_Metadata:
+      m_Items: []
   references:
     version: 1
     00000000:

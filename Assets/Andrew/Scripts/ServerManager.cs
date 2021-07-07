@@ -185,6 +185,9 @@ public class ServerManager : MonoBehaviour
         System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
         stopWatch.Start();
 
+        // Initialize upload info
+        string uploadInfo = string.Empty;
+        
         // Get areas to upload
         List<cArea> areasToUpload = cArea.GetAreasToUpload();
 
@@ -270,7 +273,13 @@ public class ServerManager : MonoBehaviour
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
                     //Debug.Log("Uploaded area successfully!");
                     //Debug.Log("Echo: " + webRequest.downloadHandler.text);
-                    
+
+                    // Add upload info
+                    if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                        uploadInfo += "areas";
+                    else
+                        uploadInfo += "περιοχών";
+
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
                     string server_area_idString = echo.Replace("[{\"max(server_area_id)\":\"", "").Replace("\"}]", "");
@@ -327,6 +336,16 @@ public class ServerManager : MonoBehaviour
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     //Debug.Log("Uploaded path successfully!");
                     //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
+
+                    // Add upload info
+                    if (uploadInfo.Length > 1)
+                        uploadInfo += ", ";
+
+                    if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                        uploadInfo += "paths";
+                    else
+                        uploadInfo += "διαδρομών";
+
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
                     string server_path_idString = echo.Replace("[{\"max(server_path_id)\":\"", "").Replace("\"}]", "");
@@ -442,6 +461,23 @@ public class ServerManager : MonoBehaviour
                     //Debug.Log("Uploaded point successfully!");
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
+
+                    // Add upload info
+                    if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                    {
+                        if (uploadInfo.Length > 1)
+                            uploadInfo += "and ";
+
+                        uploadInfo += "surveys";
+                    }
+                    else
+                    {
+                        if (uploadInfo.Length > 1)
+                            uploadInfo += "και ";
+
+                        uploadInfo += "ερωτηματολογίων";
+                    }
+
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
 
@@ -551,6 +587,17 @@ public class ServerManager : MonoBehaviour
         float secondsToWait = ((secondsToWaitBeforeWarning + minSecondsToDisplayWarning) - (float)timeSpan.TotalSeconds);
         yield return new WaitForSeconds(timeSpan.TotalSeconds > (secondsToWaitBeforeWarning + minSecondsToDisplayWarning) ? 0f : secondsToWait);
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
+
+        // Activate Upload Info panel
+        if (!string.IsNullOrEmpty(uploadInfo))
+        {
+            if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                uploadInfo = string.Format("Uploaded {0} successfully!", uploadInfo);
+            else
+                uploadInfo = string.Format("Η μεταφόρτωση {0} ολοκληρώθηκε!", uploadInfo);
+
+            AppManager.Instance.uIManager.DisplayUploadInfo(uploadInfo);
+        }
     }
 
     public void DownloadAreas()

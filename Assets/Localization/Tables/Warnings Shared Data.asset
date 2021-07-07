@@ -87,6 +87,10 @@ MonoBehaviour:
     m_Key: warningResetSurvey
     m_Metadata:
       m_Items: []
+  - m_Id: 10517594718502912
+    m_Key: warningUploadInfo
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

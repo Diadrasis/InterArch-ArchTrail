@@ -96,7 +96,13 @@ public class UIManager : MonoBehaviour
     public Button btnResetSurveyYes;
     public Button btnResetSurveyNo;
 
-     [Space]
+    [Space]
+    [Header("Warning Upload Info Screen")]
+    public GameObject pnlWarningUploadInfoScreen;
+    public TextMeshProUGUI txtUploadInfo;
+    public Button btnUploadInfoOk;
+
+    [Space]
     [Header("Warning Save Path Screen")]
     //WarningScreen when user is about to save the path
     public GameObject pnlWarningSavePathScreen;
@@ -254,6 +260,9 @@ public class UIManager : MonoBehaviour
         btnResetSurveyYes.onClick.AddListener(() => ResetSurvey());
         btnResetSurveyNo.onClick.AddListener(() => EnableScreen(pnlWarningResetSurveyScreen, false));
 
+        // upload info
+        btnUploadInfoOk.onClick.AddListener(() => EnableScreen(pnlWarningUploadInfoScreen, false));
+
         //btn on delete warning cancel or final delete
         btnDeleteCancel.onClick.AddListener(() => CloseScreenPanels());
         btnDeleteFinal.onClick.AddListener(() => DeleteFinal());
@@ -293,6 +302,12 @@ public class UIManager : MonoBehaviour
     {
         AppManager.Instance.questionnaireManager.ResetValues();
         pnlWarningResetSurveyScreen.SetActive(false);
+    }
+    
+    public void DisplayUploadInfo(string _info)
+    {
+        txtUploadInfo.text = _info;
+        pnlWarningUploadInfoScreen.SetActive(true);
     }
 
     private void SetDownloadTiles(bool _value)
