@@ -184,7 +184,7 @@ public class UIManager : MonoBehaviour
     public bool downloadTiles = false;
     [HideInInspector]
     public bool isAdmin;
-    private string passwordAdmin = "0000";
+    private string passwordAdmin = "2791";
 
     readonly string ENGLISH = "English (en)";
     readonly string GREEK = "Greek (el)";
