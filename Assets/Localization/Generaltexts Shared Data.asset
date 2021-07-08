@@ -71,6 +71,10 @@ MonoBehaviour:
     m_Key: btnSkip
     m_Metadata:
       m_Items: []
+  - m_Id: 8692052591542272
+    m_Key: selectArea
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -12,6 +12,14 @@ public class ToggleSelectLanguage : MonoBehaviour
 
     private void Awake()
     {
+        StartCoroutine(InitializeLocalizationSettings());
+    }
+
+    IEnumerator InitializeLocalizationSettings()
+    {
+        // Wait for the localization system to initialize, loading Locales, preloading etc.
+        yield return LocalizationSettings.InitializationOperation;
+
         LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[1];
         txtDisplay.text = "EN";
     }

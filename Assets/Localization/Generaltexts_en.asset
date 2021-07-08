@@ -75,5 +75,9 @@ MonoBehaviour:
     m_Localized: Skip
     m_Metadata:
       m_Items: []
+  - m_Id: 8692052591542272
+    m_Localized: Ancient Messene
+    m_Metadata:
+      m_Items: []
   references:
     version: 1

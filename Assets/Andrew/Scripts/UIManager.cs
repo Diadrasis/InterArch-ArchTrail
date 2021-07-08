@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEngine.Localization.Settings;
+using UnityEngine.Localization.Components;
 
 public class UIManager : MonoBehaviour
 {
@@ -386,7 +387,17 @@ public class UIManager : MonoBehaviour
                 GameObject newSelectArea = Instantiate(selectAreaPrefab, Vector3.zero, Quaternion.identity, pnlLoadedAreas.GetComponent<RectTransform>());
                 //newSelectArea.transform.SetAsFirstSibling();
                 TMP_Text selectAreaText = newSelectArea.GetComponentInChildren<TMP_Text>();
-                selectAreaText.text = area.title;
+                //selectAreaText.text = area.title; // TODO: UNCOMMENT!!!
+
+                // TODO: REMOVE!!! For Messene Test ONLY!!!
+                if (!area.title.Equals("Αρχαία Μεσσήνη"))
+                {
+                    selectAreaText.text = area.title;
+
+                    LocalizeStringEvent localizeStringEvent = newSelectArea.GetComponentInChildren<LocalizeStringEvent>();
+                    if (localizeStringEvent != null)
+                        localizeStringEvent.enabled = false;
+                }
 
                 Button btnSelectArea;
                 Button btnDeleteArea;
