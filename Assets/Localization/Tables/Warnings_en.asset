@@ -26,11 +26,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 302234910720
-    m_Localized: Please check your internet connection
+    m_Localized: No internet connection
     m_Metadata:
       m_Items: []
   - m_Id: 3539511984128
-    m_Localized: Do you want to delete?
+    m_Localized: Are you sure you want to delete?
     m_Metadata:
       m_Items: []
   - m_Id: 3882203398144

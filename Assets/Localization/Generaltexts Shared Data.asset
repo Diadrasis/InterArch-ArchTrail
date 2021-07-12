@@ -32,7 +32,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2391862329344
-    m_Key: PnlSaveArea
+    m_Key: PnlSaveAreaGreek
     m_Metadata:
       m_Items: []
   - m_Id: 2624306462720
@@ -73,6 +73,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 8692052591542272
     m_Key: selectArea
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10171130884554752
+    m_Key: PnlSaveAreaEnglish
     m_Metadata:
       m_Items: []
   m_Metadata:

@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Components;
+using System.Text.RegularExpressions;
 
 public class UIManager : MonoBehaviour
 {
@@ -32,6 +33,7 @@ public class UIManager : MonoBehaviour
     public GameObject pnlCreateArea;
     public GameObject pnlSaveArea;
     public TMP_InputField inptFldCreateArea;
+    public TMP_InputField inptFldCreateAreaEnglish;
     public Button btnCreateAreaSave;
     public Button btnCreateAreaCancel;
     public Button btnSaveArea;
@@ -387,17 +389,11 @@ public class UIManager : MonoBehaviour
                 GameObject newSelectArea = Instantiate(selectAreaPrefab, Vector3.zero, Quaternion.identity, pnlLoadedAreas.GetComponent<RectTransform>());
                 //newSelectArea.transform.SetAsFirstSibling();
                 TMP_Text selectAreaText = newSelectArea.GetComponentInChildren<TMP_Text>();
-                //selectAreaText.text = area.title; // TODO: UNCOMMENT!!!
 
-                // TODO: REMOVE!!! For Messene Test ONLY!!!
-                if (!area.title.Equals("Αρχαία Μεσσήνη"))
-                {
+                if (LocalizationSettings.InitializationOperation.IsDone && LocalizationSettings.SelectedLocale.Equals(LocalizationSettings.AvailableLocales.Locales[1])) // English
+                    selectAreaText.text = area.titleEnglish;
+                else
                     selectAreaText.text = area.title;
-
-                    LocalizeStringEvent localizeStringEvent = newSelectArea.GetComponentInChildren<LocalizeStringEvent>();
-                    if (localizeStringEvent != null)
-                        localizeStringEvent.enabled = false;
-                }
 
                 Button btnSelectArea;
                 Button btnDeleteArea;
@@ -711,18 +707,20 @@ public class UIManager : MonoBehaviour
 
     private void RemoveNewArea()
     {
-        AppManager.Instance.mapManager.RemoveNewArea();
-        btnSaveArea.interactable = false;
+        //AppManager.Instance.mapManager.RemoveNewArea();
+        //btnSaveArea.interactable = false;
         EnableScreen(pnlSaveArea, false);
     }
 
     private void SaveArea()
     {
-        string newAreaTitle = inptFldCreateArea.text;
+        string newAreaTitleGreek = inptFldCreateArea.text;
+        string newAreaTitleEnglish = inptFldCreateAreaEnglish.text;
 
-        if (!string.IsNullOrEmpty(newAreaTitle))
+        if (!string.IsNullOrEmpty(newAreaTitleGreek) && !Regex.IsMatch(newAreaTitleGreek, "^[a-zA-Z0-9]*$")
+            && !string.IsNullOrEmpty(newAreaTitleEnglish) && Regex.IsMatch(newAreaTitleEnglish, "^[a-zA-Z0-9]*$"))
         {
-            AppManager.Instance.mapManager.SaveArea(newAreaTitle);
+            AppManager.Instance.mapManager.SaveArea(newAreaTitleGreek, newAreaTitleEnglish);
             pnlSaveArea.SetActive(false);
             pnlCreateArea.SetActive(false);
             DisplayAreasScreen();

@@ -16,18 +16,19 @@ MonoBehaviour:
     m_Code: en
   m_SharedData: {fileID: 11400000, guid: 6989a28cf3990064cbc2756a90b88016, type: 2}
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - id: 0
   m_TableData:
   - m_Id: 120596381696
     m_Localized: Select an Area
     m_Metadata:
       m_Items: []
   - m_Id: 277182332928
-    m_Localized: Create new area on map
+    m_Localized: New Area
     m_Metadata:
       m_Items: []
   - m_Id: 484301258752
-    m_Localized: Add New Path
+    m_Localized: New Path
     m_Metadata:
       m_Items: []
   - m_Id: 584947777536
@@ -35,7 +36,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2391862329344
-    m_Localized: Give a name to the area
+    m_Localized: 'Greek:'
     m_Metadata:
       m_Items: []
   - m_Id: 2624306462720
@@ -78,6 +79,15 @@ MonoBehaviour:
   - m_Id: 8692052591542272
     m_Localized: Ancient Messene
     m_Metadata:
+      m_Items:
+      - id: 0
+  - m_Id: 10171130884554752
+    m_Localized: 'English:'
+    m_Metadata:
       m_Items: []
   references:
     version: 1
+    00000000:
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 0080163360e11e00

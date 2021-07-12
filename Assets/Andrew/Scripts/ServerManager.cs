@@ -193,6 +193,8 @@ public class ServerManager : MonoBehaviour
 
         if (areasToUpload != null && areasToUpload.Count > 0)
         {
+            bool uploaded = true;
+
             foreach (cArea areaToUpload in areasToUpload)
             {
                 // If the area's tiles are not downloaded ask user and download tiles Locally
@@ -204,7 +206,7 @@ public class ServerManager : MonoBehaviour
                     // Activate panel warning
                     AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
                     if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download " + areaToUpload.title + "'s tiles?\nSize: " + ((float)(tileDownloader.totalSize / 1000)).ToString("F2") + " ΜB";
+                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download " + areaToUpload.titleEnglish + "'s tiles?\nSize: " + ((float)(tileDownloader.totalSize / 1000)).ToString("F2") + " ΜB";
                     else
                         AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Θα θέλατε να κατεβάσετε το χάρτη της περιοχής \"" + areaToUpload.title + "\";\nΜέγεθος: " + ((float)(tileDownloader.totalSize / 1000)).ToString("F2") + " ΜB";
 
@@ -253,6 +255,7 @@ public class ServerManager : MonoBehaviour
                 formToPost.Add(new MultipartFormDataSection("action", Enum.GetName(typeof(PHPActions), 1))); // Save_Area
                 formToPost.Add(new MultipartFormDataSection("server_area_id", areaToUpload.server_area_id.ToString()));
                 formToPost.Add(new MultipartFormDataSection("title", areaToUpload.title));
+                formToPost.Add(new MultipartFormDataSection("titleEnglish", areaToUpload.titleEnglish));
                 formToPost.Add(new MultipartFormDataSection("position", areaToUpload.position.ToString("F6")));
                 formToPost.Add(new MultipartFormDataSection("zoom", areaToUpload.zoom.ToString()));
                 formToPost.Add(new MultipartFormDataSection("areaConstraintsMin", areaToUpload.areaConstraintsMin.ToString("F6")));
@@ -267,18 +270,13 @@ public class ServerManager : MonoBehaviour
                 if (webRequest.isNetworkError || webRequest.isHttpError)
                 {
                     Debug.Log("Web request failed. Error #" + webRequest.error);
+                    uploaded = false;
                 }
                 else
                 {
                     //Debug.Log("Posted successfully: " + webRequest.uploadHandler.data);
                     //Debug.Log("Uploaded area successfully!");
                     //Debug.Log("Echo: " + webRequest.downloadHandler.text);
-
-                    // Add upload info
-                    if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                        uploadInfo += "areas";
-                    else
-                        uploadInfo += "περιοχών";
 
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
@@ -292,6 +290,25 @@ public class ServerManager : MonoBehaviour
                     }
                 }
             }
+
+            // Add upload info
+            if (uploaded)
+            {
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                {
+                    if (areasToUpload.Count > 1)
+                        uploadInfo += "areas";
+                    else
+                        uploadInfo += "area";
+                }
+                else
+                {
+                    if (areasToUpload.Count > 1)
+                        uploadInfo += "των περιοχών";
+                    else
+                        uploadInfo += "της περιοχής";
+                } 
+            }
         }
        
         // ============== Upload Paths ============== //
@@ -301,6 +318,8 @@ public class ServerManager : MonoBehaviour
 
         if (pathsToUpload != null && pathsToUpload.Count > 0)
         {
+            bool uploaded = true;
+
             // Show warning panel
             if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
             {
@@ -330,21 +349,13 @@ public class ServerManager : MonoBehaviour
                 if (webRequest.isNetworkError || webRequest.isHttpError)
                 {
                     Debug.Log("Web request failed. Error #" + webRequest.error);
+                    uploaded = false;
                 }
                 else
                 {
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     //Debug.Log("Uploaded path successfully!");
                     //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
-
-                    // Add upload info
-                    if (uploadInfo.Length > 1)
-                        uploadInfo += ", ";
-
-                    if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                        uploadInfo += "paths";
-                    else
-                        uploadInfo += "διαδρομών";
 
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
@@ -356,6 +367,28 @@ public class ServerManager : MonoBehaviour
                         cPath.SetServerAreaAndPathId(pathToUpload.server_area_id, server_path_id, pathToUpload.local_path_id);
                         cSurvey.SetServerPathId(server_path_id, pathToUpload.local_path_id); // for offline
                     }
+                }
+            }
+
+            if (uploaded)
+            {
+                // Add upload info
+                if (uploadInfo.Length > 1)
+                    uploadInfo += ", ";
+
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                {
+                    if (pathsToUpload.Count > 1)
+                        uploadInfo += "paths";
+                    else
+                        uploadInfo += "path";
+                }
+                else
+                {
+                    if (pathsToUpload.Count > 1)
+                        uploadInfo += "των διαδρομών";
+                    else
+                        uploadInfo += "της διαδρομής";
                 }
             }
         }
@@ -427,6 +460,8 @@ public class ServerManager : MonoBehaviour
 
         if (questionnairesToUpload != null && questionnairesToUpload.Count > 0)
         {
+            bool uploaded = true;
+
             // Show warning panel
             if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
             {
@@ -455,6 +490,7 @@ public class ServerManager : MonoBehaviour
                 if (webRequest.isNetworkError || webRequest.isHttpError)
                 {
                     Debug.Log("Web request failed. Error #" + webRequest.error);
+                    uploaded = false;
                 }
                 else
                 {
@@ -462,28 +498,34 @@ public class ServerManager : MonoBehaviour
                     Debug.Log("Echo: " + webRequest.downloadHandler.text);
                     //AppManager.Instance.uIManager.txtLoading.text = "Uploading...";
 
-                    // Add upload info
-                    if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                    {
-                        if (uploadInfo.Length > 1)
-                            uploadInfo += "and ";
-
-                        uploadInfo += "surveys";
-                    }
-                    else
-                    {
-                        if (uploadInfo.Length > 1)
-                            uploadInfo += "και ";
-
-                        uploadInfo += "ερωτηματολογίων";
-                    }
-
                     // Get database id and set it
                     string echo = webRequest.downloadHandler.text;
 
                     // Delete questionnaire
                     if (echo.Equals("uploaded survey successfully"))
                         cSurvey.Delete(questionnaireToUpload.local_path_id);
+                }
+            }
+
+            if (uploaded)
+            {
+                // Add upload info
+                if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                {
+                    if (uploadInfo.Length > 1)
+                        uploadInfo += "and ";
+
+                    uploadInfo += "surveys";
+                }
+                else
+                {
+                    if (uploadInfo.Length > 1)
+                        uploadInfo += "και ";
+
+                    if (questionnairesToUpload.Count > 1)
+                        uploadInfo += "των ερωτηματολογίων";
+                    else
+                        uploadInfo += "του ερωτηματολόγιου";
                 }
             }
         }
@@ -660,6 +702,7 @@ public class ServerManager : MonoBehaviour
                             areaData.server_area_id,
                             //areaData.local_area_id,
                             areaData.title,
+                            areaData.titleEnglish,
                             MethodHelper.ToVector2(areaData.position),
                             areaData.zoom,
                             MethodHelper.ToVector2(areaData.areaConstraintsMin),

@@ -12,7 +12,14 @@ public class ToggleSelectLanguage : MonoBehaviour
 
     private void Awake()
     {
-        StartCoroutine(InitializeLocalizationSettings());
+        if (!LocalizationSettings.InitializationOperation.IsDone)
+            StartCoroutine(InitializeLocalizationSettings());
+    }
+
+    private void OnEnable()
+    {
+        if (LocalizationSettings.InitializationOperation.IsDone)
+            ChangeTextDisplay();
     }
 
     IEnumerator InitializeLocalizationSettings()
@@ -20,21 +27,28 @@ public class ToggleSelectLanguage : MonoBehaviour
         // Wait for the localization system to initialize, loading Locales, preloading etc.
         yield return LocalizationSettings.InitializationOperation;
 
+        // Initialize language at English
         LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[1];
         txtDisplay.text = "EN";
     }
 
     public void ChangeTextDisplay()
     {
-        if (toggle.isOn)
-        {
-            LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[1];
-            txtDisplay.text = "EN";
-        }
-        else
-        {
-            LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[0];
+        if (LocalizationSettings.SelectedLocale.Equals(LocalizationSettings.AvailableLocales.Locales[0])) // Greek
             txtDisplay.text = "EL";
-        }
+        else
+            txtDisplay.text = "EN";
+    }
+
+    public void ChangeLanguage()
+    {
+        // Change language
+        if (LocalizationSettings.SelectedLocale.Equals(LocalizationSettings.AvailableLocales.Locales[0])) // Greek
+            LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[1];
+        else
+            LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[0];
+
+        // CHange text
+        ChangeTextDisplay();
     }
 }

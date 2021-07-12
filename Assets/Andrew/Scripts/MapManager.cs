@@ -212,13 +212,13 @@ public class MapManager : MonoBehaviour
         return areas[_index];
     }
 
-    public void SaveArea(string _areaTitle)
+    public void SaveArea(string _areaTitleGreek, string _areaTitleEnglish)
     {
         // Get center point
         OnlineMapsUtils.GetCenterPointAndZoom(markersCreateArea, out Vector2 center, out int zoom);
 
         // Create a new cArea
-        cArea areaToSave = new cArea(_areaTitle, center, markersCreateArea[0].position, markersCreateArea[1].position);
+        cArea areaToSave = new cArea(_areaTitleGreek, _areaTitleEnglish, center, markersCreateArea[0].position, markersCreateArea[1].position);
 
         // Save area locally and reload areas
         cArea.Save(areaToSave);
@@ -742,7 +742,8 @@ public class MapManager : MonoBehaviour
 
     public List<cPath> GetPaths()
     {
-        currentArea.paths = cPath.LoadPathsOfArea(currentArea.local_area_id);
+        List<cPath> loadedPaths = cPath.LoadPathsOfArea(currentArea.local_area_id);
+        currentArea.paths = loadedPaths.OrderBy(path => path.date).ToList();
         return currentArea.paths;
     }
     #endregion
@@ -919,9 +920,9 @@ public class MapManager : MonoBehaviour
     {
         List<cArea> areasFromDatabase = new List<cArea>()
         {
-            new cArea(-1, 0, "Μεσσήνη", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f), new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f)),
-            new cArea(-1, 1, "Κνωσός", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f), new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f)),
-            new cArea(-1, 2, "Σαρρή", new Vector2(23.724021164280998f, 37.979955135461715f), 19, new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f), new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f))
+            new cArea(-1, 0, "Μεσσήνη", "Messene", new Vector2(21.9202085525009f, 37.17642261183837f), 17, new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f), new Vector2(21.9160667457503f, 37.1700252387224f), new Vector2(21.9227518498302f, 37.178659594564f)),
+            new cArea(-1, 1, "Κνωσός", "Knosos", new Vector2(25.16310005634713f, 35.29800050616538f), 19, new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f), new Vector2(25.1616718900387f, 35.2958874528396f), new Vector2(25.1645352578472f, 35.3000733065711f)),
+            new cArea(-1, 2, "Σαρρή", "Sarri", new Vector2(23.724021164280998f, 37.979955135461715f), 19, new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f), new Vector2(23.72385281512933f, 37.97881236959543f), new Vector2(23.725090676541246f, 37.9802439464203f))
         };
 
         //DisplayAreaDebug(areasFromDatabase[0]);

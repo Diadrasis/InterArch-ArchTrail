@@ -10,6 +10,7 @@ public class cArea
     public int server_area_id;
     public int local_area_id { get; private set; }
     public string title;
+    public string titleEnglish;
     public Vector2 position; // longitude, latitude (x, y)
     public int zoom;
     public Vector2 areaConstraintsMin; // minLongitude, minLatitude (x, y)
@@ -27,6 +28,7 @@ public class cArea
     public static readonly string SERVER_AREA_ID = "server_area_id";
     public static readonly string LOCAL_AREA_ID = "local_area_id";
     public static readonly string TITLE = "title";
+    public static readonly string TITLE_ENGLISH = "titleEnglish";
     public static readonly string POSITION = "position";
     public static readonly string ZOOM = "zoom";
     public static readonly string AREA_CONSTRAINTS_MIN = "areaConstraintsMin";
@@ -38,11 +40,12 @@ public class cArea
 
     #region Methods
     // Constructor for Loading from Player Prefs
-    public cArea(int _server_area_id, int _local_area_id, string _title, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax) // TODO: Make private when testing is finished
+    public cArea(int _server_area_id, int _local_area_id, string _title, string _titleEnglish, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax) // TODO: Make private when testing is finished
     {
         server_area_id = _server_area_id;
         local_area_id = _local_area_id;
         title = _title;
+        titleEnglish = _titleEnglish;
         position = _position;
         zoom = _zoom;
         areaConstraintsMin = _areaConstraintsMin;
@@ -52,11 +55,12 @@ public class cArea
     }
 
     // Constructor for Downloading from server
-    public cArea(int _server_area_id, string _title, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax)
+    public cArea(int _server_area_id, string _title, string _titleEnglish, Vector2 _position, int _zoom, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax, Vector2 _viewConstraintsMin, Vector2 _viewConstraintsMax)
     {
         server_area_id = _server_area_id;
         local_area_id = -1;
         title = _title;
+        titleEnglish = _titleEnglish;
         position = _position;
         zoom = _zoom;
         areaConstraintsMin = _areaConstraintsMin;
@@ -78,11 +82,12 @@ public class cArea
     }*/
 
     // Constructor for creating a new area locally
-    public cArea(string _title, Vector2 _centerPosition, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax) 
+    public cArea(string _title, string _titleEnglish, Vector2 _centerPosition, Vector2 _areaConstraintsMin, Vector2 _areaConstraintsMax) 
     {
         server_area_id = -1;
         local_area_id = GetAvailableAreaID();
         title = _title;
+        titleEnglish = _titleEnglish;
         position = _centerPosition; //OnlineMaps.instance.position;
         zoom = OnlineMaps.instance.zoom; //MapManager.DEFAULT_ZOOM;
         //constraints = new Vector4(_position.x - MapManager.DEFAULT_POSITION_OFFSET, _position.y - MapManager.DEFAULT_POSITION_OFFSET, _position.x + MapManager.DEFAULT_POSITION_OFFSET, _position.y + MapManager.DEFAULT_POSITION_OFFSET); // for testing
@@ -426,6 +431,7 @@ public class cArea
         areaNode.Create(SERVER_AREA_ID, _areaToSave.server_area_id);
         areaNode.Create(LOCAL_AREA_ID, _areaToSave.local_area_id);
         areaNode.Create(TITLE, _areaToSave.title);
+        areaNode.Create(TITLE_ENGLISH, _areaToSave.titleEnglish);
         areaNode.Create(POSITION, _areaToSave.position);
         areaNode.Create(ZOOM, _areaToSave.zoom);
         areaNode.Create(AREA_CONSTRAINTS_MIN, new Vector2(_areaToSave.areaConstraintsMin.x, _areaToSave.areaConstraintsMin.y));
@@ -466,6 +472,7 @@ public class cArea
         areaNode.Create(SERVER_AREA_ID, _areaToSave.server_area_id);
         areaNode.Create(LOCAL_AREA_ID, GetAvailableAreaID());
         areaNode.Create(TITLE, _areaToSave.title);
+        areaNode.Create(TITLE_ENGLISH, _areaToSave.titleEnglish);
         areaNode.Create(POSITION, _areaToSave.position);
         areaNode.Create(ZOOM, _areaToSave.zoom);
         areaNode.Create(AREA_CONSTRAINTS_MIN, new Vector2(_areaToSave.areaConstraintsMin.x, _areaToSave.areaConstraintsMin.y));
@@ -503,6 +510,8 @@ public class cArea
         // Remove old and Create new values
         areaNode.Remove(TITLE);
         areaNode.Create(TITLE, _areaToEdit.title);
+        areaNode.Remove(TITLE_ENGLISH);
+        areaNode.Create(TITLE_ENGLISH, _areaToEdit.titleEnglish);
         areaNode.Remove(POSITION);
         areaNode.Create(POSITION, _areaToEdit.position);
         areaNode.Remove(ZOOM);
@@ -564,6 +573,7 @@ public class cArea
         int server_area_id = _areaNode.Get<int>(SERVER_AREA_ID);
         int local_area_id = _areaNode.Get<int>(LOCAL_AREA_ID);
         string title = _areaNode.Get<string>(TITLE);
+        string titleEnglish = _areaNode.Get<string>(TITLE_ENGLISH);
         Vector2 position = _areaNode.Get<Vector2>(POSITION);
         int zoom = _areaNode.Get<int>(ZOOM);
         Vector2 areaConstraints_min = _areaNode.Get<Vector2>(AREA_CONSTRAINTS_MIN);
@@ -572,7 +582,7 @@ public class cArea
         Vector2 viewConstraints_max = _areaNode.Get<Vector2>(VIEW_CONSTRAINTS_MAX);
 
         // Create cArea and add it to loadedAreas list
-        cArea loadedArea = new cArea(server_area_id, local_area_id, title, position, zoom, areaConstraints_min, areaConstraints_max, viewConstraints_min, viewConstraints_max);
+        cArea loadedArea = new cArea(server_area_id, local_area_id, title, titleEnglish, position, zoom, areaConstraints_min, areaConstraints_max, viewConstraints_min, viewConstraints_max);
         return loadedArea;
     }
 
@@ -600,6 +610,11 @@ public class cArea
         return loadedAreas;
     }
 
+    internal void OrderBy(Func<object, object> p)
+    {
+        throw new NotImplementedException();
+    }
+
     /*public static void Upload(cArea _areaToUpload)
     {
         AppManager.Instance.serverManager.UploadArea(_areaToUpload);
@@ -623,6 +638,7 @@ public class cAreaData
     public int server_area_id;
     //public int local_area_id;
     public string title;
+    public string titleEnglish;
     public string position; // longitude, latitude (x, y)
     public int zoom;
     public string areaConstraintsMin; // minLongitude, minLatitude (x, y)
