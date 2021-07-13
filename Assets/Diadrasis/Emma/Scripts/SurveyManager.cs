@@ -180,7 +180,7 @@ public class SurveyManager : MonoBehaviour
                 btnSkip.gameObject.SetActive(true);
             }
             
-            if (step == 4 || step == 22 || step == 56)
+            if (step == 4 || step == 22 || step == 54)
             {
                 btnSkip.gameObject.SetActive(false);
             }
@@ -227,15 +227,20 @@ public class SurveyManager : MonoBehaviour
             CheckIfUserHasSelectedOtherOption();
         }
         else if (step == 11 || step == 18 || step == 29 || step == 33 || step == 39
-        || step == 45 || step == 49 || step == 58 || step == 62 || step == 67 || step == 74 || step == 78
-        || step == 82 || step == 87)
+            || step == 45 || step == 49 || step == 58 || step == 62 || step == 67 || step == 74 || step == 78
+            || step == 82 || step == 87)
         {
             //Debug.Log("Step for toggleCheck Second method: " + step);
             CheckIfUserHasSelectedOtherOptionSecond();
         }
-        else if (step == 53)
+        else if (step == 21 || step == 42 || step == 53 || step == 70 || step == 90)
         {
             step = demographicOptions.Length;
+        }
+        else if (step == 22 || step == 54)
+        {
+            btnSkip.gameObject.SetActive(false);
+            CheckToggle();
         }
         else
         {
@@ -243,7 +248,7 @@ public class SurveyManager : MonoBehaviour
             demographicOptions[step].SetActive(true);
         }
 
-        if(step == 4 || step == 22 || step == 56)
+        if(step == 4 || step == 22 || step == 54)
         {
             btnSkip.gameObject.SetActive(false);
         }
