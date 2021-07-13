@@ -91,6 +91,10 @@ MonoBehaviour:
     m_Key: warningUploadInfo
     m_Metadata:
       m_Items: []
+  - m_Id: 12680380286402560
+    m_Key: warningDeletePath
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -71,12 +71,12 @@ MonoBehaviour:
     m_Key: btnSkip
     m_Metadata:
       m_Items: []
-  - m_Id: 8692052591542272
-    m_Key: selectArea
-    m_Metadata:
-      m_Items: []
   - m_Id: 10171130884554752
     m_Key: PnlSaveAreaEnglish
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10513541519278080
+    m_Key: pnlSaveAreaName
     m_Metadata:
       m_Items: []
   m_Metadata:

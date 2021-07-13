@@ -233,12 +233,12 @@ public class MapManager : MonoBehaviour
     }
 
     //to save when edits have been made
-    public void EditArea(cArea _areaToEdit, string _areaTitle)
+    public void EditArea(cArea _areaToEdit, string _areaTitle, string _areaTitleEnglish)
     {
-        StartCoroutine(EditEnumerator(_areaToEdit, _areaTitle));
+        StartCoroutine(EditEnumerator(_areaToEdit, _areaTitle, _areaTitleEnglish));
     }
 
-    IEnumerator EditEnumerator(cArea _areaToEdit, string _areaTitle)
+    IEnumerator EditEnumerator(cArea _areaToEdit, string _areaTitle, string _areaTitleEnglish)
     {
         TileDownloader tileDownloader = AppManager.Instance.serverManager.tileDownloader;
 
@@ -258,6 +258,7 @@ public class MapManager : MonoBehaviour
 
         // Edit area values
         _areaToEdit.title = _areaTitle;
+        _areaToEdit.titleEnglish = _areaTitleEnglish;
         _areaToEdit.position = center;
         _areaToEdit.zoom = zoom;
         _areaToEdit.areaConstraintsMin = markersCreateArea[0].position;

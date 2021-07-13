@@ -52,7 +52,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2185003779407872
-    m_Localized: Cancel
+    m_Localized: Delete
     m_Metadata:
       m_Items: []
   - m_Id: 2185662717149184
@@ -96,7 +96,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10517594718502912
-    m_Localized: "\u039F\u03BA"
+    m_Localized: Ok
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12680380286402560
+    m_Localized: Are you sure you want to delete the current path?
     m_Metadata:
       m_Items: []
   references:

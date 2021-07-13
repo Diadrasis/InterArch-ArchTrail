@@ -46,7 +46,7 @@ public class UIManager : MonoBehaviour
     [Header("Edit Area Screen")]
     public GameObject pnlEditArea;
     public GameObject pnlSaveEditArea;
-    public TMP_InputField inptFldEditArea;
+    public TMP_InputField inptFldEditArea, inptFldEditAreaEnglish;
     public Button btnEditAreaSave;
     public Button btnEditAreaCancel;
     public Button btnSaveEditArea;
@@ -109,7 +109,7 @@ public class UIManager : MonoBehaviour
     [Header("Warning Save Path Screen")]
     //WarningScreen when user is about to save the path
     public GameObject pnlWarningSavePathScreen;
-    public Button btnSave, btnContinue, btnSaveCancel;
+    public Button btnSave, btnContinue, btnSaveDelete;
 
     [Space]
     [Header("Warning Delete")]
@@ -117,6 +117,11 @@ public class UIManager : MonoBehaviour
     public GameObject pnlWarningDeleteScreen;
     public Button btnDeleteFinal, btnDeleteCancel;
     Transform pnlForDelete;
+
+    [Space]
+    [Header("Warning Delete Path")]
+    public GameObject pnlWarningDeletePathScreen;
+    public Button btnDeleteYes, btnDeleteNo;
 
     [Space]
     [Header("Warning Server Screen")]
@@ -189,8 +194,8 @@ public class UIManager : MonoBehaviour
     public bool isAdmin;
     private string passwordAdmin = "2791";
 
-    readonly string ENGLISH = "English (en)";
-    readonly string GREEK = "Greek (el)";
+    //readonly string ENGLISH = "English (en)";
+    //readonly string GREEK = "Greek (el)";
     #endregion
 
     #region Unity Functions
@@ -273,7 +278,11 @@ public class UIManager : MonoBehaviour
         //btn warning panel for save or cancel a path
         btnSave.onClick.AddListener(() => SavePath());
         btnContinue.onClick.AddListener(() => ResumePath());
-        btnSaveCancel.onClick.AddListener(() => CancelInGeneral());
+        btnSaveDelete.onClick.AddListener(() => EnableScreen(pnlWarningDeletePathScreen, true));
+
+        // delete path warning
+        btnDeleteYes.onClick.AddListener(() => CancelInGeneral());
+        btnDeleteNo.onClick.AddListener(() => EnableScreen(pnlWarningDeletePathScreen, false));
 
         // for testing the saving of paths is happening smoothly
         btnPaths.onClick.AddListener(() => DisplaySavedPathsScreen());
@@ -459,7 +468,10 @@ public class UIManager : MonoBehaviour
             // Download Tiles
             AppManager.Instance.serverManager.DownloadTiles();
 
-            txtMainName.text = selectedArea.title; // selectAreaText.text;
+            if (LanguageIsEnglish())
+                txtMainName.text = selectedArea.titleEnglish;
+            else
+                txtMainName.text = selectedArea.title;
             pnlAreasScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
@@ -503,11 +515,15 @@ public class UIManager : MonoBehaviour
         // Change UI
         pnlEditArea.SetActive(true);
         pnlAreasScreen.SetActive(false);
-        txtMainName.text = selectedArea.title;
+        if (LanguageIsEnglish())
+            txtMainName.text = selectedArea.titleEnglish;
+        else
+            txtMainName.text = selectedArea.title;
         btnEditAreaSave.onClick.AddListener(EditSaveArea);
         btnSaveEditArea.interactable = true;
         btnSaveEditArea.onClick.AddListener(() => EnableScreen(pnlSaveEditArea, true));
         inptFldEditArea.text = selectedArea.title;
+        inptFldEditAreaEnglish.text = selectedArea.titleEnglish;
         ActivateButtons(true, true, false, false);
 
         // Start edit selected area
@@ -717,8 +733,8 @@ public class UIManager : MonoBehaviour
         string newAreaTitleGreek = inptFldCreateArea.text;
         string newAreaTitleEnglish = inptFldCreateAreaEnglish.text;
 
-        if (!string.IsNullOrEmpty(newAreaTitleGreek) && !Regex.IsMatch(newAreaTitleGreek, "^[a-zA-Z0-9]*$")
-            && !string.IsNullOrEmpty(newAreaTitleEnglish) && Regex.IsMatch(newAreaTitleEnglish, "^[a-zA-Z0-9]*$"))
+        if (!string.IsNullOrEmpty(newAreaTitleGreek) && !Regex.IsMatch(newAreaTitleGreek, "^[0-9A-Za-z ]+$")
+            && !string.IsNullOrEmpty(newAreaTitleEnglish) && Regex.IsMatch(newAreaTitleEnglish, "^[0-9A-Za-z ]+$"))
         {
             AppManager.Instance.mapManager.SaveArea(newAreaTitleGreek, newAreaTitleEnglish);
             pnlSaveArea.SetActive(false);
@@ -738,14 +754,19 @@ public class UIManager : MonoBehaviour
 
     public void EditSaveArea()
     {
-        string newAreaTitle = inptFldEditArea.text;
+        string newAreaTitleGreek = inptFldEditArea.text;
+        string newAreaTitleEnglish = inptFldEditAreaEnglish.text;
 
-        if (!string.IsNullOrEmpty(newAreaTitle))
+        if (!string.IsNullOrEmpty(newAreaTitleGreek) && !Regex.IsMatch(newAreaTitleGreek, "^[0-9A-Za-z ]+$")
+            && !string.IsNullOrEmpty(newAreaTitleEnglish) && Regex.IsMatch(newAreaTitleEnglish, "^[0-9A-Za-z ]+$"))
         {
-            AppManager.Instance.mapManager.EditArea(AppManager.Instance.mapManager.currentArea, newAreaTitle);
+            AppManager.Instance.mapManager.EditArea(AppManager.Instance.mapManager.currentArea, newAreaTitleGreek, newAreaTitleEnglish);
             pnlSaveEditArea.SetActive(false);
             pnlEditArea.SetActive(false);
-            txtMainName.text = newAreaTitle;
+            if (LanguageIsEnglish())
+                txtMainName.text = newAreaTitleEnglish;
+            else
+                txtMainName.text = newAreaTitleGreek;
             DisplayAreasScreen();
         }
         else
@@ -862,6 +883,7 @@ public class UIManager : MonoBehaviour
         {
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
             EnableScreen(pnlWarningSavePathScreen, false);
+            EnableScreen(pnlWarningDeletePathScreen, false);
             EnableScreen(pnlMainButtons, true);
             AppManager.Instance.mapManager.StopRecordingPath();
         }
