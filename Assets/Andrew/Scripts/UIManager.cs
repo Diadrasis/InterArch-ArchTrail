@@ -480,6 +480,7 @@ public class UIManager : MonoBehaviour
         imgRecord.gameObject.SetActive(true);
         EnableScreen(pnlSavedPaths, false); //the panel for saved paths can be removed afterwards, for testing purposes
         ActivateButtons(true, false, false, false);
+        AppManager.Instance.mapManager.isShown = false;
         AppManager.Instance.mapManager.CheckUserPosition();
     }
 
@@ -917,8 +918,8 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlForDelete.gameObject));
             DisplayAreasScreen();
         }
-
     }
+
     //instantiating paths
     private List<GameObject> InstantiateSelectPathObjects()
     {

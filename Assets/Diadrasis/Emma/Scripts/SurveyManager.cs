@@ -134,67 +134,75 @@ public class SurveyManager : MonoBehaviour
 
     void Submit()
     {
-        demographicOptions[step].SetActive(false);
-
-        if (step < demographicOptions.Length)
+        if (CheckOption(step))
         {
-            //StopCoroutine("DelayShow");
-            StartCoroutine(DelayShow());
+            demographicOptions[step].SetActive(false);
 
-            //if (step == demographicOptions.Length - 1) { btnNextText.text = "Αποστολή"; }
+            if (step < demographicOptions.Length)
+            {
+                //StopCoroutine("DelayShow");
+                StartCoroutine(DelayShow());
 
-            if (step == 4)
-            {
-                CheckValue();
-                demographicOptions[step].SetActive(true);
+                //if (step == demographicOptions.Length - 1) { btnNextText.text = "Αποστολή"; }
+
+                if (step == 4)
+                {
+                    CheckValue();
+                    demographicOptions[step].SetActive(true);
+                }
+                else if (step == 9 || step == 13 || step == 16 || step == 20 || step == 27 || step == 31
+                    || step == 37 || step == 41 || step == 43 || step == 47 || step == 51 || step == 60 || step == 65
+                    || step == 69 || step == 76 || step == 80 || step == 85
+                    || step == 89)
+                {
+                    //Debug.Log("Step for toggleCheck" + step);
+                    CheckIfUserHasSelectedOtherOption();
+                }
+                else if (step == 11 || step == 18 || step == 29 || step == 33 || step == 39
+                || step == 45 || step == 49 || step == 58 || step == 62 || step == 67 || step == 74 || step == 78
+                || step == 82 || step == 87)
+                {
+                    //Debug.Log("Step for toggleCheck Second method: " + step);
+                    CheckIfUserHasSelectedOtherOptionSecond();
+                }
+                else if (step == 21 || step == 42 || step == 53 || step == 70 || step == 90)
+                {
+                    step = demographicOptions.Length;
+                    //btnSkip.gameObject.SetActive(false);
+                }
+                else if (step == 22 || step == 54)
+                {
+                    btnSkip.gameObject.SetActive(false);
+                    CheckToggle();
+                }
+                else
+                {
+                    step++;
+                    demographicOptions[step].SetActive(true);
+                    btnSkip.gameObject.SetActive(true);
+                }
+
+                if (step == 4 || step == 22 || step == 54)
+                {
+                    btnSkip.gameObject.SetActive(false);
+                }
+                else
+                {
+                    btnSkip.gameObject.SetActive(true);
+                }
+                //Debug.Log("Step: " + step);
             }
-            else if (step == 9 || step == 13 || step == 16 || step == 20 || step == 27 || step == 31
-                || step == 37 || step == 41 || step == 43 || step == 47 || step == 51 || step == 60 || step == 65
-                || step == 69 || step == 76 || step == 80 || step == 85
-                || step == 89 )
+
+            // End survey and save
+            if (step >= demographicOptions.Length)
             {
-                //Debug.Log("Step for toggleCheck" + step);
-                CheckIfUserHasSelectedOtherOption();
+                EndSurvey();
             }
-            else if (step == 11 || step == 18 || step == 29 || step == 33 || step == 39
-            || step == 45 || step == 49 || step == 58 || step == 62 || step == 67 || step == 74 || step == 78
-            || step == 82 || step == 87)
-            {
-                //Debug.Log("Step for toggleCheck Second method: " + step);
-                CheckIfUserHasSelectedOtherOptionSecond();
-            }
-            else if (step == 21 || step == 42 || step == 53 || step == 70 || step == 90)
-            {
-                step = demographicOptions.Length;
-                //btnSkip.gameObject.SetActive(false);
-            }
-            else if (step == 22 || step == 54)
-            {
-                btnSkip.gameObject.SetActive(false);
-                CheckToggle();
-            }
-            else
-            {
-                step++;
-                demographicOptions[step].SetActive(true);
-                btnSkip.gameObject.SetActive(true);
-            }
-            
-            if (step == 4 || step == 22 || step == 54)
-            {
-                btnSkip.gameObject.SetActive(false);
-            }
-            else
-            {
-                btnSkip.gameObject.SetActive(true);
-            }
-            Debug.Log("Step: " + step);
         }
-
-        // End survey and save
-        if (step >= demographicOptions.Length)
+        else
         {
-            EndSurvey();
+            AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
+            AppManager.Instance.uIManager.SetWarningTxtOnCheckValue();
         }
     }
 
@@ -291,6 +299,32 @@ public class SurveyManager : MonoBehaviour
         ResetValues();
         AppManager.Instance.uIManager.DisplayAreasScreen();
         AppManager.Instance.uIManager.pnlWarningThankYouScreen.SetActive(true);
+    }
+
+    private bool CheckOption(int _index)
+    {
+        // Input Container
+        TMP_InputField inputField = demographicOptions[_index].GetComponentInChildren<TMP_InputField>();
+        if (inputField != null)
+        {
+            if (!string.IsNullOrEmpty(inputField.text))
+                return true;
+        }
+
+        // Toggle Container
+        Toggle[] toggles = demographicOptions[_index].GetComponentsInChildren<Toggle>();
+        if (toggles != null && toggles.Length > 0)
+        {
+            foreach (Toggle toggle in toggles)
+            {
+                if (toggle.isOn)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     //for the dropdown which will make the different selections and open/close panels

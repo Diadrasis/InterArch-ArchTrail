@@ -79,6 +79,10 @@ MonoBehaviour:
     m_Key: pnlSaveAreaName
     m_Metadata:
       m_Items: []
+  - m_Id: 10579341303250944
+    m_Key: inpFldPlaceholderExplain
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

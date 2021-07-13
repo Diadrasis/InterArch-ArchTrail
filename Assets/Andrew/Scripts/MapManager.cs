@@ -59,8 +59,9 @@ public class MapManager : MonoBehaviour
     TimeSpan startedPauseTime;
     float pausedDuration = 0f;
     public Texture2D markerForDurationTexture;
+    OnlineMapsMarker currentMarkerForDuration;
 
-    bool isShown;
+    public bool isShown;
     //for markers
     private bool touchedLastUpdate = false;
     int lastTouchCount;
@@ -69,6 +70,9 @@ public class MapManager : MonoBehaviour
     #region Unity Functions
     private void Awake()
     {
+        // Enable never sleep for android
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         areas = new List<cArea>();
         areas = cArea.LoadAreas();
     }
@@ -163,6 +167,9 @@ public class MapManager : MonoBehaviour
     private void OnDestroy()
     {
         //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+
+        // Deactivate never sleep for android
+        Screen.sleepTimeout = SleepTimeout.SystemSetting;
     }
     private void OnDisable()
     {
@@ -440,6 +447,7 @@ public class MapManager : MonoBehaviour
                     AppManager.Instance.uIManager.pnlWarningScreen.SetActive(true);
                     AppManager.Instance.uIManager.SetWarningTxtOnCheckUserPosition();
                 }
+
                 if(isRecordingPath || isPausePath)
                 {
                     AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
@@ -447,6 +455,7 @@ public class MapManager : MonoBehaviour
                     AppManager.Instance.uIManager.btnContinue.interactable = false;
                     AppManager.Instance.uIManager.IsInRecordingPath(false);
                 }
+
                 AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
                 isShown = true;
                 //Debug.Log("Out of area true");
@@ -492,6 +501,14 @@ public class MapManager : MonoBehaviour
             if (distance < OnlineMapsLocationService.instance.updateDistance / 1000f)
             {
                 //OnlineMaps.instance.Redraw();
+
+                // Change marker size
+                TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime.TimeOfDay);
+                float totalDuration = (float)timeDuration.TotalSeconds + pausedDuration;
+                float currentDuration = totalDuration - pausedDuration;
+                currentMarkerForDuration.scale = MARKERFORDURATION_SCALE - (MARKERFORDURATION_SCALE * Mathf.Clamp(currentDuration / MAX_DURATION, 0f, 1f));
+                Debug.Log(currentDuration);
+
                 return;
             }
             else
@@ -501,8 +518,15 @@ public class MapManager : MonoBehaviour
                 OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(position, label);
                 marker.SetDraggable(false);
                 marker.align = OnlineMapsAlign.Center;
-                marker.texture = markerForDurationTexture;
+                //marker.texture = markerForDurationTexture;
                 marker.scale = 0.1f;
+
+                // Create marker ontop of marker to display duration
+                currentMarkerForDuration = OnlineMapsMarkerManager.CreateItem(position, label);
+                currentMarkerForDuration.SetDraggable(false);
+                currentMarkerForDuration.align = OnlineMapsAlign.Center;
+                currentMarkerForDuration.texture = markerForDurationTexture;
+                currentMarkerForDuration.scale = MARKERFORDURATION_SCALE;
 
                 // Get new time duration
                 //Debug.Log("DateTime.Now.TimeOfDay = " + DateTime.Now.TimeOfDay);
@@ -547,7 +571,6 @@ public class MapManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlWarningSavePathScreen.SetActive(true);
             AppManager.Instance.uIManager.btnContinue.interactable = false;
             isShown = true;
-            
         }
         else if(!isRecordingPath && isPausePath && IsWithinConstraints())
         {

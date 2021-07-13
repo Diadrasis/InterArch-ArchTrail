@@ -206,9 +206,9 @@ public class ServerManager : MonoBehaviour
                     // Activate panel warning
                     AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
                     if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download " + areaToUpload.titleEnglish + "'s tiles?\nSize: " + ((float)(tileDownloader.totalSize / 1000)).ToString("F2") + " ΜB";
+                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download " + areaToUpload.titleEnglish + "'s map for offline use?\nSize: " + ((float)tileDownloader.totalSize / 1000).ToString("F2") + " ΜB";
                     else
-                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Θα θέλατε να κατεβάσετε το χάρτη της περιοχής \"" + areaToUpload.title + "\";\nΜέγεθος: " + ((float)(tileDownloader.totalSize / 1000)).ToString("F2") + " ΜB";
+                        AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Θέλετε να κάνετε λήψη του χάρτη της περιοχής \"" + areaToUpload.title + "\"για χρήση εκτός σύνδεσης;\nΜέγεθος: " + ((float)tileDownloader.totalSize / 1000).ToString("F2") + " ΜB";
 
                     // Wait for user input
                     while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
@@ -227,7 +227,7 @@ public class ServerManager : MonoBehaviour
                             {
                                 int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
                                 if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                                    AppManager.Instance.uIManager.txtWarningServer.text = "Downloading map... \n" + percentage + "%";
                                 else
                                     AppManager.Instance.uIManager.txtWarningServer.text = "Λήψη χάρτη... \n" + percentage + "%";
                                 AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
@@ -988,9 +988,9 @@ public class ServerManager : MonoBehaviour
                 // Activate panel warning
                 AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.SetActive(true);
                 if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download the area's tiles?\nSize: " + ((float)(tileDownloader.totalSize / 1000)).ToString("F2") + " ΜB";
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download the map for offline use?\nSize: " + ((float)tileDownloader.totalSize / 1000).ToString("F2") + " ΜB";
                 else
-                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Θα θέλατε να κατεβάσετε το χάρτη της περιοχής;\nΜέγεθος: " + ((float)(tileDownloader.totalSize / 1000)).ToString("F2") + " ΜB";
+                    AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Θέλετε να κάνετε λήψη του χάρτη για χρήση εκτός σύνδεσης;\nΜέγεθος: " + ((float)tileDownloader.totalSize / 1000).ToString("F2") + " ΜB";
 
                 // Wait for user input
                 while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
@@ -1007,7 +1007,7 @@ public class ServerManager : MonoBehaviour
                         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
                         int percentage = Mathf.RoundToInt((float)(((double)tileDownloader.downloadedTiles / (double)tileDownloader.countTiles) * 100));
                         if (AppManager.Instance.uIManager.LanguageIsEnglish())
-                            AppManager.Instance.uIManager.txtWarningServer.text = "Downloading tiles... \n" + percentage + "%";
+                            AppManager.Instance.uIManager.txtWarningServer.text = "Downloading map... \n" + percentage + "%";
                         else
                             AppManager.Instance.uIManager.txtWarningServer.text = "Λήψη χάρτη... \n" + percentage + "%";
 
