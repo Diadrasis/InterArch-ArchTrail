@@ -60,6 +60,11 @@ public class UIManager : MonoBehaviour
     public Button btnGPSPermission;
 
     [Space]
+    [Header("GPS Signal panel")]
+    //GPS Screen
+    public GameObject pnlGPSSignal;
+
+    [Space]
     [Header("Admin Screen")]
     public GameObject pnlWarningsAdminScreen;
     public Button btnAdminYes;
@@ -222,6 +227,34 @@ public class UIManager : MonoBehaviour
         btnBackToAreasScreen.interactable = true;
         //imgRecord = GetComponent<Animator>();
         //sexDropdown = GetComponent<TMP_Dropdown>();
+    }
+
+    private void Update()
+    {
+        if (pnlPathScreen.activeSelf)
+        {
+            if (AppManager.Instance.androidManager.HasGPS())
+            {
+                if (pnlGPSSignal.activeSelf)
+                    pnlGPSSignal.SetActive(false);
+
+                if (!AppManager.Instance.uIManager.btnAddNewPath.interactable)
+                    AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
+            }
+            else
+            {
+                if (!pnlGPSSignal.activeSelf)
+                    pnlGPSSignal.SetActive(true);
+
+                if (AppManager.Instance.uIManager.btnAddNewPath.interactable)
+                    AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
+            }
+        }
+        else
+        {
+            if (pnlGPSSignal.activeSelf)
+                pnlGPSSignal.SetActive(false);
+        }
     }
     #endregion
 

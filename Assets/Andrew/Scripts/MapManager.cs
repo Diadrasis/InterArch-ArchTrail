@@ -94,6 +94,17 @@ public class MapManager : MonoBehaviour
 
     private void Update()
     {
+        // Change marker size while recording path
+        if (isRecordingPath)
+        {
+            TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime.TimeOfDay);
+            float totalDuration = (float)timeDuration.TotalSeconds + pausedDuration;
+            float currentDuration = totalDuration - pausedDuration;
+            float scale = MARKERFORDURATION_SCALE - (MARKERFORDURATION_SCALE * Mathf.Clamp(currentDuration / 50, 0f, 1f));
+            currentMarkerForDuration.scale = MARKERFORDURATION_SCALE - (MARKERFORDURATION_SCALE * Mathf.Clamp(currentDuration / MAX_DURATION, 0f, 1f));
+            OnlineMaps.instance.Redraw();
+        }
+
         // Checks the position of the markers.
         if ((createArea || editArea) && polygon != null)
             CheckMarkerPositions();
@@ -491,23 +502,16 @@ public class MapManager : MonoBehaviour
         // Check constraints
         CheckUserPosition();
 
-        if (isRecordingPath && !isPausePath && IsWithinConstraints())
+        if (isRecordingPath && !isPausePath && IsWithinConstraints() && AppManager.Instance.androidManager.HasGPS())
         {
             // Set map view to to user's location with max zoom
             OnlineMaps.instance.SetPositionAndZoom(position.x, position.y, OnlineMaps.MAXZOOM);
 
             float distance = OnlineMapsUtils.DistanceBetweenPoints(position, previousPosition).magnitude;
             
-            if (distance < OnlineMapsLocationService.instance.updateDistance / 1000f)
+            if (distance < OnlineMapsLocationService.instance.updateDistance / 500f) //1000f
             {
                 //OnlineMaps.instance.Redraw();
-
-                // Change marker size
-                TimeSpan timeDuration = (DateTime.Now.TimeOfDay - previousPointTime.TimeOfDay);
-                float totalDuration = (float)timeDuration.TotalSeconds + pausedDuration;
-                float currentDuration = totalDuration - pausedDuration;
-                currentMarkerForDuration.scale = MARKERFORDURATION_SCALE - (MARKERFORDURATION_SCALE * Mathf.Clamp(currentDuration / MAX_DURATION, 0f, 1f));
-                Debug.Log(currentDuration);
 
                 return;
             }
@@ -527,7 +531,7 @@ public class MapManager : MonoBehaviour
                 currentMarkerForDuration.align = OnlineMapsAlign.Center;
                 currentMarkerForDuration.texture = markerForDurationTexture;
                 currentMarkerForDuration.scale = MARKERFORDURATION_SCALE;
-
+                
                 // Get new time duration
                 //Debug.Log("DateTime.Now.TimeOfDay = " + DateTime.Now.TimeOfDay);
                 //Debug.Log("previousPointTime.TimeOfDay = " + previousPointTime.TimeOfDay);
@@ -554,7 +558,16 @@ public class MapManager : MonoBehaviour
                 markerListCurrPath.Add(marker);
                 OnlineMapsDrawingElementManager.RemoveAllItems(e => e != polygon);
                 OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListCurrPath.Select(m => m.position).ToArray(), Color.red, 3)); //OnlineMapsMarkerManager.instance.Select(m => m.position).ToArray(), Color.red, 3) // Average human walk speed is 1.4m/s
+                
+                if (markerListCurrPath.Count > 1)
+                {
+                    for (int i = 1; i < markerListCurrPath.Count; i++)
+                    {
+                        OnlineMapsDrawingElementManager.AddItem(CreateTriangle(markerListCurrPath[i-1].position, markerListCurrPath[i].position));
+                    }
+                }
 
+                //OnlineMapsUtils.
                 // Set user marker on top
                 CreateUserMarker();
 
@@ -603,11 +616,19 @@ public class MapManager : MonoBehaviour
         //OnlineMapsLocationService.instance.UpdatePosition();
 
         // Create a new marker at the starting position
-        OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(previousPosition, "Point_0_" + DateTime.Now.TimeOfDay);
+        string label = "Point_0_" + DateTime.Now.TimeOfDay;
+        OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(previousPosition, label);
         marker.align = OnlineMapsAlign.Center;
-        marker.texture = markerForDurationTexture;
+        //marker.texture = markerForDurationTexture;
         marker.scale = 0.1f;
-        
+
+        // Create marker ontop of marker to display duration
+        currentMarkerForDuration = OnlineMapsMarkerManager.CreateItem(previousPosition, label);
+        currentMarkerForDuration.SetDraggable(false);
+        currentMarkerForDuration.align = OnlineMapsAlign.Center;
+        currentMarkerForDuration.texture = markerForDurationTexture;
+        currentMarkerForDuration.scale = MARKERFORDURATION_SCALE;
+
         // Clear and Add new marker to markerListCurrPath
         markerListCurrPath.Clear();
         markerListCurrPath.Add(marker);
@@ -755,6 +776,16 @@ public class MapManager : MonoBehaviour
 
         // Draw lines
         OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(markerListCurrPath.Select(m => m.position).ToArray(), Color.red, 3)); //markerListOfCurrentPath
+
+        // Draw triangles
+        if (markerListCurrPath.Count > 1)
+        {
+            for (int i = 1; i < markerListCurrPath.Count; i++)
+            {
+                OnlineMapsDrawingElementManager.AddItem(CreateTriangle(markerListCurrPath[i - 1].position, markerListCurrPath[i].position));
+            }
+        }
+
         OnlineMaps.instance.Redraw();
 
         // Set map view on path
@@ -831,10 +862,59 @@ public class MapManager : MonoBehaviour
     {
         // For points, reference to markerPositions. 
         // If you change the values ​​in markerPositions, value in the polygon will be adjusted automatically.
-        OnlineMapsDrawingPoly onlineMapsDrawingPoly = new OnlineMapsDrawingPoly(_arrayOfPoints, Color.black, borderWidth, new Color(1, 1, 1, 0.3f));
+        OnlineMapsDrawingPoly onlineMapsDrawingPoly = new OnlineMapsDrawingPoly(_arrayOfPoints, new Color(1, 1, 1, 0.3f), 0f, new Color(1, 1, 1, 0.3f));
+        //OnlineMapsDrawingPoly onlineMapsDrawingPoly = new OnlineMapsDrawingPoly(_arrayOfPoints, Color.black, borderWidth, new Color(1, 1, 1, 0.3f));
         OnlineMapsDrawingElementManager.AddItem(onlineMapsDrawingPoly);
        
         return onlineMapsDrawingPoly;
+    }
+
+    private OnlineMapsDrawingPoly CreateTriangle(Vector2 _startPos, Vector2 _endPos)
+    {
+        Vector2[] arrayOfPoints = new Vector2[3];
+
+        // Get points
+        Vector2 direction = (_endPos - _startPos).normalized;
+        Vector2 midPoint = (_startPos + _endPos) * 0.5f;
+        float radius = 0.000005f;  //OnlineMapsUtils.DistanceBetweenPoints(_startPos, _endPos).magnitude;
+        /*int angle = 120;
+        float xB = (float)(radius * 10 * Math.Cos(angle * Mathf.Deg2Rad)); // 3
+        float yB = (float)(radius * 10 * Math.Sin(angle * Mathf.Deg2Rad));
+        float xC = (float)(radius * 10 * Math.Cos(-angle * Mathf.Deg2Rad));
+        float yC = (float)(radius * 10 * Math.Sin(-angle * Mathf.Deg2Rad));*/
+        //float angleDir = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg;
+
+        Vector2 directionAToB = DirFromAngle(90, direction * 3);
+        Vector2 directionAToC = DirFromAngle(-90, direction * 3);
+
+        /*Debug.Log("direction = " + direction);
+        Debug.Log("directionAToB = " + directionAToB);
+        Debug.Log("directionAToC = " + directionAToC);*/
+
+        Vector2 pointA = midPoint + (direction * radius);
+        Vector2 pointB = midPoint + (directionAToB * radius); //new Vector2(pointA.x + xB, pointA.y + yB);
+        Vector2 pointC = midPoint + (directionAToC * radius); //new Vector2(pointA.x + xC, pointA.y + yC);
+
+        arrayOfPoints[0] = pointA;
+        arrayOfPoints[1] = pointB;
+        arrayOfPoints[2] = pointC;
+
+        OnlineMapsDrawingPoly triangle = new OnlineMapsDrawingPoly(arrayOfPoints, Color.white, 1f, Color.white);
+
+        return triangle;
+    }
+
+    /*private Vector2 DirFromAngle(float _angleInDegrees, Transform _origin)
+    {
+        if (_origin != null)
+            _angleInDegrees += _origin.eulerAngles.y;
+
+        return new Vector2(Mathf.Sin(_angleInDegrees * Mathf.Deg2Rad), Mathf.Cos(_angleInDegrees * Mathf.Deg2Rad));
+    }*/
+
+    private Vector2 DirFromAngle(float _angleInDegrees, Vector2 _direction)
+    {
+        return new Vector2(_direction.x * Mathf.Cos(_angleInDegrees) - _direction.y * Mathf.Sin(_angleInDegrees), _direction.x * Mathf.Sin(_angleInDegrees) + _direction.y * Mathf.Cos(_angleInDegrees));
     }
 
     public void DisplayArea(cArea _areaToDisplay)
@@ -845,12 +925,30 @@ public class MapManager : MonoBehaviour
         // Set user marker on top
         CreateUserMarker();
 
-        Vector2[] points = new Vector2[4];
+        /*Vector2[] points = new Vector2[4];
 
         points[0] = _areaToDisplay.areaConstraintsMin;
         points[1] = new Vector2(_areaToDisplay.areaConstraintsMin.x, _areaToDisplay.areaConstraintsMax.y);
         points[2] = _areaToDisplay.areaConstraintsMax;
-        points[3] = new Vector2(_areaToDisplay.areaConstraintsMax.x, _areaToDisplay.areaConstraintsMin.y);
+        points[3] = new Vector2(_areaToDisplay.areaConstraintsMax.x, _areaToDisplay.areaConstraintsMin.y);*/
+
+        Vector2[] points = new Vector2[10];
+
+        /*points[0] = _areaToDisplay.areaConstraintsMin;
+        points[1] = new Vector2(_areaToDisplay.areaConstraintsMin.x, _areaToDisplay.areaConstraintsMax.y);
+        points[2] = _areaToDisplay.areaConstraintsMax;
+        points[3] = new Vector2(_areaToDisplay.areaConstraintsMax.x, _areaToDisplay.areaConstraintsMin.y);*/
+
+        points[0] = _areaToDisplay.viewConstraintsMin;
+        points[1] = new Vector2(_areaToDisplay.viewConstraintsMin.x, _areaToDisplay.viewConstraintsMax.y);
+        points[2] = _areaToDisplay.viewConstraintsMax;
+        points[3] = new Vector2(_areaToDisplay.viewConstraintsMax.x, _areaToDisplay.viewConstraintsMin.y);
+        points[4] = _areaToDisplay.viewConstraintsMin;
+        points[5] = _areaToDisplay.areaConstraintsMin;
+        points[6] = new Vector2(_areaToDisplay.areaConstraintsMin.x, _areaToDisplay.areaConstraintsMax.y);
+        points[7] = _areaToDisplay.areaConstraintsMax;
+        points[8] = new Vector2(_areaToDisplay.areaConstraintsMax.x, _areaToDisplay.areaConstraintsMin.y);
+        points[9] = _areaToDisplay.areaConstraintsMin;
 
         if (polygon != null)
             OnlineMapsDrawingElementManager.RemoveItem(polygon);
@@ -927,7 +1025,7 @@ public class MapManager : MonoBehaviour
         // Create Marker
         userMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(OnlineMapsLocationService.instance.position.x, OnlineMapsLocationService.instance.position.y), AppManager.Instance.uIManager.userMarker, "User");
         userMarker.SetDraggable(false);
-        userMarker.scale = 0.3f;
+        userMarker.scale = 0.15f; //0.3f;
     }
     #endregion
 

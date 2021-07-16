@@ -87,5 +87,9 @@ MonoBehaviour:
     m_Localized: Please explain...
     m_Metadata:
       m_Items: []
+  - m_Id: 11682628849008640
+    m_Localized: --- GPS signal lost ---
+    m_Metadata:
+      m_Items: []
   references:
     version: 1

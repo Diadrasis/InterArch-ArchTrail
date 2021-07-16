@@ -83,6 +83,10 @@ MonoBehaviour:
     m_Key: inpFldPlaceholderExplain
     m_Metadata:
       m_Items: []
+  - m_Id: 11682628849008640
+    m_Key: pnlGPSSignal
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

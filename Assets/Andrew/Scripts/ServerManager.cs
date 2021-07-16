@@ -70,7 +70,7 @@ public class ServerManager : MonoBehaviour
                 {
                     OnlineMaps.instance.CheckServerConnection(OnCheckConnectionCompleteUpload);
                 }
-                
+
                 CheckInternet();
                 timeRemaining = timeToCount;
             }
@@ -513,14 +513,17 @@ public class ServerManager : MonoBehaviour
                 if (AppManager.Instance.uIManager.LanguageIsEnglish())
                 {
                     if (uploadInfo.Length > 1)
-                        uploadInfo += "and ";
+                        uploadInfo += " and ";
 
-                    uploadInfo += "surveys";
+                    if (questionnairesToUpload.Count > 1)
+                        uploadInfo += "surveys";
+                    else
+                        uploadInfo += "survey";
                 }
                 else
                 {
                     if (uploadInfo.Length > 1)
-                        uploadInfo += "και ";
+                        uploadInfo += " και ";
 
                     if (questionnairesToUpload.Count > 1)
                         uploadInfo += "των ερωτηματολογίων";
