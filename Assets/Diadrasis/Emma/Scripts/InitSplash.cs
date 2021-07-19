@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class InitSplash : MonoBehaviour
 {
-    public Animator animAppLogo, /*animEspaLogo,*/ animDiadrasisLogo/*, animUniLogo,ministry1logo, ministry2logo, animPanel*/;
+    public Animator animAppLogo, animDiadrasisLogo/*, animUniLogo,ministry1logo, ministry2logo, animPanel*/;
+    public Image mainLogo;
+    public Sprite beforeSrpite, afterSprite;
     public GameObject menuPanel;
 
     public static int isStarted;
@@ -40,7 +43,7 @@ public class InitSplash : MonoBehaviour
             //animMenu.SetBool("color", true);
             yield break;
         }
-        
+        mainLogo.sprite = beforeSrpite;
         /*animPanel.SetBool("show", false);*/
         yield return new WaitForSeconds(1f);
         animAppLogo.SetBool("show", true);
@@ -52,8 +55,17 @@ public class InitSplash : MonoBehaviour
         animDiadrasisLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
         animDiadrasisLogo.SetBool("show", false);
-        /*yield return new WaitForSeconds(0.7f);
-        animUniLogo.SetBool("show", true);
+        yield return new WaitForSeconds(0.7f);
+        
+        yield return new WaitForSeconds(0.7f);
+        mainLogo.sprite = afterSprite;
+        animAppLogo.SetBool("show", false);
+        yield return new WaitForSeconds(2f);
+        animAppLogo.SetBool("show", true);
+        animDiadrasisLogo.SetBool("show", true);
+        yield return new WaitForSeconds(2f);
+        animDiadrasisLogo.SetBool("show", false);
+        /*animUniLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
         animUniLogo.SetBool("show", false);
         yield return new WaitForSeconds(0.7f);
