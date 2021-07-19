@@ -34,6 +34,7 @@ public class ServerManager : MonoBehaviour
     public float timeRemaining = 0f;
 
     // Tiles
+    [HideInInspector]
     public TileDownloader tileDownloader;
 
     // Ui warning

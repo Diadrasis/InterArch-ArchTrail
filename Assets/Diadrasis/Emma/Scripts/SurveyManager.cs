@@ -11,7 +11,7 @@ public class SurveyManager : MonoBehaviour
     public delegate void Profile();
     public static Profile OnContinue, OnInternetError;
 
-    public Button btnSubmit, btnSkip/*, BtnOk*/;
+    public Button btnSubmit, btnSkip, btnBack/*, BtnOk*/;
     public GameObject[] demographicOptions;
     public Transform toggleContainerGeneral;
     public Transform inputContainer, inputContainerOptionA, inputContainerOptionB1, inputContainerOptionB2, inputContainerOptionC1, inputContainerOptionC2;
@@ -31,6 +31,7 @@ public class SurveyManager : MonoBehaviour
 
     public cPath currentPath;
 
+    private List<int> surveyIndexes;
     //public GameObject panelSettings;
 
     //Intro intro;
@@ -41,6 +42,7 @@ public class SurveyManager : MonoBehaviour
         //intro = FindObjectOfType<Intro>();
         btnSubmit.onClick.AddListener(() => Submit());
         btnSkip.onClick.AddListener(() => Skip());
+        btnBack.onClick.AddListener(() => Back());
         togglesGeneral = toggleContainerGeneral.GetComponentsInChildren<Toggle>(true);
         inputFieldsGeneral = inputContainer.GetComponentsInChildren<TMP_InputField>(true);
         toggleOptionA = toggleContainerOptionA.GetComponentsInChildren<Toggle>(true);
@@ -57,6 +59,8 @@ public class SurveyManager : MonoBehaviour
 
         choiceTogglesB = toggleContainerOptionB.GetComponentsInChildren<Toggle>(true);
         choiceTogglesC = toggleContainerOptionC.GetComponentsInChildren<Toggle>(true);
+
+        surveyIndexes = new List<int>();
     }
 
     void Start()
@@ -136,6 +140,8 @@ public class SurveyManager : MonoBehaviour
     {
         if (CheckOption(step))
         {
+            surveyIndexes.Add(step);
+
             demographicOptions[step].SetActive(false);
 
             if (step < demographicOptions.Length)
@@ -272,7 +278,28 @@ public class SurveyManager : MonoBehaviour
         }
     }
 
-    
+    private void Back()
+    {
+        // Remove current step
+        surveyIndexes.Remove(step);
+
+        // Deactivate question
+        demographicOptions[step].SetActive(false);
+
+        // Reset current step
+        ResetValue(demographicOptions[step]);
+
+        // Set step to previous step
+        step = surveyIndexes.Count - 1;
+        Debug.Log(step);
+        // Reset previous step
+        ResetValue(demographicOptions[step]);
+        //CheckValue();
+
+        // Activate question
+        demographicOptions[step].SetActive(true);
+        StartCoroutine(DelayShow());
+    }
 
     private void EndSurvey()
     {
