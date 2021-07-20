@@ -31,7 +31,7 @@ public class SurveyManager : MonoBehaviour
 
     public cPath currentPath;
 
-    private List<int> surveyIndexes;
+    private List<int> previousSteps;
     //public GameObject panelSettings;
 
     //Intro intro;
@@ -60,7 +60,7 @@ public class SurveyManager : MonoBehaviour
         choiceTogglesB = toggleContainerOptionB.GetComponentsInChildren<Toggle>(true);
         choiceTogglesC = toggleContainerOptionC.GetComponentsInChildren<Toggle>(true);
 
-        surveyIndexes = new List<int>();
+        previousSteps = new List<int>();
     }
 
     void Start()
@@ -138,10 +138,13 @@ public class SurveyManager : MonoBehaviour
 
     void Submit()
     {
-        if (CheckOption(step))
+        if (UserHasSelectedOption(step))
         {
-            surveyIndexes.Add(step);
+            // Add current step to previous steps
+            previousSteps.Add(step);
+            Debug.Log("added step " + step);
 
+            // Deactivate current step
             demographicOptions[step].SetActive(false);
 
             if (step < demographicOptions.Length)
@@ -197,6 +200,9 @@ public class SurveyManager : MonoBehaviour
                     btnSkip.gameObject.SetActive(true);
                 }
                 //Debug.Log("Step: " + step);
+
+                if (!btnBack.gameObject.activeSelf)
+                    btnBack.gameObject.SetActive(true);
             }
 
             // End survey and save
@@ -215,6 +221,9 @@ public class SurveyManager : MonoBehaviour
     //because we don't want to save in case user skips a step. Does the same as Submit() but in submit we will save the answers...
     void Skip()
     {
+        // Add current step to previous steps
+        previousSteps.Add(step);
+
         // Reset value
         ResetValue(demographicOptions[step]);
 
@@ -271,6 +280,9 @@ public class SurveyManager : MonoBehaviour
             btnSkip.gameObject.SetActive(true);
         }
 
+        if (!btnBack.gameObject.activeSelf)
+            btnBack.gameObject.SetActive(true);
+
         // End survey and save
         if (step >= demographicOptions.Length)
         {
@@ -280,9 +292,6 @@ public class SurveyManager : MonoBehaviour
 
     private void Back()
     {
-        // Remove current step
-        surveyIndexes.Remove(step);
-
         // Deactivate question
         demographicOptions[step].SetActive(false);
 
@@ -290,13 +299,15 @@ public class SurveyManager : MonoBehaviour
         ResetValue(demographicOptions[step]);
 
         // Set step to previous step
-        step = surveyIndexes.Count - 1;
-        Debug.Log(step);
-        // Reset previous step
-        ResetValue(demographicOptions[step]);
-        //CheckValue();
+        step = previousSteps[previousSteps.Count - 1];
+        Debug.Log("current step = " + step);
+
+        // Remove current step
+        Debug.Log("removed step " + step);
+        previousSteps.Remove(step);
 
         // Activate question
+        SetupPanels();
         demographicOptions[step].SetActive(true);
         StartCoroutine(DelayShow());
     }
@@ -325,10 +336,10 @@ public class SurveyManager : MonoBehaviour
         AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
         ResetValues();
         AppManager.Instance.uIManager.DisplayAreasScreen();
-        AppManager.Instance.uIManager.pnlWarningThankYouScreen.SetActive(true);
+        AppManager.Instance.uIManager.EnableThankYouScreen();
     }
 
-    private bool CheckOption(int _index)
+    private bool UserHasSelectedOption(int _index)
     {
         // Input Container
         TMP_InputField inputField = demographicOptions[_index].GetComponentInChildren<TMP_InputField>();
@@ -384,6 +395,49 @@ public class SurveyManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlMainQuestions.SetActive(false);
             btnSkip.gameObject.SetActive(false);
         }
+    }
+
+    public void SetupPanels()
+    {
+        if (step == 4)
+        {
+            if (questionToggle[32].isOn)
+                AppManager.Instance.uIManager.pnlOptionA.SetActive(false);
+            else if (questionToggle[33].isOn)
+                AppManager.Instance.uIManager.pnlOptionB.SetActive(false);
+            else if (questionToggle[34].isOn)
+                AppManager.Instance.uIManager.pnlOptionC.SetActive(false);
+
+            AppManager.Instance.uIManager.pnlMainQuestions.SetActive(true);
+            btnSkip.gameObject.SetActive(false);
+        }
+        else if (step == 22)
+        {
+            if (choiceTogglesB[0].isOn)
+                AppManager.Instance.uIManager.pnlOptionB1.SetActive(false);
+            else if (choiceTogglesB[1].isOn)
+                AppManager.Instance.uIManager.pnlOptionB2.SetActive(false);
+
+            toggleContainerOptionB.gameObject.SetActive(true);
+            AppManager.Instance.uIManager.pnlOptionB.SetActive(true);
+            btnSkip.gameObject.SetActive(false);
+        }
+        else if (step == 54)
+        {
+            if (choiceTogglesC[0].isOn)
+                AppManager.Instance.uIManager.pnlOptionC1.SetActive(false);
+            else if (choiceTogglesC[1].isOn)
+                AppManager.Instance.uIManager.pnlOptionC2.SetActive(false);
+
+            toggleContainerOptionC.gameObject.SetActive(true);
+            AppManager.Instance.uIManager.pnlOptionC.SetActive(true);
+            btnSkip.gameObject.SetActive(false);
+        }
+        else
+            btnSkip.gameObject.SetActive(true);
+
+        if (step <= 0)
+            btnBack.gameObject.SetActive(false);
     }
 
     /*public void CheckValue(TMP_Dropdown val)

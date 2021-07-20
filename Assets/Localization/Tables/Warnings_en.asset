@@ -48,7 +48,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2184892496134144
-    m_Localized: Continue
+    m_Localized: CONTINUE PATH
     m_Metadata:
       m_Items: []
   - m_Id: 2185003779407872
@@ -60,11 +60,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2186073767329792
-    m_Localized: Yes
+    m_Localized: YES
     m_Metadata:
       m_Items: []
   - m_Id: 2186168134975488
-    m_Localized: No
+    m_Localized: NO
     m_Metadata:
       m_Items: []
   - m_Id: 2189204425195520
@@ -84,7 +84,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10190186085777408
-    m_Localized: Please take a moment to fill out our survey.
+    m_Localized: Would you like to fill out our survey?
     m_Metadata:
       m_Items: []
   - m_Id: 10234482524585984
@@ -101,6 +101,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 12680380286402560
     m_Localized: Are you sure you want to delete the current path?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 15287079379828736
+    m_Localized: Exit
     m_Metadata:
       m_Items: []
   references:

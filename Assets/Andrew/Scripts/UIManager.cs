@@ -149,13 +149,13 @@ public class UIManager : MonoBehaviour
     [Header("Warning Thank You Screen")]
     public GameObject pnlWarningThankYouScreen;
     public TextMeshProUGUI txtWarningThankYou;
-    public Button btnThankYouContinue;
-
+    public Button btnThankYouExit;
+    
     [Space]
     [Header("Warning Survey Intro Screen")]
     public GameObject pnlWarningSurveyIntroScreen;
-    //public TextMeshProUGUI txtWarningThankYou;
-    public Button btnSurveyIntroContinue;
+    public Button btnSurveyIntroYes;
+    public Button btnSurveyIntroNo;
 
     [Space]
     [Header("Testing Purposes")]
@@ -199,6 +199,7 @@ public class UIManager : MonoBehaviour
     public bool isAdmin;
     private string passwordAdmin = "2791";
 
+    private bool userAnsweredSurvey = false;
     //readonly string ENGLISH = "English (en)";
     //readonly string GREEK = "Greek (el)";
     #endregion
@@ -210,6 +211,7 @@ public class UIManager : MonoBehaviour
         selectAreaObjects = new List<GameObject>();
         selectPathObjects = new List<GameObject>();
         isAdmin = false;
+        userAnsweredSurvey = false;
 
         // Subscribe Buttons
         SubscribeButtons();
@@ -326,10 +328,11 @@ public class UIManager : MonoBehaviour
         btnDownloadTilesNo.onClick.AddListener(() => SetDownloadTiles(false));
 
         // warning ThankYou
-        btnThankYouContinue.onClick.AddListener(() => EnableScreen(pnlWarningThankYouScreen, false));
+        btnThankYouExit.onClick.AddListener(() => Escape()); 
 
         // warning Survey Intro
-        btnSurveyIntroContinue.onClick.AddListener(() => EnableScreen(pnlWarningSurveyIntroScreen, false));
+        btnSurveyIntroYes.onClick.AddListener(() => OpenQuestionnaire());
+        btnSurveyIntroNo.onClick.AddListener(() => EnableScreen(pnlWarningSurveyIntroScreen, false));
 
         //btn for edit Area
         btnEditAreaCancel.onClick.AddListener(() => CancelInGeneral());
@@ -415,6 +418,7 @@ public class UIManager : MonoBehaviour
 
     private void Escape()
     {
+        EnableScreen(pnlWarningThankYouScreen, false);
         Application.Quit();
         OnlineMapsLocationService.instance.StopLocationService();
     }
@@ -858,7 +862,8 @@ public class UIManager : MonoBehaviour
         IsInRecordingPath(false);
         AppManager.Instance.mapManager.StopRecordingPath();
         //pnlProfilerScreen.SetActive(true);
-        OpenQuestionnaire();
+        //OpenQuestionnaire();
+        pnlWarningSurveyIntroScreen.SetActive(true);
     }
 
     //opens the saved paths screen (on click event)
@@ -1054,7 +1059,7 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region QuestionnairePanel
-    void DisplayQuestionnaire()
+    void DisplayQuestionnaire() // TODO: Remove
     {
         pnlWarningSurveyIntroScreen.SetActive(true);
         pnlQuestionnaireScreen.SetActive(true);
@@ -1065,7 +1070,8 @@ public class UIManager : MonoBehaviour
 
     void OpenQuestionnaire()
     {
-        pnlWarningSurveyIntroScreen.SetActive(true);
+        userAnsweredSurvey = true;
+        pnlWarningSurveyIntroScreen.SetActive(false);
         pnlQuestionnaireScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
         pnlOptionA.SetActive(false);
@@ -1073,6 +1079,26 @@ public class UIManager : MonoBehaviour
         pnlOptionC.SetActive(false);
         pnlPathScreen.SetActive(false);
         ActivateButtons(true, true, true, false);
+    }
+
+    public void EnableThankYouScreen()
+    {
+        if (userAnsweredSurvey)
+        {
+            if (LanguageIsEnglish())
+                txtWarningThankYou.text = "Thank you for answering our survey!";
+            else
+                txtWarningThankYou.text = "Ευχαριστούμε που απαντήσατε στο ερωτηματολόγιο μας!";
+        }
+        else
+        {
+            if (LanguageIsEnglish())
+                txtWarningThankYou.text = "Thank you for your participation!";
+            else
+                txtWarningThankYou.text = "Ευχαριστούμε για τη συμμετοχή σας!";
+        }
+
+        pnlWarningThankYouScreen.SetActive(true);
     }
 
     /*public void CheckLanguage()

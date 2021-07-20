@@ -95,6 +95,10 @@ MonoBehaviour:
     m_Key: warningDeletePath
     m_Metadata:
       m_Items: []
+  - m_Id: 15287079379828736
+    m_Key: warningExitSurvey
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
