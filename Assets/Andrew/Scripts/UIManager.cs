@@ -16,8 +16,15 @@ public class UIManager : MonoBehaviour
 
     [Space]
     [Header("Top Screen")]
-    public Button btnBackToAreasScreen, btnQuit;
+    public Button btnBackToAreasScreen;
+    public Button btnQuit;
+    public Button btnOptions;
     public TextMeshProUGUI txtMainName;
+
+    [Space]
+    [Header("Options Screen")]
+    // Options Screen
+    public GameObject pnlOptionsScreen;
 
     [Space]
     [Header("Areas Screen")]
@@ -198,6 +205,7 @@ public class UIManager : MonoBehaviour
     [HideInInspector]
     public bool isAdmin;
     private string passwordAdmin = "2791";
+    private string ancientMesseneTitle = "Αρχαία Μεσσήνη";
 
     private bool userAnsweredSurvey = false;
     //readonly string ENGLISH = "English (en)";
@@ -215,8 +223,10 @@ public class UIManager : MonoBehaviour
 
         // Subscribe Buttons
         SubscribeButtons();
+
+        // Display Areas Screen
         DisplayAreasScreen();
-        
+
         // Display Admin
         pnlWarningsAdminScreen.SetActive(true);
 
@@ -266,6 +276,7 @@ public class UIManager : MonoBehaviour
         // Map Screen
         btnBackToAreasScreen.onClick.AddListener(() => BackToAreasScreen());
         btnQuit.onClick.AddListener(() => EnableScreen(pnlWarningEscapeScreen, true));
+        btnOptions.onClick.AddListener(() => DisplayOptionsScreen());
 
         // Areas Screen
         btnCreateArea.onClick.AddListener(() => CreateNewAreaSelected());
@@ -370,6 +381,12 @@ public class UIManager : MonoBehaviour
         btnQuit.gameObject.SetActive(valQuit);
         btnProfiler.gameObject.SetActive(valProfiler);
         btnResetQuestionnaire.gameObject.SetActive(valReset);
+    }
+
+    public void DisplayOptionsScreen()
+    {
+        // Enable/Disable Options Screen
+        pnlOptionsScreen.gameObject.SetActive(!pnlOptionsScreen.activeSelf);
     }
 
     public void DisplayAreasScreen()
@@ -484,6 +501,39 @@ public class UIManager : MonoBehaviour
         return newSelectAreaObjects;
     }
 
+    public void DisplayAncientMessene()
+    {
+        // Load Αρχαία Μεσσήνη
+        cArea loadedArea = AppManager.Instance.mapManager.GetAreaByTitle(ancientMesseneTitle);
+        
+        if (loadedArea != null)
+        {
+            AppManager.Instance.mapManager.currentArea = loadedArea;
+
+            // Download Tiles
+            /*AppManager.Instance.serverManager.DownloadTiles();
+
+            if (LanguageIsEnglish())
+                txtMainName.text = loadedArea.titleEnglish;
+            else
+                txtMainName.text = loadedArea.title;*/
+
+            pnlAreasScreen.SetActive(false);
+            AppManager.Instance.mapManager.SetMapViewToArea(loadedArea);
+
+            EnableScreen(pnlPathScreen, true);
+            imgRecord.gameObject.SetActive(true);
+            EnableScreen(pnlSavedPaths, false);
+            ActivateButtons(true, false, false, false);
+            AppManager.Instance.mapManager.isShown = false;
+            //AppManager.Instance.mapManager.CheckUserPosition();
+        }
+        else
+        {
+            DisplayAreasScreen();
+        }
+    }
+
     private void OnAreaSelectPressed()
     {
         GameObject selectAreaObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
@@ -502,13 +552,14 @@ public class UIManager : MonoBehaviour
                 AppManager.Instance.serverManager.DownloadPaths(selectedArea.server_area_id);
             }*/
 
-            // Download Tiles
-            AppManager.Instance.serverManager.DownloadTiles();
-
             if (LanguageIsEnglish())
                 txtMainName.text = selectedArea.titleEnglish;
             else
                 txtMainName.text = selectedArea.title;
+
+            // Download Tiles
+            AppManager.Instance.serverManager.DownloadTiles();
+            
             pnlAreasScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }

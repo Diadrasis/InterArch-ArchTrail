@@ -530,6 +530,26 @@ public class cArea
         PlayerPrefs.Save();
     }
 
+    public static cArea GetAreaByTitle(string _areaTitle)
+    {
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = GetXML();
+
+        // Find path
+        OnlineMapsXML areaNode = xml.Find("/" + AREAS + "/" + AREA + "[" + TITLE + "=" + _areaTitle + "]");
+        if (!areaNode.isNull)
+        {
+            Debug.Log(string.Format("Area with title {0} could not be loaded!", _areaTitle));
+
+            return null;
+        }
+
+        // Load path
+        cArea loadedArea = Load(areaNode);
+
+        return loadedArea;
+    }
+
     public static void SetServerAreaId(int _local_area_id, int _server_area_id)
     {
         // Load xml document, if null creates new

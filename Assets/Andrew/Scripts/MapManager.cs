@@ -84,12 +84,17 @@ public class MapManager : MonoBehaviour
         isShown = false;
 
         SubscribeToEvents();
+
+        // Setup Variables
         fromPosition = OnlineMaps.instance.position;
         toPosition = OnlineMapsLocationService.instance.position;
         isRecordingPath = false;
         isPausePath = false;
 
         CreateUserMarker();
+
+        // Display Ancient Messene
+        //AppManager.Instance.uIManager.DisplayAncientMessene();
     }
 
     private void Update()
@@ -228,6 +233,17 @@ public class MapManager : MonoBehaviour
     public cArea GetAreaByIndex(int _index)
     {
         return areas[_index];
+    }
+
+    public cArea GetAreaByTitle(string _areaTitle)
+    {
+        foreach (cArea area in areas)
+        {
+            if (area.title.Equals(_areaTitle)) ;
+            return area;
+        }
+
+        return null;
     }
 
     public void SaveArea(string _areaTitleGreek, string _areaTitleEnglish)

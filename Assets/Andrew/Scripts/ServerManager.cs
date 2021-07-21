@@ -121,7 +121,7 @@ public class ServerManager : MonoBehaviour
         //if (OnCheckInternetCheckComplete != null) OnCheckInternetCheckComplete(status);
         if (status)
         {
-            AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(false);
+            // AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(false);
             AppManager.Instance.uIManager.imgLoading.color = Color.green;
             isShownOnce = true;
         }
@@ -129,7 +129,7 @@ public class ServerManager : MonoBehaviour
         {
             if (isShownOnce)
             {
-                AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(true);
+                // AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(true);
                 isShownOnce = false;
             }
 
