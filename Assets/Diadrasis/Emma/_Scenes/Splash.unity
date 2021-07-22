@@ -445,8 +445,8 @@ MonoBehaviour:
   animAppLogo: {fileID: 2061662581}
   animDiadrasisLogo: {fileID: 1499223922}
   mainLogo: {fileID: 1607051546}
-  beforeSrpite: {fileID: 21300000, guid: d49c715a0799c2343bd6284eeb699cd0, type: 3}
-  secondSprite: {fileID: 21300000, guid: 94e661659d7c2cb4dae18276a8bddc20, type: 3}
+  beforeSrpite: {fileID: 21300000, guid: ff7dfde7cefbeec4081a42497e4e07ce, type: 3}
+  afterSprite: {fileID: 21300000, guid: b2dd98b629e95dc418163c3206f6b17e, type: 3}
   menuPanel: {fileID: 739146489}
 --- !u!1 &926404445
 GameObject:
@@ -483,7 +483,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 14.6, y: -29.399902}
-  m_SizeDelta: {x: 1442.3356, y: 1060.0903}
+  m_SizeDelta: {x: 1442.3356, y: 942.10767}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &926404447
 MonoBehaviour:
@@ -859,7 +859,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00048828125, y: 21.199951}
+  m_AnchoredPosition: {x: -0.00048828125, y: 21.200012}
   m_SizeDelta: {x: -0.0008544922, y: 42.37903}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1607051546
@@ -881,7 +881,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: ff7dfde7cefbeec4081a42497e4e07ce, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -934,8 +934,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.00012207031, y: 428}
-  m_SizeDelta: {x: -0.00024414062, y: -341.3369}
+  m_AnchoredPosition: {x: 0.00012207031, y: 415.2}
+  m_SizeDelta: {x: -0.00024414062, y: -315.82727}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1780364224
 Animator:

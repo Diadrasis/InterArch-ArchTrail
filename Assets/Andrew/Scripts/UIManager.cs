@@ -252,7 +252,6 @@ public class UIManager : MonoBehaviour
         btnBackToAreasScreen.interactable = true;
         //imgRecord = GetComponent<Animator>();
         //sexDropdown = GetComponent<TMP_Dropdown>();
-        btnAdminNo.GetComponentInChildren<TextMeshProUGUI>();
     }
 
     private void Update()
@@ -381,19 +380,32 @@ public class UIManager : MonoBehaviour
         btnCloseInternetScreen.onClick.AddListener(() => CancelInGeneral());
     }
 
-    #region UIChanges
-    public void ChangeColor()
+    public void ResetSurvey()
     {
-        /*ColorBlock btnColor = btnAdminNo.colors;
-        btnColor.normalColor = new Color(255,255,255,255);*/
-        //btnAdminNo.GetComponentInChildren<Image>().color = new Color(255,255,255,255);
-        btnAdminNo.GetComponentInChildren<TextMeshProUGUI>().outlineColor = Color.white;
-        btnAdminNo.GetComponentInChildren<TextMeshProUGUI>().outlineWidth = 2.0f;
-
-
+        AppManager.Instance.questionnaireManager.ResetValues();
+        pnlWarningResetSurveyScreen.SetActive(false);
     }
-    #endregion
-    #region Screens
+    
+    public void DisplayUploadInfo(string _info)
+    {
+        txtUploadInfo.text = _info;
+        pnlWarningUploadInfoScreen.SetActive(true);
+    }
+
+    private void SetDownloadTiles(bool _value)
+    {
+        downloadTiles = _value;
+        pnlWarningDownloadTilesScreen.SetActive(false);
+    }
+
+    void ActivateButtons(bool valBack, bool valQuit, bool valReset, bool valProfiler)
+    {
+        btnBackToAreasScreen.gameObject.SetActive(valBack);
+        btnQuit.gameObject.SetActive(valQuit);
+        btnProfiler.gameObject.SetActive(valProfiler);
+        btnResetQuestionnaire.gameObject.SetActive(valReset);
+    }
+
     public void DisplayOptionsScreen()
     {
         // Enable Options
@@ -426,6 +438,29 @@ public class UIManager : MonoBehaviour
         // Enable Admin Screen
         pnlAdminScreen.gameObject.SetActive(true);
     }
+    
+    public void DisplayAreaSelectScreen()
+    {
+        pnlAreasScreen.SetActive(true);
+        pnlCreateArea.SetActive(false);
+
+        if (isAdmin)
+            btnCreateArea.gameObject.SetActive(true);
+        else
+            btnCreateArea.gameObject.SetActive(false);
+
+        DestroySelectObjects(selectAreaObjects);
+        selectAreaObjects = InstantiateSelectAreaObjects();
+        StartCoroutine(ReloadLayout(pnlLoadedAreas));
+        AppManager.Instance.mapManager.CreateNewAreaFinalize();
+        EnableScreen(pnlPathScreen, false);
+        imgRecord.gameObject.SetActive(false);
+        EnableScreen(pnlSavedPaths, false); //the panel for saved paths
+        ActivateButtons(false, true, false, false);
+        txtMainName.text = DEFAULT_TEXT_NAME;
+        pnlWarningDeleteScreen.SetActive(false);
+        AppManager.Instance.questionnaireManager.ResetValues();
+    }
 
     public void DisplayAboutScreen()
     {
@@ -456,32 +491,6 @@ public class UIManager : MonoBehaviour
         else
             _screenToEnable.SetActive(false);
     }
-    #endregion
-    public void ResetSurvey()
-    {
-        AppManager.Instance.questionnaireManager.ResetValues();
-        pnlWarningResetSurveyScreen.SetActive(false);
-    }
-    
-    public void DisplayUploadInfo(string _info)
-    {
-        txtUploadInfo.text = _info;
-        pnlWarningUploadInfoScreen.SetActive(true);
-    }
-
-    private void SetDownloadTiles(bool _value)
-    {
-        downloadTiles = _value;
-        pnlWarningDownloadTilesScreen.SetActive(false);
-    }
-
-    void ActivateButtons(bool valBack, bool valQuit, bool valReset, bool valProfiler)
-    {
-        btnBackToAreasScreen.gameObject.SetActive(valBack);
-        btnQuit.gameObject.SetActive(valQuit);
-        btnProfiler.gameObject.SetActive(valProfiler);
-        btnResetQuestionnaire.gameObject.SetActive(valReset);
-    }
 
     private void Escape()
     {
@@ -490,85 +499,6 @@ public class UIManager : MonoBehaviour
         OnlineMapsLocationService.instance.StopLocationService();
     }
 
-    public void DisplayAncientMessene()
-    {
-        // Load Αρχαία Μεσσήνη
-        cArea loadedArea = AppManager.Instance.mapManager.GetAreaByTitle(ancientMesseneTitle);
-        
-        if (loadedArea != null)
-        {
-            AppManager.Instance.mapManager.currentArea = loadedArea;
-
-            // Download Tiles
-            /*AppManager.Instance.serverManager.DownloadTiles();
-
-            if (LanguageIsEnglish())
-                txtMainName.text = loadedArea.titleEnglish;
-            else
-                txtMainName.text = loadedArea.title;*/
-
-            pnlAreasScreen.SetActive(false);
-            AppManager.Instance.mapManager.SetMapViewToArea(loadedArea);
-
-            EnableScreen(pnlPathScreen, true);
-            imgRecord.gameObject.SetActive(true);
-            EnableScreen(pnlSavedPaths, false);
-            ActivateButtons(true, false, false, false);
-            AppManager.Instance.mapManager.isShown = false;
-            //AppManager.Instance.mapManager.CheckUserPosition();
-        }
-        else
-        {
-            DisplayAreaSelectScreen();
-        }
-    }
-
-    private void DestroySelectObjects(List<GameObject> _selectObjects)
-    {
-        if (_selectObjects != null)
-        {
-            foreach (GameObject selectObject in _selectObjects)
-            {
-                Destroy(selectObject);
-            }
-
-            _selectObjects.Clear();
-        }
-    }
-
-    IEnumerator ReloadLayout(GameObject _layoutGameObject)
-    {
-        yield return new WaitForSeconds(interval);
-
-        LayoutRebuilder.ForceRebuildLayoutImmediate(_layoutGameObject.GetComponent<RectTransform>());
-    }
-
-    //back to all the panel accordingly and even if we press back whilst recording path
-
-
-    #region Areas
-    public void DisplayAreaSelectScreen()
-    {
-        pnlAreasScreen.SetActive(true);
-        pnlCreateArea.SetActive(false);
-
-        if (isAdmin)
-            btnCreateArea.gameObject.SetActive(true);
-        else
-            btnCreateArea.gameObject.SetActive(false);
-
-        DestroySelectObjects(selectAreaObjects);
-        selectAreaObjects = InstantiateSelectAreaObjects();
-        StartCoroutine(ReloadLayout(pnlLoadedAreas));
-        AppManager.Instance.mapManager.CreateNewAreaFinalize();
-        EnableScreen(pnlPathScreen, false);
-        imgRecord.gameObject.SetActive(false);
-        EnableScreen(pnlSavedPaths, false); //the panel for saved paths
-        ActivateButtons(false, true, false, false);
-        txtMainName.text = DEFAULT_TEXT_NAME;
-        pnlWarningDeleteScreen.SetActive(false);
-        AppManager.Instance.questionnaireManager.ResetValues();
-    }
     private List<GameObject> InstantiateSelectAreaObjects()
     {
         List<GameObject> newSelectAreaObjects = new List<GameObject>();
@@ -629,6 +559,40 @@ public class UIManager : MonoBehaviour
 
         return newSelectAreaObjects;
     }
+
+    public void DisplayAncientMessene()
+    {
+        // Load Αρχαία Μεσσήνη
+        cArea loadedArea = AppManager.Instance.mapManager.GetAreaByTitle(ancientMesseneTitle);
+        
+        if (loadedArea != null)
+        {
+            AppManager.Instance.mapManager.currentArea = loadedArea;
+
+            // Download Tiles
+            /*AppManager.Instance.serverManager.DownloadTiles();
+
+            if (LanguageIsEnglish())
+                txtMainName.text = loadedArea.titleEnglish;
+            else
+                txtMainName.text = loadedArea.title;*/
+
+            pnlAreasScreen.SetActive(false);
+            AppManager.Instance.mapManager.SetMapViewToArea(loadedArea);
+
+            EnableScreen(pnlPathScreen, true);
+            imgRecord.gameObject.SetActive(true);
+            EnableScreen(pnlSavedPaths, false);
+            ActivateButtons(true, false, false, false);
+            AppManager.Instance.mapManager.isShown = false;
+            //AppManager.Instance.mapManager.CheckUserPosition();
+        }
+        else
+        {
+            DisplayAreaSelectScreen();
+        }
+    }
+
     private void OnAreaSelectPressed()
     {
         GameObject selectAreaObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
@@ -654,7 +618,7 @@ public class UIManager : MonoBehaviour
 
             // Download Tiles
             AppManager.Instance.serverManager.DownloadTiles();
-
+            
             pnlAreasScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
@@ -713,6 +677,60 @@ public class UIManager : MonoBehaviour
         // Start edit selected area
         AppManager.Instance.mapManager.StartEditArea(selectedArea);
     }
+
+    private void OnPathSelectPressed()
+    {
+        GameObject selectPathObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
+        //TMP_Text selectPathText = selectPathObject.GetComponentInChildren<TMP_Text>();
+        // Get index
+        //Debug.Log("OnPathSelectPressed");
+        cPath selectedPath = AppManager.Instance.mapManager.GetPathByIndex(selectPathObjects.IndexOf(selectPathObject.gameObject));  //AppManager.Instance.mapManager.GetPathByTitle(selectPathText.text); // AppManager.Instance.mapManager.currentArea[selectAreaObjects.IndexOf(selectPathObject.gameObject)]; 
+        //AppManager.Instance.mapManager.currentPath = selectedPath;
+        if (selectedPath != null)
+        {
+            // Download Points of Path
+            if (selectedPath.server_path_id != -1)
+            {
+                AppManager.Instance.serverManager.DownloadPoints(selectedPath.server_path_id); // TODO: Wait until download is finished to display path
+            }
+
+            pnlScrollViewPaths.SetActive(false);
+            pnlSavedPaths.SetActive(false);
+            //if (selectedPath.pathPoints.Count > 0)
+            AppManager.Instance.mapManager.DisplayPath(selectedPath);
+        }
+    }
+
+    private void OnPathDeletePressed()
+    {
+        pnlWarningDeleteScreen.SetActive(true);
+        GameObject btnDeleteArea = EventSystem.current.currentSelectedGameObject;
+        pnlForDelete = btnDeleteArea.transform.parent;
+        //AppManager.Instance.mapManager.DeletePath(selectPathObjects.IndexOf(pnlSelectArea.gameObject));
+    }
+
+
+    private void DestroySelectObjects(List<GameObject> _selectObjects)
+    {
+        if (_selectObjects != null)
+        {
+            foreach (GameObject selectObject in _selectObjects)
+            {
+                Destroy(selectObject);
+            }
+
+            _selectObjects.Clear();
+        }
+    }
+
+    IEnumerator ReloadLayout(GameObject _layoutGameObject)
+    {
+        yield return new WaitForSeconds(interval);
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(_layoutGameObject.GetComponent<RectTransform>());
+    }
+
+    //back to all the panel accordingly and even if we press back whilst recording path
     private void BackToAreasScreen()
     {
         if (pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
@@ -833,6 +851,12 @@ public class UIManager : MonoBehaviour
 
         //mapScreen.SetActive(false);
     }
+
+    public void IsInRecordingPath(bool val)
+    {
+        imgRecord.SetBool("isPlaying", val);
+    }
+
     private void CreateNewAreaSelected()
     {
         pnlAreasScreen.SetActive(false);
@@ -904,40 +928,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    #endregion
-
     #region PathPanel
-
-    private void OnPathSelectPressed()
-    {
-        GameObject selectPathObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
-        //TMP_Text selectPathText = selectPathObject.GetComponentInChildren<TMP_Text>();
-        // Get index
-        //Debug.Log("OnPathSelectPressed");
-        cPath selectedPath = AppManager.Instance.mapManager.GetPathByIndex(selectPathObjects.IndexOf(selectPathObject.gameObject));  //AppManager.Instance.mapManager.GetPathByTitle(selectPathText.text); // AppManager.Instance.mapManager.currentArea[selectAreaObjects.IndexOf(selectPathObject.gameObject)]; 
-        //AppManager.Instance.mapManager.currentPath = selectedPath;
-        if (selectedPath != null)
-        {
-            // Download Points of Path
-            if (selectedPath.server_path_id != -1)
-            {
-                AppManager.Instance.serverManager.DownloadPoints(selectedPath.server_path_id); // TODO: Wait until download is finished to display path
-            }
-
-            pnlScrollViewPaths.SetActive(false);
-            pnlSavedPaths.SetActive(false);
-            //if (selectedPath.pathPoints.Count > 0)
-            AppManager.Instance.mapManager.DisplayPath(selectedPath);
-        }
-    }
-
-    private void OnPathDeletePressed()
-    {
-        pnlWarningDeleteScreen.SetActive(true);
-        GameObject btnDeleteArea = EventSystem.current.currentSelectedGameObject;
-        pnlForDelete = btnDeleteArea.transform.parent;
-        //AppManager.Instance.mapManager.DeletePath(selectPathObjects.IndexOf(pnlSelectArea.gameObject));
-    }
     //changes icon from plus to save icon, listener changes to next method for saving path, here also have the drawing?
     private void AddNewPath()
     {
@@ -1017,12 +1008,8 @@ public class UIManager : MonoBehaviour
         pnlMainButtons.SetActive(false);
         if (pnlWarningSavePathScreen.activeSelf) pnlWarningSavePathScreen.SetActive(false);
     }
-
-    public void IsInRecordingPath(bool val)
-    {
-        imgRecord.SetBool("isPlaying", val);
-    }
     #endregion
+
 
     #region Warnings
     //to close main warning screen for area check
@@ -1270,8 +1257,6 @@ public class UIManager : MonoBehaviour
             txtWarning.text = "Παρακαλώ εισάγετε μία έγκυρη επιλογή";
     }
     #endregion
-
-    
 
     #region NotInUse
     public void EnableSaveAreaScreen()
