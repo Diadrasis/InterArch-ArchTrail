@@ -383,7 +383,7 @@ public class MapManager : MonoBehaviour
         areas = cArea.LoadAreas();
 
         // Display Areas
-        AppManager.Instance.uIManager.DisplayAreasScreen();
+        AppManager.Instance.uIManager.DisplayAreaSelectScreen();
     }
 
     public void ReloadPaths()

@@ -25,6 +25,14 @@ public class UIManager : MonoBehaviour
     [Header("Options Screen")]
     // Options Screen
     public GameObject pnlOptionsScreen;
+    public GameObject pnlOptions;
+    public GameObject pnlLanguageScreen;
+    public GameObject pnlAdminScreen;
+    public GameObject pnlAboutScreen;
+    public Button btnLanguageScreen;
+    public Button btnAdminScreen;
+    public Button btnAreaSelectScreen;
+    public Button btnAboutScreen;
 
     [Space]
     [Header("Areas Screen")]
@@ -225,7 +233,7 @@ public class UIManager : MonoBehaviour
         SubscribeButtons();
 
         // Display Areas Screen
-        DisplayAreasScreen();
+        DisplayAreaSelectScreen();
 
         // Display Admin
         pnlWarningsAdminScreen.SetActive(true);
@@ -277,6 +285,12 @@ public class UIManager : MonoBehaviour
         btnBackToAreasScreen.onClick.AddListener(() => BackToAreasScreen());
         btnQuit.onClick.AddListener(() => EnableScreen(pnlWarningEscapeScreen, true));
         btnOptions.onClick.AddListener(() => DisplayOptionsScreen());
+
+        // Options Screen
+        btnLanguageScreen.onClick.AddListener(() => DisplayLanguageScreen());
+        btnAdminScreen.onClick.AddListener(() => DisplayAdminScreen());
+        btnAreaSelectScreen.onClick.AddListener(() => DisplayAreaSelectScreen());
+        btnAboutScreen.onClick.AddListener(() => DisplayAboutScreen());
 
         // Areas Screen
         btnCreateArea.onClick.AddListener(() => CreateNewAreaSelected());
@@ -385,11 +399,38 @@ public class UIManager : MonoBehaviour
 
     public void DisplayOptionsScreen()
     {
+        // Enable Options
+        pnlOptions.gameObject.SetActive(true);
+
+        // Close other screens
+        pnlLanguageScreen.gameObject.SetActive(false);
+        pnlAdminScreen.gameObject.SetActive(false);
+        pnlAboutScreen.gameObject.SetActive(false); // TODO: Deactivate AreasScreen
+        pnlAboutScreen.gameObject.SetActive(false);
+
         // Enable/Disable Options Screen
         pnlOptionsScreen.gameObject.SetActive(!pnlOptionsScreen.activeSelf);
     }
 
-    public void DisplayAreasScreen()
+    public void DisplayLanguageScreen()
+    {
+        // Disable Options
+        pnlOptions.gameObject.SetActive(false);
+
+        // Enable Language Screen
+        pnlLanguageScreen.gameObject.SetActive(true);
+    }
+
+    public void DisplayAdminScreen()
+    {
+        // Disable Options
+        pnlOptions.gameObject.SetActive(false);
+
+        // Enable Admin Screen
+        pnlAdminScreen.gameObject.SetActive(true);
+    }
+    
+    public void DisplayAreaSelectScreen()
     {
         pnlAreasScreen.SetActive(true);
         pnlCreateArea.SetActive(false);
@@ -410,6 +451,15 @@ public class UIManager : MonoBehaviour
         txtMainName.text = DEFAULT_TEXT_NAME;
         pnlWarningDeleteScreen.SetActive(false);
         AppManager.Instance.questionnaireManager.ResetValues();
+    }
+
+    public void DisplayAboutScreen()
+    {
+        // Disable Options
+        pnlOptions.gameObject.SetActive(false);
+
+        // Enable About Screen
+        pnlAboutScreen.gameObject.SetActive(true);
     }
 
     public void DisplayPathsScreen()
@@ -530,7 +580,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
         }
     }
 
@@ -684,7 +734,7 @@ public class UIManager : MonoBehaviour
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
             !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath)
         {
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
             AppManager.Instance.serverManager.DownloadAreas();
             pnlPathScreen.SetActive(false);
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
@@ -697,7 +747,7 @@ public class UIManager : MonoBehaviour
         {
             pnlSaveArea.SetActive(false);
             pnlCreateArea.SetActive(false);
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
             AppManager.Instance.serverManager.DownloadAreas();
             //Debug.Log("pnlCreateArea false");
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
@@ -724,7 +774,7 @@ public class UIManager : MonoBehaviour
             //to open edit panel
             pnlEditArea.SetActive(false);
             AppManager.Instance.mapManager.RemoveMarkersAndLine();
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
             AppManager.Instance.serverManager.DownloadAreas();
         }
         else if (!pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && !pnlPathScreen.activeSelf &&
@@ -733,7 +783,7 @@ public class UIManager : MonoBehaviour
             !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             pnlQuestionnaireScreen.SetActive(false);
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
             AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
         }
@@ -743,7 +793,7 @@ public class UIManager : MonoBehaviour
            pnlQuestionnaireScreen.activeSelf && pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             pnlQuestionnaireScreen.SetActive(false);
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
             pnlOptionA.SetActive(false);
             AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
@@ -754,7 +804,7 @@ public class UIManager : MonoBehaviour
            pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             pnlQuestionnaireScreen.SetActive(false);
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
             pnlOptionB.SetActive(false);
             AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
@@ -766,7 +816,7 @@ public class UIManager : MonoBehaviour
           pnlQuestionnaireScreen.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && pnlOptionC.activeSelf)
         {
             pnlQuestionnaireScreen.SetActive(false);
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
             pnlOptionC.SetActive(false);
             AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
@@ -777,14 +827,14 @@ public class UIManager : MonoBehaviour
          pnlQuestionnaireScreen.activeSelf && pnlMainQuestions.activeSelf && !pnlOptionA.activeSelf && !pnlOptionB.activeSelf && !pnlOptionC.activeSelf)
         {
             pnlQuestionnaireScreen.SetActive(false);
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
             pnlMainQuestions.SetActive(false);
             AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
         }
         else
         {
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
             EnableScreen(pnlQuestionnaireScreen, false);
             AppManager.Instance.questionnaireManager.ResetValues();
             AppManager.Instance.serverManager.DownloadAreas();
@@ -828,7 +878,7 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.SaveArea(newAreaTitleGreek, newAreaTitleEnglish);
             pnlSaveArea.SetActive(false);
             pnlCreateArea.SetActive(false);
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
         }
         else
         {
@@ -856,7 +906,7 @@ public class UIManager : MonoBehaviour
                 txtMainName.text = newAreaTitleEnglish;
             else
                 txtMainName.text = newAreaTitleGreek;
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
         }
         else
         {
@@ -1005,7 +1055,7 @@ public class UIManager : MonoBehaviour
         else if (pnlAreasScreen.activeSelf)
         {
             AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlForDelete.gameObject));
-            DisplayAreasScreen();
+            DisplayAreaSelectScreen();
         }
     }
 
@@ -1105,7 +1155,7 @@ public class UIManager : MonoBehaviour
 
         pnlWarningsPasswordScreen.SetActive(false);
         pnlWarningsAdminScreen.SetActive(false);
-        DisplayAreasScreen();
+        DisplayAreaSelectScreen();
     }
     #endregion
 

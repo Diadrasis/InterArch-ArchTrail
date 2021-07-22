@@ -335,7 +335,7 @@ public class SurveyManager : MonoBehaviour
         //close questionnairePanel and go to DisplayAreas and reset questionnaire for new user
         AppManager.Instance.uIManager.pnlQuestionnaireScreen.SetActive(false);
         ResetValues();
-        AppManager.Instance.uIManager.DisplayAreasScreen();
+        AppManager.Instance.uIManager.DisplayAreaSelectScreen();
         AppManager.Instance.uIManager.EnableThankYouScreen();
     }
 
