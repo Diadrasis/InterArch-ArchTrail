@@ -8,7 +8,7 @@ public class InitSplash : MonoBehaviour
 {
     public Animator animAppLogo, animDiadrasisLogo/*, animUniLogo,ministry1logo, ministry2logo, animPanel*/;
     public Image mainLogo;
-    public Sprite beforeSrpite, afterSprite;
+    public Sprite beforeSrpite, secondSprite;
     public GameObject menuPanel;
 
     public static int isStarted;
@@ -47,7 +47,7 @@ public class InitSplash : MonoBehaviour
         /*animPanel.SetBool("show", false);*/
         yield return new WaitForSeconds(1f);
         animAppLogo.SetBool("show", true);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         /*animEspaLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
         animEspaLogo.SetBool("show", false);*/
@@ -55,15 +55,16 @@ public class InitSplash : MonoBehaviour
         animDiadrasisLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
         animDiadrasisLogo.SetBool("show", false);
-        yield return new WaitForSeconds(0.7f);
-        
-        yield return new WaitForSeconds(0.7f);
-        mainLogo.sprite = afterSprite;
+        yield return new WaitForSeconds(1.2f);
         animAppLogo.SetBool("show", false);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.2f);
+
+        mainLogo.sprite = secondSprite;
+        yield return new WaitForSeconds(1f);
         animAppLogo.SetBool("show", true);
+        yield return new WaitForSeconds(1.2f);
         animDiadrasisLogo.SetBool("show", true);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(3f);
         animDiadrasisLogo.SetBool("show", false);
         /*animUniLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
@@ -77,7 +78,7 @@ public class InitSplash : MonoBehaviour
         yield return new WaitForSeconds(2f);
         ministry2logo.SetBool("show", false);*/
         //menuPanel.SetActive(true);
-        yield return new WaitForSeconds(0.7f);
+        //yield return new WaitForSeconds(0.7f);
         animAppLogo.SetBool("show", false);
         Screen.orientation = ScreenOrientation.Portrait;
         yield return new WaitForSeconds(1f);
