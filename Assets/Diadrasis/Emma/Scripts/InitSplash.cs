@@ -55,16 +55,16 @@ public class InitSplash : MonoBehaviour
         animDiadrasisLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
         animDiadrasisLogo.SetBool("show", false);
-        yield return new WaitForSeconds(0.7f);
-        
+        yield return new WaitForSeconds(1f);
+        animAppLogo.SetBool("show", false);
         yield return new WaitForSeconds(0.7f);
         mainLogo.sprite = afterSprite;
-        animAppLogo.SetBool("show", false);
-        yield return new WaitForSeconds(2f);
+        
+        yield return new WaitForSeconds(0.7f);
         animAppLogo.SetBool("show", true);
+        //animDiadrasisLogo.SetBool("show", true);
+        yield return new WaitForSeconds(0.7f);
         animDiadrasisLogo.SetBool("show", true);
-        yield return new WaitForSeconds(2f);
-        animDiadrasisLogo.SetBool("show", false);
         /*animUniLogo.SetBool("show", true);
         yield return new WaitForSeconds(2f);
         animUniLogo.SetBool("show", false);
@@ -77,10 +77,10 @@ public class InitSplash : MonoBehaviour
         yield return new WaitForSeconds(2f);
         ministry2logo.SetBool("show", false);*/
         //menuPanel.SetActive(true);
-        yield return new WaitForSeconds(0.7f);
-        animAppLogo.SetBool("show", false);
+        /*yield return new WaitForSeconds(0.7f);
+        animAppLogo.SetBool("show", false);*/
         Screen.orientation = ScreenOrientation.Portrait;
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(3f);
         SceneManager.LoadScene(1);
         //animPanel.SetBool("show", false);
         //animMenu.SetBool("color", true);
