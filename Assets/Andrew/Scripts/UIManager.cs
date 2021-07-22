@@ -35,6 +35,11 @@ public class UIManager : MonoBehaviour
     public Button btnAboutScreen;
 
     [Space]
+    [Header("Language Screen")]
+    public Button btnGreek;
+    public Button btnEnglish;
+
+    [Space]
     [Header("Areas Screen")]
     // Areas Screen
     public GameObject pnlAreasScreen;
@@ -291,6 +296,10 @@ public class UIManager : MonoBehaviour
         btnAdminScreen.onClick.AddListener(() => DisplayAdminScreen());
         btnAreaSelectScreen.onClick.AddListener(() => DisplayAreaSelectScreen());
         btnAboutScreen.onClick.AddListener(() => DisplayAboutScreen());
+
+        // Language Screen
+        //btnGreek.onClick.AddListener(() => );
+        //btnEnglish.onClick.AddListener(() => );
 
         // Areas Screen
         btnCreateArea.onClick.AddListener(() => CreateNewAreaSelected());
