@@ -8,7 +8,7 @@ public class InitSplash : MonoBehaviour
 {
     public Animator animAppLogo, animDiadrasisLogo/*, animUniLogo,ministry1logo, ministry2logo, animPanel*/;
     public Image mainLogo;
-    public Sprite beforeSrpite, afterSprite;
+    public Image beforeSrpite, afterSprite;
     public GameObject menuPanel;
 
     public static int isStarted;
@@ -43,7 +43,7 @@ public class InitSplash : MonoBehaviour
             //animMenu.SetBool("color", true);
             yield break;
         }
-        mainLogo.sprite = beforeSrpite;
+            mainLogo = beforeSrpite;
         /*animPanel.SetBool("show", false);*/
         yield return new WaitForSeconds(1f);
         animAppLogo.SetBool("show", true);
@@ -58,7 +58,7 @@ public class InitSplash : MonoBehaviour
         yield return new WaitForSeconds(1f);
         animAppLogo.SetBool("show", false);
         yield return new WaitForSeconds(0.7f);
-        mainLogo.sprite = afterSprite;
+        //mainLogo.sprite = afterSprite;
         
         yield return new WaitForSeconds(0.7f);
         animAppLogo.SetBool("show", true);
