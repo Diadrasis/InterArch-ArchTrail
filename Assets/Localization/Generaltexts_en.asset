@@ -138,5 +138,13 @@ MonoBehaviour:
     m_Localized: LOGOUT
     m_Metadata:
       m_Items: []
+  - m_Id: 14168462752137216
+    m_Localized: OPTIONS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14181195740528640
+    m_Localized: SELECT AREA
+    m_Metadata:
+      m_Items: []
   references:
     version: 1

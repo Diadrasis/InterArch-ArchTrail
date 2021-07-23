@@ -127,6 +127,14 @@ MonoBehaviour:
     m_Key: btnLogout
     m_Metadata:
       m_Items: []
+  - m_Id: 14168462752137216
+    m_Key: pnlOptions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14181195740528640
+    m_Key: btnSelectAreaC
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
