@@ -20,15 +20,15 @@ MonoBehaviour:
     - id: 0
   m_TableData:
   - m_Id: 9879339008
-    m_Localized: "\u03A6\u03CD\u03BB\u03BF."
+    m_Localized: "\u03A6\u03CD\u03BB\u03BF"
     m_Metadata:
       m_Items: []
   - m_Id: 64500142882816
-    m_Localized: "\u0397\u03BB\u03B9\u03BA\u03AF\u03B1."
+    m_Localized: "\u0397\u03BB\u03B9\u03BA\u03AF\u03B1"
     m_Metadata:
       m_Items: []
   - m_Id: 64585102704640
-    m_Localized: "\u0395\u03C0\u03AC\u03B3\u03B3\u03B5\u03BB\u03BC\u03B1."
+    m_Localized: "\u0395\u03C0\u03AC\u03B3\u03B3\u03B5\u03BB\u03BC\u03B1"
     m_Metadata:
       m_Items: []
   - m_Id: 64876543918080
@@ -44,31 +44,31 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 6146741339848704
-    m_Localized: "\u0386\u03C1\u03C1\u03B5\u03BD."
+    m_Localized: "\u0386\u03C1\u03C1\u03B5\u03BD"
     m_Metadata:
       m_Items: []
   - m_Id: 6146818217246720
-    m_Localized: "\u0398\u03AE\u03BB\u03C5."
+    m_Localized: "\u0398\u03AE\u03BB\u03C5"
     m_Metadata:
       m_Items: []
   - m_Id: 6146833283186688
-    m_Localized: "\u0386\u03BB\u03BB\u03BF."
+    m_Localized: "\u0386\u03BB\u03BB\u03BF"
     m_Metadata:
       m_Items: []
   - m_Id: 6147777853030400
     m_Localized: "\u0391\u03C4\u03BF\u03BC\u03B9\u03BA\u03AE\u03C2 \u03B5\u03C0\u03AF\u03C3\u03BA\u03B5\u03C8\u03B7\u03C2
       (\u03AE \u03BC\u03B9\u03BA\u03C1\u03AE\u03C2 \u03B1\u03BD\u03B5\u03BE\u03AC\u03C1\u03C4\u03B7\u03C4\u03B7\u03C2
-      \u03BF\u03BC\u03AC\u03B4\u03B1)."
+      \u03BF\u03BC\u03AC\u03B4\u03B1)"
     m_Metadata:
       m_Items: []
   - m_Id: 6147812875468800
     m_Localized: "\u039F\u03C1\u03B3\u03B1\u03BD\u03C9\u03BC\u03AD\u03BD\u03B7\u03C2
       \u03B5\u03C0\u03AF\u03C3\u03BA\u03B5\u03C8\u03B7\u03C2 \u03BC\u03B5 \u03BE\u03B5\u03BD\u03B1\u03B3\u03CC
-      / \u03B1\u03C1\u03C7\u03B7\u03B3\u03CC \u03BF\u03BC\u03AC\u03B4\u03B1\u03C2."
+      / \u03B1\u03C1\u03C7\u03B7\u03B3\u03CC \u03BF\u03BC\u03AC\u03B4\u03B1\u03C2"
     m_Metadata:
       m_Items: []
   - m_Id: 6147829262614528
-    m_Localized: "\u03A3\u03C7\u03BF\u03BB\u03B9\u03BA\u03AE\u03C2 \u03B5\u03C0\u03AF\u03C3\u03BA\u03B5\u03C8\u03B7\u03C2."
+    m_Localized: "\u03A3\u03C7\u03BF\u03BB\u03B9\u03BA\u03AE\u03C2 \u03B5\u03C0\u03AF\u03C3\u03BA\u03B5\u03C8\u03B7\u03C2"
     m_Metadata:
       m_Items: []
   references:

@@ -21,15 +21,15 @@ MonoBehaviour:
     - id: 1
   m_TableData:
   - m_Id: 9879339008
-    m_Localized: Gender.
+    m_Localized: Gender
     m_Metadata:
       m_Items: []
   - m_Id: 64500142882816
-    m_Localized: Age.
+    m_Localized: Age
     m_Metadata:
       m_Items: []
   - m_Id: 64585102704640
-    m_Localized: Profession.
+    m_Localized: Profession
     m_Metadata:
       m_Items: []
   - m_Id: 64876543918080
@@ -42,27 +42,27 @@ MonoBehaviour:
       m_Items:
       - id: 1
   - m_Id: 6146741339848704
-    m_Localized: Male.
+    m_Localized: Male
     m_Metadata:
       m_Items: []
   - m_Id: 6146818217246720
-    m_Localized: Female.
+    m_Localized: Female
     m_Metadata:
       m_Items: []
   - m_Id: 6146833283186688
-    m_Localized: Other.
+    m_Localized: Other
     m_Metadata:
       m_Items: []
   - m_Id: 6147777853030400
-    m_Localized: An individual visit (member of a small group of friends or family).
+    m_Localized: An individual visit (member of a small group of friends or family)
     m_Metadata:
       m_Items: []
   - m_Id: 6147812875468800
-    m_Localized: An organized group visit accompanied by a tour guide / group leader.
+    m_Localized: An organized group visit accompanied by a tour guide / group leader
     m_Metadata:
       m_Items: []
   - m_Id: 6147829262614528
-    m_Localized: A school visit.
+    m_Localized: A school visit
     m_Metadata:
       m_Items: []
   references:

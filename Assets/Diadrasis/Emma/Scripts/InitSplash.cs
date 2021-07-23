@@ -25,6 +25,7 @@ public class InitSplash : MonoBehaviour
 
             //Screen.orientation = ScreenOrientation.Landscape;
         }
+        afterSprite.gameObject.SetActive(false);
     }
 
     IEnumerator Start()
@@ -58,7 +59,9 @@ public class InitSplash : MonoBehaviour
         yield return new WaitForSeconds(1f);
         animAppLogo.SetBool("show", false);
         yield return new WaitForSeconds(0.7f);
-        //mainLogo.sprite = afterSprite;
+        beforeSrpite.gameObject.SetActive(false);
+        afterSprite.gameObject.SetActive(true);
+        mainLogo = afterSprite;
         
         yield return new WaitForSeconds(0.7f);
         animAppLogo.SetBool("show", true);
@@ -82,6 +85,7 @@ public class InitSplash : MonoBehaviour
         Screen.orientation = ScreenOrientation.Portrait;
         yield return new WaitForSeconds(3f);
         SceneManager.LoadScene(1);
+        afterSprite.gameObject.SetActive(false);
         //animPanel.SetBool("show", false);
         //animMenu.SetBool("color", true);
         //yield return new WaitForSeconds(0.7f);
