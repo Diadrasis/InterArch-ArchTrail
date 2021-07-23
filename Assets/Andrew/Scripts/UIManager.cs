@@ -467,7 +467,7 @@ public class UIManager : MonoBehaviour
     {
         pnlOptions.SetActive(false);
         pnlAreaSelectScreen.SetActive(true);
-        // pnlAreasScreen.SetActive(true);
+        //pnlAreasScreen.SetActive(true);
 
         pnlCreateArea.SetActive(false);
 
@@ -647,7 +647,7 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.serverManager.DownloadTiles();
             
             //pnlAreasScreen.SetActive(false);
-            pnlOptionsScreen.SetActive(false);
+            pnlAreaSelectScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
 
