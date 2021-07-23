@@ -34,6 +34,10 @@ public class UIManager : MonoBehaviour
     public Button btnAdminScreen;
     public Button btnAreaSelectScreen;
     public Button btnAboutScreen;
+    public GameObject pnlLineSeparatorBtnLanguage;
+    public GameObject pnlLineSeparatorBtnAdmin;
+    public GameObject pnlLineSeparatorBtnAreaSelect;
+    public GameObject pnlLineSeparatorBtnAbout;
 
     [Space]
     [Header("Language Screen")]
@@ -385,7 +389,7 @@ public class UIManager : MonoBehaviour
 
         // warning Survey Intro
         btnSurveyIntroYes.onClick.AddListener(() => OpenQuestionnaire());
-        btnSurveyIntroNo.onClick.AddListener(() => EnableScreen(pnlWarningSurveyIntroScreen, false));
+        btnSurveyIntroNo.onClick.AddListener(() => DisplayThankYouScreenNoSurvey()); // EnableScreen(pnlWarningSurveyIntroScreen, false)
 
         //btn for edit Area
         btnEditAreaCancel.onClick.AddListener(() => CancelInGeneral());
@@ -403,6 +407,13 @@ public class UIManager : MonoBehaviour
     {
         AppManager.Instance.questionnaireManager.ResetValues();
         pnlWarningResetSurveyScreen.SetActive(false);
+    }
+
+    private void DisplayThankYouScreenNoSurvey()
+    {
+        pnlWarningSurveyIntroScreen.SetActive(false);
+
+        EnableThankYouScreen();
     }
     
     public void DisplayUploadInfo(string _info)
@@ -438,6 +449,32 @@ public class UIManager : MonoBehaviour
     {
         // Enable Options
         pnlOptions.gameObject.SetActive(true);
+
+        // Close other screens
+        if (pnlQuestionnaireScreen.activeSelf)
+        {
+            btnLanguageScreen.gameObject.SetActive(true);
+            btnAdminScreen.gameObject.SetActive(false);
+            btnAreaSelectScreen.gameObject.SetActive(false);
+            btnAboutScreen.gameObject.SetActive(false);
+
+            // Lines
+            pnlLineSeparatorBtnLanguage.SetActive(true);
+            pnlLineSeparatorBtnAdmin.SetActive(false);
+            pnlLineSeparatorBtnAreaSelect.SetActive(false);
+            pnlLineSeparatorBtnAbout.SetActive(false);
+        }
+        else
+        {
+            btnLanguageScreen.gameObject.SetActive(true);
+            pnlLineSeparatorBtnLanguage.SetActive(true);
+            btnAdminScreen.gameObject.SetActive(true);
+            pnlLineSeparatorBtnAdmin.SetActive(true);
+            btnAreaSelectScreen.gameObject.SetActive(true);
+            pnlLineSeparatorBtnAreaSelect.SetActive(true);
+            btnAboutScreen.gameObject.SetActive(true);
+            pnlLineSeparatorBtnAbout.SetActive(true);
+        }
 
         // Close other screens
         pnlLanguageScreen.gameObject.SetActive(false);
@@ -525,6 +562,7 @@ public class UIManager : MonoBehaviour
 
     private void Escape()
     {
+        pnlOptionsScreen.SetActive(false);
         EnableScreen(pnlWarningThankYouScreen, false);
         Application.Quit();
         OnlineMapsLocationService.instance.StopLocationService();
