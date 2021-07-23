@@ -28,6 +28,7 @@ public class UIManager : MonoBehaviour
     public GameObject pnlOptions;
     public GameObject pnlLanguageScreen;
     public GameObject pnlAdminScreen;
+    public GameObject pnlAreaSelectScreen;
     public GameObject pnlAboutScreen;
     public Button btnLanguageScreen;
     public Button btnAdminScreen;
@@ -414,7 +415,7 @@ public class UIManager : MonoBehaviour
         // Close other screens
         pnlLanguageScreen.gameObject.SetActive(false);
         pnlAdminScreen.gameObject.SetActive(false);
-        pnlAboutScreen.gameObject.SetActive(false); // TODO: Deactivate AreasScreen
+        pnlAreaSelectScreen.gameObject.SetActive(false); // TODO: Deactivate AreasScreen
         pnlAboutScreen.gameObject.SetActive(false);
 
         // Enable/Disable Options Screen
@@ -441,7 +442,8 @@ public class UIManager : MonoBehaviour
     
     public void DisplayAreaSelectScreen()
     {
-        pnlAreasScreen.SetActive(true);
+        pnlAreaSelectScreen.SetActive(true);
+        //pnlAreasScreen.SetActive(true);
         pnlCreateArea.SetActive(false);
 
         if (isAdmin)
@@ -619,7 +621,8 @@ public class UIManager : MonoBehaviour
             // Download Tiles
             AppManager.Instance.serverManager.DownloadTiles();
             
-            pnlAreasScreen.SetActive(false);
+            //pnlAreasScreen.SetActive(false);
+            pnlAreaSelectScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(selectedArea);
         }
 
@@ -859,7 +862,8 @@ public class UIManager : MonoBehaviour
 
     private void CreateNewAreaSelected()
     {
-        pnlAreasScreen.SetActive(false);
+        pnlAreaSelectScreen.SetActive(false);
+        //pnlAreasScreen.SetActive(false);
         pnlCreateArea.SetActive(true);
         btnSaveArea.interactable = false;
 
@@ -1174,7 +1178,8 @@ public class UIManager : MonoBehaviour
         pnlWarningSurveyIntroScreen.SetActive(true);
         pnlQuestionnaireScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
-        pnlAreasScreen.SetActive(false);
+        pnlAreaSelectScreen.SetActive(false);
+        //pnlAreasScreen.SetActive(false);
         ActivateButtons(true, true, true, false);
     }
 
