@@ -112,7 +112,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 14144565570879488
-    m_Localized: SELECT LANGUAGE
+    m_Localized: LANGUAGE
     m_Metadata:
       m_Items: []
   - m_Id: 14146202817445888
@@ -144,6 +144,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 14181195740528640
     m_Localized: SELECT AREA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14210138929545216
+    m_Localized: SAVED PATHS
     m_Metadata:
       m_Items: []
   references:

@@ -97,7 +97,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3266177302528
-    m_Localized: What impressed you the most about the archaeological site?
+    m_Localized: What impressed you the most about the archaeological site? (multiple
+      choice)
     m_Metadata:
       m_Items: []
   - m_Id: 3328710180864
