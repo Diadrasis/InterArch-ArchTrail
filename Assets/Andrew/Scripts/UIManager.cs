@@ -41,6 +41,13 @@ public class UIManager : MonoBehaviour
     public Button btnEnglish;
 
     [Space]
+    [Header("Admin Screen")]
+    public GameObject pnlPassword;
+    public TMP_InputField inptFldPasswordScreen;
+    public Button btnPasswordLogin;
+    public Button btnLogout;
+
+    [Space]
     [Header("Areas Screen")]
     // Areas Screen
     public GameObject pnlAreasScreen;
@@ -85,7 +92,7 @@ public class UIManager : MonoBehaviour
     //GPS Screen
     public GameObject pnlGPSSignal;
 
-    [Space]
+    /*[Space]
     [Header("Admin Screen")]
     public GameObject pnlWarningsAdminScreen;
     public Button btnAdminYes;
@@ -95,7 +102,7 @@ public class UIManager : MonoBehaviour
     [Header("Password Screen")]
     public GameObject pnlWarningsPasswordScreen;
     public TMP_InputField inptFldPasswordScreen;
-    public Button btnPasswordContinue;
+    public Button btnPasswordLogin;*/
     //public Button btnPasswordScreenClose;
 
     [Space]
@@ -227,6 +234,12 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region Unity Functions
+    private void Awake()
+    {
+        if (!LocalizationSettings.InitializationOperation.IsDone)
+            StartCoroutine(InitializeLocalizationSettings());
+    }
+
     public void Start()
     {
         // Initialize variables
@@ -239,10 +252,10 @@ public class UIManager : MonoBehaviour
         SubscribeButtons();
 
         // Display Areas Screen
-        DisplayAreaSelectScreen();
+        //DisplayAreaSelectScreen();
 
         // Display Admin
-        pnlWarningsAdminScreen.SetActive(true);
+        //pnlWarningsAdminScreen.SetActive(true);
 
         // Initialize panels
         pnlWarningScreen.SetActive(false);
@@ -299,8 +312,8 @@ public class UIManager : MonoBehaviour
         btnAboutScreen.onClick.AddListener(() => DisplayAboutScreen());
 
         // Language Screen
-        //btnGreek.onClick.AddListener(() => );
-        //btnEnglish.onClick.AddListener(() => );
+        btnGreek.onClick.AddListener(() => ChangeLanguage(true));
+        btnEnglish.onClick.AddListener(() => ChangeLanguage(false));
 
         // Areas Screen
         btnCreateArea.onClick.AddListener(() => CreateNewAreaSelected());
@@ -313,13 +326,14 @@ public class UIManager : MonoBehaviour
         //btn GPS
         btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeAndroidSettings());
 
-        // Admin
-        btnAdminYes.onClick.AddListener(() => DisplayPasswordScreen());
-        btnAdminNo.onClick.AddListener(() => SetAdmin(false));
+        // Admin (OLD)
+        //btnAdminYes.onClick.AddListener(() => DisplayPasswordScreen());
+        //btnAdminNo.onClick.AddListener(() => SetAdmin(false));
 
-        // Password
+        // Admin (NEW) / Password
         inptFldPasswordScreen.characterLimit = 4;
-        btnPasswordContinue.onClick.AddListener(() => CheckPassword(inptFldPasswordScreen.text));
+        btnPasswordLogin.onClick.AddListener(() => CheckPassword(inptFldPasswordScreen.text));
+        btnLogout.onClick.AddListener(() => SetAdmin(false));
         //btnPasswordScreenClose.onClick.AddListener(() => SetAdmin(false));
 
         //btn Path and stop record
@@ -407,6 +421,15 @@ public class UIManager : MonoBehaviour
         btnResetQuestionnaire.gameObject.SetActive(valReset);
     }
 
+    IEnumerator InitializeLocalizationSettings()
+    {
+        // Wait for the localization system to initialize, loading Locales, preloading etc.
+        yield return LocalizationSettings.InitializationOperation;
+
+        // Initialize language as English
+        LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[1];
+    }
+
     public void DisplayOptionsScreen()
     {
         // Enable Options
@@ -442,8 +465,10 @@ public class UIManager : MonoBehaviour
     
     public void DisplayAreaSelectScreen()
     {
+        pnlOptions.SetActive(false);
         pnlAreaSelectScreen.SetActive(true);
         //pnlAreasScreen.SetActive(true);
+
         pnlCreateArea.SetActive(false);
 
         if (isAdmin)
@@ -1132,11 +1157,11 @@ public class UIManager : MonoBehaviour
         }
         
     }*/
-    public void DisplayPasswordScreen()
+    /*public void DisplayPasswordScreen()
     {
         pnlWarningsAdminScreen.SetActive(false);
         pnlWarningsPasswordScreen.SetActive(true);
-    }
+    }*/
 
     /*public void ClosePasswordScreen()
     {
@@ -1149,12 +1174,14 @@ public class UIManager : MonoBehaviour
         {
             SetAdmin(true);
         }
-        else
+        /*else
         {
             inptFldPasswordScreen.text = "";
-            pnlWarningsPasswordScreen.SetActive(false);
-            pnlWarningsAdminScreen.SetActive(true);
-        }
+            //pnlWarningsPasswordScreen.SetActive(false);
+            //pnlWarningsAdminScreen.SetActive(true);
+        }*/
+
+        inptFldPasswordScreen.text = "";
     } 
 
     public void SetAdmin(bool _value)
@@ -1166,9 +1193,32 @@ public class UIManager : MonoBehaviour
         else
             btnPaths.gameObject.SetActive(false);
 
-        pnlWarningsPasswordScreen.SetActive(false);
+        // Disable Options Screen
+        pnlOptionsScreen.gameObject.SetActive(false);
+
+
+        if (isAdmin)
+        {
+            // Deactivate login button and password panel
+            pnlPassword.gameObject.SetActive(false);
+            btnPasswordLogin.gameObject.SetActive(false);
+
+            // Activate logout button
+            btnLogout.gameObject.SetActive(true);
+        }
+        else
+        {
+            // Deactivate logout button
+            btnLogout.gameObject.SetActive(false);
+
+            // Activate login button and password panel
+            pnlPassword.gameObject.SetActive(true);
+            btnPasswordLogin.gameObject.SetActive(true);
+        }
+
+        /*pnlWarningsPasswordScreen.SetActive(false);
         pnlWarningsAdminScreen.SetActive(false);
-        DisplayAreaSelectScreen();
+        DisplayAreaSelectScreen();*/
     }
     #endregion
 
@@ -1239,6 +1289,18 @@ public class UIManager : MonoBehaviour
             Debug.Log("Greek");
         }
     }*/
+
+    public void ChangeLanguage(bool _isGreek)
+    {
+        // Change language
+        if (_isGreek)
+            LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[0];
+        else
+            LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[1];
+
+        // Disable Options Screen
+        pnlOptionsScreen.gameObject.SetActive(false);
+    }
 
     public bool LanguageIsEnglish()
     {
