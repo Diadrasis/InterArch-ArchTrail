@@ -169,10 +169,10 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.Diadrasis.ArchTrail
+    Android: net.Diadrasis.ArchTrail
     Standalone: net.Diadrasis.ArchTrail
   buildNumber: {}
-  AndroidBundleVersionCode: 6
+  AndroidBundleVersionCode: 8
   AndroidMinSdkVersion: 20
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 2
@@ -250,8 +250,8 @@ PlayerSettings:
   AndroidTargetArchitectures: 3
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: '{inproject}: Deploy/user.keystore'
-  AndroidKeyaliasName: at
+  AndroidKeystoreName: '{inproject}: Deploy/userNew.keystore'
+  AndroidKeyaliasName: nat
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 0
   AndroidIsGame: 1
