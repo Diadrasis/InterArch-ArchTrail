@@ -274,7 +274,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (pnlPathScreen.activeSelf)
+        if (pnlPathScreen.activeSelf && !pnlOptionsScreen.activeSelf)
         {
             if (AppManager.Instance.androidManager.HasGPS())
             {
