@@ -95,5 +95,48 @@ MonoBehaviour:
     m_Localized: Back
     m_Metadata:
       m_Items: []
+  - m_Id: 14141623128211456
+    m_Localized: ADMINISTRATOR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14143760939794432
+    m_Localized: Select Area
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14143982080278528
+    m_Localized: About
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14144270124105728
+    m_Localized: Select Path
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14144565570879488
+    m_Localized: SELECT LANGUAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14146202817445888
+    m_Localized: ABOUT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14146460876193792
+    m_Localized: InterArch is a design research project based on digital representation,
+      supporting Virtual and Augmented Reality (VR, AR) technology. Multiple senses
+      are engaged, through the processes of storytelling, while the proposed application,
+      takes into account the physical features of the archaeological site, by enabling
+      different levels of interaction with the digital contents and archaeological
+      data, as well as with the natural surroundings. Aiming at app customization,
+      the application is also addressed to people with visual or hearing impairments.
+      A digital learning Game is especially developed for school students and children.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14150583839277056
+    m_Localized: LOGIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14150667142348800
+    m_Localized: LOGOUT
+    m_Metadata:
+      m_Items: []
   references:
     version: 1

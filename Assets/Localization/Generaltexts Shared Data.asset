@@ -91,6 +91,42 @@ MonoBehaviour:
     m_Key: btnBackSurvey
     m_Metadata:
       m_Items: []
+  - m_Id: 14141623128211456
+    m_Key: pnlAdminC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14143760939794432
+    m_Key: btnSelectArea
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14143982080278528
+    m_Key: btnAbout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14144270124105728
+    m_Key: btnSelectPath
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14144565570879488
+    m_Key: pnlLangC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14146202817445888
+    m_Key: pnlAboutC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14146460876193792
+    m_Key: pnlAboutMainText
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14150583839277056
+    m_Key: btnLogin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14150667142348800
+    m_Key: btnLogout
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
