@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
 
     [Space]
     [Header("Top Screen")]
-    public Button btnBackToAreasScreen;
+    //public Button btnBackToAreasScreen;
     public Button btnQuit;
     public Button btnOptions;
     public TextMeshProUGUI txtMainName;
@@ -263,9 +263,13 @@ public class UIManager : MonoBehaviour
         pnlQuestionnaireScreen.SetActive(false);
         txtMainName.text = DEFAULT_TEXT_NAME;
         imgPauseRecording.gameObject.SetActive(false);
-        btnBackToAreasScreen.interactable = true;
+        //btnBackToAreasScreen.interactable = true;
         //imgRecord = GetComponent<Animator>();
         //sexDropdown = GetComponent<TMP_Dropdown>();
+
+        // Display Options Screen / Language Selection
+        pnlOptionsScreen.SetActive(true);
+        pnlLanguageScreen.SetActive(true);
     }
 
     private void Update()
@@ -301,7 +305,7 @@ public class UIManager : MonoBehaviour
     private void SubscribeButtons()
     {
         // Map Screen
-        btnBackToAreasScreen.onClick.AddListener(() => BackToAreasScreen());
+        //btnBackToAreasScreen.onClick.AddListener(() => BackToAreasScreen());
         btnQuit.onClick.AddListener(() => EnableScreen(pnlWarningEscapeScreen, true));
         btnOptions.onClick.AddListener(() => DisplayOptionsScreen());
 
@@ -415,8 +419,8 @@ public class UIManager : MonoBehaviour
 
     void ActivateButtons(bool valBack, bool valQuit, bool valReset, bool valProfiler)
     {
-        btnBackToAreasScreen.gameObject.SetActive(valBack);
-        btnQuit.gameObject.SetActive(valQuit);
+        //btnBackToAreasScreen.gameObject.SetActive(valBack);
+        //btnQuit.gameObject.SetActive(valQuit);
         btnProfiler.gameObject.SetActive(valProfiler);
         btnResetQuestionnaire.gameObject.SetActive(valReset);
     }
@@ -604,7 +608,7 @@ public class UIManager : MonoBehaviour
             else
                 txtMainName.text = loadedArea.title;*/
 
-            pnlAreasScreen.SetActive(false);
+            //pnlAreasScreen.SetActive(false);
             AppManager.Instance.mapManager.SetMapViewToArea(loadedArea);
 
             EnableScreen(pnlPathScreen, true);
@@ -690,7 +694,9 @@ public class UIManager : MonoBehaviour
 
         // Change UI
         pnlEditArea.SetActive(true);
-        pnlAreasScreen.SetActive(false);
+        pnlOptionsScreen.SetActive(false);
+        //pnlAreasScreen.SetActive(false);
+
         if (LanguageIsEnglish())
             txtMainName.text = selectedArea.titleEnglish;
         else
@@ -759,7 +765,7 @@ public class UIManager : MonoBehaviour
     }
 
     //back to all the panel accordingly and even if we press back whilst recording path
-    private void BackToAreasScreen()
+    /*private void BackToAreasScreen()
     {
         if (pnlSavedPaths.activeSelf && !pnlAreasScreen.activeSelf && pnlPathScreen.activeSelf &&
             !pnlSaveArea.activeSelf && !pnlEditArea.activeSelf && !pnlCreateArea.activeSelf && !AppManager.Instance.mapManager.isRecordingPath && !AppManager.Instance.mapManager.isPausePath)
@@ -878,7 +884,7 @@ public class UIManager : MonoBehaviour
         }
 
         //mapScreen.SetActive(false);
-    }
+    }*/
 
     public void IsInRecordingPath(bool val)
     {
@@ -1228,7 +1234,8 @@ public class UIManager : MonoBehaviour
         pnlWarningSurveyIntroScreen.SetActive(true);
         pnlQuestionnaireScreen.SetActive(true);
         pnlMainQuestions.SetActive(true);
-        pnlAreaSelectScreen.SetActive(false);
+        //pnlAreaSelectScreen.SetActive(false);
+        pnlOptionsScreen.SetActive(false);
         //pnlAreasScreen.SetActive(false);
         ActivateButtons(true, true, true, false);
     }
