@@ -17,6 +17,7 @@ public class UIManager : MonoBehaviour
     [Space]
     [Header("Top Screen")]
     //public Button btnBackToAreasScreen;
+    public Button btnBack;
     public Button btnQuit;
     public Button btnOptions;
     public TextMeshProUGUI txtMainName;
@@ -274,6 +275,7 @@ public class UIManager : MonoBehaviour
         // Display Options Screen / Language Selection
         pnlOptionsScreen.SetActive(true);
         pnlLanguageScreen.SetActive(true);
+        btnBack.gameObject.SetActive(true);
     }
 
     private void Update()
@@ -322,6 +324,7 @@ public class UIManager : MonoBehaviour
     {
         // Map Screen
         //btnBackToAreasScreen.onClick.AddListener(() => BackToAreasScreen());
+        btnBack.onClick.AddListener(() => BackToOptions());
         btnQuit.onClick.AddListener(() => EnableScreen(pnlWarningEscapeScreen, true));
         btnOptions.onClick.AddListener(() => DisplayOptionsScreen());
 
@@ -491,11 +494,55 @@ public class UIManager : MonoBehaviour
         // Close other screens
         pnlLanguageScreen.gameObject.SetActive(false);
         pnlAdminScreen.gameObject.SetActive(false);
-        pnlAreaSelectScreen.gameObject.SetActive(false); // TODO: Deactivate AreasScreen
+        pnlAreaSelectScreen.gameObject.SetActive(false);
         pnlAboutScreen.gameObject.SetActive(false);
 
         // Enable/Disable Options Screen
         pnlOptionsScreen.gameObject.SetActive(!pnlOptionsScreen.activeSelf);
+
+        // Disable Back Button
+        btnBack.gameObject.SetActive(false);
+    }
+
+    private void BackToOptions()
+    {
+        // Enable Options
+        pnlOptions.gameObject.SetActive(true);
+
+        // Close other screens
+        if (pnlQuestionnaireScreen.activeSelf)
+        {
+            btnLanguageScreen.gameObject.SetActive(true);
+            btnAdminScreen.gameObject.SetActive(false);
+            btnAreaSelectScreen.gameObject.SetActive(false);
+            btnAboutScreen.gameObject.SetActive(false);
+
+            // Lines
+            pnlLineSeparatorBtnLanguage.SetActive(true);
+            pnlLineSeparatorBtnAdmin.SetActive(false);
+            pnlLineSeparatorBtnAreaSelect.SetActive(false);
+            pnlLineSeparatorBtnAbout.SetActive(false);
+        }
+        else
+        {
+            btnLanguageScreen.gameObject.SetActive(true);
+            pnlLineSeparatorBtnLanguage.SetActive(true);
+            btnAdminScreen.gameObject.SetActive(true);
+            pnlLineSeparatorBtnAdmin.SetActive(true);
+            btnAreaSelectScreen.gameObject.SetActive(true);
+            pnlLineSeparatorBtnAreaSelect.SetActive(true);
+            btnAboutScreen.gameObject.SetActive(true);
+            pnlLineSeparatorBtnAbout.SetActive(true);
+        }
+
+        // Close other screens
+        pnlLanguageScreen.gameObject.SetActive(false);
+        pnlAdminScreen.gameObject.SetActive(false);
+        pnlAreaSelectScreen.gameObject.SetActive(false);
+        pnlAboutScreen.gameObject.SetActive(false);
+
+        // Disable Back Button
+        btnBack.gameObject.SetActive(false);
     }
 
     public void DisplayLanguageScreen()
@@ -505,6 +552,9 @@ public class UIManager : MonoBehaviour
 
         // Enable Language Screen
         pnlLanguageScreen.gameObject.SetActive(true);
+
+        // Enable Back Button
+        btnBack.gameObject.SetActive(true);
     }
 
     public void DisplayAdminScreen()
@@ -514,6 +564,9 @@ public class UIManager : MonoBehaviour
 
         // Enable Admin Screen
         pnlAdminScreen.gameObject.SetActive(true);
+
+        // Enable Back Button
+        btnBack.gameObject.SetActive(true);
     }
     
     public void DisplayAreaSelectScreen()
@@ -532,7 +585,7 @@ public class UIManager : MonoBehaviour
         DestroySelectObjects(selectAreaObjects);
         selectAreaObjects = InstantiateSelectAreaObjects();
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
-        AppManager.Instance.mapManager.CreateNewAreaFinalize();
+        //AppManager.Instance.mapManager.CreateNewAreaFinalize();
         //EnableScreen(pnlPathScreen, false);
         //imgRecord.gameObject.SetActive(false);
         //EnableScreen(pnlSavedPaths, false); //the panel for saved paths
@@ -540,6 +593,9 @@ public class UIManager : MonoBehaviour
         //txtMainName.text = DEFAULT_TEXT_NAME;
         pnlWarningDeleteScreen.SetActive(false);
         AppManager.Instance.questionnaireManager.ResetValues();
+
+        // Enable Back Button
+        btnBack.gameObject.SetActive(true);
     }
 
     private void ResetPanels()
@@ -561,6 +617,8 @@ public class UIManager : MonoBehaviour
         // Extras
         pnlSavedPaths.SetActive(false);
         AppManager.Instance.mapManager.RemoveMarkersAndLine();
+        // Disable Back Button
+        btnBack.gameObject.SetActive(false);
     }
 
     public void DisplayAboutScreen()
@@ -570,6 +628,9 @@ public class UIManager : MonoBehaviour
 
         // Enable About Screen
         pnlAboutScreen.gameObject.SetActive(true);
+
+        // Enable Back Button
+        btnBack.gameObject.SetActive(true);
     }
 
     public void DisplayPathsScreen()
@@ -706,6 +767,7 @@ public class UIManager : MonoBehaviour
     {
         // Reset Panels
         ResetPanels();
+        AppManager.Instance.mapManager.CreateNewAreaFinalize();
 
         GameObject selectAreaObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
         //TMP_Text selectAreaText = selectAreaObject.GetComponentInChildren<TMP_Text>();
@@ -983,6 +1045,7 @@ public class UIManager : MonoBehaviour
     {
         // Reset Panels
         ResetPanels();
+        AppManager.Instance.mapManager.CreateNewAreaFinalize();
 
         // Disable Options Screen
         pnlOptionsScreen.SetActive(false);
@@ -1330,6 +1393,9 @@ public class UIManager : MonoBehaviour
         // Disable Options Screen
         pnlOptionsScreen.gameObject.SetActive(false);
 
+        // Disable Back Button
+        btnBack.gameObject.SetActive(false);
+
         /*pnlWarningsPasswordScreen.SetActive(false);
         pnlWarningsAdminScreen.SetActive(false);
         DisplayAreaSelectScreen();*/
@@ -1424,6 +1490,9 @@ public class UIManager : MonoBehaviour
             else
                 txtMainName.text = AppManager.Instance.mapManager.currentArea.title;
         }
+
+        // Disable Back Button
+        btnBack.gameObject.SetActive(false);
     }
 
     public bool LanguageIsEnglish()
