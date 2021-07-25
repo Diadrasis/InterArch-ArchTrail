@@ -142,7 +142,7 @@ public class SurveyManager : MonoBehaviour
         {
             // Add current step to previous steps
             previousSteps.Add(step);
-            Debug.Log("added step " + step);
+            //Debug.Log("added step " + step);
 
             // Deactivate current step
             demographicOptions[step].SetActive(false);
@@ -300,10 +300,10 @@ public class SurveyManager : MonoBehaviour
 
         // Set step to previous step
         step = previousSteps[previousSteps.Count - 1];
-        Debug.Log("current step = " + step);
+        //Debug.Log("current step = " + step);
 
         // Remove current step
-        Debug.Log("removed step " + step);
+        //Debug.Log("removed step " + step);
         previousSteps.Remove(step);
 
         // Activate question
@@ -992,13 +992,13 @@ public class SurveyManager : MonoBehaviour
             }
         }
 
-        Debug.Log("answers count = " + answers.Count);
-        Debug.Log("demographicOptions count = " + demographicOptions.Length);
-        for (int i = 0; i < answers.Count; i++)
+        //Debug.Log("answers count = " + answers.Count);
+        //Debug.Log("demographicOptions count = " + demographicOptions.Length);
+        /*for (int i = 0; i < answers.Count; i++)
         {
             Debug.Log("demographicOptions " + i + " = " + demographicOptions[i].name);
             Debug.Log("answer " + i + " = " + answers[i]);
-        }
+        }*/
 
         // Save Survey
         cSurvey surveyToSave = new cSurvey(currentPath.server_path_id, currentPath.local_area_id, answers);

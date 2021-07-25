@@ -65,6 +65,10 @@ public class MapManager : MonoBehaviour
     //for markers
     private bool touchedLastUpdate = false;
     int lastTouchCount;
+
+    // Display Ancient Messene
+    [HideInInspector]
+    public bool displayMessene;
     #endregion
 
     #region Unity Functions
@@ -73,13 +77,16 @@ public class MapManager : MonoBehaviour
         // Enable never sleep for android
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        areas = new List<cArea>();
+        //areas = new List<cArea>();
         areas = cArea.LoadAreas();
+        if (areas == null)
+            areas = new List<cArea>();
     }
 
     private void Start()
     {
         // Download areas
+        displayMessene = true;
         AppManager.Instance.serverManager.DownloadAreas();
         isShown = false;
 
@@ -94,7 +101,7 @@ public class MapManager : MonoBehaviour
         CreateUserMarker();
 
         // Display Ancient Messene
-        //AppManager.Instance.uIManager.DisplayAncientMessene();
+        AppManager.Instance.uIManager.DisplayAncientMessene();
     }
 
     private void Update()
@@ -182,7 +189,7 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
 
         // Deactivate never sleep for android
         Screen.sleepTimeout = SleepTimeout.SystemSetting;
@@ -239,7 +246,7 @@ public class MapManager : MonoBehaviour
     {
         foreach (cArea area in areas)
         {
-            if (area.title.Equals(_areaTitle)) ;
+            if (area.title.Equals(_areaTitle))
             return area;
         }
 
@@ -382,8 +389,13 @@ public class MapManager : MonoBehaviour
         // Reload Areas
         areas = cArea.LoadAreas();
 
-        // Display Areas
-        //AppManager.Instance.uIManager.DisplayAreaSelectScreen();
+        // Refresh Areas Select
+        if (AppManager.Instance.uIManager.pnlAreaSelectScreen.activeSelf)
+            AppManager.Instance.uIManager.DisplayAreaSelectScreen();
+
+        // Display Ancient Messene
+        if (displayMessene)
+            AppManager.Instance.uIManager.DisplayAncientMessene();
     }
 
     public void ReloadPaths()

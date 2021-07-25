@@ -26,6 +26,15 @@ public class InitSplash : MonoBehaviour
             //Screen.orientation = ScreenOrientation.Landscape;
         }
         afterSprite.gameObject.SetActive(false);
+
+        // Enable never sleep for android
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+    }
+
+    private void OnDestroy()
+    {
+        // Deactivate never sleep for android
+        Screen.sleepTimeout = SleepTimeout.SystemSetting;
     }
 
     IEnumerator Start()
@@ -92,5 +101,4 @@ public class InitSplash : MonoBehaviour
         //animPanel.gameObject.SetActive(false);
         yield break;
     }
-
 }

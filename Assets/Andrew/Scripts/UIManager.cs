@@ -278,7 +278,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (pnlPathScreen.activeSelf && !pnlOptionsScreen.activeSelf)
+        if (pnlPathScreen.activeSelf && !pnlOptionsScreen.activeSelf && !pnlSavedPaths.activeSelf)
         {
             if (AppManager.Instance.androidManager.HasGPS())
             {
@@ -301,6 +301,18 @@ public class UIManager : MonoBehaviour
         {
             if (pnlGPSSignal.activeSelf)
                 pnlGPSSignal.SetActive(false);
+        }
+
+        // Disable Options if is recording path
+        if (AppManager.Instance.mapManager.isRecordingPath)
+        {
+            if (btnOptions.interactable)
+                btnOptions.interactable = false;
+        }
+        else
+        {
+            if (!btnOptions.interactable)
+                btnOptions.interactable = true;
         }
     }
     #endregion
@@ -510,7 +522,7 @@ public class UIManager : MonoBehaviour
         pnlAreaSelectScreen.SetActive(true);
         //pnlAreasScreen.SetActive(true);
 
-        pnlCreateArea.SetActive(false);
+        //pnlCreateArea.SetActive(false);
 
         if (isAdmin)
             btnCreateArea.gameObject.SetActive(true);
@@ -521,13 +533,34 @@ public class UIManager : MonoBehaviour
         selectAreaObjects = InstantiateSelectAreaObjects();
         StartCoroutine(ReloadLayout(pnlLoadedAreas));
         AppManager.Instance.mapManager.CreateNewAreaFinalize();
-        EnableScreen(pnlPathScreen, false);
-        imgRecord.gameObject.SetActive(false);
-        EnableScreen(pnlSavedPaths, false); //the panel for saved paths
+        //EnableScreen(pnlPathScreen, false);
+        //imgRecord.gameObject.SetActive(false);
+        //EnableScreen(pnlSavedPaths, false); //the panel for saved paths
         ActivateButtons(false, true, false, false);
-        txtMainName.text = DEFAULT_TEXT_NAME;
+        //txtMainName.text = DEFAULT_TEXT_NAME;
         pnlWarningDeleteScreen.SetActive(false);
         AppManager.Instance.questionnaireManager.ResetValues();
+    }
+
+    private void ResetPanels()
+    {
+        // Create Area
+        //AppManager.Instance.mapManager.CreateNewAreaFinalize();
+        pnlCreateArea.SetActive(false);
+        pnlSaveArea.SetActive(false);
+
+        // Edit Area
+        pnlEditArea.SetActive(false);
+        pnlSaveEditArea.SetActive(false);
+
+        // Path Screen
+        imgRecord.gameObject.SetActive(false);
+        pnlPathScreen.SetActive(false);
+        pnlWarningDownloadTilesScreen.SetActive(false);
+
+        // Extras
+        pnlSavedPaths.SetActive(false);
+        AppManager.Instance.mapManager.RemoveMarkersAndLine();
     }
 
     public void DisplayAboutScreen()
@@ -541,8 +574,10 @@ public class UIManager : MonoBehaviour
 
     public void DisplayPathsScreen()
     {
-        pnlPathScreen.SetActive(true);
-        pnlSavedPaths.SetActive(true);
+        //pnlPathScreen.SetActive(true);
+
+        //pnlSavedPaths.SetActive(!pnlSavedPaths.activeSelf);
+
         DestroySelectObjects(selectPathObjects);
         selectPathObjects = InstantiateSelectPathObjects();
         StartCoroutine(ReloadLayout(pnlSavedPaths));
@@ -639,9 +674,12 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.currentArea = loadedArea;
 
             // Download Tiles
-            /*AppManager.Instance.serverManager.DownloadTiles();
+            AppManager.Instance.serverManager.DownloadTiles();
 
-            if (LanguageIsEnglish())
+            // Set main title
+            txtMainName.text = loadedArea.titleEnglish;
+
+            /*if (LanguageIsEnglish())
                 txtMainName.text = loadedArea.titleEnglish;
             else
                 txtMainName.text = loadedArea.title;*/
@@ -656,14 +694,19 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.isShown = false;
             //AppManager.Instance.mapManager.CheckUserPosition();
         }
-        else
+        /*else
         {
+            // Display Areas Screen
+            DisplayOptionsScreen();
             DisplayAreaSelectScreen();
-        }
+        }*/
     }
 
     private void OnAreaSelectPressed()
     {
+        // Reset Panels
+        ResetPanels();
+
         GameObject selectAreaObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
         //TMP_Text selectAreaText = selectAreaObject.GetComponentInChildren<TMP_Text>();
 
@@ -725,6 +768,9 @@ public class UIManager : MonoBehaviour
     //to edit an area
     private void OnEditSelect()
     {
+        // Reset Panels
+        ResetPanels();
+
         // Get selected area
         GameObject btnEditArea = EventSystem.current.currentSelectedGameObject;
         pnlForEdit = btnEditArea.transform.parent;
@@ -752,6 +798,10 @@ public class UIManager : MonoBehaviour
 
     private void OnPathSelectPressed()
     {
+        // Reset Panels
+        ResetPanels();
+        pnlPathScreen.SetActive(true);
+
         GameObject selectPathObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
         //TMP_Text selectPathText = selectPathObject.GetComponentInChildren<TMP_Text>();
         // Get index
@@ -931,12 +981,19 @@ public class UIManager : MonoBehaviour
 
     private void CreateNewAreaSelected()
     {
+        // Reset Panels
+        ResetPanels();
+
+        // Disable Options Screen
+        pnlOptionsScreen.SetActive(false);
+
         pnlAreaSelectScreen.SetActive(false);
         //pnlAreasScreen.SetActive(false);
         pnlCreateArea.SetActive(true);
         btnSaveArea.interactable = false;
 
         inptFldCreateArea.text = "";
+        inptFldCreateAreaEnglish.text = "";
 
         ActivateButtons(true, false, false, false);
         AppManager.Instance.mapManager.CreateNewAreaInitialize();
@@ -960,6 +1017,9 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.SaveArea(newAreaTitleGreek, newAreaTitleEnglish);
             pnlSaveArea.SetActive(false);
             pnlCreateArea.SetActive(false);
+
+            // Enable Options Screen
+            DisplayOptionsScreen();
             DisplayAreaSelectScreen();
         }
         else
@@ -988,6 +1048,9 @@ public class UIManager : MonoBehaviour
                 txtMainName.text = newAreaTitleEnglish;
             else
                 txtMainName.text = newAreaTitleGreek;
+
+            // Enable Options Screen
+            DisplayOptionsScreen();
             DisplayAreaSelectScreen();
         }
         else
@@ -1016,6 +1079,7 @@ public class UIManager : MonoBehaviour
         AppManager.Instance.mapManager.StartRecordingPath();
         //btnPaths.interactable = false;
         pnlRecordButton.SetActive(true);
+        pnlSavedPaths.SetActive(false);
         imgOnRecord.gameObject.SetActive(true);
         imgPauseRecording.gameObject.SetActive(false);
         IsInRecordingPath(true);
@@ -1052,13 +1116,19 @@ public class UIManager : MonoBehaviour
     //opens the saved paths screen (on click event)
     public void DisplaySavedPathsScreen()
     {
-        // Download Paths of Area
-        if (AppManager.Instance.mapManager.currentArea.server_area_id != -1)
-        {
-            AppManager.Instance.serverManager.DownloadPaths(AppManager.Instance.mapManager.currentArea.server_area_id);
-        }
+        pnlSavedPaths.SetActive(!pnlSavedPaths.activeSelf);
 
-        DisplayPathsScreen();
+        if (pnlSavedPaths.activeSelf)
+        {
+            // Download Paths of Area
+            if (AppManager.Instance.mapManager.currentArea.server_area_id != -1)
+            {
+                AppManager.Instance.serverManager.DownloadPaths(AppManager.Instance.mapManager.currentArea.server_area_id);
+            }
+
+            DisplayPathsScreen();
+        }
+        
         /*pnlSavedPaths.SetActive(true);
         DestroySelectObjects(selectPathObjects);
         selectPathObjects = InstantiateSelectPathObjects();
@@ -1233,16 +1303,10 @@ public class UIManager : MonoBehaviour
         isAdmin = _value;
         
         if (isAdmin)
-            btnPaths.gameObject.SetActive(true);
-        else
-            btnPaths.gameObject.SetActive(false);
-
-        // Disable Options Screen
-        pnlOptionsScreen.gameObject.SetActive(false);
-
-
-        if (isAdmin)
         {
+            // Enable Saved Paths button
+            btnPaths.gameObject.SetActive(true);
+
             // Deactivate login button and password panel
             pnlPassword.gameObject.SetActive(false);
             btnPasswordLogin.gameObject.SetActive(false);
@@ -1252,6 +1316,9 @@ public class UIManager : MonoBehaviour
         }
         else
         {
+            // Disable Saved Paths button
+            btnPaths.gameObject.SetActive(false);
+
             // Deactivate logout button
             btnLogout.gameObject.SetActive(false);
 
@@ -1259,6 +1326,9 @@ public class UIManager : MonoBehaviour
             pnlPassword.gameObject.SetActive(true);
             btnPasswordLogin.gameObject.SetActive(true);
         }
+
+        // Disable Options Screen
+        pnlOptionsScreen.gameObject.SetActive(false);
 
         /*pnlWarningsPasswordScreen.SetActive(false);
         pnlWarningsAdminScreen.SetActive(false);
@@ -1345,12 +1415,25 @@ public class UIManager : MonoBehaviour
 
         // Disable Options Screen
         pnlOptionsScreen.gameObject.SetActive(false);
+
+        // Set main title
+        if (AppManager.Instance.mapManager.currentArea != null)
+        {
+            if (LanguageIsEnglish())
+                txtMainName.text = AppManager.Instance.mapManager.currentArea.titleEnglish;
+            else
+                txtMainName.text = AppManager.Instance.mapManager.currentArea.title;
+        }
     }
 
     public bool LanguageIsEnglish()
     {
-        //Debug.Log(LocalizationSettings.SelectedLocale.Identifier == "en");//.name == ENGLISH);
-        return (LocalizationSettings.SelectedLocale.Identifier == "en");//.name == ENGLISH);
+        if (LocalizationSettings.InitializationOperation.IsDone)
+        {
+            return (LocalizationSettings.SelectedLocale.Identifier == "en");//.name == ENGLISH);
+        }
+
+        return true;
     }
 
     public void SetWarningTxtOnCheckUserPosition()
