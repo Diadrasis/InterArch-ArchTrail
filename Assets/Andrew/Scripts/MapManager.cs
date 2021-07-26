@@ -510,7 +510,7 @@ public class MapManager : MonoBehaviour
         }
     }
     
-    private bool IsWithinConstraints()
+    public bool IsWithinConstraints()
     {
         if ((currentArea.areaConstraintsMin.x < OnlineMapsLocationService.instance.position.x) && (OnlineMapsLocationService.instance.position.x < currentArea.areaConstraintsMax.x)
             && (currentArea.areaConstraintsMin.y < OnlineMapsLocationService.instance.position.y) && (OnlineMapsLocationService.instance.position.y < currentArea.areaConstraintsMax.y))

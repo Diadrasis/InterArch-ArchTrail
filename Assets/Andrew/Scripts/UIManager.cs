@@ -225,7 +225,6 @@ public class UIManager : MonoBehaviour
     readonly List<string> ageValuesEN = new List<string> {"<Choose Below>","0-12", "13-18", "19-25", "26-30", "31-40", "41-50", "51-60","61+" };
     readonly List<string> ageValuesGR = new List<string> { "<Επιλέξτε από τα παρακάτω>", "0-12", "13-18", "19-25", "26-30", "31-40", "41-50", "51-60", "61+" };
 
-
     [HideInInspector]
     public bool downloadTiles = false;
     [HideInInspector]
@@ -280,23 +279,27 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (pnlPathScreen.activeSelf && !pnlOptionsScreen.activeSelf && !pnlSavedPaths.activeSelf)
+        if (pnlPathScreen.activeSelf && !pnlOptionsScreen.activeSelf) //  && !pnlSavedPaths.activeSelf
         {
             if (AppManager.Instance.androidManager.HasGPS())
             {
+                // Disable GPS signal panel
                 if (pnlGPSSignal.activeSelf)
                     pnlGPSSignal.SetActive(false);
 
-                if (!AppManager.Instance.uIManager.btnAddNewPath.interactable)
-                    AppManager.Instance.uIManager.btnAddNewPath.interactable = true;
+                // Enable new path button
+                if (!btnAddNewPath.interactable && AppManager.Instance.mapManager.IsWithinConstraints())
+                    btnAddNewPath.interactable = true;
             }
             else
             {
+                // Enable GPS signal panel
                 if (!pnlGPSSignal.activeSelf)
                     pnlGPSSignal.SetActive(true);
 
-                if (AppManager.Instance.uIManager.btnAddNewPath.interactable)
-                    AppManager.Instance.uIManager.btnAddNewPath.interactable = false;
+                // Disable new path button
+                if (btnAddNewPath.interactable)
+                    btnAddNewPath.interactable = false;
             }
         }
         else
@@ -305,7 +308,7 @@ public class UIManager : MonoBehaviour
                 pnlGPSSignal.SetActive(false);
         }
 
-        // Disable Options if is recording path
+        // Disable Options button if is recording path
         if (AppManager.Instance.mapManager.isRecordingPath)
         {
             if (btnOptions.interactable)
@@ -331,7 +334,7 @@ public class UIManager : MonoBehaviour
         // Options Screen
         btnLanguageScreen.onClick.AddListener(() => DisplayLanguageScreen());
         btnAdminScreen.onClick.AddListener(() => DisplayAdminScreen());
-        btnAreaSelectScreen.onClick.AddListener(() => DisplayAreaSelectScreen());
+        btnAreaSelectScreen.onClick.AddListener(() => DisplayAreas());
         btnAboutScreen.onClick.AddListener(() => DisplayAboutScreen());
 
         // Language Screen
@@ -460,6 +463,13 @@ public class UIManager : MonoBehaviour
         LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[1];
     }
 
+    private void DisplayAreas()
+    {
+        AppManager.Instance.serverManager.DownloadAreas();
+        DisplayAreaSelectScreen();
+        Debug.Log("Display Areas");
+    }
+
     public void DisplayOptionsScreen()
     {
         // Enable Options
@@ -496,6 +506,10 @@ public class UIManager : MonoBehaviour
         pnlAdminScreen.gameObject.SetActive(false);
         pnlAreaSelectScreen.gameObject.SetActive(false);
         pnlAboutScreen.gameObject.SetActive(false);
+
+        // Close Saved Paths
+        if (pnlSavedPaths.activeSelf)
+            pnlSavedPaths.SetActive(false);
 
         // Enable/Disable Options Screen
         pnlOptionsScreen.gameObject.SetActive(!pnlOptionsScreen.activeSelf);
@@ -764,7 +778,7 @@ public class UIManager : MonoBehaviour
             EnableScreen(pnlSavedPaths, false);
             ActivateButtons(true, false, false, false);
             AppManager.Instance.mapManager.isShown = false;
-            //AppManager.Instance.mapManager.CheckUserPosition();
+            AppManager.Instance.mapManager.CheckUserPosition();
         }
         else
         {
@@ -901,7 +915,6 @@ public class UIManager : MonoBehaviour
         pnlForDelete = btnDeleteArea.transform.parent;
         //AppManager.Instance.mapManager.DeletePath(selectPathObjects.IndexOf(pnlSelectArea.gameObject));
     }
-
 
     private void DestroySelectObjects(List<GameObject> _selectObjects)
     {
@@ -1268,19 +1281,23 @@ public class UIManager : MonoBehaviour
             pnlWarningInternetScreen.SetActive(false);
         }
     }
+
     //final warning on delete
     public void DeleteFinal()
     {
-        if (pnlPathScreen.activeSelf)
+        if (pnlSavedPaths.activeSelf) //pnlPathScreen.activeSelf
         {
             AppManager.Instance.mapManager.DeletePath(selectPathObjects.IndexOf(pnlForDelete.gameObject));
-            DisplaySavedPathsScreen();
+            // DisplaySavedPathsScreen();
+            DisplayPathsScreen();
+            //Debug.Log("Delete Path");
         }
         else if (pnlAreasScreen.activeSelf)
         {
             AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlForDelete.gameObject));
             DisplayAreaSelectScreen();
             DisplayAncientMessene();
+            //Debug.Log("Delete Area");
         }
     }
 
