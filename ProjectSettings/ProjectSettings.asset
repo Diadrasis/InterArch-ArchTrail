@@ -172,7 +172,7 @@ PlayerSettings:
     Android: net.Diadrasis.ArchTrail
     Standalone: net.Diadrasis.ArchTrail
   buildNumber: {}
-  AndroidBundleVersionCode: 8
+  AndroidBundleVersionCode: 9
   AndroidMinSdkVersion: 20
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 2
