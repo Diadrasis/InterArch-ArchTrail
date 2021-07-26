@@ -995,7 +995,7 @@ public class ServerManager : MonoBehaviour
                     AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Would you like to download the map for offline use?\nSize: " + ((float)tileDownloader.totalSize / 1000).ToString("F2") + " ΜB";
                 else
                     AppManager.Instance.uIManager.txtWarningDownloadTiles.text = "Θέλετε να κάνετε λήψη του χάρτη για χρήση εκτός σύνδεσης;\nΜέγεθος: " + ((float)tileDownloader.totalSize / 1000).ToString("F2") + " ΜB";
-
+                
                 // Wait for user input
                 while (AppManager.Instance.uIManager.pnlWarningDownloadTilesScreen.activeSelf)
                 {
