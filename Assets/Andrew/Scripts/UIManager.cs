@@ -465,7 +465,7 @@ public class UIManager : MonoBehaviour
         // Enable Options
         pnlOptions.gameObject.SetActive(true);
 
-        // Close other screens
+        // Close other option screens
         if (pnlQuestionnaireScreen.activeSelf)
         {
             btnLanguageScreen.gameObject.SetActive(true);
@@ -491,7 +491,7 @@ public class UIManager : MonoBehaviour
             pnlLineSeparatorBtnAbout.SetActive(true);
         }
 
-        // Close other screens
+        // Close other option screens
         pnlLanguageScreen.gameObject.SetActive(false);
         pnlAdminScreen.gameObject.SetActive(false);
         pnlAreaSelectScreen.gameObject.SetActive(false);
@@ -502,6 +502,17 @@ public class UIManager : MonoBehaviour
 
         // Disable Back Button
         btnBack.gameObject.SetActive(false);
+    }
+
+    private void DefaultMap()
+    {
+        ResetPanels();
+
+        // Reset Map Graphics
+        AppManager.Instance.mapManager.CreateNewAreaFinalize();
+
+        // Reset Title
+        txtMainName.text = DEFAULT_TEXT_NAME;
     }
 
     private void BackToOptions()
@@ -755,12 +766,10 @@ public class UIManager : MonoBehaviour
             AppManager.Instance.mapManager.isShown = false;
             //AppManager.Instance.mapManager.CheckUserPosition();
         }
-        /*else
+        else
         {
-            // Display Areas Screen
-            DisplayOptionsScreen();
-            DisplayAreaSelectScreen();
-        }*/
+            DefaultMap();
+        }
     }
 
     private void OnAreaSelectPressed()
@@ -1271,6 +1280,7 @@ public class UIManager : MonoBehaviour
         {
             AppManager.Instance.mapManager.DeleteArea(selectAreaObjects.IndexOf(pnlForDelete.gameObject));
             DisplayAreaSelectScreen();
+            DisplayAncientMessene();
         }
     }
 
@@ -1388,6 +1398,9 @@ public class UIManager : MonoBehaviour
             // Activate login button and password panel
             pnlPassword.gameObject.SetActive(true);
             btnPasswordLogin.gameObject.SetActive(true);
+
+            // Reload Ancient Messene
+            DisplayAncientMessene();
         }
 
         // Disable Options Screen
