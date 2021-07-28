@@ -117,6 +117,7 @@ public class UIManager : MonoBehaviour
     public Button btnAddNewPath, btnStopRecording, btnResumeRecording;
     public Image imgOnRecord, imgPauseRecording;
     public Animator imgRecord;
+    public RectTransform imgRecordStopBar;
 
     [Space]
     [Header("Warning Area Screen")]
@@ -235,6 +236,10 @@ public class UIManager : MonoBehaviour
     private bool userAnsweredSurvey = false;
     //readonly string ENGLISH = "English (en)";
     //readonly string GREEK = "Greek (el)";
+
+    private bool stopRecording = false;
+    readonly private float stopRecordingPressDuration = 3f; // seconds
+    private float stopRecordingCounter = 0;
     #endregion
 
     #region Unity Functions
@@ -251,6 +256,7 @@ public class UIManager : MonoBehaviour
         selectPathObjects = new List<GameObject>();
         isAdmin = false;
         userAnsweredSurvey = false;
+        stopRecording = false;
 
         // Subscribe Buttons
         SubscribeButtons();
@@ -311,13 +317,42 @@ public class UIManager : MonoBehaviour
         // Disable Options button if is recording path
         if (AppManager.Instance.mapManager.isRecordingPath)
         {
+            // Disable options button
             if (btnOptions.interactable)
                 btnOptions.interactable = false;
+
+            // Disable quit button
+            if (btnQuit.interactable)
+                btnQuit.interactable = false;
         }
         else
         {
+            // Enable options button
             if (!btnOptions.interactable)
                 btnOptions.interactable = true;
+
+            // Enable quit button
+            if (!btnQuit.interactable)
+                btnQuit.interactable = true;
+        }
+
+        // Stop recording check
+        if (stopRecording)
+        {
+            // Change graphic over time
+            imgRecordStopBar.localScale = new Vector3(imgRecordStopBar.localScale.x + ((Time.deltaTime) / stopRecordingPressDuration), 1f, 1f);
+
+            // Update counter
+            stopRecordingCounter += Time.deltaTime;
+
+            // Check counter
+            if (stopRecordingCounter >= stopRecordingPressDuration)
+            {
+                SaveUIButton();
+                stopRecording = false;
+                stopRecordingCounter = 0;
+                imgRecordStopBar.localScale = new Vector3(0f, 1f, 1f);
+            }
         }
     }
     #endregion
@@ -364,8 +399,22 @@ public class UIManager : MonoBehaviour
 
         //btn Path and stop record
         btnAddNewPath.onClick.AddListener(() => AddNewPath());
-        btnStopRecording.onClick.AddListener(() => SaveUIButton());
         btnResumeRecording.onClick.AddListener(() => ResumePath());
+
+        // Stop Recording
+        btnStopRecording.onClick.AddListener(() => CancelStopRecord());
+        // OnPointerDown
+        EventTrigger triggerDown = btnStopRecording.gameObject.AddComponent<EventTrigger>();
+        var pointerDown = new EventTrigger.Entry();
+        pointerDown.eventID = EventTriggerType.PointerDown;
+        pointerDown.callback.AddListener((s) => StartStopRecord());
+        triggerDown.triggers.Add(pointerDown);
+        // OnPointerExit
+        EventTrigger triggerExit = btnStopRecording.gameObject.AddComponent<EventTrigger>();
+        var pointerExit = new EventTrigger.Entry();
+        pointerExit.eventID = EventTriggerType.PointerExit;
+        pointerExit.callback.AddListener((c) => CancelStopRecord());
+        triggerExit.triggers.Add(pointerExit);
 
         //btn warning on area
         btnCancel.onClick.AddListener(() => CloseScreenPanels());
@@ -419,6 +468,18 @@ public class UIManager : MonoBehaviour
 
         //btn for close Internet screen
         btnCloseInternetScreen.onClick.AddListener(() => CancelInGeneral());
+    }
+
+    private void StartStopRecord()
+    {
+        stopRecordingCounter = 0;
+        stopRecording = true;
+    }
+
+    private void CancelStopRecord()
+    {
+        stopRecording = false;
+        imgRecordStopBar.localScale = new Vector3(0f, 1f, 1f);
     }
 
     public void ResetSurvey()
@@ -1180,7 +1241,6 @@ public class UIManager : MonoBehaviour
         imgPauseRecording.gameObject.SetActive(true);
         IsInRecordingPath(false);
         AppManager.Instance.mapManager.PauseRecordingPath();
-
     }
 
     //when save button is pressed on warning screen and recording, pausing goes to false. Same with anim recording
