@@ -744,8 +744,8 @@ public class UIManager : MonoBehaviour
 
     private void Escape()
     {
-        pnlOptionsScreen.SetActive(false);
-        EnableScreen(pnlWarningThankYouScreen, false);
+        //pnlOptionsScreen.SetActive(false);
+        //EnableScreen(pnlWarningThankYouScreen, false);
         Application.Quit();
         OnlineMapsLocationService.instance.StopLocationService();
     }
