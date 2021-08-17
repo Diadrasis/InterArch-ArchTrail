@@ -74,7 +74,7 @@ public class MapManager : MonoBehaviour
     #region Unity Functions
     private void Awake()
     {
-        // Enable never sleep for android
+        // Enable never sleep for mobile
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
         //areas = new List<cArea>();

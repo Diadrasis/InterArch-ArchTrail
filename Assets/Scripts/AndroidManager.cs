@@ -234,7 +234,9 @@ public class AndroidManager : MonoBehaviour
     //open the grant permissions on android devices
     public void OpenNativeAndroidSettings()
     {
+#if PLATFORM_ANDROID
         AndroidBridge.OpenIntent(IntentNames.GPS_SETTINGS);
+#endif
     }
     #endregion
 
