@@ -88,14 +88,14 @@ public class AndroidManager : MonoBehaviour
 
         //locationService.TryStartLocationService();
 
-        /*#if PLATFORM_ANDROID
-                if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+/*#if PLATFORM_IOS
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
                 {
                     //Debug.Log("Please grant your gps location");
                     Permission.RequestUserPermission(Permission.FineLocation);
                 }
-        #endif
-                if (CheckForLocationServices())
+        #endif*/
+                /*if (CheckForLocationServices())
                     return;*/
     }
 

@@ -17,8 +17,8 @@ PlayerSettings:
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
-  m_ShowUnitySplashScreen: 0
-  m_ShowUnitySplashLogo: 0
+  m_ShowUnitySplashScreen: 1
+  m_ShowUnitySplashLogo: 1
   m_SplashScreenOverlayOpacity: 1
   m_SplashScreenAnimation: 1
   m_SplashScreenLogoStyle: 1
@@ -171,7 +171,9 @@ PlayerSettings:
   applicationIdentifier:
     Android: net.Diadrasis.ArchTrail
     Standalone: net.Diadrasis.ArchTrail
-  buildNumber: {}
+    iPhone: net.Diadrasis.ArchTrail
+  buildNumber:
+    iPhone: 1
   AndroidBundleVersionCode: 12
   AndroidMinSdkVersion: 20
   AndroidTargetSdkVersion: 0
@@ -465,7 +467,8 @@ PlayerSettings:
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
   cameraUsageDescription: 
-  locationUsageDescription: 
+  locationUsageDescription: 'In order to show you your location, this app needs access
+    to your device''s location services. '
   microphoneUsageDescription: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144
