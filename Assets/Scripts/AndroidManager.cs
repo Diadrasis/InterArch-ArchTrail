@@ -238,13 +238,13 @@ public class AndroidManager : MonoBehaviour
         AndroidBridge.OpenIntent(IntentNames.GPS_SETTINGS);
 #endif
 
-#if UNITY_IOS
+/*#if UNITY_IOS
 #if UNITY_IPHONE
             string url = MyNativeBindings.GetSettingsURL();
             //Debug.Log("the settings url is:" + url);
             Application.OpenURL(url);
 #endif
-#endif
+#endif*/
     }
     #endregion
 
