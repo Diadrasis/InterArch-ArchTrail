@@ -171,8 +171,10 @@ PlayerSettings:
   applicationIdentifier:
     Android: net.Diadrasis.ArchTrail
     Standalone: net.Diadrasis.ArchTrail
-  buildNumber: {}
-  AndroidBundleVersionCode: 11
+    iPhone: net.Diadrasis.ArchTrail
+  buildNumber:
+    iPhone: 1
+  AndroidBundleVersionCode: 12
   AndroidMinSdkVersion: 20
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 2
@@ -465,7 +467,8 @@ PlayerSettings:
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
   cameraUsageDescription: 
-  locationUsageDescription: 
+  locationUsageDescription: 'In order to show you your location, this app needs access
+    to your device''s location services. '
   microphoneUsageDescription: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144
