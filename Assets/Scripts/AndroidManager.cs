@@ -232,13 +232,51 @@ public class AndroidManager : MonoBehaviour
     }
 
     //open the grant permissions on android devices
-    public void OpenNativeAndroidSettings()
+    public void OpenNativeMobileSettings()
     {
-#if PLATFORM_ANDROID
+#if UNITY_ANDROID
         AndroidBridge.OpenIntent(IntentNames.GPS_SETTINGS);
+#endif
+
+#if UNITY_IOS
+#if UNITY_IPHONE
+            string url = MyNativeBindings.GetSettingsURL();
+            //Debug.Log("the settings url is:" + url);
+            Application.OpenURL(url);
+#endif
 #endif
     }
     #endregion
+
+
+    /*private void IOSOpenIntent(string intentName)
+    {
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            Debug.LogWarning("Editor: fake call " + intentName);
+            return;
+        }
+
+        if (Application.platform != RuntimePlatform.IPhonePlayer) { return; }
+
+        try
+        {
+#if UNITY_IOS
+            using (var unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using (AndroidJavaObject currentActivityObject = unityClass.GetStatic<AndroidJavaObject>("currentActivity"))
+            using (var intentObject = new AndroidJavaObject("android.content.Intent", intentName))
+            {
+                currentActivityObject.Call("startActivity", intentObject);
+            }
+#endif
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogException(ex);
+            Debug.Log(ex.Message);
+        }
+    }*/
+
 
     #region NOT IN USE
     /*private void OnApplicationPause(bool pause)

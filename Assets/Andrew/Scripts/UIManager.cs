@@ -385,7 +385,7 @@ public class UIManager : MonoBehaviour
         btnCreateAreaCancel.onClick.AddListener(() => RemoveNewArea());
 
         //btn GPS
-        btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeAndroidSettings());
+        btnGPSPermission.onClick.AddListener(() => AppManager.Instance.androidManager.OpenNativeMobileSettings());
 
         // Admin (OLD)
         //btnAdminYes.onClick.AddListener(() => DisplayPasswordScreen());
