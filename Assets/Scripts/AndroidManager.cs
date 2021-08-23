@@ -217,7 +217,7 @@ public class AndroidManager : MonoBehaviour
         // Check if platform is editor
         if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor)
         {
-            // Reurn true if gps emulator is enabled and false if it is not.
+            // Return true if gps emulator is enabled and false if it is not.
             return locationService.useGPSEmulator;
         }
         else
@@ -227,7 +227,11 @@ public class AndroidManager : MonoBehaviour
                 return true;
             else
                 return locationService.TryStartLocationService();*/
-            return (locationService.IsLocationServiceRunning() && (Input.location.lastData.horizontalAccuracy <= locationService.desiredAccuracy));
+
+            // For testing GPS accuracy
+            //AppManager.Instance.uIManager.infoText.text = string.Format("hor acc {0} <= des acc {1}\nLocation service running = {2}\nArea title = {3}", (Input.location.lastData.horizontalAccuracy * 2).ToString(), locationService.desiredAccuracy, locationService.IsLocationServiceRunning(), AppManager.Instance.mapManager.currentArea.title);
+
+            return (locationService.IsLocationServiceRunning() && (Input.location.lastData.horizontalAccuracy <= locationService.desiredAccuracy * 2));
         }
     }
 
