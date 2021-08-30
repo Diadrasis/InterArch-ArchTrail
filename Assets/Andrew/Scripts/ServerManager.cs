@@ -39,8 +39,8 @@ public class ServerManager : MonoBehaviour
 
     // Ui warning
     public bool panelInternetWarning, isShownOnce;
-    private float secondsToWaitBeforeWarning = 1f;
-    private float minSecondsToDisplayWarning = 1f;
+    private float secondsToWaitBeforeWarning = 0.5f;
+    private float minSecondsToDisplayWarning = 0.5f;
     #endregion
 
     #region UnityMethods
@@ -123,15 +123,15 @@ public class ServerManager : MonoBehaviour
         {
             // AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(false);
             AppManager.Instance.uIManager.imgLoading.color = Color.green;
-            isShownOnce = true;
+            //isShownOnce = true;
         }
         else
         {
-            if (isShownOnce)
+            /*if (isShownOnce)
             {
                 // AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(true);
                 isShownOnce = false;
-            }
+            }*/
 
             AppManager.Instance.uIManager.imgLoading.color = Color.red;
         }
@@ -171,10 +171,19 @@ public class ServerManager : MonoBehaviour
                 StartCoroutine(GetTiles());
                 downloadTiles = false;
             }
+
+            isShownOnce = true;
         }
         else
         {
             AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
+
+            // No internet connection warning
+            if (isShownOnce)
+            {
+                AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(true);
+                isShownOnce = false;
+            }
         }
     }
     #endregion
@@ -663,11 +672,27 @@ public class ServerManager : MonoBehaviour
 
         UnityWebRequest webRequest = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPostGetAreas);
 
+        // Show warning panel
+        if (AppManager.Instance.uIManager.pnlAreaSelectScreen.activeSelf) // Only show on area select panel
+        {
+            if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                AppManager.Instance.uIManager.txtWarningServer.text = "Updating areas...";
+            else
+                AppManager.Instance.uIManager.txtWarningServer.text = "Ενημέρωση περιοχών...";
+            AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+        }
+
         yield return webRequest.SendWebRequest();
 
         if (webRequest.isNetworkError || webRequest.isHttpError)
         {
-            Debug.Log("Web request failed. Error #" + webRequest.error);
+            //Debug.Log("Web request failed. Error #" + webRequest.error);
+
+            // Update warning panel
+            if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                AppManager.Instance.uIManager.txtWarningServer.text = "Web request failed. Error #" + webRequest.error;
+            else
+                AppManager.Instance.uIManager.txtWarningServer.text = "Η ενημέρωση απέτυχε. Error #" + webRequest.error;
         }
         else
         {
@@ -689,7 +714,7 @@ public class ServerManager : MonoBehaviour
 
                 if (areasDataFromJSON != null && areasDataFromJSON.Length > 0)
                 {
-                    // Show warning panel
+                    /*// Show warning panel
                     if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
                     {
                         if (AppManager.Instance.uIManager.LanguageIsEnglish())
@@ -697,7 +722,7 @@ public class ServerManager : MonoBehaviour
                         else
                             AppManager.Instance.uIManager.txtWarningServer.text = "Ενημέρωση περιοχών...";
                         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    }
+                    }*/
 
                     foreach (cAreaData areaData in areasDataFromJSON)
                     {
@@ -807,11 +832,24 @@ public class ServerManager : MonoBehaviour
 
         UnityWebRequest webRequestPaths = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPostGetPaths);
 
+        // Show warning panel
+        if (AppManager.Instance.uIManager.LanguageIsEnglish())
+            AppManager.Instance.uIManager.txtWarningServer.text = "Updating paths...";
+        else
+            AppManager.Instance.uIManager.txtWarningServer.text = "Ενημέρωση διαδρομών...";
+        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
         yield return webRequestPaths.SendWebRequest();
 
         if (webRequestPaths.isNetworkError || webRequestPaths.isHttpError)
         {
-            Debug.Log("Web request failed. Error #" + webRequestPaths.error);
+            //Debug.Log("Web request failed. Error #" + webRequestPaths.error);
+
+            // Update warning panel
+            if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                AppManager.Instance.uIManager.txtWarningServer.text = "Web request failed. Error #" + webRequestPaths.error;
+            else
+                AppManager.Instance.uIManager.txtWarningServer.text = "Η ενημέρωση απέτυχε. Error #" + webRequestPaths.error;
         }
         else
         {
@@ -833,14 +871,14 @@ public class ServerManager : MonoBehaviour
                 if (pathsDataFromJSON != null && pathsDataFromJSON.Length > 0)
                 {
                     // Show warning panel
-                    if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+                    /*if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
                     {
                         if (AppManager.Instance.uIManager.LanguageIsEnglish())
                             AppManager.Instance.uIManager.txtWarningServer.text = "Updating paths...";
                         else
                             AppManager.Instance.uIManager.txtWarningServer.text = "Ενημέρωση διαδρομών...";
                         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    }
+                    }*/
 
                     foreach (cPathData pathData in pathsDataFromJSON)
                     {
@@ -897,11 +935,24 @@ public class ServerManager : MonoBehaviour
 
         UnityWebRequest webRequestPoints = UnityWebRequest.Post(diadrasisAreaManagerUrl, formToPostGetPoints);
 
+        // Show warning panel
+        if (AppManager.Instance.uIManager.LanguageIsEnglish())
+            AppManager.Instance.uIManager.txtWarningServer.text = "Updating points...";
+        else
+            AppManager.Instance.uIManager.txtWarningServer.text = "Ενημέρωση σημείων...";
+        AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
+
         yield return webRequestPoints.SendWebRequest();
 
         if (webRequestPoints.isNetworkError || webRequestPoints.isHttpError)
         {
-            Debug.Log("Web request failed. Error #" + webRequestPoints.error);
+            //Debug.Log("Web request failed. Error #" + webRequestPoints.error);
+
+            // Update warning panel
+            if (AppManager.Instance.uIManager.LanguageIsEnglish())
+                AppManager.Instance.uIManager.txtWarningServer.text = "Web request failed. Error #" + webRequestPoints.error;
+            else
+                AppManager.Instance.uIManager.txtWarningServer.text = "Η ενημέρωση απέτυχε. Error #" + webRequestPoints.error;
         }
         else
         {
@@ -916,21 +967,23 @@ public class ServerManager : MonoBehaviour
             {
                 // Create a Json string from byte[]
                 string json = System.Text.Encoding.UTF8.GetString(pointsData);
-                //Debug.Log("points --> Json string = " + json);
+                // Debug.Log("points --> Json string = " + json);
                 // Create a cAreasData from json string
                 cPointData[] pointsDataFromJSON = MethodHelper.FromJson<cPointData>(MethodHelper.SetupJson(json));
 
                 if (pointsDataFromJSON != null && pointsDataFromJSON.Length > 0)
                 {
                     // Show warning panel
-                    if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
+                    /*if (stopWatch.Elapsed.TotalSeconds > secondsToWaitBeforeWarning)
                     {
+                        //Debug.Log("GetPoints show warning time: " + stopWatch.Elapsed.TotalSeconds);
+
                         if (AppManager.Instance.uIManager.LanguageIsEnglish())
                             AppManager.Instance.uIManager.txtWarningServer.text = "Updating points...";
                         else
                             AppManager.Instance.uIManager.txtWarningServer.text = "Ενημέρωση σημείων...";
                         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
-                    }
+                    }*/
 
                     foreach (cPointData pointData in pointsDataFromJSON)
                     {
@@ -963,6 +1016,7 @@ public class ServerManager : MonoBehaviour
         stopWatch.Stop();
         TimeSpan timeSpan = stopWatch.Elapsed;
         yield return new WaitForSeconds(timeSpan.TotalSeconds > (secondsToWaitBeforeWarning + minSecondsToDisplayWarning) ? 0f : ((secondsToWaitBeforeWarning + minSecondsToDisplayWarning) - (float)timeSpan.TotalSeconds));
+        //Debug.Log("GetPoints stop time: " + stopWatch.Elapsed.TotalSeconds);
         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
     }
 

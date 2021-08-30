@@ -189,7 +189,7 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        //PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
 
         // Deactivate never sleep for android
         Screen.sleepTimeout = SleepTimeout.SystemSetting;
