@@ -231,7 +231,7 @@ public class AndroidManager : MonoBehaviour
             // For testing GPS accuracy
             //AppManager.Instance.uIManager.infoText.text = string.Format("hor acc {0} <= des acc {1}\nLocation service running = {2}\nArea title = {3}", (Input.location.lastData.horizontalAccuracy * 2).ToString(), locationService.desiredAccuracy, locationService.IsLocationServiceRunning(), AppManager.Instance.mapManager.currentArea.title);
 
-            return (locationService.IsLocationServiceRunning() && (Input.location.lastData.horizontalAccuracy <= locationService.desiredAccuracy * 2));
+            return (locationService.IsLocationServiceRunning() && (Input.location.lastData.horizontalAccuracy <= locationService.desiredAccuracy));
         }
     }
 

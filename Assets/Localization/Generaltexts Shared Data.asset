@@ -139,6 +139,26 @@ MonoBehaviour:
     m_Key: btnSavedPathsC
     m_Metadata:
       m_Items: []
+  - m_Id: 29416075356962816
+    m_Key: btnSettings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29431032823840768
+    m_Key: pnlSettingsC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29438466573369344
+    m_Key: inpFldDesiredAccuracy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29439643201470464
+    m_Key: inpFldUpdateDistance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 29442526210850816
+    m_Key: btnSaveSettings
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

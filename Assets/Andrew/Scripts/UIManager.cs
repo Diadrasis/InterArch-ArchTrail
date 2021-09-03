@@ -31,14 +31,17 @@ public class UIManager : MonoBehaviour
     public GameObject pnlAdminScreen;
     public GameObject pnlAreaSelectScreen;
     public GameObject pnlAboutScreen;
+    public GameObject pnlSettingsScreen;
     public Button btnLanguageScreen;
     public Button btnAdminScreen;
     public Button btnAreaSelectScreen;
     public Button btnAboutScreen;
-    public GameObject pnlLineSeparatorBtnLanguage;
-    public GameObject pnlLineSeparatorBtnAdmin;
-    public GameObject pnlLineSeparatorBtnAreaSelect;
-    public GameObject pnlLineSeparatorBtnAbout;
+    public Button btnSettingsScreen;
+    public GameObject pnlBtnLanguage;
+    public GameObject pnlBtnAdmin;
+    public GameObject pnlBtnAreaSelect;
+    public GameObject pnlBtnAbout;
+    public GameObject pnlBtnSettings;
 
     [Space]
     [Header("Language Screen")]
@@ -371,6 +374,7 @@ public class UIManager : MonoBehaviour
         btnAdminScreen.onClick.AddListener(() => DisplayAdminScreen());
         btnAreaSelectScreen.onClick.AddListener(() => DisplayAreas());
         btnAboutScreen.onClick.AddListener(() => DisplayAboutScreen());
+        btnSettingsScreen.onClick.AddListener(() => DisplaySettingsScreen());
 
         // Language Screen
         btnGreek.onClick.AddListener(() => ChangeLanguage(true));
@@ -539,27 +543,32 @@ public class UIManager : MonoBehaviour
         // Close other option screens
         if (pnlQuestionnaireScreen.activeSelf)
         {
-            btnLanguageScreen.gameObject.SetActive(true);
+            /*btnLanguageScreen.gameObject.SetActive(true);
             btnAdminScreen.gameObject.SetActive(false);
             btnAreaSelectScreen.gameObject.SetActive(false);
-            btnAboutScreen.gameObject.SetActive(false);
+            btnAboutScreen.gameObject.SetActive(false);*/
 
-            // Lines
-            pnlLineSeparatorBtnLanguage.SetActive(true);
-            pnlLineSeparatorBtnAdmin.SetActive(false);
-            pnlLineSeparatorBtnAreaSelect.SetActive(false);
-            pnlLineSeparatorBtnAbout.SetActive(false);
+            // Button Panels
+            pnlBtnLanguage.SetActive(true);
+            pnlBtnAdmin.SetActive(false);
+            pnlBtnAreaSelect.SetActive(false);
+            pnlBtnAbout.SetActive(false);
+            pnlBtnSettings.SetActive(false);
         }
         else
         {
-            btnLanguageScreen.gameObject.SetActive(true);
-            pnlLineSeparatorBtnLanguage.SetActive(true);
-            btnAdminScreen.gameObject.SetActive(true);
-            pnlLineSeparatorBtnAdmin.SetActive(true);
-            btnAreaSelectScreen.gameObject.SetActive(true);
-            pnlLineSeparatorBtnAreaSelect.SetActive(true);
-            btnAboutScreen.gameObject.SetActive(true);
-            pnlLineSeparatorBtnAbout.SetActive(true);
+            //btnLanguageScreen.gameObject.SetActive(true);
+            pnlBtnLanguage.SetActive(true);
+            //btnAdminScreen.gameObject.SetActive(true);
+            pnlBtnAdmin.SetActive(true);
+            //btnAreaSelectScreen.gameObject.SetActive(true);
+            pnlBtnAreaSelect.SetActive(true);
+            //btnAboutScreen.gameObject.SetActive(true);
+            pnlBtnAbout.SetActive(true);
+            if (isAdmin)
+                pnlBtnSettings.SetActive(true);
+            else
+                pnlBtnSettings.SetActive(false);
         }
 
         // Close other option screens
@@ -567,6 +576,7 @@ public class UIManager : MonoBehaviour
         pnlAdminScreen.gameObject.SetActive(false);
         pnlAreaSelectScreen.gameObject.SetActive(false);
         pnlAboutScreen.gameObject.SetActive(false);
+        pnlSettingsScreen.gameObject.SetActive(false);
 
         // Close Saved Paths
         if (pnlSavedPaths.activeSelf)
@@ -598,27 +608,32 @@ public class UIManager : MonoBehaviour
         // Close other screens
         if (pnlQuestionnaireScreen.activeSelf)
         {
-            btnLanguageScreen.gameObject.SetActive(true);
+            /*btnLanguageScreen.gameObject.SetActive(true);
             btnAdminScreen.gameObject.SetActive(false);
             btnAreaSelectScreen.gameObject.SetActive(false);
-            btnAboutScreen.gameObject.SetActive(false);
+            btnAboutScreen.gameObject.SetActive(false);*/
 
-            // Lines
-            pnlLineSeparatorBtnLanguage.SetActive(true);
-            pnlLineSeparatorBtnAdmin.SetActive(false);
-            pnlLineSeparatorBtnAreaSelect.SetActive(false);
-            pnlLineSeparatorBtnAbout.SetActive(false);
+            // Button Panels
+            pnlBtnLanguage.SetActive(true);
+            pnlBtnAdmin.SetActive(false);
+            pnlBtnAreaSelect.SetActive(false);
+            pnlBtnAbout.SetActive(false);
+            pnlBtnSettings.SetActive(false);
         }
         else
         {
-            btnLanguageScreen.gameObject.SetActive(true);
-            pnlLineSeparatorBtnLanguage.SetActive(true);
-            btnAdminScreen.gameObject.SetActive(true);
-            pnlLineSeparatorBtnAdmin.SetActive(true);
-            btnAreaSelectScreen.gameObject.SetActive(true);
-            pnlLineSeparatorBtnAreaSelect.SetActive(true);
-            btnAboutScreen.gameObject.SetActive(true);
-            pnlLineSeparatorBtnAbout.SetActive(true);
+            //btnLanguageScreen.gameObject.SetActive(true);
+            pnlBtnLanguage.SetActive(true);
+            //btnAdminScreen.gameObject.SetActive(true);
+            pnlBtnAdmin.SetActive(true);
+            //btnAreaSelectScreen.gameObject.SetActive(true);
+            pnlBtnAreaSelect.SetActive(true);
+            //btnAboutScreen.gameObject.SetActive(true);
+            pnlBtnAbout.SetActive(true);
+            if (isAdmin)
+                pnlBtnSettings.SetActive(true);
+            else
+                pnlBtnSettings.SetActive(false);
         }
 
         // Close other screens
@@ -626,6 +641,7 @@ public class UIManager : MonoBehaviour
         pnlAdminScreen.gameObject.SetActive(false);
         pnlAreaSelectScreen.gameObject.SetActive(false);
         pnlAboutScreen.gameObject.SetActive(false);
+        pnlSettingsScreen.gameObject.SetActive(false);
 
         // Disable Back Button
         btnBack.gameObject.SetActive(false);
@@ -714,6 +730,18 @@ public class UIManager : MonoBehaviour
 
         // Enable About Screen
         pnlAboutScreen.gameObject.SetActive(true);
+
+        // Enable Back Button
+        btnBack.gameObject.SetActive(true);
+    }
+
+    public void DisplaySettingsScreen()
+    {
+        // Disable Options
+        pnlOptions.gameObject.SetActive(false);
+
+        // Enable About Screen
+        pnlSettingsScreen.gameObject.SetActive(true);
 
         // Enable Back Button
         btnBack.gameObject.SetActive(true);
