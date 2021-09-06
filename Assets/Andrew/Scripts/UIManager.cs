@@ -64,6 +64,20 @@ public class UIManager : MonoBehaviour
     public Button btnCreateArea;
 
     [Space]
+    [Header("Settings Screen")]
+    public Slider sldrDesiredAccuracy;
+    public Slider sldrUpdateDistance;
+    public TextMeshProUGUI tmpDesiredAccuracy;
+    public TextMeshProUGUI tmpUpdateDistance;
+    //public TMP_InputField inptFldDesiredAccuracy;
+    //public TMP_InputField inptFldUpdateDistance;
+    public Button btnSaveSettings;
+    private readonly float DEFAULT_DESIRED_ACCURACY = 10;
+    private readonly float DEFAULT_UPDATE_DISTANCE = 5;
+    private readonly string DESIRED_ACCURACY_KEY = "desiredAccuracyKey";
+    private readonly string UPDATE_DISTANCE_KEY = "updateDistanceKey";
+
+    [Space]
     [Header("Create Area Screen")]
     // Create Area Screen
     public GameObject pnlCreateArea;
@@ -99,19 +113,6 @@ public class UIManager : MonoBehaviour
     [Header("GPS Signal panel")]
     //GPS Screen
     public GameObject pnlGPSSignal;
-
-    /*[Space]
-    [Header("Admin Screen")]
-    public GameObject pnlWarningsAdminScreen;
-    public Button btnAdminYes;
-    public Button btnAdminNo;
-
-    [Space]
-    [Header("Password Screen")]
-    public GameObject pnlWarningsPasswordScreen;
-    public TMP_InputField inptFldPasswordScreen;
-    public Button btnPasswordLogin;*/
-    //public Button btnPasswordScreenClose;
 
     [Space]
     [Header("Path Screen")]
@@ -288,7 +289,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (pnlPathScreen.activeSelf && !pnlOptionsScreen.activeSelf) //  && !pnlSavedPaths.activeSelf
+        if (pnlPathScreen.activeSelf && !pnlOptionsScreen.activeSelf && !pnlSavedPaths.activeSelf)
         {
             if (AppManager.Instance.androidManager.HasGPS())
             {
@@ -383,6 +384,17 @@ public class UIManager : MonoBehaviour
         // Areas Screen
         btnCreateArea.onClick.AddListener(() => CreateNewAreaSelected());
 
+        // Settings Screen
+        sldrDesiredAccuracy.onValueChanged.AddListener(ChangeSliderTxtDesiredAccuracy);
+        sldrUpdateDistance.onValueChanged.AddListener(ChangeSliderTxtUpdateDistance);
+        btnSaveSettings.onClick.AddListener(() => CheckSettings());
+        //inptFldDesiredAccuracy.characterLimit = 6;
+        //inptFldUpdateDistance.characterLimit = 6;
+        SetLocationServiceSettings(); // TODO: Map Manager method
+        SetSettingsTexts();
+        //inptFldDesiredAccuracy.text = OnlineMapsLocationService.instance.desiredAccuracy.ToString();
+        //inptFldUpdateDistance.text = OnlineMapsLocationService.instance.updateDistance.ToString();
+
         // CreateAreaScreen
         btnSaveArea.onClick.AddListener(() => EnableScreen(pnlSaveArea, true));
         btnCreateAreaSave.onClick.AddListener(() => SaveArea());
@@ -471,7 +483,7 @@ public class UIManager : MonoBehaviour
         btnResetQuestionnaire.onClick.AddListener(() => EnableScreen(pnlWarningResetSurveyScreen, true));
 
         //btn for close Internet screen
-        btnCloseInternetScreen.onClick.AddListener(() => CancelInGeneral());
+        btnCloseInternetScreen.onClick.AddListener(() => EnableScreen(pnlWarningInternetScreen, false)); // CancelInGeneral()
     }
 
     private void StartStopRecord()
@@ -740,6 +752,9 @@ public class UIManager : MonoBehaviour
         // Disable Options
         pnlOptions.gameObject.SetActive(false);
 
+        // Reset Settings
+        SetSettingsTexts();
+
         // Enable About Screen
         pnlSettingsScreen.gameObject.SetActive(true);
 
@@ -973,8 +988,8 @@ public class UIManager : MonoBehaviour
     private void OnPathSelectPressed()
     {
         // Reset Panels
-        ResetPanels();
-        pnlPathScreen.SetActive(true);
+        //ResetPanels();
+        //pnlPathScreen.SetActive(true);
 
         GameObject selectPathObject = EventSystem.current.currentSelectedGameObject.transform.parent.transform.parent.gameObject;
         //TMP_Text selectPathText = selectPathObject.GetComponentInChildren<TMP_Text>();
@@ -984,16 +999,30 @@ public class UIManager : MonoBehaviour
         //AppManager.Instance.mapManager.currentPath = selectedPath;
         if (selectedPath != null)
         {
-            // Download Points of Path
-            if (selectedPath.server_path_id != -1)
+            // Try to load points of path
+            List<cPathPoint> loadedPoints = cPathPoint.LoadPathPointsOfPath(selectedPath.local_path_id);
+
+            // Check if points are loaded, else download points
+            if (loadedPoints != null && loadedPoints.Count > 0)
             {
-                AppManager.Instance.serverManager.DownloadPoints(selectedPath.server_path_id); // TODO: Wait until download is finished to display path
+                selectedPath.pathPoints = loadedPoints;
+
+                // Display Path
+                AppManager.Instance.mapManager.DisplayPath(selectedPath);
+            }
+            else
+            {
+                // Download Points of Path
+                if (selectedPath.server_path_id != -1)
+                {
+                    AppManager.Instance.mapManager.pathToDisplay = selectedPath;
+                    AppManager.Instance.serverManager.DownloadPoints(selectedPath.server_path_id); // TODO: Wait until download is finished to display path
+                }
             }
 
-            pnlScrollViewPaths.SetActive(false);
+            /*pnlScrollViewPaths.SetActive(false);
             pnlSavedPaths.SetActive(false);
-            //if (selectedPath.pathPoints.Count > 0)
-            AppManager.Instance.mapManager.DisplayPath(selectedPath);
+            AppManager.Instance.mapManager.DisplayPath(selectedPath);*/
         }
     }
 
@@ -1517,6 +1546,81 @@ public class UIManager : MonoBehaviour
         /*pnlWarningsPasswordScreen.SetActive(false);
         pnlWarningsAdminScreen.SetActive(false);
         DisplayAreaSelectScreen();*/
+    }
+
+    void CheckSettings()
+    {
+        // Check if all settings are valid
+        if (IsValidPathSetting(tmpDesiredAccuracy.text) && IsValidPathSetting(tmpUpdateDistance.text)) // inptFldDesiredAccuracy.text inptFldUpdateDistance.text
+        {
+            // Save settings locally
+            SaveSettings(float.Parse(tmpDesiredAccuracy.text), float.Parse(tmpUpdateDistance.text));
+
+            // Set settings in location service
+            SetLocationServiceSettings();
+
+            // Close Settings Screen
+            DisplayOptionsScreen();
+        }
+        else
+        {
+            //inptFldDesiredAccuracy.text = DEFAULT_DESIRED_ACCURACY.ToString();
+            //inptFldUpdateDistance.text = DEFAULT_UPDATE_DISTANCE.ToString();
+
+            sldrDesiredAccuracy.value = DEFAULT_DESIRED_ACCURACY;
+            sldrUpdateDistance.value = DEFAULT_UPDATE_DISTANCE;
+        }
+    }
+
+    void SetSettingsTexts()
+    {
+        // Set input field texts
+        //inptFldDesiredAccuracy.text = OnlineMapsLocationService.instance.desiredAccuracy.ToString();
+        //inptFldUpdateDistance.text = OnlineMapsLocationService.instance.updateDistance.ToString();
+        sldrDesiredAccuracy.value = OnlineMapsLocationService.instance.desiredAccuracy;
+        sldrUpdateDistance.value = OnlineMapsLocationService.instance.updateDistance;
+    }
+
+    void SetLocationServiceSettings()
+    {
+        // Load settings
+        float? desiredAccuracy = LoadSetting(DESIRED_ACCURACY_KEY);
+        float? updateDistance = LoadSetting(UPDATE_DISTANCE_KEY);
+
+        // Set Location Service
+        OnlineMapsLocationService.instance.desiredAccuracy = desiredAccuracy != null ? (float)desiredAccuracy : DEFAULT_DESIRED_ACCURACY;
+        OnlineMapsLocationService.instance.updateDistance = updateDistance != null ? (float)updateDistance : DEFAULT_UPDATE_DISTANCE;
+    }
+
+    void SaveSettings(float _desiredAccuracy, float _updateDistance)
+    {
+        PlayerPrefs.SetFloat(DESIRED_ACCURACY_KEY, _desiredAccuracy);
+        PlayerPrefs.SetFloat(UPDATE_DISTANCE_KEY, _updateDistance);
+    }
+
+    float? LoadSetting(string _key)
+    {
+        if (PlayerPrefs.HasKey(_key))
+            return PlayerPrefs.GetFloat(_key);
+        else
+            return null;
+    }
+
+    bool IsValidPathSetting(string _text)
+    {
+        float f;
+
+        return float.TryParse(_text, out f) && f >= 0;
+    }
+
+    public void ChangeSliderTxtDesiredAccuracy(float _number)
+    {
+        tmpDesiredAccuracy.text = _number.ToString();
+    }
+
+    public void ChangeSliderTxtUpdateDistance(float _number)
+    {
+        tmpUpdateDistance.text = _number.ToString();
     }
     #endregion
 

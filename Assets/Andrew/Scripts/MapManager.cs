@@ -189,11 +189,12 @@ public class MapManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
+        // PlayerPrefs.DeleteAll(); // TODO: REMOVE!!!
 
         // Deactivate never sleep for android
         Screen.sleepTimeout = SleepTimeout.SystemSetting;
     }
+
     private void OnDisable()
     {
         //AppManager.Instance.serverManager.OnCheckInternetCheckComplete -= AppManager.Instance.androidManager.OnCheckInternetCheckComplete;
@@ -738,6 +739,10 @@ public class MapManager : MonoBehaviour
 
     public void DisplayPath(cPath _pathToDisplay)
     {
+        // Close panels
+        AppManager.Instance.uIManager.pnlScrollViewPaths.SetActive(false);
+        AppManager.Instance.uIManager.pnlSavedPaths.SetActive(false);
+
         // Remove user marker
         if (userMarker != null)
             OnlineMapsMarkerManager.instance.items.Remove(userMarker);

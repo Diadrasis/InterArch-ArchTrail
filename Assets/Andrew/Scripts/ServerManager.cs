@@ -179,10 +179,10 @@ public class ServerManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
 
             // No internet connection warning
-            if (isShownOnce)
+            if (isShownOnce && AppManager.Instance.uIManager.isAdmin) //!AppManager.Instance.uIManager.pnlLanguageScreen.activeSelf
             {
                 AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(true);
-                isShownOnce = false;
+                //isShownOnce = false;
             }
         }
     }
@@ -925,6 +925,8 @@ public class ServerManager : MonoBehaviour
 
     IEnumerator GetPoints(int _server_path_id)
     {
+        bool downloadedPoints = false;
+
         // Calculate seconds to Download
         System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
         stopWatch.Start();
@@ -985,6 +987,8 @@ public class ServerManager : MonoBehaviour
                         AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(true);
                     }*/
 
+                    downloadedPoints = true;
+
                     foreach (cPointData pointData in pointsDataFromJSON)
                     {
                         // Create a path from pathData
@@ -1010,7 +1014,8 @@ public class ServerManager : MonoBehaviour
         }
 
         // Reload points
-        AppManager.Instance.mapManager.ReloadPoints();
+        if (downloadedPoints)
+            AppManager.Instance.mapManager.ReloadPoints();
 
         // Deactivate warning panel
         stopWatch.Stop();
