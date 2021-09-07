@@ -244,6 +244,8 @@ public class UIManager : MonoBehaviour
     private bool stopRecording = false;
     readonly private float stopRecordingPressDuration = 3f; // seconds
     private float stopRecordingCounter = 0;
+
+    bool quit = false;
     #endregion
 
     #region Unity Functions
@@ -304,7 +306,7 @@ public class UIManager : MonoBehaviour
             else
             {
                 // Enable GPS signal panel
-                if (!pnlGPSSignal.activeSelf)
+                if (!pnlGPSSignal.activeSelf && !quit)
                     pnlGPSSignal.SetActive(true);
 
                 // Disable new path button
@@ -791,6 +793,8 @@ public class UIManager : MonoBehaviour
         //EnableScreen(pnlWarningThankYouScreen, false);
         Application.Quit();
         OnlineMapsLocationService.instance.StopLocationService();
+        pnlGPSSignal.SetActive(false);
+        quit = true;
     }
 
     private List<GameObject> InstantiateSelectAreaObjects()

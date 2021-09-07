@@ -179,7 +179,8 @@ public class ServerManager : MonoBehaviour
             AppManager.Instance.uIManager.pnlWarningServerScreen.SetActive(false);
 
             // No internet connection warning
-            if (isShownOnce && AppManager.Instance.uIManager.isAdmin) //!AppManager.Instance.uIManager.pnlLanguageScreen.activeSelf
+            if (isShownOnce && AppManager.Instance.uIManager.isAdmin
+                && (AppManager.Instance.uIManager.pnlOptionsScreen.activeSelf || AppManager.Instance.uIManager.pnlSavedPaths.activeSelf))
             {
                 AppManager.Instance.uIManager.pnlWarningInternetScreen.SetActive(true);
                 //isShownOnce = false;
