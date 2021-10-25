@@ -1001,7 +1001,8 @@ public class SurveyManager : MonoBehaviour
         }*/
 
         // Save Survey
-        cSurvey surveyToSave = new cSurvey(currentPath.server_path_id, currentPath.local_area_id, answers);
+        //cSurvey surveyToSave = new cSurvey(currentPath.server_path_id, currentPath.local_area_id, answers);
+        cSurvey surveyToSave = new cSurvey(-1, currentPath.local_path_id, answers);
         cSurvey.Save(surveyToSave);
 
         // Upload to server

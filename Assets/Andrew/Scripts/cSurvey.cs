@@ -49,7 +49,7 @@ public class cSurvey
         // Load xml document, if null creates new
         OnlineMapsXML xml = GetXML();
 
-        // Check if area is already saved
+        // Check if survey is already saved
         OnlineMapsXML surveySaved = xml.Find("/" + SURVEYS + "/" + SURVEY + "[" + LOCAL_PATH_ID + "=" + _surveyToSave.local_path_id + "]");
         if (!surveySaved.isNull)
         {
@@ -70,6 +70,10 @@ public class cSurvey
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
+
+        // Debug
+        Debug.Log("Saved Survey");
+        Debug.Log("Edited xml = " + xml.outerXml);
     }
 
     public static void SetServerPathId(int _server_path_id, int _local_path_id)
@@ -166,7 +170,7 @@ public class cSurvey
         OnlineMapsXML xml = GetXML();
 
         // Get surveys with server_path_id != -1
-        OnlineMapsXMLList surveyNodes = xml.FindAll("/" + SURVEYS + "/" + SURVEY + "[" + SERVER_PATH_ID + "!=" + (-1) + "]");
+        OnlineMapsXMLList surveyNodes = xml.FindAll("/" + SURVEYS + "/" + SURVEY + "[" + SERVER_PATH_ID + "=" + (-1) + "]");
 
         foreach (OnlineMapsXML surveyNode in surveyNodes)
         {
@@ -175,12 +179,28 @@ public class cSurvey
                 Debug.Log("Survey has been deleted!");
                 continue;
             }
-
+            
+            // Load survey
             cSurvey loadedSurvey = Load(surveyNode);
-
+            
             if (loadedSurvey != null)
-                surveysToUpload.Add(loadedSurvey);
+            {
+                // Get server_path_id from local path id
+                int? serverPathId = cPath.GetServerPathId(loadedSurvey.local_path_id);
+                if (serverPathId != null)
+                {
+                    // Set survey server path id
+                    loadedSurvey.server_path_id = (int)serverPathId;
+
+                    // Add this survey to the list
+                    surveysToUpload.Add(loadedSurvey);
+                }
+            }
         }
+
+        // Debug
+        //Debug.Log("surveyNodes = " + surveyNodes.count);
+        //Debug.Log("Edited xml = " + xml.outerXml);
 
         return surveysToUpload;
     }

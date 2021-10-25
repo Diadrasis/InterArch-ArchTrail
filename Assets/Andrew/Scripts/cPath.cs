@@ -232,7 +232,7 @@ public class cPath
         pathNode.Remove(SERVER_PATH_ID);
         pathNode.Create(SERVER_PATH_ID, _pathToEdit.server_path_id);
 
-        Debug.Log("Edited xml = " + xml.outerXml);
+        //Debug.Log("Edited xml = " + xml.outerXml);
         // Save xml string to PlayerPrefs
         PlayerPrefs.SetString(cArea.PREFS_KEY, xml.outerXml);
         PlayerPrefs.Save();
@@ -405,6 +405,31 @@ public class cPath
 
         // Edit path
         EditServerPathId(loadedPath);
+    }
+
+    public static int? GetServerPathId(int _local_path_id)
+    {
+        // Load xml document, if null creates new
+        OnlineMapsXML xml = cArea.GetXML();
+
+        // Find path
+        OnlineMapsXML pathNode = xml.Find("/" + cArea.AREAS + "/" + cArea.AREA + "/" + cArea.PATHS + "/" + PATH + "[" + LOCAL_PATH_ID + "=" + _local_path_id + "]");
+
+        if (pathNode.isNull)
+        {
+            Debug.Log("There is no path with local id = " + _local_path_id);
+            return null;
+        }
+
+        // Load path
+        cPath loadedPath = Load(pathNode);
+        if (loadedPath.server_path_id == -1)
+        {
+            Debug.Log("Path has not been uploaded");
+            return null;
+        }
+
+        return loadedPath.server_path_id;
     }
     #endregion
 }

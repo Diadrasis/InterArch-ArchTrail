@@ -198,7 +198,7 @@ public class ServerManager : MonoBehaviour
 
         // Initialize upload info
         string uploadInfo = string.Empty;
-        
+
         // Get areas to upload
         List<cArea> areasToUpload = cArea.GetAreasToUpload();
 
@@ -376,7 +376,7 @@ public class ServerManager : MonoBehaviour
                     if (int.TryParse(server_path_idString, out int server_path_id))
                     {
                         cPath.SetServerAreaAndPathId(pathToUpload.server_area_id, server_path_id, pathToUpload.local_path_id);
-                        cSurvey.SetServerPathId(server_path_id, pathToUpload.local_path_id); // for offline
+                        //cSurvey.SetServerPathId(server_path_id, pathToUpload.local_path_id); // for offline
                     }
                 }
             }
