@@ -12,6 +12,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class Marker3D_GPS_Example : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the 3D control (Texture or Tileset). If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsControlBase3D control;
+        
+        /// <summary>
         /// Prefab of 3D marker
         /// </summary>
         public GameObject prefab;
@@ -20,8 +25,10 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
-            // Gets the current 3D control.
-            OnlineMapsControlBase3D control = OnlineMapsControlBase3D.instance;
+            // If the control is not specified, get the current instance.
+            if (control == null) control = OnlineMapsControlBase3D.instance;
+
+            // Check if the control is 3D.
             if (control == null)
             {
                 Debug.LogError("You must use the 3D control (Texture or Tileset).");
@@ -29,8 +36,7 @@ namespace InfinityCode.OnlineMapsExamples
             }
 
             //Create a marker to show the current GPS coordinates.
-            //Instead of "null", you can specify the texture desired marker.
-            locationMarker = OnlineMapsMarker3DManager.CreateItem(Vector2.zero, prefab);
+            locationMarker = control.marker3DManager.Create(Vector2.zero, prefab);
 
             //Hide handle until the coordinates are not received.
             locationMarker.enabled = false;
@@ -41,7 +47,7 @@ namespace InfinityCode.OnlineMapsExamples
             if (ls == null)
             {
                 Debug.LogError(
-                    "Location Service not found.\nAdd Location Service Component (Component / Infinity Code / Online Maps / Plugins / Location Service).");
+                    "Location Service not found.\nAdd Location Service component (Component / Infinity Code / Online Maps / Plugins / Location Service).");
                 return;
             }
 
@@ -50,13 +56,13 @@ namespace InfinityCode.OnlineMapsExamples
             ls.OnCompassChanged += OnCompassChanged;
 
             //Subscribe to zoom change
-            OnlineMaps.instance.OnChangeZoom += OnChangeZoom;
+            control.map.OnChangeZoom += OnChangeZoom;
         }
 
         private void OnChangeZoom()
         {
             //Example of scaling object
-            int zoom = OnlineMaps.instance.zoom;
+            int zoom = control.map.zoom;
 
             if (zoom >= 5 && zoom < 10)
             {

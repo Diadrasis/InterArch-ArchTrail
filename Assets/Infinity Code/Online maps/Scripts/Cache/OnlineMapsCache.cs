@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -109,17 +110,21 @@ public partial class OnlineMapsCache:MonoBehaviour, IOnlineMapsSavableComponent
 
     private void OnPreloadTiles(OnlineMaps map)
     {
+        OnlineMapsTile[] tiles;
+
         lock (OnlineMapsTile.lockTiles)
         {
-            float start = Time.realtimeSinceStartup;
-            for (int i = 0; i < map.tileManager.tiles.Count; i++)
-            {
-                OnlineMapsTile tile = map.tileManager.tiles[i];
-                if (tile.status != OnlineMapsTileStatus.none || tile.cacheChecked) continue;
-                if (!TryLoadFromCache(tile)) tile.cacheChecked = true;
-                else if (OnLoadedFromCache != null) OnLoadedFromCache(tile);
-                if (Time.realtimeSinceStartup - start > 0.02) return;
-            }
+            tiles = map.tileManager.tiles.ToArray();
+        }
+
+        float start = Time.realtimeSinceStartup;
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            OnlineMapsTile tile = tiles[i];
+            if (tile.status != OnlineMapsTileStatus.none || tile.cacheChecked) continue;
+            if (!TryLoadFromCache(tile)) tile.cacheChecked = true;
+            else if (OnLoadedFromCache != null) OnLoadedFromCache(tile);
+            if (Time.realtimeSinceStartup - start > 0.02) return;
         }
     }
 
@@ -169,25 +174,56 @@ public partial class OnlineMapsCache:MonoBehaviour, IOnlineMapsSavableComponent
         OnlineMapsTile.OnTileDownloaded += OnTileDownloaded;
     }
 
+    /// <summary>
+    /// Base class for cache atlas.
+    /// </summary>
+    /// <typeparam name="T">Type of cache item</typeparam>
     public abstract class CacheAtlas<T> where T: CacheItem
     {
+        /// <summary>
+        /// Version of the atlas.
+        /// </summary>
         protected const short ATLAS_VERSION = 1;
 
+        /// <summary>
+        /// Capacity of the atlas.
+        /// </summary>
         protected int capacity = 256;
+        
+        /// <summary>
+        /// Count of items in the atlas.
+        /// </summary>
         protected int count = 0;
 
+        /// <summary>
+        /// Items of the atlas.
+        /// </summary>
         protected T[] items;
 
+        /// <summary>
+        /// Name of the atlas.
+        /// </summary>
         protected abstract string atlasName { get; }
 
+        /// <summary>
+        /// Size of the atlas.
+        /// </summary>
         public int size { get; protected set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public CacheAtlas()
         {
             size = 0;
             items = new T[capacity];
         }
 
+        /// <summary>
+        /// Checks whether the atlas contains the specified file.
+        /// </summary>
+        /// <param name="filename">Name of the file</param>
+        /// <returns>True - contains, false - not contains.</returns>
         public bool Contains(string filename)
         {
             int hash = filename.GetHashCode();
@@ -198,10 +234,25 @@ public partial class OnlineMapsCache:MonoBehaviour, IOnlineMapsSavableComponent
             return false;
         }
 
+        /// <summary>
+        /// Creates a new item.
+        /// </summary>
+        /// <param name="filename">Name of the file</param>
+        /// <param name="size">Size of the file</param>
+        /// <param name="time">Creation time</param>
+        /// <returns>Item</returns>
         public abstract T CreateItem(string filename, int size, long time);
 
+        /// <summary>
+        /// Deletes old items.
+        /// </summary>
+        /// <param name="cache">Cache</param>
         public abstract void DeleteOldItems(OnlineMapsCache cache);
 
+        /// <summary>
+        /// Loads the atlas from the cache.
+        /// </summary>
+        /// <param name="cache">Cache</param>
         public void Load(OnlineMapsCache cache)
         {
 #if ALLOW_FILECACHE
@@ -248,6 +299,10 @@ public partial class OnlineMapsCache:MonoBehaviour, IOnlineMapsSavableComponent
 #endif
         }
 
+        /// <summary>
+        /// Saves the atlas.
+        /// </summary>
+        /// <param name="cache">Cache</param>
         public void Save(OnlineMapsCache cache)
         {
 #if ALLOW_FILECACHE
@@ -265,24 +320,30 @@ public partial class OnlineMapsCache:MonoBehaviour, IOnlineMapsSavableComponent
             OnlineMapsThreadManager.AddThreadAction(() =>
             {
 #endif
-                FileStream stream = new FileStream(filename, FileMode.Create);
-                BinaryWriter writer = new BinaryWriter(stream);
-
-                writer.Write((byte)'T');
-                writer.Write((byte)'C');
-                writer.Write(ATLAS_VERSION);
-
-                writer.Write(size);
-
-                for (int i = 0; i < count; i++)
+                try
                 {
-                    T item = itemsCopy[i];
-                    writer.Write(item.key);
-                    writer.Write(item.size);
-                    writer.Write(item.time);
-                }
+                    FileStream stream = new FileStream(filename, FileMode.Create);
+                    BinaryWriter writer = new BinaryWriter(stream);
 
-                writer.Close();
+                    writer.Write((byte)'T');
+                    writer.Write((byte)'C');
+                    writer.Write(ATLAS_VERSION);
+
+                    writer.Write(size);
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        T item = itemsCopy[i];
+                        writer.Write(item.key);
+                        writer.Write(item.size);
+                        writer.Write(item.time);
+                    }
+
+                    writer.Close();
+                }
+                catch
+                {
+                }
 #if !UNITY_WEBGL
         });
 #endif
@@ -290,13 +351,35 @@ public partial class OnlineMapsCache:MonoBehaviour, IOnlineMapsSavableComponent
         }
     }
 
+    /// <summary>
+    /// Base class for cache item.
+    /// </summary>
     public abstract class CacheItem
     {
+        /// <summary>
+        /// Size of the item.
+        /// </summary>
         public int size;
+        
+        /// <summary>
+        /// Hash of the key.
+        /// </summary>
         public int hash;
+        
+        /// <summary>
+        /// Key of the item.
+        /// </summary>
         public string key;
+        
+        /// <summary>
+        /// Creation time.
+        /// </summary>
         public long time;
 
+        /// <summary>
+        /// Creates a new item.
+        /// </summary>
+        /// <returns>Item</returns>
         public static CacheItem Create()
         {
             return null;

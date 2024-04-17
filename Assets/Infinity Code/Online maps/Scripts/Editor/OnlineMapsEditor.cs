@@ -88,6 +88,7 @@ public class OnlineMapsEditor : Editor
     private int trafficProviderIndex;
     private SerializedProperty pCustomTrafficProviderURL;
     private SerializedProperty pOSMServer;
+    private SerializedProperty pDragMarkerHoldingCTRL;
 
     public static GUIStyle warningStyle
     {
@@ -118,14 +119,25 @@ public class OnlineMapsEditor : Editor
                 ig == 6 || 
                 ig >= 15 && ig <= 18 ||
                 ig == 20 || 
-                ig >= 22 && ig <= 24) continue;
+                ig >= 22 && ig <= 24 ||
+                ig == 26) continue;
 
+#if UNITY_2023_1_OR_NEWER
+            UnityEditor.Build.NamedBuildTarget buildTarget = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(g);
+            string currentDefinitions = PlayerSettings.GetScriptingDefineSymbols(buildTarget);
+#else
             string currentDefinitions = PlayerSettings.GetScriptingDefineSymbolsForGroup(g);
+#endif
             List<string> directives = currentDefinitions.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Distinct().ToList();
             if (!directives.Contains(directive))
             {
                 directives.Add(directive);
-                PlayerSettings.SetScriptingDefineSymbolsForGroup(g, String.Join(";", directives.ToArray()));
+                currentDefinitions = String.Join(";", directives.ToArray());
+#if UNITY_2023_1_OR_NEWER
+                PlayerSettings.SetScriptingDefineSymbols(buildTarget, currentDefinitions);
+#else
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(g, currentDefinitions);
+#endif
             }
         }
     }
@@ -157,6 +169,7 @@ public class OnlineMapsEditor : Editor
         pShowMarkerTooltip = serializedObject.FindProperty("showMarkerTooltip");
         pUseSoftwareJPEGDecoder = serializedObject.FindProperty("useSoftwareJPEGDecoder");
         pActiveTypeSettings = serializedObject.FindProperty("_activeTypeSettings");
+        pDragMarkerHoldingCTRL = serializedObject.FindProperty("dragMarkerHoldingCTRL");
 
 #if !UNITY_WEBGL
         pRenderInThread = serializedObject.FindProperty("renderInThread");
@@ -168,8 +181,8 @@ public class OnlineMapsEditor : Editor
         pStopPlayingWhenScriptsCompile = serializedObject.FindProperty("stopPlayingWhenScriptsCompile");
         pOSMServer = serializedObject.FindProperty("osmServer");
 
-        cWidth = new GUIContent("Width (pixels)");
-        cHeight = new GUIContent("Height (pixels)");
+        cWidth = new GUIContent("Width (pixels)", "Width of the map. It works as a resolution.\nImportant: the map must have a side size of N * 256.");
+        cHeight = new GUIContent("Height (pixels)", "Height of the map. It works as a resolution.\nImportant: the map must have a side size of N * 256.");
         cUseSoftwareJPEGDecoder = new GUIContent("Software JPEG Decoder");
         cTooltipTexture = new GUIContent("Tooltip Background");
     }
@@ -318,7 +331,7 @@ public class OnlineMapsEditor : Editor
         float oldWidth = EditorGUIUtility.labelWidth;
         EditorGUIUtility.labelWidth = 160;
 
-        if (control.resultIsTexture)
+        if (control != null && control.resultIsTexture)
         {
             OnlineMapsEditorUtils.PropertyField(pRedrawOnPlay, "Redraw the map immediately after the start of the scene");
         }
@@ -347,14 +360,19 @@ public class OnlineMapsEditor : Editor
 
         OnlineMapsEditorUtils.PropertyField(pTooltipTexture, cTooltipTexture, "Tooltip background texture");
         OnlineMapsEditorUtils.PropertyField(pShowMarkerTooltip, "Tooltip display rule");
+        OnlineMapsEditorUtils.PropertyField(pDragMarkerHoldingCTRL, "Hold CTRL and press on the marker to drag the item.");
 
         EditorGUIUtility.labelWidth = oldWidth;
     }
 
     private void DrawCacheGUI(ref bool dirty)
     {
-        if (pSource.enumValueIndex == (int)OnlineMapsSource.Resources) return;
-        if (!GUILayout.Button("Cache tiles to Resources")) return;
+        if (pSource.enumValueIndex == (int)OnlineMapsSource.Resources || pSource.enumValueIndex == (int)OnlineMapsSource.StreamingAssets) return;
+
+        string targetSource = "Resources";
+        if (pSource.enumValueIndex == (int) OnlineMapsSource.StreamingAssetsAndOnline) targetSource = "Streaming Assets";
+
+        if (!GUILayout.Button("Cache tiles to " + targetSource)) return;
 
         OnlineMapsTileSetControl tsControl = control as OnlineMapsTileSetControl;
         if (tsControl != null && tsControl.compressTextures)
@@ -366,26 +384,33 @@ public class OnlineMapsEditor : Editor
             return;
         }
 
-
         lock (OnlineMapsTile.lockTiles)
         {
-            const string resPath = "Assets/Resources";
+            string resPath = "Assets/Resources";
+            if (pSource.enumValueIndex == (int) OnlineMapsSource.StreamingAssetsAndOnline) resPath = Application.streamingAssetsPath;
 
             foreach (OnlineMapsTile tile in map.tileManager.tiles)
             {
-                if (tile.status != OnlineMapsTileStatus.loaded || tile.texture == null) continue;
+                if (tile.status != OnlineMapsTileStatus.loaded) continue;
 
                 string tilePath = Path.Combine(resPath, tile.resourcesPath + ".png");
                 FileInfo info = new FileInfo(tilePath);
                 if (!info.Directory.Exists) info.Directory.Create();
 
-                if (!control.resultIsTexture) File.WriteAllBytes(tilePath, tile.texture.EncodeToPNG());
+                if (!control.resultIsTexture)
+                {
+                    if (tile.texture != null) File.WriteAllBytes(tilePath, tile.texture.EncodeToPNG());
+                }
                 else
                 {
-                    Texture2D texture = new Texture2D(OnlineMapsUtils.tileSize, OnlineMapsUtils.tileSize, TextureFormat.ARGB32, false);
-                    texture.SetPixels32((tile as OnlineMapsRasterTile).colors);
-                    texture.Apply();
-                    File.WriteAllBytes(tilePath, texture.EncodeToPNG());
+                    OnlineMapsRasterTile rasterTile = tile as OnlineMapsRasterTile;
+                    if (rasterTile != null && rasterTile.colors != null)
+                    {
+                        Texture2D texture = new Texture2D(OnlineMapsUtils.tileSize, OnlineMapsUtils.tileSize, TextureFormat.ARGB32, false);
+                        texture.SetPixels32(rasterTile.colors);
+                        texture.Apply();
+                        File.WriteAllBytes(tilePath, texture.EncodeToPNG());
+                    }
                 }
             }
         }
@@ -393,7 +418,7 @@ public class OnlineMapsEditor : Editor
         EditorPrefs.SetBool("OnlineMapsRefreshAssets", true);
 
         EditorUtility.ClearProgressBar();
-        EditorUtility.DisplayDialog("Cache complete", "Stop playback and select 'Source - Resources And Online'.", "OK");
+        EditorUtility.DisplayDialog("Cache complete", "Stop playback and select 'Source - " + targetSource + " And Online'.", "OK");
 
         dirty = true;
     }
@@ -476,8 +501,8 @@ public class OnlineMapsEditor : Editor
 
         EditorGUILayout.BeginVertical();
         EditorGUI.BeginChangeCheck();
-        py = EditorGUILayout.DoubleField("Latitude", py);
-        px = EditorGUILayout.DoubleField("Longitude", px);
+        py = EditorGUILayout.DoubleField(new GUIContent("Latitude", "Latitude of the center point of the map"), py);
+        px = EditorGUILayout.DoubleField(new GUIContent("Longitude", "Longitude of the center point of the map"), px);
 
         if (EditorGUI.EndChangeCheck())
         {
@@ -496,14 +521,16 @@ public class OnlineMapsEditor : Editor
         EditorGUI.BeginChangeCheck();
 
         EditorGUILayout.BeginHorizontal();
-        float newZoom = EditorGUILayout.Slider("Zoom", map.floatZoom, OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM);
+        string tooltip = "Current zoom of the map";
+        float newZoom = EditorGUILayout.Slider(new GUIContent("Zoom", tooltip), map.floatZoom, OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM_EXT);
 
         if (EditorGUI.EndChangeCheck())
         {
             map.floatZoom = newZoom;
             dirty = true;
         }
-        OnlineMapsEditorUtils.HelpButton("Current zoom of the map");
+
+        OnlineMapsEditorUtils.HelpButton(tooltip);
         EditorGUILayout.EndHorizontal();
     }
 
@@ -511,7 +538,27 @@ public class OnlineMapsEditor : Editor
     {
         EditorGUILayout.BeginHorizontal();
         EditorGUI.BeginChangeCheck();
-        providerIndex = EditorGUILayout.Popup("Provider", providerIndex, providersTitle);
+        string helpMessage = "Tile provider.\nImportant: all tile presets are for testing purpose only. Before using the tile provider, make sure that it suits you by the terms of use and price.";
+
+        if (Application.isPlaying)
+        {
+            if (mapType != map.activeType)
+            {
+                string pid = map.activeType.provider.id;
+                for (int i = 0; i < providers.Length; i++)
+                {
+                    if (providers[i].id == pid)
+                    {
+                        providerIndex = i;
+                        break;
+                    }
+                }
+
+                mapType = map.activeType;
+            }
+        }
+        
+        providerIndex = EditorGUILayout.Popup(new GUIContent("Provider", helpMessage), providerIndex, providersTitle);
         if (EditorGUI.EndChangeCheck())
         {
             mapType = providers[providerIndex].types[0];
@@ -519,7 +566,7 @@ public class OnlineMapsEditor : Editor
             pActiveTypeSettings.stringValue = "";
         }
 
-        OnlineMapsEditorUtils.HelpButton("Tile provider.\nImportant: all tile presets are for testing purpose only. Before using the tile provider, make sure that it suits you by the terms of use and price.");
+        OnlineMapsEditorUtils.HelpButton(helpMessage);
 
         EditorGUILayout.EndHorizontal();
 
@@ -541,10 +588,10 @@ public class OnlineMapsEditor : Editor
             showCustomProviderTokens = Foldout(showCustomProviderTokens, "Available tokens");
             if (showCustomProviderTokens)
             {
-                GUILayout.Label("{zoom}");
-                GUILayout.Label("{x}");
-                GUILayout.Label("{y}");
-                GUILayout.Label("{quad}");
+                GUILayout.Label("{zoom} or {z} - Tile zoom");
+                GUILayout.Label("{x} - Tile X");
+                GUILayout.Label("{y} - Tile Y");
+                GUILayout.Label("{quad} - Tile Quad");
                 GUILayout.Space(10);
             }
             EditorGUILayout.EndVertical();
@@ -705,13 +752,14 @@ public class OnlineMapsEditor : Editor
             int index = mapType.index;
             EditorGUILayout.BeginHorizontal();
             EditorGUI.BeginChangeCheck();
-            index = EditorGUILayout.Popup(new GUIContent("Type", "Type of map texture"), index, availableTypes);
+            string tooltip = "Type (style) of the map";
+            index = EditorGUILayout.Popup(new GUIContent("Type", tooltip), index, availableTypes);
             if (EditorGUI.EndChangeCheck())
             {
                 mapType = mapType.provider.types[index];
                 pMapType.stringValue = mapType.ToString();
             }
-            OnlineMapsEditorUtils.HelpButton("Type (style) of the map");
+            OnlineMapsEditorUtils.HelpButton(tooltip);
             EditorGUILayout.EndHorizontal();
         }
 
@@ -733,7 +781,11 @@ public class OnlineMapsEditor : Editor
                         if (ef.token != "version") return false;
                         return true;
                     }) as OnlineMapsProvider.ExtraField;
-                    if (version != null) version.value = match.Groups[1].Value;
+                    if (version != null)
+                    {
+                        version.value = match.Groups[1].Value;
+                        EditorUtility.SetDirty(target);
+                    }
                 }
             }
         }

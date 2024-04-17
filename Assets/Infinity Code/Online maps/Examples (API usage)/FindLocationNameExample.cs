@@ -12,20 +12,28 @@ namespace InfinityCode.OnlineMapsExamples
     public class FindLocationNameExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Google API Key
         /// </summary>
         public string googleAPIKey;
 
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Subscribe to click event.
-            OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
+            map.control.OnMapClick += OnMapClick;
         }
 
         private void OnMapClick()
         {
             // Get the coordinates where the user clicked.
-            Vector2 mouseCoords = OnlineMapsControlBase.instance.GetCoords();
+            Vector2 mouseCoords = map.control.GetCoords();
 
             // Try find location name by coordinates.
             OnlineMapsGoogleGeocoding request = new OnlineMapsGoogleGeocoding(mouseCoords, googleAPIKey);

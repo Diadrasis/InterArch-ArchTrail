@@ -17,6 +17,15 @@ namespace InfinityCode.OnlineMapsExamples
         private Color emptyColor = new Color32(204, 204, 204, 255);
 
         /// <summary>
+        /// This method is called when the script starts
+        /// </summary>
+        private void Start()
+        {
+            // Subscribe to tile loaded event
+            OnlineMapsTileManager.OnTileLoaded += OnTileLoaded;
+        }
+
+        /// <summary>
         /// This method is called for each loaded tile.
         /// </summary>
         /// <param name="tile">The tile that was loaded</param>
@@ -30,15 +39,6 @@ namespace InfinityCode.OnlineMapsExamples
 
             // If both colors are empty, the tile is empty
             if (c1 == emptyColor && c2 == emptyColor) tile.status = OnlineMapsTileStatus.error;
-        }
-
-        /// <summary>
-        /// This method is called when the script starts
-        /// </summary>
-        private void Start()
-        {
-            // Subscribe to tile loaded event
-            OnlineMapsTileManager.OnTileLoaded += OnTileLoaded;
         }
     }
 }

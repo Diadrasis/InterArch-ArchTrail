@@ -79,8 +79,8 @@ public class OnlineMapsMarker3DInstance : OnlineMapsMarkerInstanceBase
         if (marker3D.sizeType == OnlineMapsMarker3D.SizeType.scene) transform.localScale = new Vector3(_scale, _scale, _scale);
         else if (marker3D.sizeType == OnlineMapsMarker3D.SizeType.realWorld)
         {
-            float coof = (1 << (OnlineMaps.MAXZOOM - _marker.manager.map.zoom)) * _marker.manager.map.zoomCoof;
-            float s = _scale / coof;
+            float factor = (1 << (OnlineMaps.MAXZOOM - _marker.manager.map.zoom)) * _marker.manager.map.zoomFactor;
+            float s = _scale / factor;
             transform.localScale = new Vector3(s, s, s);
         }
 

@@ -11,6 +11,14 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/ResetCameraRotationExample")]
     public class ResetCameraRotationExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the camera orbit.
+        /// </summary>
+        public OnlineMapsCameraOrbit cameraOrbit;
+
+        /// <summary>
+        /// Default rotation of camera.
+        /// </summary>
         public Vector2 defaultRotation = Vector2.zero;
 
         /// <summary>
@@ -27,7 +35,6 @@ namespace InfinityCode.OnlineMapsExamples
         private bool isReset;
         private float camX;
         private float camY;
-        private OnlineMapsCameraOrbit cameraOrbit;
 
         private void OnGUI()
         {
@@ -42,7 +49,8 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
-            cameraOrbit = OnlineMapsCameraOrbit.instance;
+            // If the camera orbit is not specified, get the current instance.
+            if (cameraOrbit == null) cameraOrbit = OnlineMapsCameraOrbit.instance;
         }
 
         private void Update()

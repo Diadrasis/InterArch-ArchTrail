@@ -34,15 +34,15 @@ public class OnlineMapsTextureControl : OnlineMapsControlBase3D
         RaycastHit hit;
 
         tx = ty = 0;
-        if (!cl.Raycast(activeCamera.ScreenPointToRay(position), out hit, OnlineMapsUtils.maxRaycastDistance)) return false;
+        if (!cl.Raycast(currentCamera.ScreenPointToRay(position), out hit, OnlineMapsUtils.maxRaycastDistance)) return false;
 
         if (rendererInstance == null || rendererInstance.sharedMaterial == null || rendererInstance.sharedMaterial.mainTexture == null) return false;
 
         Vector2 r = hit.textureCoord;
 
-        float zoomCoof = map.zoomCoof;
-        r.x = (r.x - 0.5f) * zoomCoof;
-        r.y = (r.y - 0.5f) * zoomCoof;
+        float zoomFactor = map.zoomFactor;
+        r.x = (r.x - 0.5f) * zoomFactor;
+        r.y = (r.y - 0.5f) * zoomFactor;
 
         int countX = map.width / OnlineMapsUtils.tileSize;
         int countY = map.height / OnlineMapsUtils.tileSize;

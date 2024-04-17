@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Localization-String-Tables-Greek (el)
+  m_EditorClassIdentifier: 
+  m_GroupName: Localization-String-Tables-Greek (el)
+  m_Data:
+    m_SerializedData: []
+  m_GUID: f99f2f505f9527342886ec1a71709864
+  m_SerializeEntries:
+  - m_GUID: 176a50071d985aa47956ce5fb4f5219d
+    m_Address: OptionCQuestions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: b4876f96db3bfec4fabce36e899f8a63
+    m_Address: MainQuestions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: 8de17d6f74d12454ba9a28dada441f08
+    m_Address: OptionB1Questions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: 859e5b0b977876c4080943a2ac4e81ad
+    m_Address: OptionBQuestions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: 7a097fe706c603a4a9d3de71d3c9e39c
+    m_Address: OptionC1Questions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: d13bd0a93dccad44d9e5d2ab6704ca00
+    m_Address: Generaltexts_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: e288d5f72676ccb4d81b3d2cfd6982a6
+    m_Address: GeneralQuestions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: d054a99d640cb1a4282b2b3d14ef43e5
+    m_Address: Warnings_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: ecb8e9935b9cf8b41ba92c590bd873b3
+    m_Address: OptionAQuestions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: bf090af701e03f64486d0af2d13da652
+    m_Address: TestText_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: df0c204cd7b74b2438d4d37b84b84a9d
+    m_Address: OptionC2Questions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  - m_GUID: d0877911baab2de44b34cda3c13027d5
+    m_Address: OptionB2Questions_el
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-el
+  m_ReadOnly: 1
+  m_Settings: {fileID: 11400000, guid: 619a2ec54f5ed454389ea03cfbaa9cba, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: f93286bd88116144f91ac97ccbfd6ef3, type: 2}
+    - {fileID: 11400000, guid: 9c5889897500e5c4190597946c182f07, type: 2}

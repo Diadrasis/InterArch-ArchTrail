@@ -76,9 +76,10 @@ namespace InfinityCode.OnlineMapsExamples
             public Drawer(OnlineMapsControlBase control)
             {
                 this.control = control;
+                map = control.map;
 
                 // Subscribe to draw markers event
-                control.OnDrawMarkers += OnDrawMarkers;
+                map.OnMapUpdated += OnDrawMarkers;
             }
 
             /// <summary>

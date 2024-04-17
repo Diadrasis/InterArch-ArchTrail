@@ -150,6 +150,11 @@ public abstract class OnlineMapsLocationServiceBase : MonoBehaviour, IOnlineMaps
     public float trueHeading = 0;
 
     /// <summary>
+    /// Specifies the need to update the position of the emulator by marker position.
+    /// </summary>
+    public bool updateEmulatorPositionByMarker = false;
+
+    /// <summary>
     /// Specifies whether the script will automatically update the location
     /// </summary>
     public bool updatePosition = true;
@@ -341,6 +346,14 @@ public abstract class OnlineMapsLocationServiceBase : MonoBehaviour, IOnlineMaps
             }
             if (OnFindLocationByIPComplete != null) OnFindLocationByIPComplete();
         }
+    }
+
+    private void OnMarkerDrag(OnlineMapsMarkerBase m)
+    {
+        if (!useGPSEmulator) return;
+        
+        emulatorPosition = m.position;
+        OnChangePosition();
     }
 
     protected virtual OnlineMapsJSONItem SaveSettings()
@@ -581,6 +594,12 @@ public abstract class OnlineMapsLocationServiceBase : MonoBehaviour, IOnlineMaps
                 m3d.scale = markerScale;
                 m3d.label = markerTooltip;
                 if (useCompassForMarker) m3d.rotationY = trueHeading;
+            }
+
+            if (updateEmulatorPositionByMarker)
+            {
+                _marker.SetDraggable();
+                _marker.OnDrag += OnMarkerDrag;
             }
         }
         else

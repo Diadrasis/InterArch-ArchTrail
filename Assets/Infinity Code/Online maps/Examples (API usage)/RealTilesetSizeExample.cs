@@ -11,13 +11,21 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/RealTilesetSizeExample")]
     public class RealTilesetSizeExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map control. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsTileSetControl control;
+        
         private void Start()
         {
+            // Get the reference to the map control.
+            if (control == null) control = OnlineMapsTileSetControl.instance;
+            
             // Initial resize
             UpdateSize();
 
             // Subscribe to change zoom
-            OnlineMaps.instance.OnChangeZoom += OnChangeZoom;
+            control.map.OnChangeZoom += OnChangeZoom;
         }
 
         private void OnChangeZoom()
@@ -28,14 +36,14 @@ namespace InfinityCode.OnlineMapsExamples
         private void UpdateSize()
         {
             // Get distance (km) between corners of map
-            Vector2 distance = OnlineMapsUtils.DistanceBetweenPoints(OnlineMaps.instance.topLeftPosition,
-                OnlineMaps.instance.bottomRightPosition);
+            Vector2 distance = OnlineMapsUtils.DistanceBetweenPoints(control.map.topLeftPosition,
+                control.map.bottomRightPosition);
 
             // Set tileset size
-            OnlineMapsControlBaseDynamicMesh.instance.sizeInScene = distance * 1000;
+            control.sizeInScene = distance * 1000;
 
             // Redraw map
-            OnlineMaps.instance.Redraw();
+            control.map.Redraw();
         }
     }
 }

@@ -11,10 +11,18 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/ColorUnderCursorExample")]
     public class ColorUnderCursorExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         private void Start()
         {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Subscribe to OnMapClick
-            OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
+            map.control.OnMapClick += OnMapClick;
         }
 
         /// <summary>
@@ -24,18 +32,18 @@ namespace InfinityCode.OnlineMapsExamples
         {
             // Get the coordinates under the cursor.
             double lng, lat;
-            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
+            map.control.GetCoords(out lng, out lat);
 
             // Convert coordinates to tile position
             double tx, ty;
-            OnlineMaps.instance.projection.CoordinatesToTile(lng, lat, OnlineMaps.instance.zoom, out tx, out ty);
+            map.projection.CoordinatesToTile(lng, lat, map.zoom, out tx, out ty);
 
             // Get tile index
             int itx = (int)tx;
             int ity = (int)ty;
 
             // Get tile
-            OnlineMapsTile tile = OnlineMaps.instance.tileManager.GetTile(OnlineMaps.instance.zoom, itx, ity);
+            OnlineMapsTile tile = map.tileManager.GetTile(map.zoom, itx, ity);
 
             // If the tile exists, but is not yet loaded, take the parent
             while (tile != null && tile.status != OnlineMapsTileStatus.loaded)
@@ -57,7 +65,7 @@ namespace InfinityCode.OnlineMapsExamples
             double ry = ty - (int)ty;
 
             // For Target - Tileset
-            if (!OnlineMapsControlBase.instance.resultIsTexture)
+            if (!map.control.resultIsTexture)
             {
                 Color color = tile.texture.GetPixelBilinear((float)rx, 1 - (float)ry);
                 Debug.Log(color);

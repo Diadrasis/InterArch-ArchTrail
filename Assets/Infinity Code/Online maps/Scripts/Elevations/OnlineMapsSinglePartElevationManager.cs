@@ -53,7 +53,7 @@ public abstract class OnlineMapsSinglePartElevationManager<T> : OnlineMapsElevat
     public override float GetUnscaledElevationValue(double x, double z, double tlx, double tly, double brx, double bry)
     {
         if (elevationData == null) return 0;
-        if (elevationDataWidth == 0 || elevationDataHeight == 0) return 0;
+        if (elevationDataWidth == 0 || elevationDataHeight == 0 || elevationW == 0 || elevationH == 0) return 0;
 
         x = x / -_sizeInScene.x;
         z = z / _sizeInScene.y;

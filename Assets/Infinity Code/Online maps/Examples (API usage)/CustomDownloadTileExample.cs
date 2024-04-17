@@ -11,11 +11,14 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/CustomDownloadTileExample")]
     public class CustomDownloadTileExample : MonoBehaviour
     {
-        private OnlineMaps map;
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
 
         private void Start()
         {
-            map = OnlineMaps.instance;
+            if (map == null) map = OnlineMaps.instance;
 
             // Subscribe to the tile download event.
             OnlineMapsTileManager.OnStartDownloadTile += OnStartDownloadTile;
@@ -37,7 +40,7 @@ namespace InfinityCode.OnlineMapsExamples
             if (map.control.resultIsTexture)
             {
                 // Apply tile texture
-                (tile as OnlineMapsRasterTile).ApplyTexture(tileTexture as Texture2D);
+                (tile as OnlineMapsRasterTile).ApplyTexture(tileTexture);
 
                 // Send tile to buffer
                 map.buffer.ApplyTile(tile);

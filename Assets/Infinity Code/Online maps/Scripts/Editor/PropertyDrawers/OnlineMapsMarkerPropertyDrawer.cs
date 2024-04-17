@@ -53,7 +53,30 @@ public class OnlineMapsMarkerPropertyDrawer : OnlineMapsMarkerBasePropertyDrawer
 
             EditorGUI.BeginChangeCheck();
             SerializedProperty pTexture = DrawProperty(property, "_texture", ref rect);
-            if (EditorGUI.EndChangeCheck()) OnlineMapsEditorUtils.CheckMarkerTextureImporter(pTexture);
+            if (EditorGUI.EndChangeCheck())
+            {
+                OnlineMapsEditorUtils.CheckMarkerTextureImporter(pTexture);
+
+                if (EditorApplication.isPlaying)
+                {
+                    string displayName = property.displayName;
+                    string indexStr = displayName.Substring(8);
+                    int index;
+                    if (int.TryParse(indexStr, out index))
+                    {
+                        OnlineMapsMarkerManager manager = property.serializedObject.targetObject as OnlineMapsMarkerManager;
+                        if (manager != null)
+                        {
+                            OnlineMapsMarker marker = manager[index];
+                            if (marker != null)
+                            {
+                                marker.texture = pTexture.objectReferenceValue as Texture2D;
+                                manager.map.Redraw();
+                            }
+                        }
+                    }
+                }
+            }
 
             DrawCenterButton(rect, pLng, pLat);
         }

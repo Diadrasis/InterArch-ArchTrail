@@ -25,6 +25,11 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsXML xml2 = new OnlineMapsXML("MarkerData");
             xml2.Create("ID", "marker2");
             marker2["data"] = xml2;
+            
+            // You can also store data of any type.
+            marker1["str_data"] = "Some data";
+            marker1["int_data"] = 123;
+            marker1["marker2"] = marker2;
 
             // Subscribe to click event.
             marker1.OnClick += OnMarkerClick;
@@ -35,7 +40,10 @@ namespace InfinityCode.OnlineMapsExamples
         {
             // Try get XML from customData.
             OnlineMapsXML xml = marker["data"] as OnlineMapsXML;
-
+            
+            // or you can use this way
+            xml = marker.Get<OnlineMapsXML>("data");
+            
             if (xml == null)
             {
                 Debug.Log("The marker does not contain XML.");

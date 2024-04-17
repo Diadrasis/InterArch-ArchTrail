@@ -58,7 +58,9 @@ public class OnlineMapsMarker3D : OnlineMapsMarkerBase
     /// </summary>
     public SizeType sizeType = SizeType.scene;
 
-    private GameObject _prefab;
+    [NonSerialized]
+    public GameObject _prefab;
+
     private Vector3 _relativePosition;
     private bool _visible = true;
 
@@ -189,7 +191,11 @@ public class OnlineMapsMarker3D : OnlineMapsMarkerBase
     {
         base.DestroyInstance();
 
-        if (instance != null) OnlineMapsUtils.Destroy(instance);
+        if (instance != null)
+        {
+            OnlineMapsUtils.Destroy(instance);
+            instance = null;
+        }
     }
 
     /// <summary>
@@ -216,7 +222,8 @@ public class OnlineMapsMarker3D : OnlineMapsMarkerBase
 
         instance.layer = parent.gameObject.layer;
         instance.AddComponent<OnlineMapsMarker3DInstance>().marker = this;
-        visible = false;
+        _visible = false;
+        instance.SetActive(false);
         inited = true;
 
         control = map.control as OnlineMapsControlBase3D;
@@ -254,7 +261,7 @@ public class OnlineMapsMarker3D : OnlineMapsMarkerBase
     /// <param name="zoom">Map zoom</param>
     public void Reinit(double tlx, double tly, double brx, double bry, int zoom)
     {
-        if (instance)
+        if (instance != null)
         {
             Transform parent = instance.transform.parent;
             OnlineMapsUtils.Destroy(instance);
@@ -294,10 +301,11 @@ public class OnlineMapsMarker3D : OnlineMapsMarkerBase
     /// <param name="zoom">Zoom of the map</param>
     public override void Update(double tlx, double tly, double brx, double bry, int zoom)
     {
+        if (control == null) control = OnlineMapsControlBase3D.instance;
         if (control.meshFilter == null) return;
         double ttlx, ttly, tbrx, tbry;
         map.GetTileCorners(out ttlx, out ttly, out tbrx, out tbry, zoom);
-        float bestYScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(tlx, tly, brx, bry);
+        float bestYScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(control.elevationManager, tlx, tly, brx, bry);
         Update(control.meshFilter.sharedMesh.bounds, tlx, tly, brx, bry, zoom, ttlx, ttly, tbrx, tbry, bestYScale);
     }
 
@@ -387,7 +395,7 @@ public class OnlineMapsMarker3D : OnlineMapsMarkerBase
 
         if (altitude.HasValue)
         {
-            float yScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(tlx, tly, brx, bry);
+            float yScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(control.elevationManager, tlx, tly, brx, bry);
             y = altitude.Value;
             if (altitudeType == OnlineMapsAltitudeType.relative && tsControl != null && elevationActive) y += elevationManager.GetUnscaledElevationValue(px, pz, tlx, tly, brx, bry);
             y *= yScale;
@@ -409,13 +417,9 @@ public class OnlineMapsMarker3D : OnlineMapsMarkerBase
         {
             double dx, dy;
             OnlineMapsUtils.DistanceBetweenPoints(tlx, tly, brx, bry, out dx, out dy);
-            if (tsControl != null)
-            {
-                dx = tsControl.sizeInScene.x / dx / 1000;
-                dy = tsControl.sizeInScene.y / dy / 1000;
-            }
+            if (tsControl != null) dy = tsControl.sizeInScene.y / dy / 1000;
 
-            double d = (dx + dy) / 2 * scale;
+            double d = dy * scale;
             float fd = (float)d;
 
             instance.transform.localScale = new Vector3(fd, fd, fd);

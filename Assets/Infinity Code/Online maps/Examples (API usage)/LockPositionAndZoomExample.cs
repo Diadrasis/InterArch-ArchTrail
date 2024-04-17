@@ -11,17 +11,25 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/LockPositionAndZoomExample")]
     public class LockPositionAndZoomExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Lock map zoom range
-            OnlineMaps.instance.zoomRange = new OnlineMapsRange(10, 15);
+            map.zoomRange = new OnlineMapsRange(10, 15);
 
             // Lock map coordinates range
-            OnlineMaps.instance.positionRange = new OnlineMapsPositionRange(33, -119, 34, -118);
+            map.positionRange = new OnlineMapsPositionRange(33, -119, 34, -118);
 
             // Initializes the position and zoom
-            OnlineMaps.instance.zoom = 10;
-            OnlineMaps.instance.position = OnlineMaps.instance.positionRange.center;
+            map.zoom = 10;
+            map.position = map.positionRange.center;
         }
     }
 }

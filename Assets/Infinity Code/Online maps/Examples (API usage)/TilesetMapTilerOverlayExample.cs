@@ -12,11 +12,31 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/TilesetMapTilerOverlayExample")]
     public class TilesetMapTilerOverlayExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         // Overlay transparency
         [Range(0, 1)]
         public float alpha = 1;
 
         private float _alpha = 1;
+
+        private void Start()
+        {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
+            if (OnlineMapsCache.instance != null)
+            {
+                // Subscribe to the cache events.
+                OnlineMapsCache.instance.OnLoadedFromCache += LoadTileOverlay;
+            }
+
+            // Subscribe to the tile download event.
+            OnlineMapsTileManager.OnStartDownloadTile += OnStartDownloadTile;
+        }
 
         private static void LoadTileOverlay(OnlineMapsTile tile)
         {
@@ -39,18 +59,6 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsTileManager.StartDownloadTile(tile);
         }
 
-        private void Start()
-        {
-            if (OnlineMapsCache.instance != null)
-            {
-                // Subscribe to the cache events.
-                OnlineMapsCache.instance.OnLoadedFromCache += LoadTileOverlay;
-            }
-
-            // Subscribe to the tile download event.
-            OnlineMapsTileManager.OnStartDownloadTile += OnStartDownloadTile;
-        }
-
         private void Update()
         {
             // Update the transparency of overlay.
@@ -59,7 +67,7 @@ namespace InfinityCode.OnlineMapsExamples
                 _alpha = alpha;
                 lock (OnlineMapsTile.lockTiles)
                 {
-                    foreach (OnlineMapsTile tile in OnlineMaps.instance.tileManager.tiles) tile.overlayBackAlpha = alpha;
+                    foreach (OnlineMapsTile tile in map.tileManager.tiles) tile.overlayBackAlpha = alpha;
                 }
             }
         }

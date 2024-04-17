@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Localization-String-Tables-English (en)
+  m_EditorClassIdentifier: 
+  m_GroupName: Localization-String-Tables-English (en)
+  m_Data:
+    m_SerializedData: []
+  m_GUID: e1e7b5709c1dded488836db6273e9bbd
+  m_SerializeEntries:
+  - m_GUID: 03ae02e9d7575b641ab54fe9b11f6c85
+    m_Address: OptionB2Questions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: ce4b7a27055d2f7488b9ae3a7bae655c
+    m_Address: OptionCQuestions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: 1dbd9def7c3d75445b68305bf5852b7e
+    m_Address: MainQuestions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: 36b0c4d72468b60469930cf01d88301a
+    m_Address: OptionB1Questions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: b2c7f926cde961441ad24d5acae2b2ef
+    m_Address: OptionBQuestions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: c09bf29e20c23214d85c2b51e6cafe4d
+    m_Address: OptionC1Questions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: 29960c08be57bc34eb63a82697052828
+    m_Address: Generaltexts_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: 2bec2cc0e1495b047977cf0e697726b3
+    m_Address: GeneralQuestions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: 4b3c1d55b1f357e4d9921dd7b391fcfa
+    m_Address: Warnings_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: fb701e652b81fc84991e3d6a3b833144
+    m_Address: OptionAQuestions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: 45c9cf22160a3c948812439085b58ea3
+    m_Address: TestText_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  - m_GUID: 40d9a5d74264a624383c968821f9c3c6
+    m_Address: OptionC2Questions_en
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-en
+  m_ReadOnly: 1
+  m_Settings: {fileID: 11400000, guid: 619a2ec54f5ed454389ea03cfbaa9cba, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 8043823c9d02102489ba31d282089d7a, type: 2}
+    - {fileID: 11400000, guid: 65c86b83510b35a45bc68fdef7553bf6, type: 2}

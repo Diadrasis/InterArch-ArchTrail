@@ -8,8 +8,6 @@ using UnityEngine;
 /// <summary>
 /// Implements the use of elevation data from ArcGIS base on tiles
 /// </summary>
-[OnlineMapsPlugin("ArcGIS Tiled Elevations", typeof(OnlineMapsControlBaseDynamicMesh), "Elevations")]
-[AddComponentMenu("Infinity Code/Online Maps/Elevations/ArcGIS Tiled")]
 public class OnlineMapsArcGISTiledElevationManager : OnlineMapsTiledElevationManager<OnlineMapsArcGISTiledElevationManager>
 {
     /// <summary>
@@ -42,6 +40,7 @@ public class OnlineMapsArcGISTiledElevationManager : OnlineMapsTiledElevationMan
         if (www.hasError)
         {
             Debug.Log("Download error");
+            if (OnElevationFails != null) OnElevationFails(www.error);
             return;
         }
 
@@ -50,6 +49,8 @@ public class OnlineMapsArcGISTiledElevationManager : OnlineMapsTiledElevationMan
 
         OnlineMapsCache.Add(tile.GetCacheKey(cachePrefix), Encoding.UTF8.GetBytes(response));
         ParseResponse(tile, response);
+
+        if (OnElevationUpdated != null) OnElevationUpdated();
     }
 
     private void ParseResponse(Tile tile, string response)
@@ -115,5 +116,7 @@ public class OnlineMapsArcGISTiledElevationManager : OnlineMapsTiledElevationMan
                                        ",\"xmax\":" + rx.ToString(OnlineMapsUtils.numberFormat) + "}");
         OnlineMapsWWW request = new OnlineMapsWWW(url);
         request.OnComplete += www => OnTileDownloaded(tile, www);
+
+        if (OnElevationRequested != null) OnElevationRequested();
     }
 }

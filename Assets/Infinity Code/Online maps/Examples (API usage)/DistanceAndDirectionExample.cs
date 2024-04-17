@@ -13,6 +13,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class DistanceAndDirectionExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// The coordinates of user.
         /// </summary>
         public Vector2 userCoordinares;
@@ -26,6 +31,12 @@ namespace InfinityCode.OnlineMapsExamples
         /// The direction of the compass.
         /// </summary>
         public float compassTrueHeading = 0;
+        
+        private void Start()
+        {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+        }
 
         private void OnGUI()
         {
@@ -41,8 +52,8 @@ namespace InfinityCode.OnlineMapsExamples
 
                 // Calculate the tile position of locations.
                 double userTileX, userTileY, markerTileX, markerTileY;
-                OnlineMaps.instance.projection.CoordinatesToTile(userCoordinares.x, userCoordinares.y, zoom, out userTileX, out userTileY);
-                OnlineMaps.instance.projection.CoordinatesToTile(markerCoordinates.x, markerCoordinates.y, zoom, out markerTileX, out markerTileY);
+                map.projection.CoordinatesToTile(userCoordinares.x, userCoordinares.y, zoom, out userTileX, out userTileY);
+                map.projection.CoordinatesToTile(markerCoordinates.x, markerCoordinates.y, zoom, out markerTileX, out markerTileY);
 
                 // Calculate the angle between locations.
                 double angle = OnlineMapsUtils.Angle2D(userTileX, userTileY, markerTileX, markerTileY);

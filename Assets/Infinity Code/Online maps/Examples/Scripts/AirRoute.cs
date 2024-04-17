@@ -10,6 +10,7 @@ namespace InfinityCode.OnlineMapsDemos
     [AddComponentMenu("Infinity Code/Online Maps/Demos/AirRoute")]
     public class AirRoute : MonoBehaviour
     {
+        public OnlineMapsTileSetControl control;
         public float maxSpeed = 270; // km/h
         public float maxAltitude = 4000; // meters
         public GameObject airplane;
@@ -55,10 +56,11 @@ namespace InfinityCode.OnlineMapsDemos
 
         private void Start()
         {
-            map = OnlineMaps.instance;
+            if (control == null) control = OnlineMapsTileSetControl.instance;
+            map = control.map;
 
             if (points == null) points = new List<Point>();
-            if (points.Count == 0) points.Add(new Point(OnlineMaps.instance.position));
+            if (points.Count == 0) points.Add(new Point(map.position));
 
             Point p1 = points[0];
             Point p2 = points[1];
@@ -110,13 +112,13 @@ namespace InfinityCode.OnlineMapsDemos
 
             tilt = tiltRotation - airplane.transform.rotation.eulerAngles.y;
 
-            Vector3 p = OnlineMapsTileSetControl.instance.GetWorldPosition(position.longitude, position.latitude);
+            Vector3 p = control.GetWorldPosition(position.longitude, position.latitude);
             altitude = position.relativeAltitude * maxAltitude;
             float elevation = OnlineMapsElevationManagerBase.GetUnscaledElevation(p.x, p.z);
-            p.x = -1024;
+            p.x = control.sizeInScene.x / -2;
             float zoom = altitudeZoomCurve.Evaluate(altitude / maxAltitude);
             p.y = Mathf.Max(altitude, elevation) * OnlineMapsElevationManagerBase.GetBestElevationYScale();
-            p.z = 1024;
+            p.z = control.sizeInScene.y / 2;
             airplane.transform.position = p;
             airplane.transform.rotation = Quaternion.Euler(0, Mathf.LerpAngle(airplane.transform.rotation.eulerAngles.y, targetRotation, Time.deltaTime), 0);
             float s = 1 / Mathf.Pow(2, 15 - map.floatZoom);

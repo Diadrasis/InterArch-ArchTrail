@@ -78,6 +78,18 @@ public class OnlineMapsMarkerManager : OnlineMapsMarkerManagerBase<OnlineMapsMar
         if (instance != null) return instance.Create(longitude, latitude, texture, label);
         return null;
     }
+    
+    /// <summary>
+    /// Create a new marker
+    /// </summary>
+    /// <param name="location">Location of the marker (X - longitude, Y - latitude)</param>
+    /// <param name="label">Tooltip</param>
+    /// <returns>Instance of the marker</returns>
+    public OnlineMapsMarker Create(Vector2 location, string label)
+    {
+        if (instance != null) return Create(location.x, location.y, label);
+        return null;
+    } 
 
     /// <summary>
     /// Create a new marker
@@ -85,11 +97,23 @@ public class OnlineMapsMarkerManager : OnlineMapsMarkerManagerBase<OnlineMapsMar
     /// <param name="location">Location of the marker (X - longitude, Y - latitude)</param>
     /// <param name="texture">Texture of the marker</param>
     /// <param name="label">Tooltip</param>
-    /// <returns>Instance of the marker</returns
+    /// <returns>Instance of the marker</returns>
     public OnlineMapsMarker Create(Vector2 location, Texture2D texture = null, string label = "")
     {
         if (instance != null) return Create(location.x, location.y, texture, label);
         return null;
+    }
+    
+    /// <summary>
+    /// Create a new marker
+    /// </summary>
+    /// <param name="longitude">Longitude</param>
+    /// <param name="latitude">Latitude</param>
+    /// <param name="label">Tooltip</param>
+    /// <returns>Instance of the marker</returns>
+    public OnlineMapsMarker Create(double longitude, double latitude, string label)
+    {
+        return Create(longitude, latitude, null, label);
     }
 
     /// <summary>

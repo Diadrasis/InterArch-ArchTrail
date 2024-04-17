@@ -124,21 +124,6 @@ public class OnlineMapsMarkerBase: IOnlineMapsInteractiveElement
     }
 
     /// <summary>
-    /// Get or set a value in the customFields dictionary by key.
-    /// </summary>
-    /// <param name="key">Field key.</param>
-    /// <returns>Field value.</returns>
-    public object this[string key]
-    {
-        get
-        {
-            object val;
-            return customFields.TryGetValue(key, out val)? val: null;
-        }
-        set { customFields[key] = value; }
-    }
-
-    /// <summary>
     /// Gets or sets marker enabled.
     /// </summary>
     /// <value>
@@ -253,9 +238,24 @@ public class OnlineMapsMarkerBase: IOnlineMapsInteractiveElement
         }
     }
 
+    /// <summary>
+    /// Get or set a value in the customFields dictionary by key.
+    /// </summary>
+    /// <param name="key">Field key.</param>
+    /// <returns>Field value.</returns>
+    public object this[string key]
+    {
+        get
+        {
+            object val;
+            return customFields.TryGetValue(key, out val)? val: null;
+        }
+        set { customFields[key] = value; }
+    }
+
     public OnlineMapsMarkerBase()
     {
-        range = new OnlineMapsRange(OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM);
+        range = new OnlineMapsRange(OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM_EXT);
         tags = new List<string>();
     }
 
@@ -286,6 +286,18 @@ public class OnlineMapsMarkerBase: IOnlineMapsInteractiveElement
         OnRollOver = null;
 
         DestroyInstance();
+    }
+    
+    /// <summary>
+    /// Gets the value from the customFields dictionary by key.
+    /// </summary>
+    /// <param name="key">Field key.</param>
+    /// <typeparam name="T">Type of value.</typeparam>
+    /// <returns>Field value.</returns>
+    public T Get<T>(string key)
+    {
+        object val;
+        return customFields.TryGetValue(key, out val)? (T)val: default(T);
     }
 
     /// <summary>
@@ -362,16 +374,6 @@ public class OnlineMapsMarkerBase: IOnlineMapsInteractiveElement
     private void OnMarkerPress(OnlineMapsMarkerBase marker)
     {
         map.control.dragMarker = this;
-    }
-    public virtual OnlineMapsXML Save(OnlineMapsXML parent)
-    {
-        OnlineMapsXML element = parent.Create("Marker");
-        element.Create("Longitude", longitude);
-        element.Create("Latitude", latitude);
-        element.Create("Range", range);
-        element.Create("Label", label);
-        element.Create("Scale", scale);
-        return element;
     }
 
     /// <summary>

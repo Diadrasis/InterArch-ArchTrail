@@ -14,6 +14,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class DottedLineExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the control. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsTileSetControl control;
+        
+        /// <summary>
         /// The thickness of the line.
         /// </summary>
         public float size = 10;
@@ -37,6 +42,9 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
+            // If control is not specified, use the current instance.
+            if (control == null) control = OnlineMapsTileSetControl.instance;
+            
             // Create a new GameObject.
             GameObject container = new GameObject("Dotted Line");
 
@@ -60,8 +68,8 @@ namespace InfinityCode.OnlineMapsExamples
             coords[4] = new Vector2(1, 6);
 
             // Subscribe to events of map.
-            OnlineMaps.instance.OnChangePosition += UpdateLine;
-            OnlineMaps.instance.OnChangeZoom += UpdateLine;
+            control.map.OnChangePosition += UpdateLine;
+            control.map.OnChangeZoom += UpdateLine;
 
             // Initial update line.
             UpdateLine();
@@ -90,7 +98,7 @@ namespace InfinityCode.OnlineMapsExamples
             for (int i = 0; i < coords.Length; i++)
             {
                 // Get world position by coordinates
-                Vector3 position = OnlineMapsTileSetControl.instance.GetWorldPosition(coords[i]);
+                Vector3 position = control.GetWorldPosition(coords[i]);
                 positions.Add(position);
 
                 if (i != 0)

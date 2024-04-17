@@ -15,6 +15,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class CalcAreaExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Texture of marker
         /// </summary>
         public Texture2D markerTexture;
@@ -23,24 +28,39 @@ namespace InfinityCode.OnlineMapsExamples
         /// Line width.
         /// </summary>
         public float borderWidth = 1;
-
-        private OnlineMaps map;
+        
+        private float _borderWidth;
         private bool changed = false;
+        private OnlineMapsControlBase control;
+        private OnlineMapsDrawingElementManager drawingElementManager;
         private List<OnlineMapsMarker> markers = new List<OnlineMapsMarker>();
+        private OnlineMapsMarkerManager markerManager;
         private List<Vector2> markerPositions = new List<Vector2>();
         private OnlineMapsDrawingPoly polygon;
 
-        private float _borderWidth;
+
+        private void Start()
+        {
+            // If the map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
+            // Get references to the control, drawingElementManager and markerManager.
+            control = map.control;
+            drawingElementManager = control.drawingElementManager;
+            markerManager = control.markerManager;
+
+            _borderWidth = borderWidth;
+        }
 
         public void Clear()
         {
             if (polygon != null)
             {
-                OnlineMapsDrawingElementManager.RemoveItem(polygon);
+                drawingElementManager.Remove(polygon);
                 polygon = null;
             }
 
-            foreach (OnlineMapsMarker marker in markers) OnlineMapsMarkerManager.RemoveItem(marker);
+            foreach (OnlineMapsMarker marker in markers) markerManager.Remove(marker);
             markers.Clear();
 
             markerPositions.Clear();
@@ -67,10 +87,10 @@ namespace InfinityCode.OnlineMapsExamples
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 // Get the geographical coordinates of the cursor.
-                Vector2 cursorCoords = map.control.GetCoords();
+                Vector2 cursorCoords = control.GetCoords();
 
                 // Create a new marker at the specified coordinates.
-                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(cursorCoords, markerTexture, "Marker " + (OnlineMapsMarkerManager.CountItems + 1));
+                OnlineMapsMarker marker = markerManager.Create(cursorCoords, markerTexture, "Marker " + (markerManager.Count + 1));
 
                 // Save marker and coordinates.
                 markerPositions.Add(cursorCoords);
@@ -79,14 +99,6 @@ namespace InfinityCode.OnlineMapsExamples
                 // Mark that markers changed.
                 changed = true;
             }
-        }
-
-        private void Start()
-        {
-            // Get a reference to an instance of the map.
-            map = OnlineMaps.instance;
-
-            _borderWidth = borderWidth;
         }
 
         private void Update()
@@ -119,14 +131,14 @@ namespace InfinityCode.OnlineMapsExamples
             if (polygon == null)
             {
                 // For points, reference to markerPositions. 
-                // If you change the values ​​in markerPositions, value in the polygon will be adjusted automatically.
+                // If you change the values in markerPositions, value in the polygon will be adjusted automatically.
                 polygon = new OnlineMapsDrawingPoly(markerPositions, Color.black, borderWidth, new Color(1, 1, 1, 0.3f));
 
                 // Add an element to the map.
-                OnlineMapsDrawingElementManager.AddItem(polygon);
+                drawingElementManager.Add(polygon);
             }
 
-            // Calculates area of ​​the polygon.
+            // Calculates area of the polygon.
             // Important: this algorithm works correctly only if the lines do not intersect.
             float area = 0;
 

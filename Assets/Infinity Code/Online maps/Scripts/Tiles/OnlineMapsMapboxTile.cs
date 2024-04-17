@@ -12,7 +12,7 @@ public class OnlineMapsMapboxTile : OnlineMapsVectorTile
 
     public override string url
     {
-        get { return "https://b.tiles.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7/" + zoom + "/" + x + "/" + y + ".vector.pbf?access_token=" + OnlineMapsKeyManager.Mapbox(); }
+        get { return "https://b.tiles.mapbox.com/v4/mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v8/" + zoom + "/" + x + "/" + y + ".vector.pbf?access_token=" + OnlineMapsKeyManager.Mapbox(); }
     }
 
     public OnlineMapsMapboxTile(int x, int y, int zoom, OnlineMaps map, bool isMapTile = true) : base(x, y, zoom, map, isMapTile)

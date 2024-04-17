@@ -24,7 +24,7 @@ public abstract class OnlineMapsMarker2DDrawer : OnlineMapsMarkerDrawerBase
         double mx, my;
         int zoom = map.zoom;
 
-        foreach (OnlineMapsMarker m in map.control.markerManager)
+        foreach (OnlineMapsMarker m in map.markerManager)
         {
             if (!m.enabled || !m.range.InRange(zoom)) continue;
             if (m.HitTest(coords, zoom))

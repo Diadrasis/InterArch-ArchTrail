@@ -11,21 +11,18 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/InterceptElevationRequestExample")]
     public class InterceptElevationRequestExample : MonoBehaviour
     {
-        private OnlineMapsTileSetControl control;
+        /// <summary>
+        /// Reference to the Bing Maps Elevation Manager. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsBingMapsElevationManager elevationManager;
 
         private void Start()
         {
-            // Get Tileset control.
-            control = OnlineMapsControlBase.instance as OnlineMapsTileSetControl;
-
-            if (control == null)
-            {
-                Debug.LogError("You must use the Tileset control.");
-                return;
-            }
+            // If the elevation manager is not specified, get the current instance.
+            if (elevationManager == null) elevationManager = OnlineMapsBingMapsElevationManager.instance;
 
             // Intercept elevation request
-            OnlineMapsElevationManagerBase.instance.OnGetElevation += OnGetElevation;
+            elevationManager.OnGetElevation += OnGetElevation;
         }
 
         private void OnGetElevation(double leftLongitude, double topLatitude, double rightLongitude, double bottomLatitude)
@@ -36,7 +33,7 @@ namespace InfinityCode.OnlineMapsExamples
             // Here you get the elevation from own sources.
 
             // Set elevation map
-            OnlineMapsBingMapsElevationManager.instance.SetElevationData(elevation);
+            elevationManager.SetElevationData(elevation);
         }
     }
 }

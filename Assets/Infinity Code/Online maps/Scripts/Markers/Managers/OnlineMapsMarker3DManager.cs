@@ -45,16 +45,30 @@ public class OnlineMapsMarker3DManager : OnlineMapsMarkerManagerBase<OnlineMapsM
     /// <summary>
     /// Create a new 3D marker
     /// </summary>
+    /// <param name="location">Location of the marker (X - longitude, Y - latitude)</param>
+    /// <param name="prefab">Prefab</param>
+    /// /// <param name="label">Marker label</param>
+    /// <returns>Instance of the marker</returns>
+    public OnlineMapsMarker3D Create(Vector2 location, GameObject prefab, string label = "")
+    {
+        return Create(location.x, location.y, prefab, label);
+    }
+
+    /// <summary>
+    /// Create a new 3D marker
+    /// </summary>
     /// <param name="longitude">Longitude</param>
     /// <param name="latitude">Latitude</param>
     /// <param name="prefab">Prefab</param>
+    /// <param name="label">Marker label</param>
     /// <returns>Instance of the marker</returns>
-    public OnlineMapsMarker3D Create(double longitude, double latitude, GameObject prefab)
+    public OnlineMapsMarker3D Create(double longitude, double latitude, GameObject prefab, string label = "")
     {
         OnlineMapsMarker3D marker = _CreateItem(longitude, latitude);
         marker.prefab = prefab;
         marker.manager = this;
         marker.scale = defaultScale;
+        marker.label = label;
         marker.Init(container);
         Redraw();
         return marker;
@@ -70,7 +84,7 @@ public class OnlineMapsMarker3DManager : OnlineMapsMarkerManagerBase<OnlineMapsM
     public OnlineMapsMarker3D CreateFromExistGameObject(double longitude, double latitude, GameObject markerGameObject)
     {
         OnlineMapsMarker3D marker = _CreateItem(longitude, latitude);
-        marker.prefab = marker.instance = markerGameObject;
+        marker.prefab = marker._prefab = marker.instance = markerGameObject;
         marker.control = map.control as OnlineMapsControlBase3D;
         marker.manager = this;
         marker.scale = defaultScale;
@@ -103,9 +117,9 @@ public class OnlineMapsMarker3DManager : OnlineMapsMarkerManagerBase<OnlineMapsM
     /// <param name="lat">Latitude</param>
     /// <param name="prefab">Prefab</param>
     /// <returns>Instance of the marker</returns>
-    public static OnlineMapsMarker3D CreateItem(double lng, double lat, GameObject prefab)
+    public static OnlineMapsMarker3D CreateItem(double lng, double lat, GameObject prefab, string label = "")
     {
-        if (instance != null) return instance.Create(lng, lat, prefab);
+        if (instance != null) return instance.Create(lng, lat, prefab, label);
         return null;
     }
 
@@ -182,6 +196,8 @@ public class OnlineMapsMarker3DManager : OnlineMapsMarkerManagerBase<OnlineMapsM
         OnlineMapsControlBase3D control = map.control as OnlineMapsControlBase3D;
         if (control != null)
         {
+            if (control.marker3DManager == null) control.marker3DManager = this;
+
             foreach (OnlineMapsMarker3D item in _items)
             {
                 bool isFirstStart = item.manager == null;

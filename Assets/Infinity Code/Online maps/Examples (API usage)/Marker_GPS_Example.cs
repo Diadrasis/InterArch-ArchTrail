@@ -11,13 +11,21 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/Marker_GPS_Example")]
     public class Marker_GPS_Example : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         // Marker, which should display the location.
         private OnlineMapsMarker playerMarker;
 
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Create a new marker.
-            playerMarker = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), null, "Player");
+            playerMarker = map.markerManager.Create(0, 0, null, "Player");
 
             // Get instance of LocationService.
             OnlineMapsLocationService locationService = OnlineMapsLocationService.instance;
@@ -39,8 +47,8 @@ namespace InfinityCode.OnlineMapsExamples
             // Change the position of the marker.
             playerMarker.position = position;
 
-            // Redraw map.
-            OnlineMaps.instance.Redraw();
+            // Redraw the map.
+            map.Redraw();
         }
     }
 }

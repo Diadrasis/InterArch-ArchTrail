@@ -23,7 +23,7 @@ public class OnlineMapsRange
     /// Maximum limit.<br/>
     /// Uses in inspector.
     /// </summary>
-    public float maxLimit = OnlineMaps.MAXZOOM;
+    public float maxLimit = OnlineMaps.MAXZOOM_EXT;
 
     /// <summary>
     /// Minimum limit.<br/>
@@ -43,7 +43,7 @@ public class OnlineMapsRange
     /// <param name="max">Maximum value.</param>
     /// <param name="minLimit">Minimum limit.</param>
     /// <param name="maxLimit">Maximum limit.</param>
-    public OnlineMapsRange(float min = float.MinValue, float max = float.MaxValue, float minLimit = OnlineMaps.MINZOOM, float maxLimit = OnlineMaps.MAXZOOM)
+    public OnlineMapsRange(float min = float.MinValue, float max = float.MaxValue, float minLimit = OnlineMaps.MINZOOM, float maxLimit = OnlineMaps.MAXZOOM_EXT)
     {
         this.min = min;
         this.max = max;
@@ -83,7 +83,7 @@ public class OnlineMapsRange
     }
 
     /// <summary>
-    /// Updates the minimum and maximum values​​.
+    /// Updates the minimum and maximum values.
     /// </summary>
     /// <param name="newMin">Minimum value.</param>
     /// <param name="newMax">Maximum value.</param>

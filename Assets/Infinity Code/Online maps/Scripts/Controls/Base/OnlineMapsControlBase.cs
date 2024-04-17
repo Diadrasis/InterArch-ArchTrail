@@ -39,6 +39,9 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
 
     #region Actions
 
+    /// <summary>
+    /// Event that occurs when need to draw markers.
+    /// </summary>
     public Action OnDrawMarkers;
 
     /// <summary>
@@ -120,6 +123,12 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
     /// Event that occurs at start Update.
     /// </summary>
     public Action OnUpdateBefore;
+
+    /// <summary>
+    /// Event validating that cursor is on UI element.<br/>
+    /// True - cursor on UI element, false - otherwise.
+    /// </summary>
+    public Predicate<GameObject> OnValidateCursorOnUIElement;
 
     /// <summary>
     /// Event validating that current zoom event is allowed.<br/>
@@ -254,6 +263,9 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         get { return false; }
     }
 
+    /// <summary>
+    /// Indicates whether it is possible to use the touch zoom.
+    /// </summary>
     protected virtual bool allowTouchZoom
     {
         get { return true; }
@@ -268,10 +280,12 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         set
         {
             _dragMarker = value;
-            //if (_dragMarker != null) UpdateLastPosition();
         }
     }
 
+    /// <summary>
+    /// Gets/sets the marker drawer.
+    /// </summary>
     public OnlineMapsMarker2DDrawer markerDrawer
     {
         get { return _markerDrawer; }
@@ -311,16 +325,25 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         get { return _screenRect; }
     }
 
+    /// <summary>
+    /// Whether the current control draws to a texture.
+    /// </summary>
     public bool resultIsTexture
     {
         get { return resultType == OnlineMapsTarget.texture; }
     }
 
+    /// <summary>
+    /// The result type of the current control.
+    /// </summary>
     public virtual OnlineMapsTarget resultType
     {
         get { return OnlineMapsTarget.texture; }
     }
 
+    /// <summary>
+    /// Whether the current control uses raster tiles.
+    /// </summary>
     public virtual bool useRasterTiles
     {
         get { return true; }
@@ -356,6 +379,14 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         
     }
 
+    /// <summary>
+    /// Creates a new tile.
+    /// </summary>
+    /// <param name="x">Tile X</param>
+    /// <param name="y">Tile Y</param>
+    /// <param name="zoom">Tile Zoom</param>
+    /// <param name="isMapTile">Should this tile be displayed on the map?</param>
+    /// <returns>Tile</returns>
     public virtual OnlineMapsTile CreateTile(int x, int y, int zoom, bool isMapTile = true)
     {
         return new OnlineMapsRasterTile(x, y, zoom, map, isMapTile);
@@ -419,6 +450,13 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         return GetCoords(GetInputPosition(), out lng, out lat);
     }
 
+    /// <summary>
+    /// Returns the geographical coordinates of the location where the position is.
+    /// </summary>
+    /// <param name="position">Screen position</param>
+    /// <param name="lng">Longitude</param>
+    /// <param name="lat">Latitude</param>
+    /// <returns>True - success, False - otherwise.</returns>
     public abstract bool GetCoords(Vector2 position, out double lng, out double lat);
 
     protected virtual bool GetCoordsInternal(out double lng, out double lat)
@@ -437,6 +475,11 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         return Input.mousePosition;
     }
 
+    /// <summary>
+    /// Get the interactive element located at the screen position.
+    /// </summary>
+    /// <param name="screenPosition">Screen position</param>
+    /// <returns>Interactive element</returns>
     public virtual IOnlineMapsInteractiveElement GetInteractiveElement(Vector2 screenPosition)
     {
         if (IsCursorOnUIElement(screenPosition)) return null;
@@ -480,8 +523,8 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         int maxX = 1 << (lastState.zoom - 1);
         if (dx < -maxX) dx += maxX << 1;
         if (dx < 0 && map.width == (1L << lastState.zoom) * tileSize) dx += map.width / tileSize;
-        px = dx * tileSize / lastState.zoomCoof;
-        py = dy * tileSize / lastState.zoomCoof;
+        px = dx * tileSize / lastState.zoomFactor;
+        py = dy * tileSize / lastState.zoomFactor;
     }
 
     /// <summary>
@@ -537,6 +580,13 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         return new Vector2((float)mx, (float)my);
     }
 
+    /// <summary>
+    /// Gets a tile by screen position.
+    /// </summary>
+    /// <param name="position">Screen position</param>
+    /// <param name="tx">Tile X</param>
+    /// <param name="ty">Tile Y</param>
+    /// <returns>Tile</returns>
     public abstract bool GetTile(Vector2 position, out double tx, out double ty);
 
     protected virtual bool GetTileInternal(Vector2 position, out double tx, out double ty)
@@ -572,6 +622,11 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         return HitTest(GetInputPosition());
     }
 
+    /// <summary>
+    /// Checks whether specified position over the map.
+    /// </summary>
+    /// <param name="position">Screen position</param>
+    /// <returns>True - if the position over the map, false - if not.</returns>
     protected virtual bool HitTest(Vector2 position)
     {
         return true;
@@ -593,6 +648,11 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         OnMapBaseRelease();
     }
 
+    /// <summary>
+    /// Whether the screen position is on UI element
+    /// </summary>
+    /// <param name="position">Screen position</param>
+    /// <returns>True - on UI element, False - otherwise</returns>
     public bool IsCursorOnUIElement(Vector2 position)
     {
         if (!map.notInteractUnderGUI) return false;
@@ -610,8 +670,10 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
 
         GameObject go = hits[0].gameObject;
         if (go == gameObject) return false;
+        if (go.GetComponent<OnlineMapsMarkerInstanceBase>() != null || go.GetComponent<OnlineMapsBuildingBase>() != null) return false;
+        if (OnValidateCursorOnUIElement != null) return OnValidateCursorOnUIElement(go);
 
-        return go.GetComponent<OnlineMapsMarkerInstanceBase>() == null && go.GetComponent<OnlineMapsBuildingBase>() == null;
+        return true;
     }
 
     protected virtual void LoadSettings(OnlineMapsJSONObject json)
@@ -712,13 +774,13 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
             else return;
         }
 
+        if (map.blockAllInteractions) return;
+
         dragMarker = null;
         Vector2 inputPosition = GetInputPosition();
         if (!HitTest(inputPosition)) return;
 
         if (IsCursorOnUIElement(inputPosition)) return;
-
-        if (OnMapPress != null) OnMapPress();
 
         lastClickTimes[0] = lastClickTimes[1];
         lastClickTimes[1] = Time.realtimeSinceStartup;
@@ -731,36 +793,70 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
 
         OnlineMapsMarkerBase marker = null;
         OnlineMapsDrawingElement drawingElement = null;
+        string elementName = null;
 
         IOnlineMapsInteractiveElement interactiveElement = GetInteractiveElement(inputPosition);
+        IOnlineMapsInteractiveElement pressedElement = null;
 
         if (interactiveElement != null)
         {
-            if (interactiveElement is OnlineMapsMarkerBase) marker = interactiveElement as OnlineMapsMarkerBase;
-            else if (interactiveElement is OnlineMapsDrawingElement) drawingElement = interactiveElement as OnlineMapsDrawingElement;
+            if (interactiveElement is OnlineMapsMarkerBase)
+            {
+                marker = interactiveElement as OnlineMapsMarkerBase;
+                elementName = !string.IsNullOrEmpty(marker.label) ? marker.label : marker.manager.IndexOf(marker).ToString();
+            }
+            else if (interactiveElement is OnlineMapsDrawingElement)
+            {
+                drawingElement = interactiveElement as OnlineMapsDrawingElement;
+                elementName = drawingElement.manager.IndexOf(drawingElement).ToString();
+            }
         }
 
         if (marker != null)
         {
-            if (marker.OnPress != null) marker.OnPress(marker);
+            if (marker.OnPress != null)
+            {
+                OnlineMapsLog.Info("Marker " + elementName + " is pressed", OnlineMapsLog.Type.interactiveElement);
+                pressedElement = interactiveElement;
+                marker.OnPress(marker);
+            }
             if (map.showMarkerTooltip == OnlineMapsShowMarkerTooltip.onPress)
             {
                 OnlineMapsTooltipDrawerBase.tooltipMarker = marker;
                 OnlineMapsTooltipDrawerBase.tooltip = marker.label;
             }
-            if (Input.GetKey(KeyCode.LeftControl)) dragMarker = marker;
+
+            if (map.dragMarkerHoldingCTRL && Input.GetKey(KeyCode.LeftControl))
+            {
+                OnlineMapsLog.Info("Start drag marker " + elementName, OnlineMapsLog.Type.interactiveElement);
+                dragMarker = marker;
+            }
         }
         else if (drawingElement != null)
         {
-            if (drawingElement.OnPress != null) drawingElement.OnPress(drawingElement);
+            if (drawingElement.OnPress != null)
+            {
+                OnlineMapsLog.Info("Drawing element " + elementName + " is pressed", OnlineMapsLog.Type.interactiveElement);
+                pressedElement = interactiveElement;
+                drawingElement.OnPress(drawingElement);
+            }
             if (map.showMarkerTooltip == OnlineMapsShowMarkerTooltip.onPress)
             {
                 OnlineMapsTooltipDrawerBase.tooltipDrawingElement = drawingElement;
                 OnlineMapsTooltipDrawerBase.tooltip = drawingElement.tooltip;
             }
         }
+        
+        if (pressedElement == null && OnMapPress != null)
+        {
+            OnlineMapsLog.Info("Map is pressed", OnlineMapsLog.Type.map);
+            OnMapPress();
+        }
 
-        if (dragMarker == null) isMapDrag = true;
+        if (dragMarker == null)
+        {
+            isMapDrag = true;
+        }
 
         activeElement = interactiveElement;
 
@@ -776,37 +872,48 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
     protected virtual void OnMapBaseRelease()
     {
         if (waitZeroTouches && GetTouchCount() == 0) waitZeroTouches = false;
-        if (GUIUtility.hotControl != 0) return;
+        if (GUIUtility.hotControl != 0 || map.blockAllInteractions) return;
 
         Vector2 inputPosition = GetInputPosition();
         bool isClick = (pressPoint - inputPosition).sqrMagnitude < 400 && !lockClick;
         lockClick = false;
         isMapDrag = false;
-        mapDragStarted = false;
+
+        if (mapDragStarted)
+        {
+            OnlineMapsLog.Info("Stop drag a map", OnlineMapsLog.Type.map);
+            mapDragStarted = false;
+        }
+
         dragMarker = null;
 
-        if (longPressEnumerator != null)
-        {
-            StopCoroutine(longPressEnumerator);
-            longPressEnumerator = null;
-        }
+        StopLongPressCoroutine();
 
         lastInputPosition = Vector2.zero;
         OnlineMaps.isUserControl = false;
 
         if (!isMapPress) return;
         isMapPress = false;
-        if (OnMapRelease != null) OnMapRelease();
 
         OnlineMapsMarkerBase marker = null;
         OnlineMapsDrawingElement drawingElement = null;
+        string elementName = null;
 
         IOnlineMapsInteractiveElement interactiveElement = GetInteractiveElement(inputPosition);
+        IOnlineMapsInteractiveElement releasedElement = null;
 
         if (interactiveElement != null)
         {
-            if (interactiveElement is OnlineMapsMarkerBase) marker = interactiveElement as OnlineMapsMarkerBase;
-            else if (interactiveElement is OnlineMapsDrawingElement) drawingElement = interactiveElement as OnlineMapsDrawingElement;
+            if (interactiveElement is OnlineMapsMarkerBase)
+            {
+                marker = interactiveElement as OnlineMapsMarkerBase;
+                elementName = !string.IsNullOrEmpty(marker.label) ? marker.label : marker.manager.IndexOf(marker).ToString();
+            }
+            else if (interactiveElement is OnlineMapsDrawingElement)
+            {
+                drawingElement = interactiveElement as OnlineMapsDrawingElement;
+                elementName = drawingElement.manager.IndexOf(drawingElement).ToString();
+            }
         }
 
         if (map.showMarkerTooltip == OnlineMapsShowMarkerTooltip.onPress && (OnlineMapsTooltipDrawerBase.tooltipMarker != null || OnlineMapsTooltipDrawerBase.tooltipDrawingElement != null))
@@ -816,20 +923,59 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
             OnlineMapsTooltipDrawerBase.tooltip = null;
         }
 
-        bool isClicked = false;
-
         if (marker != null)
         {
-            if (marker.OnRelease != null) marker.OnRelease(marker);
-            if (isClick && marker.OnClick != null)
+            if (marker.OnRelease != null)
             {
-                marker.OnClick(marker);
-                isClicked = true;
+                OnlineMapsLog.Info("Marker " + elementName + " is released", OnlineMapsLog.Type.interactiveElement);
+                marker.OnRelease(marker);
+                releasedElement = interactiveElement;
+            }
+            if (isClick)
+            {
+                if (marker.OnClick != null)
+                {
+                    OnlineMapsLog.Info("Marker " + elementName + " is clicked", OnlineMapsLog.Type.interactiveElement);
+                    marker.OnClick(marker);
+                    releasedElement = interactiveElement;
+                }
             }
         }
         else if (drawingElement != null)
         {
-            if (drawingElement.OnRelease != null) drawingElement.OnRelease(drawingElement);
+            if (drawingElement.OnRelease != null)
+            {
+                OnlineMapsLog.Info("Drawing element " + elementName + " is released", OnlineMapsLog.Type.interactiveElement);
+                releasedElement = interactiveElement;
+                drawingElement.OnRelease(drawingElement);
+            }
+            if (isClick)
+            {
+                if (drawingElement.OnClick != null)
+                {
+                    OnlineMapsLog.Info("Drawing element " + elementName + " is clicked", OnlineMapsLog.Type.interactiveElement);
+                    releasedElement = interactiveElement;
+                    drawingElement.OnClick(drawingElement);
+                }
+            }
+        }
+
+        if (releasedElement == null)
+        {
+            if (OnMapRelease != null)
+            {
+                OnlineMapsLog.Info("Map is released", OnlineMapsLog.Type.map);
+                OnMapRelease();
+            }
+
+            if (isClick)
+            {
+                if (OnMapClick != null)
+                {
+                    OnlineMapsLog.Info("Map is clicked", OnlineMapsLog.Type.map); 
+                    OnMapClick();
+                }
+            }
         }
 
         if (activeElement != null && activeElement != interactiveElement)
@@ -837,22 +983,43 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
             if (activeElement is OnlineMapsMarkerBase)
             {
                 OnlineMapsMarkerBase m = activeElement as OnlineMapsMarkerBase;
-                if (m.OnRelease != null) m.OnRelease(m);
+                if (m.OnRelease != null)
+                {
+                    string markerName = !string.IsNullOrEmpty(m.label) ? m.label : m.manager.IndexOf(m).ToString();
+                    OnlineMapsLog.Info("Marker " + markerName + " is released", OnlineMapsLog.Type.interactiveElement);
+
+                    m.OnRelease(m);
+                }
             }
             else if (activeElement is OnlineMapsDrawingElement)
             {
                 OnlineMapsDrawingElement d = activeElement as OnlineMapsDrawingElement;
-                if (d.OnRelease != null) d.OnRelease(d);
+                if (d.OnRelease != null)
+                {
+                    string elName = d.manager.IndexOf(d).ToString();
+                    OnlineMapsLog.Info("Drawing element " + elName + " is released", OnlineMapsLog.Type.interactiveElement);
+
+                    d.OnRelease(d);
+                }
             }
             activeElement = null;
         }
 
         if (isClick && Time.realtimeSinceStartup - lastClickTimes[0] < 0.5f)
         {
-            if (marker != null && marker.OnDoubleClick != null) marker.OnDoubleClick(marker);
-            else if (drawingElement != null && drawingElement.OnDoubleClick != null) drawingElement.OnDoubleClick(drawingElement); 
-            else
+            if (marker != null && marker.OnDoubleClick != null)
             {
+                OnlineMapsLog.Info("Marker " + elementName + " is double clicked", OnlineMapsLog.Type.interactiveElement);
+                marker.OnDoubleClick(marker);
+            }
+            else if (drawingElement != null && drawingElement.OnDoubleClick != null)
+            {
+                OnlineMapsLog.Info("Drawing element " + elementName + " is double clicked", OnlineMapsLog.Type.interactiveElement);
+                drawingElement.OnDoubleClick(drawingElement);
+            } 
+            else if (releasedElement == null)
+            {
+                OnlineMapsLog.Info("Map is double clicked", OnlineMapsLog.Type.map);
                 if (OnMapDoubleClick != null) OnMapDoubleClick();
 
                 if (allowZoom && zoomInOnDoubleClick)
@@ -871,62 +1038,12 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
             lastClickTimes[0] = 0;
             lastClickTimes[1] = 0;
         }
-        else if (isClick && !isClicked)
-        {
-            if (drawingElement != null && drawingElement.OnClick != null) drawingElement.OnClick(drawingElement);
-            else if (OnMapClick != null) OnMapClick();
-        }
 
         if (map.bufferStatus == OnlineMapsBufferStatus.wait) map.needRedraw = true;
     }
 
-    protected virtual OnlineMapsJSONItem SaveSettings()
+    private void ProcessInteractions()
     {
-        return OnlineMapsJSON.Serialize(new
-        {
-            allowZoom,
-            allowUserControl,
-            zoomInOnDoubleClick,
-            smoothZoom
-        });
-    }
-
-    /// <summary>
-    /// Specifies the texture, which will draw the map. In texture must be enabled "Read / Write Enabled".
-    /// </summary>
-    /// <param name="texture">Texture</param>
-    public virtual void SetTexture(Texture2D texture)
-    {
-        activeTexture = texture;
-    }
-
-    private void StartGestureZoom()
-    {
-        if (OnSmoothZoomInit != null) OnSmoothZoomInit();
-        smoothZoomStarted = true;
-        lastGestureDistance = 0;
-        waitZeroTouches = true;
-        lockClick = true;
-        if (OnSmoothZoomBegin != null) OnSmoothZoomBegin();
-    }
-
-    private void StopGestureZoom()
-    {
-        smoothZoomStarted = false;
-        lastGestureCenter = Vector2.zero;
-
-#if UNITY_EDITOR
-        initialGestureCenter = Vector2.zero;
-#endif 
-        lastGestureDistance = 0;
-        if (OnSmoothZoomFinish != null) OnSmoothZoomFinish();
-    }
-
-    protected void Update()
-    {
-        if (OnUpdateBefore != null) OnUpdateBefore();
-
-        BeforeUpdate();
         _screenRect = GetRect();
 
         int touchCount = GetTouchCount();
@@ -962,6 +1079,68 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
             OnlineMapsTooltipDrawerBase.tooltip = string.Empty;
             OnlineMapsTooltipDrawerBase.tooltipMarker = null;
         }
+    }
+
+    protected virtual OnlineMapsJSONItem SaveSettings()
+    {
+        return OnlineMapsJSON.Serialize(new
+        {
+            allowZoom,
+            allowUserControl,
+            zoomInOnDoubleClick,
+            smoothZoom
+        });
+    }
+
+    /// <summary>
+    /// Specifies the texture, which will draw the map. In texture must be enabled "Read / Write Enabled".
+    /// </summary>
+    /// <param name="texture">Texture</param>
+    public virtual void SetTexture(Texture2D texture)
+    {
+        activeTexture = texture;
+    }
+
+    private void StartGestureZoom()
+    {
+        if (OnSmoothZoomInit != null) OnSmoothZoomInit();
+        smoothZoomStarted = true;
+        lastGestureDistance = 0;
+        waitZeroTouches = true;
+        lockClick = true;
+
+        StopLongPressCoroutine();
+
+        if (OnSmoothZoomBegin != null) OnSmoothZoomBegin();
+    }
+
+    private void StopGestureZoom()
+    {
+        smoothZoomStarted = false;
+        lastGestureCenter = Vector2.zero;
+
+#if UNITY_EDITOR
+        initialGestureCenter = Vector2.zero;
+#endif 
+        lastGestureDistance = 0;
+        if (OnSmoothZoomFinish != null) OnSmoothZoomFinish();
+    }
+
+    private void StopLongPressCoroutine()
+    {
+        if (longPressEnumerator != null)
+        {
+            StopCoroutine(longPressEnumerator);
+            longPressEnumerator = null;
+        }
+    }
+
+    protected void Update()
+    {
+        if (OnUpdateBefore != null) OnUpdateBefore();
+
+        BeforeUpdate();
+        if (!map.blockAllInteractions) ProcessInteractions();
         AfterUpdate();
 
         if (OnUpdateAfter != null) OnUpdateAfter();
@@ -985,6 +1164,18 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
             touchPositions[0] = Input.mousePosition;
             touchPositions[1] = initialGestureCenter * 2 - (Vector2)Input.mousePosition;
         }
+        else
+        {
+            if (Input.touchSupported)
+            {
+                touchPositions = Input.touches.Select(t => t.position).ToArray();
+            }
+            else
+            {
+                touchPositions = new Vector2[touchCount];
+                for (int i = 0; i < touchCount; i++) touchPositions[i] = Input.mousePosition;
+            }
+        }
 #else 
         if(OnGetMultitouchInputPositions != null) touchPositions = OnGetMultitouchInputPositions();
         else touchPositions = Input.touches.Select(t => t.position).ToArray();
@@ -993,7 +1184,15 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         if (touchCount != lastGestureTouchCount)
         {
             lastGestureTouchCount = touchCount;
-            if (touchCount == 2) StartGestureZoom();
+            if (touchCount == 2)
+            {
+                if (map.notInteractUnderGUI)
+                {
+                    Vector2 pos = (touchPositions[0] + touchPositions[1]) / 2;
+                    if (HitTest(pos) && !IsCursorOnUIElement(pos)) StartGestureZoom();
+                }
+                else StartGestureZoom();
+            }
             else if (smoothZoomStarted) StopGestureZoom();
         }
 
@@ -1061,40 +1260,43 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
         if (!allowUserControl || GetTouchCount() > 1) return;
 
         Vector2 inputPosition = GetInputPosition();
+        //if (inputPosition.y > Screen.height) return;
 
-        if (!mapDragStarted && (lastInputPosition - inputPosition).magnitude < startDragDistance) return;
-        mapDragStarted = true;
+        if (!mapDragStarted && (pressPoint - inputPosition).sqrMagnitude < startDragDistance * startDragDistance) return;
+        if (!mapDragStarted)
+        {
+            OnlineMapsLog.Info("Start drag a map", OnlineMapsLog.Type.map);
+            mapDragStarted = true;
+        }
+        if (lastInputPosition == inputPosition) return;
 
         double lat, lng;
-        bool hit = GetCoordsInternal(out lng, out lat);
-
-        if (!hit || lastInputPosition == inputPosition) return;
+        if (!GetCoordsInternal(out lng, out lat)) return;
 
         double offsetX = lng - lastPositionLng;
         double offsetY = lat - lastPositionLat;
 
         if (offsetX > 270) offsetX -= 360;
         else if (offsetX < -270) offsetX += 360;
-            
-        if (Math.Abs(offsetX) > double.Epsilon || Math.Abs(offsetY) > double.Epsilon)
+
+        if (Math.Abs(offsetX) <= double.Epsilon && Math.Abs(offsetY) <= double.Epsilon) return;
+        
+        double px, py;
+        map.GetPosition(out px, out py);
+        px -= offsetX;
+        py -= offsetY;
+        map.SetPosition(px, py);
+
+        map.needRedraw = true;
+
+        StopLongPressCoroutine();
+
+        if (OnMapDrag != null)
         {
-            double px, py;
-            map.GetPosition(out px, out py);
-            px -= offsetX;
-            py -= offsetY;
-            map.SetPosition(px, py);
-
-            map.needRedraw = true;
-
-            if (longPressEnumerator != null)
-            {
-                StopCoroutine(longPressEnumerator);
-                longPressEnumerator = null;
-            }
-
-            if (OnMapDrag != null) OnMapDrag();
+            OnlineMapsLog.Info("Map is being dragged", OnlineMapsLog.Type.map);
+            OnMapDrag();
         }
-
+        
         GetCoordsInternal(out lastPositionLng, out lastPositionLat);
     }
 
@@ -1103,7 +1305,7 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
     /// </summary>
     protected void UpdateZoom()
     {
-#if UNITY_IOS && !UNITY_EDITOR
+#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
         return;
 #endif
 
@@ -1147,10 +1349,24 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
             else if (interactiveElement is OnlineMapsDrawingElement) drawingElement = interactiveElement as OnlineMapsDrawingElement;
         }
 
-        if (marker != null && marker.OnLongPress != null) marker.OnLongPress(marker);
-        else if (drawingElement != null && drawingElement.OnLongPress != null) drawingElement.OnLongPress(drawingElement);
+        if (marker != null && marker.OnLongPress != null)
+        {
+            string markerName = !string.IsNullOrEmpty(marker.label) ? marker.label : marker.manager.IndexOf(marker).ToString();
+            OnlineMapsLog.Info("Marker " + markerName + " is long pressed", OnlineMapsLog.Type.interactiveElement);
+
+            marker.OnLongPress(marker);
+        }
+        else if (drawingElement != null && drawingElement.OnLongPress != null)
+        {
+            string elementName = drawingElement.manager.IndexOf(drawingElement).ToString();
+            OnlineMapsLog.Info("Drawing element " + elementName + " is pressed", OnlineMapsLog.Type.interactiveElement);
+
+            drawingElement.OnLongPress(drawingElement);
+        }
         else if (OnMapLongPress != null)
         {
+            OnlineMapsLog.Info("Map is long pressed", OnlineMapsLog.Type.map);
+
             OnMapLongPress();
             isMapDrag = false;
         }
@@ -1166,7 +1382,7 @@ public abstract class OnlineMapsControlBase : MonoBehaviour, IOnlineMapsSavableC
     /// <returns>True - if zoom changed, False - if zoom not changed</returns>
     public bool ZoomOnPoint(float zoomOffset, Vector2 screenPosition)
     {
-        float newZoom = Mathf.Clamp(map.floatZoom + zoomOffset, OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM);
+        float newZoom = Mathf.Clamp(map.floatZoom + zoomOffset, OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM_EXT);
         if (Math.Abs(newZoom - map.floatZoom) < float.Epsilon) return false;
 
         double mx, my;

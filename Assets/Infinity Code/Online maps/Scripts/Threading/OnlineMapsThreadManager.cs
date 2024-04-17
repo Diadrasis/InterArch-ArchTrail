@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-
+using UnityEngine;
 #if !UNITY_WEBGL
 using System.Threading;
 #endif
@@ -103,7 +103,10 @@ public class OnlineMapsThreadManager
 
         lock (mainThreadActions)
         {
-            for (int i = 0; i < mainThreadActions.Count; i++)
+            float startTime = Time.realtimeSinceStartup;
+            int i;
+
+            for (i = 0; i < mainThreadActions.Count; i++)
             {
                 try
                 {
@@ -113,8 +116,22 @@ public class OnlineMapsThreadManager
                 {
 
                 }
+
+                if (Time.realtimeSinceStartup - startTime > 0.1)
+                {
+                    i++;
+                    break;
+                }
             }
-            mainThreadActions.Clear();
+
+            if (i == mainThreadActions.Count) mainThreadActions.Clear();
+            else
+            {
+                while (i-- > 0)
+                {
+                    mainThreadActions.RemoveAt(0);
+                }
+            }
         }
     }
 

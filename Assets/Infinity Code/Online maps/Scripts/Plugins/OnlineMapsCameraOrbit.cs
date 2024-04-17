@@ -120,17 +120,17 @@ public class OnlineMapsCameraOrbit : MonoBehaviour, IOnlineMapsSavableComponent
         obj.DeserializeObject(this);
     }
 
-    private OnlineMapsJSONItem SaveSettings()
-    {
-        return OnlineMapsJSON.Serialize(this);
-    }
-
     private void OnEnable()
     {
         _instance = this;
         map = GetComponent<OnlineMaps>();
-        if (map == null) map = FindObjectOfType<OnlineMaps>();
+        if (map == null) map = OnlineMapsUtils.FindObjectOfType<OnlineMaps>();
         control = map.control as OnlineMapsControlBaseDynamicMesh;
+    }
+
+    private OnlineMapsJSONItem SaveSettings()
+    {
+        return OnlineMapsJSON.Serialize(this);
     }
 
     private void Start()
@@ -183,6 +183,8 @@ public class OnlineMapsCameraOrbit : MonoBehaviour, IOnlineMapsSavableComponent
         if (rotation.x > maxRotationX) rotation.x = maxRotationX;
         else if (rotation.x < 0) rotation.x = 0;
 
+        if (activeCamera == null) return;
+
         float rx = 90 - rotation.x;
         if (rx > 89.9) rx = 89.9f;
 
@@ -190,6 +192,9 @@ public class OnlineMapsCameraOrbit : MonoBehaviour, IOnlineMapsSavableComponent
         double py = Math.Sin(rx * Mathf.Deg2Rad) * distance;
         double pz = Math.Cos(rotation.y * Mathf.Deg2Rad) * px;
         px = Math.Sin(rotation.y * Mathf.Deg2Rad) * px;
+        
+        double tlx = 0, tly = 0, brx = 0, bry = 0;
+        float yScale = 0;
 
         Vector3 targetPosition;
 
@@ -204,9 +209,8 @@ public class OnlineMapsCameraOrbit : MonoBehaviour, IOnlineMapsSavableComponent
 
             if (OnlineMapsElevationManagerBase.useElevation)
             {
-                double tlx, tly, brx, bry;
                 map.GetCorners(out tlx, out tly, out brx, out bry);
-                float yScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(tlx, tly, brx, bry);
+                yScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(control.elevationManager, tlx, tly, brx, bry);
 
                 if (adjustTo == OnlineMapsCameraAdjust.maxElevationInArea) offset.y = OnlineMapsElevationManagerBase.instance.GetMaxElevation(yScale);
                 else if (adjustTo == OnlineMapsCameraAdjust.averageCenter)
@@ -248,6 +252,12 @@ public class OnlineMapsCameraOrbit : MonoBehaviour, IOnlineMapsSavableComponent
 
         Vector3 oldPosition = activeCamera.transform.position;
         Vector3 newPosition = map.transform.rotation * new Vector3((float)px,  (float)py, (float)pz) + targetPosition;
+
+        if (OnlineMapsElevationManagerBase.useElevation)
+        {
+            float y = OnlineMapsElevationManagerBase.GetElevation(newPosition.x, newPosition.z, yScale, tlx, tly, brx, bry);
+            if (newPosition.y < y + 200) newPosition.y = y + 200;
+        }
 
         activeCamera.transform.position = newPosition;
         activeCamera.transform.LookAt(targetPosition);

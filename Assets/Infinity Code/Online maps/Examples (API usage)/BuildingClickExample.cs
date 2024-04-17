@@ -12,6 +12,22 @@ namespace InfinityCode.OnlineMapsExamples
     public class BuildingClickExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the building manager. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsBuildings buildings;
+
+        /// <summary>
+        /// This method is called when the script starts
+        /// </summary>
+        private void Start()
+        {
+            if (buildings == null) buildings = OnlineMapsBuildings.instance;
+            
+            // Subscribe to the building creation event
+            buildings.OnBuildingCreated += OnBuildingCreated;
+        }
+
+        /// <summary>
         /// This method is called when click on building
         /// </summary>
         /// <param name="building">The building on which clicked</param>
@@ -48,15 +64,6 @@ namespace InfinityCode.OnlineMapsExamples
         private void OnBuildingRelease(OnlineMapsBuildingBase building)
         {
             Debug.Log("Release: " + building.id);
-        }
-
-        /// <summary>
-        /// This method is called when the script starts
-        /// </summary>
-        private void Start()
-        {
-            // Subscribe to the building creation event
-            OnlineMapsBuildings.instance.OnBuildingCreated += OnBuildingCreated;
         }
     }
 }

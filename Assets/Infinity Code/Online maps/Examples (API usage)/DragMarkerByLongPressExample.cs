@@ -11,10 +11,18 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/DragMarkerByLongPressExample")]
     public class DragMarkerByLongPressExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         private void Start()
         {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Create a new marker.
-            OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(OnlineMaps.instance.position, "My Marker");
+            OnlineMapsMarker marker = map.markerManager.Create(map.position, "My Marker");
 
             // Subscribe to OnLongPress event.
             marker.OnLongPress += OnMarkerLongPress;
@@ -23,8 +31,8 @@ namespace InfinityCode.OnlineMapsExamples
         private void OnMarkerLongPress(OnlineMapsMarkerBase marker)
         {
             // Starts moving the marker.
-            OnlineMapsControlBase.instance.dragMarker = marker;
-            OnlineMapsControlBase.instance.isMapDrag = false;
+            map.control.dragMarker = marker;
+            map.control.isMapDrag = false;
         }
     }
 }

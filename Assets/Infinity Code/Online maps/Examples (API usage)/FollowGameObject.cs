@@ -12,6 +12,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class FollowGameObject : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the control. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsTileSetControl control;
+
+        /// <summary>
         /// GameObject to be followed by the map
         /// </summary>
         public GameObject target;
@@ -27,20 +32,17 @@ namespace InfinityCode.OnlineMapsExamples
         private OnlineMaps map;
 
         /// <summary>
-        /// Reference to the control
-        /// </summary>
-        private OnlineMapsTileSetControl control;
-
-        /// <summary>
         /// Last tile position of the center of the map
         /// </summary>
         private double tx, ty;
 
         private void Start()
         {
+            // If the control is not specified, get the current instance.
+            if (control == null) control = OnlineMapsTileSetControl.instance;
+            
             // Set a reference to the map and control
-            map = OnlineMaps.instance;
-            control = OnlineMapsTileSetControl.instance;
+            map = control.map;
 
             // Disable the movement and zoom of the map with the mouse
             control.allowUserControl = false;
@@ -84,8 +86,8 @@ namespace InfinityCode.OnlineMapsExamples
 
             // Calculate offset (in tile position)
             Vector3 offset = map.transform.rotation * (lastPosition - map.transform.position - control.center);
-            offset.x = offset.x / OnlineMapsUtils.tileSize / size.x * map.width * map.zoomCoof;
-            offset.z = offset.z / OnlineMapsUtils.tileSize / size.y * map.height * map.zoomCoof;
+            offset.x = offset.x / OnlineMapsUtils.tileSize / size.x * map.width * map.zoomFactor;
+            offset.z = offset.z / OnlineMapsUtils.tileSize / size.y * map.height * map.zoomFactor;
 
             // Calculate current tile position of the center of the map
             tx -= offset.x;

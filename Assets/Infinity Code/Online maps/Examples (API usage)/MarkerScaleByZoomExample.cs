@@ -12,6 +12,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class MarkerScaleByZoomExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Zoom, when the scale = 1.
         /// </summary>
         public int defaultZoom = 15;
@@ -26,11 +31,14 @@ namespace InfinityCode.OnlineMapsExamples
         /// </summary>
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Create a new marker.
-            marker = OnlineMapsMarkerManager.CreateItem(new Vector2(15, 15));
+            marker = map.markerManager.Create(15, 15);
 
             // Subscribe to change zoom.
-            OnlineMaps.instance.OnChangeZoom += OnChangeZoom;
+            map.OnChangeZoom += OnChangeZoom;
 
             // Initial rescale marker.
             OnChangeZoom();
@@ -42,7 +50,7 @@ namespace InfinityCode.OnlineMapsExamples
         private void OnChangeZoom()
         {
             float originalScale = 1 << defaultZoom;
-            float currentScale = 1 << OnlineMaps.instance.zoom;
+            float currentScale = 1 << map.zoom;
 
             marker.scale = currentScale / originalScale;
         }

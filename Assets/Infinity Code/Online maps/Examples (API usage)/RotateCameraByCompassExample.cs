@@ -12,14 +12,18 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/RotateCameraByCompassExample")]
     public class RotateCameraByCompassExample : MonoBehaviour
     {
-        private OnlineMapsCameraOrbit cameraOrbit;
+        /// <summary>
+        /// Reference to the camera orbit. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsCameraOrbit cameraOrbit;
 
         private void Start()
         {
+            // If the camera orbit is not specified, get the current instance.
+            if (cameraOrbit == null) cameraOrbit = OnlineMapsCameraOrbit.instance;
+            
             // Subscribe to compass event
             OnlineMapsLocationService.instance.OnCompassChanged += OnCompassChanged;
-
-            cameraOrbit = OnlineMapsCameraOrbit.instance;
         }
 
         /// <summary>

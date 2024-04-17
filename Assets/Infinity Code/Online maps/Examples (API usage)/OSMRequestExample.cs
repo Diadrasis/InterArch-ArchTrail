@@ -14,11 +14,19 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/OSMRequestExample")]
     public class OSMRequestExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Get map corners
-            Vector2 topLeft = OnlineMaps.instance.topLeftPosition;
-            Vector2 bottomRight = OnlineMaps.instance.bottomRightPosition;
+            Vector2 topLeft = map.topLeftPosition;
+            Vector2 bottomRight = map.bottomRightPosition;
 
             // Create OSM Overpass request where highway is primary or residential
             string requestData = String.Format("node({0},{1},{2},{3});way(bn)[{4}];(._;>;);out;",

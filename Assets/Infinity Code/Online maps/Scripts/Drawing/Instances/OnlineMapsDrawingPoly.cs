@@ -4,7 +4,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -16,10 +15,16 @@ public class OnlineMapsDrawingPoly : OnlineMapsDrawingElement
     private static List<Vector3> normals;
     private static List<int> triangles;
     private static List<Vector2> uv;
+    private static float[] internalPoints;
+    private static List<int> internalIndices;
+    private static int countInternalPoints;
+    private static List<int> fillTriangles;
 
     private Color _backgroundColor = new Color(1, 1, 1, 0);
     private Color _borderColor = Color.black;
     private float _borderWidth = 1;
+    private IEnumerable _points;
+
 
     /// <summary>
     /// Background color of the polygon.<br/>
@@ -95,18 +100,58 @@ public class OnlineMapsDrawingPoly : OnlineMapsDrawingElement
         get
         {
             OnlineMapsVector2d centerPoint = OnlineMapsVector2d.zero;
-            int count = 0;
-            foreach (OnlineMapsVector2d point in points)
+            int i = 0, count = 0;
+            int valueType = -1; // 0 - Vector2, 1 - float, 2 - double, 3 - OnlineMapsVector2d
+            object prev = null;
+
+            foreach (object p in points)
             {
-                centerPoint += point;
-                count++;
+                if (valueType == -1)
+                {
+                    if (p is Vector2) valueType = 0;
+                    else if (p is float) valueType = 1;
+                    else if (p is double) valueType = 2;
+                    else if (p is OnlineMapsVector2d) valueType = 3;
+                }
+
+                i++;
+
+                if (valueType == 0)
+                {
+                    centerPoint += (OnlineMapsVector2d)(Vector2)p;
+                    count++;
+                    continue;
+                }
+
+                if (valueType == 3)
+                {
+                    centerPoint += (OnlineMapsVector2d) p;
+                    count++;
+                    continue;
+                }
+
+                if (i % 2 == 0)
+                {
+                    if (valueType == 1)
+                    {
+                        centerPoint.x += (float) prev;
+                        centerPoint.y += (float) p;
+                    }
+                    else
+                    {
+                        centerPoint.x += (double) prev;
+                        centerPoint.y += (double) p;
+                    }
+
+                    count++;
+                }
+
+                prev = p;
             }
             if (count == 0) return OnlineMapsVector2d.zero;
             return centerPoint / count;
         }
     }
-
-    private IEnumerable _points;
 
     /// <summary>
     /// Creates a new polygon.
@@ -124,7 +169,7 @@ public class OnlineMapsDrawingPoly : OnlineMapsDrawingElement
     /// The values can be of type: Vector2, float, double.<br/>
     /// If values float or double, the value should go in pairs(longitude, latitude).
     /// </param>
-    public OnlineMapsDrawingPoly(IEnumerable points):this()
+    public OnlineMapsDrawingPoly(IEnumerable points) : this()
     {
         if (points == null) throw new Exception("Points can not be null.");
         _points = points;
@@ -248,7 +293,7 @@ public class OnlineMapsDrawingPoly : OnlineMapsDrawingElement
                     nv1.y = elevationManager.GetElevationValue(nv1.x, nv1.z, bestElevationYScale, tlx, tly, brx, bry);
                     nv2.y = elevationManager.GetElevationValue(nv2.x, nv2.z, bestElevationYScale, tlx, tly, brx, bry);
                 }
-                
+
                 vertices[0] = vertices[vertices.Count - 3] = nv1;
                 vertices[3] = vertices[vertices.Count - 2] = nv2;
             }
@@ -259,7 +304,8 @@ public class OnlineMapsDrawingPoly : OnlineMapsDrawingElement
             }
         }
 
-        int[] fillTriangles = null;
+        if (fillTriangles == null) fillTriangles = new List<int>(128);
+        else fillTriangles.Clear();
 
         if (!checkMapBoundaries && backgroundColor.a > 0 && vertices.Count > 0)
         {
@@ -283,8 +329,14 @@ public class OnlineMapsDrawingPoly : OnlineMapsDrawingElement
             int off2 = side ? 2 : 1;
 
             Vector2 lastPoint = Vector2.zero;
-            List<int> internalIndices = new List<int>(vertices.Count / 4);
-            List<Vector2> internalPoints = new List<Vector2>(vertices.Count / 4);
+
+            if (internalIndices == null) internalIndices = new List<int>(128);
+            else internalIndices.Clear();
+
+            if (internalPoints == null) internalPoints = new float[128];
+            countInternalPoints = 0;
+            int ipl = internalPoints.Length;
+
             float w = borderWidth / 2;
             w *= w;
             for (int i = 0, j = 0; i < vertices.Count / 4; i++, j += 4)
@@ -296,14 +348,22 @@ public class OnlineMapsDrawingPoly : OnlineMapsDrawingElement
                     if ((lastPoint - p2).sqrMagnitude > w)
                     {
                         internalIndices.Add(j + off1);
-                        internalPoints.Add(p2);
+
+                        internalPoints[countInternalPoints++] = p2.x;
+                        internalPoints[countInternalPoints++] = p2.y;
+                        if (ipl == countInternalPoints) Array.Resize(ref internalPoints, ipl *= 2);
+
                         lastPoint = p2;
                     }
                 }
                 else
                 {
                     internalIndices.Add(j + off1);
-                    internalPoints.Add(p2);
+
+                    internalPoints[countInternalPoints++] = p2.x;
+                    internalPoints[countInternalPoints++] = p2.y;
+                    if (ipl == countInternalPoints) Array.Resize(ref internalPoints, ipl *= 2);
+
                     lastPoint = p2;
                 }
                 p = vertices[j + off2];
@@ -311,29 +371,35 @@ public class OnlineMapsDrawingPoly : OnlineMapsDrawingElement
                 if ((lastPoint - p2).sqrMagnitude > w)
                 {
                     internalIndices.Add(j + off2);
-                    internalPoints.Add(p2);
+
+                    internalPoints[countInternalPoints++] = p2.x;
+                    internalPoints[countInternalPoints++] = p2.y;
+                    if (ipl == countInternalPoints) Array.Resize(ref internalPoints, ipl *= 2);
+
                     lastPoint = p2;
                 }
             }
 
-            if (internalPoints[0] == internalPoints[internalPoints.Count - 1]) internalPoints.RemoveAt(internalPoints.Count - 1);
-
-            fillTriangles = OnlineMapsUtils.Triangulate(internalPoints).ToArray();
-            //fillTriangles = OMTriangulator.Triangulate(internalPoints);
-
-
-            if (fillTriangles.Length > 2)
+            if (Math.Abs(internalPoints[0] - internalPoints[countInternalPoints - 2]) < float.Epsilon &&
+                Math.Abs(internalPoints[1] - internalPoints[countInternalPoints - 1]) < float.Epsilon)
             {
-                for (int i = 0; i < fillTriangles.Length; i++) fillTriangles[i] = internalIndices[fillTriangles[i]];
+                countInternalPoints -= 2;
+            }
+
+            OnlineMapsUtils.Triangulate(internalPoints, countInternalPoints / 2, fillTriangles);
+
+            if (fillTriangles.Count > 2)
+            {
+                for (int i = 0; i < fillTriangles.Count; i++) fillTriangles[i] = internalIndices[fillTriangles[i]];
 
                 Vector3 side1 = vertices[fillTriangles[1]] - vertices[fillTriangles[0]];
                 Vector3 side2 = vertices[fillTriangles[2]] - vertices[fillTriangles[0]];
                 Vector3 perp = Vector3.Cross(side1, side2);
 
                 bool reversed = perp.y < 0;
-                if (reversed) fillTriangles = fillTriangles.Reverse().ToArray();
+                if (reversed) fillTriangles.Reverse();
             }
-            else fillTriangles = null;
+            else fillTriangles.Clear();
         }
 
         mesh.subMeshCount = 2;
@@ -343,7 +409,7 @@ public class OnlineMapsDrawingPoly : OnlineMapsDrawingElement
         mesh.SetUVs(0, uv);
 
         mesh.SetTriangles(triangles.ToArray(), 0);
-        if (fillTriangles != null) mesh.SetTriangles(fillTriangles.ToArray(), 1);
+        if (fillTriangles.Count > 0) mesh.SetTriangles(fillTriangles.ToArray(), 1);
 
         UpdateMaterialsQuote(control, index);
     }

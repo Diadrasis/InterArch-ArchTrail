@@ -1,7 +1,9 @@
 ﻿/*         INFINITY CODE         */
 /*   https://infinity-code.com   */
 
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
@@ -14,7 +16,23 @@ public class OnlineMapsLog: MonoBehaviour
     private static OnlineMapsLog _instance;
     private static bool missed = false;
 
-    public bool showRequests = false;
+    [Tooltip("Display events using IMGUI.")]
+    public bool logOnUI = false;
+
+    [Header("Event Types")]
+    public bool cacheEvents = false;
+    [Tooltip("Shows the events of interactive elements that have subscriptions")]
+    public bool interactiveElementEvents = false;
+    [Tooltip("Shows the events of map that have subscriptions")]
+    public bool mapEvents = false;
+    [FormerlySerializedAs("showRequests")]
+    public bool requestEvents = false;
+
+    public int fontSize = 14;
+    public Color fontColor = Color.white;
+
+    private static List<string> messages = new List<string>();
+    private static GUIStyle style;
 
     public static OnlineMapsLog instance
     {
@@ -22,7 +40,7 @@ public class OnlineMapsLog: MonoBehaviour
         {
             if (_instance == null && !missed)
             {
-                _instance = FindObjectOfType<OnlineMapsLog>();
+                _instance = OnlineMapsUtils.FindObjectOfType<OnlineMapsLog>();
                 missed = _instance == null;
             }
 
@@ -33,7 +51,21 @@ public class OnlineMapsLog: MonoBehaviour
     public static void Info(string message, Type type)
     {
         if (!ValidateType(type)) return;
+
         Debug.Log(message);
+        AddUIMessage(message);
+    }
+
+    private static void AddUIMessage(string message)
+    {
+        if (!instance.logOnUI) return;
+
+        while (messages.Count > 19)
+        {
+            messages.RemoveAt(messages.Count - 1);
+        }
+
+        messages.Insert(0, message);
     }
 
     private void OnEnable()
@@ -41,13 +73,42 @@ public class OnlineMapsLog: MonoBehaviour
         _instance = this;
     }
 
+    private void OnGUI()
+    {
+        if (!logOnUI) return;
+
+        if (style == null)
+        {
+            style = new GUIStyle()
+            {
+                fontSize = fontSize,
+                normal =
+                {
+                    textColor = fontColor
+                }
+            };
+        }
+
+        foreach (string message in messages)
+        {
+            GUILayout.Label(message, style);
+        }
+    }
+
     private static bool ValidateType(Type type)
     {
         if (instance == null) return false;
+
         switch (type)
         {
             case Type.request:
-                return instance.showRequests;
+                return instance.requestEvents;
+            case Type.cache:
+                return instance.cacheEvents;
+            case Type.interactiveElement:
+                return instance.interactiveElementEvents;
+            case Type.map:
+                return instance.mapEvents;
             default:
                 return false;
         }
@@ -56,11 +117,16 @@ public class OnlineMapsLog: MonoBehaviour
     public static void Warning(string message, Type type)
     {
         if (!ValidateType(type)) return;
+
         Debug.LogWarning(message);
+        AddUIMessage("[WARNING] " + message);
     }
 
     public enum Type
     {
+        cache,
+        interactiveElement,
+        map,
         request
     }
 }

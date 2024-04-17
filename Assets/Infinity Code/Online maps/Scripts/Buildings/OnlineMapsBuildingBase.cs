@@ -10,6 +10,9 @@ using UnityEngine;
 /// </summary>
 public abstract class OnlineMapsBuildingBase:MonoBehaviour
 {
+    /// <summary>
+    /// Indices of the roof vertices.
+    /// </summary>
     public static List<int> roofIndices;
 
     protected static Shader defaultShader;
@@ -56,6 +59,9 @@ public abstract class OnlineMapsBuildingBase:MonoBehaviour
     /// </summary>
     public string id;
 
+    /// <summary>
+    /// Initial size of building in scene.
+    /// </summary>
     public Vector2 initialSizeInScene;
 
     /// <summary>
@@ -73,10 +79,16 @@ public abstract class OnlineMapsBuildingBase:MonoBehaviour
     /// </summary>
     public float perimeter;
 
+    /// <summary>
+    /// Building way.
+    /// </summary>
     public OnlineMapsOSMWay way;
+    
+    /// <summary>
+    /// Building nodes.
+    /// </summary>
     public List<OnlineMapsOSMNode> nodes;
 
-    private int lastTouchCount = 0;
 
     /// <summary>
     /// Collider of building.
@@ -91,6 +103,7 @@ public abstract class OnlineMapsBuildingBase:MonoBehaviour
     protected bool hasErrors = false;
 
     private bool isPressed;
+    private int lastTouchCount = 0;
     private Vector2 pressPoint;
 
     /// <summary>
@@ -194,10 +207,10 @@ public abstract class OnlineMapsBuildingBase:MonoBehaviour
         container.map.projection.CoordinatesToTile(tl.x, tl.y, container.map.buffer.renderState.zoom, out sx, out sy);
 
         List<Vector3> localPoints = new List<Vector3>(Mathf.Min(nodes.Count, 8));
-        float zoomCoof = container.map.buffer.renderState.zoomCoof;
+        float zoomFactor = container.map.buffer.renderState.zoomFactor;
 
-        float sw = OnlineMapsUtils.tileSize * container.control.sizeInScene.x / container.map.width / zoomCoof;
-        float sh = OnlineMapsUtils.tileSize * container.control.sizeInScene.y / container.map.height / zoomCoof;
+        float sw = OnlineMapsUtils.tileSize * container.control.sizeInScene.x / container.map.width / zoomFactor;
+        float sh = OnlineMapsUtils.tileSize * container.control.sizeInScene.y / container.map.height / zoomFactor;
 
         for (int i = 0; i < nodes.Count; i++)
         {
@@ -214,7 +227,7 @@ public abstract class OnlineMapsBuildingBase:MonoBehaviour
 
         RaycastHit hit;
         OnlineMapsControlBaseDynamicMesh control = container.control;
-        return buildingCollider.Raycast(control.activeCamera.ScreenPointToRay(control.GetInputPosition()), out hit, OnlineMapsUtils.maxRaycastDistance);
+        return buildingCollider.Raycast(control.currentCamera.ScreenPointToRay(control.GetInputPosition()), out hit, OnlineMapsUtils.maxRaycastDistance);
     }
 
     /// <summary>

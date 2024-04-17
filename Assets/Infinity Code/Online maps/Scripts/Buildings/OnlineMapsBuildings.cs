@@ -102,18 +102,30 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
         get { return _instance.container; }
     }
 
+    /// <summary>
+    /// Rate of requests to OSM Overpass API.
+    /// </summary>
     public static float requestRate = 0.1f;
 
     #endregion
 
     #region Public
 
+    /// <summary>
+    /// Dictionary of buildings.
+    /// </summary>
     [NonSerialized]
     public Dictionary<string, OnlineMapsBuildingBase> buildings;
 
+    /// <summary>
+    /// Container for buildings.
+    /// </summary>
     [NonSerialized]
     public GameObject container;
 
+    /// <summary>
+    /// Reference to the control.
+    /// </summary>
     [NonSerialized]
     public OnlineMapsControlBaseDynamicMesh control;
 
@@ -137,6 +149,9 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
     /// </summary>
     public float heightScale = 1;
 
+    /// <summary>
+    /// Reference to the map.
+    /// </summary>
     [NonSerialized]
     public OnlineMaps map;
 
@@ -154,11 +169,6 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
     /// The maximum number of buildings (0 - unlimited).
     /// </summary>
     public int maxBuilding = 0;
-
-    /// <summary>
-    /// Building download mode
-    /// </summary>
-    //public Mode mode = Mode.tile;
 
     /// <summary>
     /// Minimal height of the building.
@@ -183,7 +193,7 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
     /// <summary>
     /// Range of zoom, in which the building will be created.
     /// </summary>
-    public OnlineMapsRange zoomRange = new OnlineMapsRange(19, OnlineMaps.MAXZOOM);
+    public OnlineMapsRange zoomRange = new OnlineMapsRange(19, OnlineMaps.MAXZOOM_EXT);
 
     #endregion
 
@@ -230,6 +240,10 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
 
     #region Methods
 
+    /// <summary>
+    /// Creates a building.
+    /// </summary>
+    /// <param name="data">Building data</param>
     public void CreateBuilding(OnlineMapsBuildingsNodeData data)
     {
         if (OnCreateBuilding != null && !OnCreateBuilding(data)) return;
@@ -299,6 +313,10 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
         return savableItems;
     }
 
+    /// <summary>
+    /// Parses the OSM data and adds buildings to the queue for creation.
+    /// </summary>
+    /// <param name="osmData">OSM data</param>
     public void LoadBuildingsFromOSM(string osmData)
     {
         Action action = () =>
@@ -387,6 +405,12 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
         return true;
     }
 
+    /// <summary>
+    /// Moves buildings from relations to ways.
+    /// </summary>
+    /// <param name="relations">Relations</param>
+    /// <param name="ways">Ways</param>
+    /// <param name="nodes">Nodes</param>
     public void MoveRelationsToWays(List<OnlineMapsOSMRelation> relations, Dictionary<string, OnlineMapsOSMWay> ways, Dictionary<string, OnlineMapsOSMNode> nodes)
     {
         List<string> waysInRelation = new List<string>();
@@ -482,11 +506,6 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
         }
     }
 
-    private void OnDestroy()
-    {
-        OnlineMapsTileManager.OnPrepareDownloadTile -= OnPrepareDownloadTile;
-    }
-
     private void OnEnable()
     {
         map = GetComponent<OnlineMaps>();
@@ -535,11 +554,6 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
 
         GenerateBuildings();
         UpdateBuildings();
-    }
-
-    private void UpdateTiles()
-    {
-        
     }
 
     private void RemoveAllBuildings()
@@ -617,11 +631,6 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
         map.OnLateUpdateAfter += OnUpdate;
 
         UpdateBuildings();
-    }
-
-    private void OnPrepareDownloadTile(OnlineMapsTile tile)
-    {
-        
     }
 
     private void UpdateBuildings()
@@ -778,6 +787,9 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
         tile
     }
 
+    /// <summary>
+    /// Building tile
+    /// </summary>
     public class Tile
     {
         /// <summary>
@@ -799,7 +811,12 @@ public class OnlineMapsBuildings : MonoBehaviour, IOnlineMapsSavableComponent
         /// Tile zoom
         /// </summary>
         public int zoom;
-
+        
+        /// <summary>
+        /// Tile cache key
+        /// </summary>
+        /// <param name="prefix">Prefix for key</param> 
+        /// <returns>Tile key</returns>
         public string GetCacheKey(string prefix)
         {
             return prefix + OnlineMapsTileManager.GetTileKey(zoom, x, y);

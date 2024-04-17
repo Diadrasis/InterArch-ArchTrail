@@ -11,11 +11,17 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/OnHoverExample")]
     public class OnHoverExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         private OnlineMapsMarkerBase hoverMarker;
 
         private void Start()
         {
-            OnlineMaps map = OnlineMaps.instance;
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
 
             // Create a new marker
             OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(new Vector2(), "Marker");

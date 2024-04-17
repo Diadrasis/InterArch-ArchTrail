@@ -11,8 +11,21 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/ChangeMarkerTextureExample")]
     public class ChangeMarkerTextureExample : MonoBehaviour
     {
-        // Must enable "Read / Write enabled".
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
+        /// New texture for markers. Must have "Read / Write Enabled - ON".
+        /// </summary>
         public Texture2D newMarkerTexture;
+
+        private void Start()
+        {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+        }
 
         private void OnGUI()
         {
@@ -20,14 +33,14 @@ namespace InfinityCode.OnlineMapsExamples
             if (GUI.Button(new Rect(10, 10, 100, 20), "Change markers"))
             {
                 // ... all markers will change the texture.
-                foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
+                foreach (OnlineMapsMarker marker in map.markerManager)
                 {
                     marker.texture = newMarkerTexture;
                     marker.Init();
                 }
 
                 // Redraw map
-                OnlineMaps.instance.Redraw();
+                map.Redraw();
             }
         }
     }

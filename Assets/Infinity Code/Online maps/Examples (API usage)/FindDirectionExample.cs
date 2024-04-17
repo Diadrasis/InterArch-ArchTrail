@@ -12,11 +12,27 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/FindDirectionExample")]
     public class FindDirectionExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
+        /// Google API Key. You can find it in the Google APIs Console.
+        /// </summary>
         public string googleAPIKey;
 
         private void Start()
         {
-            if (string.IsNullOrEmpty(googleAPIKey)) Debug.LogWarning("Please specify Google API Key");
+            // Check Google API Key
+            if (string.IsNullOrEmpty(googleAPIKey))
+            {
+                Debug.LogWarning("Please specify Google API Key");
+                return;
+            }
+            
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
 
             // Begin to search a route from Los Angeles to the specified coordinates.
             OnlineMapsGoogleDirections request = new OnlineMapsGoogleDirections
@@ -34,7 +50,7 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void OnFindDirectionComplete(string response)
         {
-            // Get the resut object.
+            // Get the result object.
             OnlineMapsGoogleDirectionsResult result = OnlineMapsGoogleDirections.GetResult(response);
 
             // Check that the result is not null, and the number of routes is not zero.
@@ -57,8 +73,8 @@ namespace InfinityCode.OnlineMapsExamples
             // Create a line, on the basis of points of the route.
             OnlineMapsDrawingLine route = new OnlineMapsDrawingLine(result.routes[0].overview_polylineD, Color.green);
 
-            // Draw the line route on the map.
-            OnlineMapsDrawingElementManager.AddItem(route);
+            // Add the line route on the map.
+            map.drawingElementManager.Add(route);
         }
     }
 }

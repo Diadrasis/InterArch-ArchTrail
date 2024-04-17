@@ -12,22 +12,30 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/DrawingElementEventsExample")]
     public class DrawingElementEventsExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
 
-        // Use this for initialization
         private void Start()
         {
+            if (map == null) map = OnlineMaps.instance;
+            
             // Create a new rect element.
-            OnlineMapsDrawingRect element = new OnlineMapsDrawingRect(-119.0807f, 34.58658f, 3, 3, Color.black, 1f,
+            OnlineMapsDrawingRect rect = new OnlineMapsDrawingRect(-119.0807f, 34.58658f, 3, 3, Color.black, 1f,
                 Color.blue);
 
             // Subscribe to events.
-            element.OnClick += OnClick;
-            element.OnPress += OnPress;
-            element.OnRelease += OnRelease;
-            element.OnDoubleClick += OnDoubleClick;
-            OnlineMapsDrawingElementManager.AddItem(element);
+            rect.OnClick += OnClick;
+            rect.OnPress += OnPress;
+            rect.OnRelease += OnRelease;
+            rect.OnDoubleClick += OnDoubleClick;
+            
+            // Add element to map.
+            map.drawingElementManager.Add(rect);
 
-            List<Vector2> poly = new List<Vector2>
+            // Create a new poly element.
+            List<Vector2> polyPoints = new List<Vector2>
             {
                 //Geographic coordinates
                 new Vector2(0, 0),
@@ -35,19 +43,20 @@ namespace InfinityCode.OnlineMapsExamples
                 new Vector2(2, 2),
                 new Vector2(0, 1)
             };
-
-            // Create a new poly element.
-            OnlineMapsDrawingPoly polyElement = new OnlineMapsDrawingPoly(poly, Color.red, 1f);
+            
+            OnlineMapsDrawingPoly poly = new OnlineMapsDrawingPoly(polyPoints, Color.red, 1f);
+            
+            // Create tooltip for poly.
+            poly.tooltip = "Drawing Element";
 
             // Subscribe to events.
-            polyElement.OnClick += OnClick;
-            polyElement.OnPress += OnPress;
-            polyElement.OnRelease += OnRelease;
-            polyElement.OnDoubleClick += OnDoubleClick;
-            OnlineMapsDrawingElementManager.AddItem(polyElement);
-
-            // Create tooltip for poly.
-            polyElement.tooltip = "Drawing Element";
+            poly.OnClick += OnClick;
+            poly.OnPress += OnPress;
+            poly.OnRelease += OnRelease;
+            poly.OnDoubleClick += OnDoubleClick;
+            
+            // Add element to map.
+            map.drawingElementManager.Add(poly);
         }
 
         private void OnDoubleClick(OnlineMapsDrawingElement drawingElement)

@@ -92,7 +92,7 @@ public static class OnlineMapsEditorUtils
     /// <returns>Instance of Canvas</returns>
     public static Canvas GetCanvas()
     {
-        Canvas canvas = Object.FindObjectOfType<Canvas>();
+        Canvas canvas = OnlineMapsUtils.FindObjectOfType<Canvas>();
         if (canvas == null)
         {
             GameObject canvasGO = new GameObject("Canvas");
@@ -114,7 +114,7 @@ public static class OnlineMapsEditorUtils
     /// <returns>Instance of event system</returns>
     public static EventSystem GetEventSystem()
     {
-        EventSystem eventSystem = Object.FindObjectOfType<EventSystem>();
+        EventSystem eventSystem = OnlineMapsUtils.FindObjectOfType<EventSystem>();
         if (eventSystem == null)
         {
             GameObject es = new GameObject("EventSystem");

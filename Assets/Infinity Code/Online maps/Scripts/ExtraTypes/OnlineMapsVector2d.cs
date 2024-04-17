@@ -52,11 +52,22 @@ public struct OnlineMapsVector2d
     {
         return new OnlineMapsVector2d(v1.x - v2.x, v1.y - v2.y);
     }
+    
+    public static OnlineMapsVector2d operator -(OnlineMapsVector2d v1, Vector2 v2)
+    {
+        return new OnlineMapsVector2d(v1.x - v2.x, v1.y - v2.y);
+    }
 
     public static OnlineMapsVector2d operator +(OnlineMapsVector2d v1, OnlineMapsVector2d v2)
     {
         return new OnlineMapsVector2d(v1.x + v2.x, v1.y + v2.y);
     }
+    
+    public static OnlineMapsVector2d operator +(OnlineMapsVector2d v1, Vector2 v2)
+    {
+        return new OnlineMapsVector2d(v1.x + v2.x, v1.y + v2.y);
+    }
+    
 
     public static bool operator ==(OnlineMapsVector2d lhs, OnlineMapsVector2d rhs)
     {
@@ -116,5 +127,10 @@ public struct OnlineMapsVector2d
         if (!(other is OnlineMapsVector2d)) return false;
         OnlineMapsVector2d vector2 = (OnlineMapsVector2d)other;
         return x.Equals(vector2.x) && y.Equals(vector2.y);
+    }
+
+    public override string ToString()
+    {
+        return "[" + x + ", " + y + "]";
     }
 }

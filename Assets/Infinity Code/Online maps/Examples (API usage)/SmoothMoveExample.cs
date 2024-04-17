@@ -12,6 +12,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class SmoothMoveExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Move duration (sec)
         /// </summary>
         public float time = 3;
@@ -31,6 +36,11 @@ namespace InfinityCode.OnlineMapsExamples
         private double fromTileX, fromTileY, toTileX, toTileY;
         private int moveZoom;
 
+        private void Start()
+        {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+        }
 
         private void OnGUI()
         {
@@ -38,15 +48,15 @@ namespace InfinityCode.OnlineMapsExamples
             if (GUI.Button(new Rect(5, 5, 100, 30), "Goto marker"))
             {
                 // from current map position
-                fromPosition = OnlineMaps.instance.position;
+                fromPosition = map.position;
 
                 // to GPS position;
                 toPosition = OnlineMapsLocationService.instance.position;
 
                 // calculates tile positions
-                moveZoom = OnlineMaps.instance.zoom;
-                OnlineMaps.instance.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
-                OnlineMaps.instance.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
+                moveZoom = map.zoom;
+                map.projection.CoordinatesToTile(fromPosition.x, fromPosition.y, moveZoom, out fromTileX, out fromTileY);
+                map.projection.CoordinatesToTile(toPosition.x, toPosition.y, moveZoom, out toTileX, out toTileY);
 
                 // if tile offset < 4, then start smooth movement
                 if (OnlineMapsUtils.Magnitude(fromTileX, fromTileY, toTileX, toTileY) < 4)
@@ -59,7 +69,7 @@ namespace InfinityCode.OnlineMapsExamples
                 }
                 else // too far
                 {
-                    OnlineMaps.instance.position = toPosition;
+                    map.position = toPosition;
                 }
             }
         }

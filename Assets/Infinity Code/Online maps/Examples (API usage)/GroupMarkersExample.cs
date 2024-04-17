@@ -16,6 +16,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class GroupMarkersExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Base texture for grouping marker. 
         /// On top of this texture will be drawn numbers.
         /// </summary>
@@ -40,12 +45,15 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             markers = new List<OnlineMapsMarker>();
 
             // Create a random markers.
             for (int i = 0; i < countMarkers; i++)
             {
-                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(new Vector2(Random.Range(-180f, 180f), Random.Range(-90, 90)));
+                OnlineMapsMarker marker = map.markerManager.Create(Random.Range(-180f, 180f), Random.Range(-90, 90));
                 marker.label = "Marker " + i;
                 markers.Add(marker);
             }
@@ -68,7 +76,7 @@ namespace InfinityCode.OnlineMapsExamples
                     MarkerGroup group = null;
                     double px, py;
                     marker.GetPosition(out px, out py);
-                    OnlineMaps.instance.projection.CoordinatesToTile(px, py, zoom, out px, out py);
+                    map.projection.CoordinatesToTile(px, py, zoom, out px, out py);
 
                     int k = j + 1;
 
@@ -78,13 +86,13 @@ namespace InfinityCode.OnlineMapsExamples
 
                         double p2x, p2y;
                         marker2.GetPosition(out p2x, out p2y);
-                        OnlineMaps.instance.projection.CoordinatesToTile(p2x, p2y, zoom, out p2x, out p2y);
+                        map.projection.CoordinatesToTile(p2x, p2y, zoom, out p2x, out p2y);
 
                         if (OnlineMapsUtils.Magnitude(px, py, p2x, p2y) < distance)
                         {
                             if (group == null)
                             {
-                                group = new MarkerGroup(zoom, groupTexture);
+                                group = new MarkerGroup(map, zoom, groupTexture);
                                 groups.Add(group);
                                 group.Add(marker);
                                 if (Math.Abs(marker.range.min - OnlineMaps.MINZOOM) < float.Epsilon) marker.range.min = zoom + 1;
@@ -105,6 +113,7 @@ namespace InfinityCode.OnlineMapsExamples
 
         private class MarkerGroup
         {
+            public OnlineMaps map;
             public List<OnlineMapsMarker> markers;
             public OnlineMapsMarker instance;
 
@@ -113,11 +122,12 @@ namespace InfinityCode.OnlineMapsExamples
 
             public int zoom;
 
-            public MarkerGroup(int zoom, Texture2D texture)
+            public MarkerGroup(OnlineMaps map, int zoom, Texture2D texture)
             {
+                this.map = map;
                 markers = new List<OnlineMapsMarker>();
                 this.zoom = zoom;
-                instance = OnlineMapsMarkerManager.CreateItem(Vector2.zero, texture);
+                instance = map.markerManager.Create(Vector2.zero, texture);
                 instance.align = OnlineMapsAlign.Center;
                 instance.range = new OnlineMapsRange(zoom, zoom);
             }
@@ -127,7 +137,7 @@ namespace InfinityCode.OnlineMapsExamples
                 markers.Add(marker);
                 center = markers.Aggregate(Vector2.zero, (current, m) => current + m.position) / markers.Count;
                 instance.position = center;
-                OnlineMaps.instance.projection.CoordinatesToTile(center.x, center.y, zoom, out tilePositionX, out tilePositionY);
+                map.projection.CoordinatesToTile(center.x, center.y, zoom, out tilePositionX, out tilePositionY);
                 instance.label = "Group. Count: " + markers.Count;
             }
 

@@ -17,9 +17,14 @@ public class OnlineMapsTilesetControlEditor : OnlineMapsControlBaseDynamicMeshEd
     private SerializedProperty markerShader;
     private SerializedProperty mipmapForTiles;
     private bool showShaders;
+    private SerializedProperty overlayFromParentTiles;
     private SerializedProperty sizeInScene;
     private SerializedProperty tileMaterial;
     private SerializedProperty tilesetShader;
+
+#if UNITY_2019_1_OR_NEWER
+    private Shader defaultTilesetShader2;
+#endif
 
     protected override void CacheSerializedFields()
     {
@@ -36,6 +41,7 @@ public class OnlineMapsTilesetControlEditor : OnlineMapsControlBaseDynamicMeshEd
         sizeInScene = serializedObject.FindProperty("sizeInScene");
         compressTextures = serializedObject.FindProperty("compressTextures");
         elevationResolution = serializedObject.FindProperty("elevationResolution");
+        overlayFromParentTiles = serializedObject.FindProperty("overlayFromParentTiles");
     }
 
     private void CheckCameraDistance()
@@ -79,8 +85,8 @@ public class OnlineMapsTilesetControlEditor : OnlineMapsControlBaseDynamicMeshEd
 
 #if UNITY_2019_1_OR_NEWER
         if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset == null) return;
-        bool wrongTileset = tilesetShader.objectReferenceValue == defaultTilesetShader;
-        bool wrongMarker = markerShader.objectReferenceValue != null && (markerShader.objectReferenceValue as Shader).name == "Transparent/Diffuse";
+        bool wrongTileset = tilesetShader.objectReferenceValue == defaultTilesetShader || tilesetShader.objectReferenceValue == defaultTilesetShader2;
+        bool wrongMarker = markerShader.objectReferenceValue != null && (markerShader.objectReferenceValue as Shader).name == "Legacy Shaders/Transparent/Diffuse";
         bool wrongDrawing = drawingShader.objectReferenceValue != null && (drawingShader.objectReferenceValue as Shader).name == "Infinity Code/Online Maps/Tileset DrawingElement";
 
         if (!wrongTileset && !wrongMarker && !wrongDrawing) return;
@@ -152,6 +158,7 @@ public class OnlineMapsTilesetControlEditor : OnlineMapsControlBaseDynamicMeshEd
         rootLayoutItem.Create(colliderType).disabledInPlaymode = true;
         rootLayoutItem.Create("colliderWarning", CheckColliderType);
         rootLayoutItem.Create("SRPWarning", CheckSRP).priority = -2;
+        rootLayoutItem.Create(overlayFromParentTiles);
         rootLayoutItem.Create("elevationResolution", DrawElevationResolution);
 
         GenerateMaterialsLayout();
@@ -189,6 +196,9 @@ public class OnlineMapsTilesetControlEditor : OnlineMapsControlBaseDynamicMeshEd
         base.OnEnableLate();
 
         defaultTilesetShader = Shader.Find("Infinity Code/Online Maps/Tileset Cutout");
+#if UNITY_2019_1_OR_NEWER
+        defaultTilesetShader2 = Shader.Find("Infinity Code/Online Maps/Tileset");
+#endif
 
         if (tilesetShader.objectReferenceValue == null) tilesetShader.objectReferenceValue = defaultTilesetShader;
         if (markerShader.objectReferenceValue == null) markerShader.objectReferenceValue = Shader.Find("Transparent/Diffuse");

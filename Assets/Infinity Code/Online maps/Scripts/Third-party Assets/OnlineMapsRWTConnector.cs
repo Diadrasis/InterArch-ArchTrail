@@ -142,7 +142,7 @@ public class OnlineMapsRWTConnector : MonoBehaviour, IOnlineMapsSavableComponent
         rwt = GetComponent<RealWorldTerrainContainer>();
         if (rwt == null)
         {
-            Debug.LogError("Real World Terrain Connector should be together c Real World Terrain Container.");
+            Debug.LogError("Real World Terrain Connector should be together with Real World Terrain Container.");
             OnlineMapsUtils.Destroy(this);
             return;
         }

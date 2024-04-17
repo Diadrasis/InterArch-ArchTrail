@@ -11,25 +11,39 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/ChangePositionAndZoomEventsExample")]
     public class ChangePositionAndZoomEventsExample : MonoBehaviour
     {
-        private void OnChangePosition()
-        {
-            // When the position changes you will see in the console new map coordinates.
-            Debug.Log(OnlineMaps.instance.position);
-        }
-
-        private void OnChangeZoom()
-        {
-            // When the zoom changes you will see in the console new zoom.
-            Debug.Log(OnlineMaps.instance.zoom);
-        }
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
 
         private void Start()
         {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Subscribe to change position event.
-            OnlineMaps.instance.OnChangePosition += OnChangePosition;
+            map.OnChangePosition += OnChangePosition;
 
             // Subscribe to change zoom event.
-            OnlineMaps.instance.OnChangeZoom += OnChangeZoom;
+            map.OnChangeZoom += OnChangeZoom;
+        }
+
+        /// <summary>
+        /// This method is called when the position of the map is changed.
+        /// </summary>
+        private void OnChangePosition()
+        {
+            // When the position changes you will see in the console new map coordinates.
+            Debug.Log(map.position);
+        }
+
+        /// <summary>
+        /// This method is called when the zoom of the map is changed.
+        /// </summary>
+        private void OnChangeZoom()
+        {
+            // When the zoom changes you will see in the console new zoom.
+            Debug.Log(map.floatZoom);
         }
     }
 }

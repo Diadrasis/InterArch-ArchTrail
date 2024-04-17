@@ -13,24 +13,47 @@ namespace InfinityCode.OnlineMapsExamples
     public class BingMapsLocationAPIExample : MonoBehaviour
     {
         /// <summary>
-        /// Bing Maps API Key
+        /// Reference to the map. If not specified, the current instance will be used.
         /// </summary>
-        public string key;
+        public OnlineMaps map;
+
+        /// <summary>
+        /// Search query
+        /// </summary>
+        public string query = "New York";
 
         private void Start()
         {
+            if (!OnlineMapsKeyManager.hasBingMaps)
+            {
+                Debug.LogError("Bing Maps API Key is missing. Specify the key in Key Manager.");
+                return;
+            }
+            
+            // If the map is not specified, then find the map.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Looking for a location by name.
-            OnlineMapsBingMapsLocation.FindByQuery("Moscow", key).OnComplete += OnQueryComplete;
+            OnlineMapsBingMapsLocation.FindByQuery(query, OnlineMapsKeyManager.BingMaps()).OnComplete += OnRequestComplete;
 
             // Subscribe to map click event.
-            OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
+            map.control.OnMapClick += OnMapClick;
+        }
+
+        /// <summary>
+        /// This method is called when click on map.
+        /// </summary>
+        private void OnMapClick()
+        {
+            // Looking for a location by coordinates.
+            OnlineMapsBingMapsLocation.FindByPoint(map.position, OnlineMapsKeyManager.BingMaps()).OnComplete += OnRequestComplete;
         }
 
         /// <summary>
         /// This method is called when a response is received.
         /// </summary>
         /// <param name="response">Response string</param>
-        private static void OnQueryComplete(string response)
+        private static void OnRequestComplete(string response)
         {
             Debug.Log(response);
 
@@ -54,15 +77,6 @@ namespace InfinityCode.OnlineMapsExamples
                 }
                 Debug.Log("------------------------------");
             }
-        }
-
-        /// <summary>
-        /// This method is called when click on map.
-        /// </summary>
-        private void OnMapClick()
-        {
-            // Looking for a location by coordinates.
-            OnlineMapsBingMapsLocation.FindByPoint(OnlineMaps.instance.position, key).OnComplete += OnQueryComplete;
         }
     }
 }

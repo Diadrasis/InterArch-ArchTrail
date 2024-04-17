@@ -14,6 +14,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class MapBaseboards : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the control. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsTileSetControl control;
+
+        /// <summary>
         /// Side material
         /// </summary>
         public Material sideMaterial;
@@ -33,7 +38,6 @@ namespace InfinityCode.OnlineMapsExamples
         /// </summary>
         public Material bottomMaterial;
 
-        private OnlineMapsTileSetControl control;
         private Mesh mesh;
         private Mesh mapMesh;
 
@@ -42,9 +46,9 @@ namespace InfinityCode.OnlineMapsExamples
         /// </summary>
         private void Start()
         {
-            // Save the reference to control
-            control = OnlineMapsTileSetControl.instance;
-
+            // If the control is not specified, get the current instance.
+            if (control == null) control = OnlineMapsTileSetControl.instance;
+            
             // Subscribe to update mesh event
             control.OnMeshUpdated += UpdateSides;
 

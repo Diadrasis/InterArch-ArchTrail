@@ -12,6 +12,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class SaveMarker3DExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map control. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsControlBase3D control;
+        
+        /// <summary>
         /// Key in PlayerPrefs
         /// </summary>
         private static string prefsKey = "markers";
@@ -25,6 +30,20 @@ namespace InfinityCode.OnlineMapsExamples
         /// Scale of the markers
         /// </summary>
         public int markerScale = 20;
+
+        /// <summary>
+        /// Use this for initialization
+        /// </summary>
+        private void Start()
+        {
+            if (control == null) control = OnlineMapsControlBase3D.instance;
+            
+            // Try load markers
+            TryLoadMarkers();
+
+            // Subscribe to OnMapClick event
+            control.OnMapClick += OnMapClick;
+        }
 
         private void OnGUI()
         {
@@ -40,23 +59,21 @@ namespace InfinityCode.OnlineMapsExamples
         /// </summary>
         private void OnMapClick()
         {
-            OnlineMapsControlBase3D control = OnlineMapsControlBase3D.instance;
-
             // Create new marker
-            OnlineMapsMarker3D marker = OnlineMapsMarker3DManager.CreateItem(control.GetCoords(), markerPrefab);
+            OnlineMapsMarker3D marker = control.marker3DManager.Create(control.GetCoords(), markerPrefab);
             marker.scale = markerScale;
         }
 
         /// <summary>
         /// Saves markers to PlayerPrefs as xml string
         /// </summary>
-        private static void SaveMarkers()
+        private void SaveMarkers()
         {
             // Create XMLDocument and first child
             OnlineMapsXML xml = new OnlineMapsXML("Markers");
 
             // Save markers data
-            foreach (OnlineMapsMarker3D marker in OnlineMapsMarker3DManager.instance)
+            foreach (OnlineMapsMarker3D marker in control.marker3DManager)
             {
                 // Create marker node
                 xml.Create("Marker", marker.position);
@@ -65,18 +82,6 @@ namespace InfinityCode.OnlineMapsExamples
             // Save xml string
             PlayerPrefs.SetString(prefsKey, xml.outerXml);
             PlayerPrefs.Save();
-        }
-
-        /// <summary>
-        /// Use this for initialization
-        /// </summary>
-        private void Start()
-        {
-            // Try load markers
-            TryLoadMarkers();
-
-            // Subscribe to OnMapClick event
-            OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
         }
 
         /// <summary>
@@ -100,7 +105,7 @@ namespace InfinityCode.OnlineMapsExamples
                 Vector2 position = node.Value<Vector2>();
 
                 // Create marker
-                OnlineMapsMarker3D marker = OnlineMapsMarker3DManager.CreateItem(position, markerPrefab);
+                OnlineMapsMarker3D marker = control.marker3DManager.Create(position, markerPrefab);
                 marker.scale = markerScale;
             }
         }

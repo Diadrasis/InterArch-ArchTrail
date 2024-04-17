@@ -12,6 +12,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class FindLocationExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Google API Key
         /// </summary>
         public  string googleAPIKey;
@@ -38,7 +43,15 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
-            if (string.IsNullOrEmpty(googleAPIKey)) Debug.LogWarning("Please specify Google API Key");
+            // Check Google API Key
+            if (string.IsNullOrEmpty(googleAPIKey))
+            {
+                Debug.LogWarning("Please specify Google API Key");
+                return;
+            }
+            
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
 
             // Start search Chicago.
             OnlineMapsGoogleGeocoding request = new OnlineMapsGoogleGeocoding("Chicago", googleAPIKey);
@@ -59,7 +72,7 @@ namespace InfinityCode.OnlineMapsExamples
             if (position != Vector2.zero)
             {
                 // Create a new marker at the position of Chicago.
-                if (addMarker) OnlineMapsMarkerManager.CreateItem(position, "Chicago");
+                if (addMarker) map.markerManager.Create(position, "Chicago");
 
                 // Set best zoom
                 if (setZoom)
@@ -85,7 +98,7 @@ namespace InfinityCode.OnlineMapsExamples
                         OnlineMapsUtils.GetCenterPointAndZoom(new[] {sw, ne}, out center, out zoom);
 
                         // Set map zoom
-                        OnlineMaps.instance.zoom = zoom;
+                        map.zoom = zoom;
                     }
                 }
 

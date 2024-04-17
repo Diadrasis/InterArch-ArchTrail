@@ -265,7 +265,7 @@ public abstract class OnlineMapsVectorTile : OnlineMapsTile
     public void Read(byte[] data)
     {
         if (data == null) throw new Exception("Tile data cannot be null");
-        if (data.Length < 1) throw new Exception("Tile data cannot be empty");
+        if (data.Length < 2) throw new Exception("Tile data cannot be empty");
         if (data[0] == 0x1f && data[1] == 0x8b) return;
 
         OnlineMapsPBFReader reader = new OnlineMapsPBFReader(data);

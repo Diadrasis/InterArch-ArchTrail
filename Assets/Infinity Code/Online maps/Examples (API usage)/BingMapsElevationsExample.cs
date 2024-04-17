@@ -23,15 +23,15 @@ namespace InfinityCode.OnlineMapsExamples
             double tlx, tly, brx, bry;
             OnlineMaps.instance.GetCorners(out tlx, out tly, out brx, out bry);
 
-            // Ceate a new request and subscribe to OnComplete event
-            OnlineMapsBingMapsElevation.GetElevationByBounds(key, tlx, tly, brx, bry, 32, 32).OnComplete += OnComplete;
+            // Create a new request and subscribe to OnComplete event
+            OnlineMapsBingMapsElevation.GetElevationByBounds(key, tlx, tly, brx, bry, 32, 32).OnComplete += OnRequestComplete;
         }
 
         /// <summary>
         /// On request Complete
         /// </summary>
         /// <param name="response">Response</param>
-        private void OnComplete(string response)
+        private void OnRequestComplete(string response)
         {
             // Log response
             Debug.Log(response);

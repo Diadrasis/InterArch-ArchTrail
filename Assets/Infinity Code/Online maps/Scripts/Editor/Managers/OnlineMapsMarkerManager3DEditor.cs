@@ -27,6 +27,8 @@ public class OnlineMapsMarkerManager3DEditor : OnlineMapsMarkerManagerBaseEditor
             map.GetPosition(out lng, out lat);
             manager.Create(lng, lat, manager.defaultPrefab);
         }
+        
+        base.AddMarker();
     }
 
     protected override void DrawItem(int i, ref int removedIndex)
@@ -40,9 +42,9 @@ public class OnlineMapsMarkerManager3DEditor : OnlineMapsMarkerManagerBaseEditor
         }
     }
 
-    protected override void DrawSettings(ref bool dirty)
+    protected override void DrawSettings()
     {
-        base.DrawSettings(ref dirty);
+        base.DrawSettings();
 
         EditorGUI.BeginChangeCheck();
 
@@ -50,7 +52,7 @@ public class OnlineMapsMarkerManager3DEditor : OnlineMapsMarkerManagerBaseEditor
         EditorGUILayout.PropertyField(defaultScale);
         EditorGUILayout.PropertyField(allowAddMarker3DByN, new GUIContent("Add Marker3D by N"));
 
-        if (EditorGUI.EndChangeCheck()) dirty = true;
+        if (EditorGUI.EndChangeCheck()) isDirty = true;
     }
 
     protected override void OnEnableLate()

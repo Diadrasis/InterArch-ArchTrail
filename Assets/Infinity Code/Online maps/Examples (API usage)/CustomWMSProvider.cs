@@ -13,9 +13,34 @@ namespace InfinityCode.OnlineMapsExamples
     public class CustomWMSProvider : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// URL pattern for your server
         /// </summary>
         public string url = "http://192.168.0.1:8080/geoserver/tuzla/wms?LAYERS=tuzla&STYLES=&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG%3A4326&BBOX={lx},{by},{rx},{ty}&WIDTH=256&HEIGHT=256";
+
+        /// <summary>
+        /// This method is called when the script starts
+        /// </summary>
+        private void Start()
+        {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
+            // Register a new provider and map type
+            OnlineMapsProvider.CreateMapType("mywms.style1", url);
+
+            // Select a new map type
+            map.mapType = "mywms.style1";
+
+            // Subscribe to replace token event
+            OnlineMapsTile.OnReplaceURLToken += OnReplaceUrlToken;
+
+            map.SetPositionAndZoom(29.254738, 40.8027188, 14);
+        }
 
         /// <summary>
         /// This method will be called for each token in url
@@ -31,27 +56,8 @@ namespace InfinityCode.OnlineMapsExamples
             if (token == "lx") return tile.topLeft.x.ToString(OnlineMapsUtils.numberFormat);
             if (token == "rx") return tile.bottomRight.x.ToString(OnlineMapsUtils.numberFormat);
 
-            // Otherwise, return the token
-            return token;
-        }
-
-        /// <summary>
-        /// This method is called when the script starts
-        /// </summary>
-        private void Start()
-        {
-            // Register a new provider and map type
-            OnlineMapsProvider.Create("mywms").AppendTypes(
-                new OnlineMapsProvider.MapType("style1") {urlWithLabels = url}
-            );
-
-            // Select a new map type
-            OnlineMaps.instance.mapType = "mywms.style1";
-
-            // Subscribe to replace token event
-            OnlineMapsTile.OnReplaceURLToken += OnReplaceUrlToken;
-
-            OnlineMaps.instance.SetPositionAndZoom(29.254738, 40.8027188, 14);
+            // Otherwise, return null
+            return null;
         }
     }
 }

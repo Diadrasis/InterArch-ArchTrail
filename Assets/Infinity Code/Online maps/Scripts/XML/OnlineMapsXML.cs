@@ -241,7 +241,14 @@ public class OnlineMapsXML : IEnumerable
     public void A(string attributeName, object value)
     {
         if (_element == null) return;
-        _element.SetAttribute(attributeName, value.ToString());
+
+        string val;
+        Type type = value.GetType();
+        MethodInfo method = OnlineMapsReflectionHelper.GetMethod(type, "ToString", new[] { typeof(IFormatProvider) });
+        if (method != null) val = (string)method.Invoke(value, new object[] { OnlineMapsUtils.numberFormat });
+        else val = value.ToString();
+
+        _element.SetAttribute(attributeName, val);
     }
 
     /// <summary>

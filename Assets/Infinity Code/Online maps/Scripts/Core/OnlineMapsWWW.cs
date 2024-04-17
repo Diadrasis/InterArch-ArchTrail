@@ -19,6 +19,11 @@ public class OnlineMapsWWW: CustomYieldInstruction, IDisposable
     #region Actions
 
     /// <summary>
+    /// Called when a request has been created but not yet sent.
+    /// </summary>
+    public static Action<OnlineMapsWWW> OnCreateRequest;
+
+    /// <summary>
     /// This event is occurs when URL is initialized, and allows you to modify it.
     /// </summary>
     public static Func<string, string> OnInit;
@@ -164,6 +169,10 @@ public class OnlineMapsWWW: CustomYieldInstruction, IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets a value indicating whether this coroutine should continue executing.
+    /// </summary>
+    /// <value>True if the coroutine should continue waiting; otherwise, false.</value>
     public override bool keepWaiting
     {
         get
@@ -171,6 +180,15 @@ public class OnlineMapsWWW: CustomYieldInstruction, IDisposable
             isYield = true;
             return !isDone;
         }
+    }
+
+    /// <summary>
+    /// Gets the UnityWebRequest object for this request.
+    /// </summary>
+    /// <returns>The UnityWebRequest object.</returns>
+    public UnityWebRequest request
+    {
+        get { return www; }
     }
 
     /// <summary>
@@ -228,6 +246,7 @@ public class OnlineMapsWWW: CustomYieldInstruction, IDisposable
         }
 
         www = UnityWebRequest.Get(this.url);
+        if (OnCreateRequest != null) OnCreateRequest(this);
         www.SendWebRequest();
 
         currentCoroutineBehaviour = coroutineBehaviour;
@@ -265,6 +284,7 @@ public class OnlineMapsWWW: CustomYieldInstruction, IDisposable
         if (type == RequestType.www)
         {
             www = UnityWebRequest.Get(this.url);
+            if (OnCreateRequest != null) OnCreateRequest(this);
             www.SendWebRequest();
 
             currentCoroutineBehaviour = coroutineBehaviour;
@@ -309,6 +329,7 @@ public class OnlineMapsWWW: CustomYieldInstruction, IDisposable
         byte[] bodyRaw = Encoding.UTF8.GetBytes(postData);
 
         www = new UnityWebRequest(this.url, "POST");
+        if (OnCreateRequest != null) OnCreateRequest(this);
         www.uploadHandler = new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = new DownloadHandlerBuffer();
 

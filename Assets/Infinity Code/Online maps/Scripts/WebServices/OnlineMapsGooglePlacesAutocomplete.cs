@@ -174,13 +174,13 @@ public class OnlineMapsGooglePlacesAutocomplete: OnlineMapsTextWebService
         /// If no offset is supplied, the service will use the whole term.<br/>
         /// The offset should generally be set to the position of the text caret.
         /// </summary>
-        public int offset;
+        public int offset = -1;
 
         /// <summary>
         /// The distance (in meters) within which to return place results. <br/>
         /// Note that setting a radius biases results to the indicated area, but may not fully restrict results to the specified area.
         /// </summary>
-        public int radius;
+        public int radius = -1;
 
         /// <summary>
         /// The language in which to return results.

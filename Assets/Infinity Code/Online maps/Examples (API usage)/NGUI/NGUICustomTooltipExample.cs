@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace InfinityCode.OnlineMapsExamples
 {
-    [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/uGUICustomTooltipExample")]
+    [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/NGUICustomTooltipExample")]
     public class NGUICustomTooltipExample : MonoBehaviour
     {
         public GameObject tooltipPrefab;

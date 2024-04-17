@@ -12,8 +12,16 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/OpenRouteServiceExample")]
     public class OpenRouteServiceExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Looking for pedestrian route between the coordinates.
             OnlineMapsOpenRouteServiceDirections.Find(
                 new double[]
@@ -49,10 +57,11 @@ namespace InfinityCode.OnlineMapsExamples
             List<OnlineMapsVector2d> points = result.routes[0].points;
 
             // Draw the route.
-            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(points, Color.red));
+            OnlineMapsDrawingLine line = new OnlineMapsDrawingLine(points, Color.red);
+            map.drawingElementManager.Add(line);
 
             // Set the map position to the first point of route.
-            OnlineMaps.instance.position = points[0];
+            map.position = points[0];
         }
     }
 }

@@ -12,12 +12,16 @@ namespace InfinityCode.OnlineMapsExamples
     public class ChangePositionUsingGyro : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Speed of moving the map.
         /// </summary>
         public float speed;
 
         private bool allowDrag;
-        private OnlineMaps map;
 
         private void OnGUI()
         {
@@ -27,17 +31,20 @@ namespace InfinityCode.OnlineMapsExamples
             allowDrag = GUI.RepeatButton(new Rect(5, 5, 100, 100), "Drag", style);
 
             // Log gyroscope rotationRate.
-            GUI.Label(new Rect(5, Screen.height - 50, Screen.width - 10, 50), Input.gyro.rotationRate.ToString("F4"));
+            string rotationRate = Input.gyro.rotationRate.ToString("F4");
+            GUI.Label(new Rect(5, Screen.height - 50, Screen.width - 10, 50), rotationRate);
         }
 
         private void Start()
         {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Forbid the user to control the map.
-            OnlineMapsControlBase.instance.allowUserControl = false;
+            map.control.allowUserControl = false;
 
             // Turn on the gyro.
             Input.gyro.enabled = true;
-            map = OnlineMaps.instance;
         }
 
         private void Update()

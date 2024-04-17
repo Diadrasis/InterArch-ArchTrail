@@ -32,11 +32,13 @@ public class OnlineMapsMarkerManagerEditor: OnlineMapsMarkerManagerBaseEditor<On
             marker.align = manager.defaultAlign;
             marker.scale = manager.defaultScale;
         }
+        
+        base.AddMarker();
     }
 
-    protected override void DrawSettings(ref bool dirty)
+    protected override void DrawSettings()
     {
-        base.DrawSettings(ref dirty);
+        base.DrawSettings();
 
         EditorGUI.BeginChangeCheck();
 
@@ -48,7 +50,7 @@ public class OnlineMapsMarkerManagerEditor: OnlineMapsMarkerManagerBaseEditor<On
         EditorGUILayout.PropertyField(defaultScale);
         EditorGUILayout.PropertyField(allowAddMarkerByM, new GUIContent("Add Marker by M"));
 
-        if (EditorGUI.EndChangeCheck()) dirty = true;
+        if (EditorGUI.EndChangeCheck()) isDirty = true;
     }
 
     protected override void OnEnableLate()

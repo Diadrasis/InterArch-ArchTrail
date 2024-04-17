@@ -18,7 +18,7 @@ public class OnlineMapsDrawingRect : OnlineMapsDrawingElement
 
     private Color _backgroundColor = new Color(1, 1, 1, 0);
     private Color _borderColor = Color.black;
-    public float _borderWidth = 1;
+    private float _borderWidth = 1;
     
     private double[] points;
     private double _height = 1;

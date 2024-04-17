@@ -12,6 +12,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class What3WordsExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// What3Words API key
         /// </summary>
         public string key;
@@ -20,6 +25,9 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void OnGUI()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             words = GUILayout.TextField(words, GUILayout.ExpandWidth(true));
             if (GUILayout.Button("Forward"))
             {
@@ -29,7 +37,7 @@ namespace InfinityCode.OnlineMapsExamples
             if (GUILayout.Button("Suggestions"))
             {
                 // Returns a list of 3 word addresses based on user input and other parameters.
-                OnlineMapsWhat3Words.AutoSuggest(key, words, true, null, OnlineMaps.instance.position).OnComplete += OnSuggestComplete;
+                OnlineMapsWhat3Words.AutoSuggest(key, words, true, null, map.position).OnComplete += OnSuggestComplete;
             }
             if (GUILayout.Button("Blends"))
             {
@@ -39,12 +47,12 @@ namespace InfinityCode.OnlineMapsExamples
                 // a partial 3 word address containing the first 2 words in full and 
                 // at least 1 character of the 3rd word.StandardBlend provides the search logic 
                 // that powers the search box on map.what3words.com and in the what3words mobile apps.
-                OnlineMapsWhat3Words.StandardBlend(key, words, true, null, OnlineMaps.instance.position).OnComplete += OnSuggestComplete;
+                OnlineMapsWhat3Words.StandardBlend(key, words, true, null, map.position).OnComplete += OnSuggestComplete;
             }
             if (GUILayout.Button("Grid"))
             {
                 // Returns a section of the 3m x 3m what3words grid for a given area.
-                OnlineMapsWhat3Words.Grid(key, OnlineMaps.instance.bounds).OnComplete += OnGridComplete;
+                OnlineMapsWhat3Words.Grid(key, map.bounds).OnComplete += OnGridComplete;
             }
             if (GUILayout.Button("Languages"))
             {

@@ -36,6 +36,7 @@ public class OnlineMapsBingMapsTiledElevationManager : OnlineMapsTiledElevationM
         if (request.status == OnlineMapsQueryStatus.error)
         {
             Debug.Log("Download error");
+            if (OnElevationFails != null) OnElevationFails(request.response);
             return;
         }
 
@@ -58,6 +59,8 @@ public class OnlineMapsBingMapsTiledElevationManager : OnlineMapsTiledElevationM
             SetElevationToCache(tile, elevations);
             SetElevationData(tile, elevations);
         }
+
+        if (OnElevationUpdated != null) OnElevationUpdated();
     }
 
     public override void StartDownloadElevationTile(Tile tile)
@@ -67,5 +70,7 @@ public class OnlineMapsBingMapsTiledElevationManager : OnlineMapsTiledElevationM
         map.projection.TileToCoordinates(tile.x + 1, tile.y + 1, tile.zoom, out rx, out @by);
         OnlineMapsBingMapsElevation request = OnlineMapsBingMapsElevation.GetElevationByBounds(OnlineMapsKeyManager.BingMaps(), lx, ty, rx, @by, tileWidth, tileHeight);
         request.OnFinish += r => OnTileDownloaded(tile, request);
+
+        if (OnElevationRequested != null) OnElevationRequested();
     }
 }

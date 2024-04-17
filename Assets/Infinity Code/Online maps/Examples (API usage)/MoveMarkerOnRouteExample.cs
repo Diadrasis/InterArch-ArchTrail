@@ -14,6 +14,14 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/MoveMarkerOnRouteExample")]
     public class MoveMarkerOnRouteExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
+        /// Google API Key
+        /// </summary>
         public string googleAPIKey;
 
         /// <summary>
@@ -63,7 +71,14 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
-            if (string.IsNullOrEmpty(googleAPIKey)) Debug.LogWarning("Please specify Google API Key");
+            if (string.IsNullOrEmpty(googleAPIKey))
+            {
+                Debug.LogWarning("Please specify Google API Key");
+                return;
+            }
+            
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
 
             // Looking for a route between locations.
             OnlineMapsGoogleDirections request = new OnlineMapsGoogleDirections(googleAPIKey, fromPlace, toPlace);
@@ -87,14 +102,14 @@ namespace InfinityCode.OnlineMapsExamples
             List<OnlineMapsGoogleDirectionsResult.Step> steps = firstRoute.legs.SelectMany(l => l.steps).ToList();
 
             // Create a new marker in first point.
-            marker = OnlineMapsMarkerManager.CreateItem(steps[0].start_location, "Car");
+            marker = map.markerManager.Create(steps[0].start_location, "Car");
 
             // Gets points of route.
             points = firstRoute.overview_polylineD;
 
             // Draw the route.
             OnlineMapsDrawingLine route = new OnlineMapsDrawingLine(points, Color.red, 3);
-            OnlineMapsDrawingElementManager.AddItem(route);
+            map.drawingElementManager.Add(route);
 
             pointIndex = 0;
         }
@@ -128,7 +143,7 @@ namespace InfinityCode.OnlineMapsExamples
                 marker.SetPosition(position.x, position.y);
 
                 // Orient marker
-                if (orientMarkerOnNextPoint) marker.rotation = 1.25f - OnlineMapsUtils.Angle2D((Vector2)p1, (Vector2)p2) / 360f;
+                if (orientMarkerOnNextPoint) marker.rotation = 1.25f - OnlineMapsUtils.Angle2D(p1, p2) / 360f;
             }
             else
             {
@@ -148,8 +163,8 @@ namespace InfinityCode.OnlineMapsExamples
                 }
             }
 
-            if (lookToMarker) OnlineMaps.instance.SetPosition(position.x, position.y);
-            OnlineMaps.instance.Redraw();
+            if (lookToMarker) map.SetPosition(position.x, position.y);
+            map.Redraw();
         }
     }
 }

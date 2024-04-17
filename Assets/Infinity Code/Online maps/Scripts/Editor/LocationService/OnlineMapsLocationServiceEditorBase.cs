@@ -7,10 +7,18 @@ using UnityEngine;
 public abstract class OnlineMapsLocationServiceEditorBase : Editor
 {
     private static GUIStyle _toggleStyle;
+    
+    private OnlineMaps _map;
+    private OnlineMapsCameraOrbit cameraOrbit;
+    
     private bool showCommonIssues = false;
     private bool showCreateMarker = true;
     private bool showGPSEmulator = true;
     private bool showUpdatePosition = true;
+    private bool selectLocationOnMap = false;
+
+    #region Serialized Properties
+
     private SerializedProperty pCreateMarkerInUserPosition;
     private SerializedProperty pMarkerType;
     private SerializedProperty pMarker3DPrefab;
@@ -31,7 +39,23 @@ public abstract class OnlineMapsLocationServiceEditorBase : Editor
     private SerializedProperty pDisableEmulatorInPublish;
     private SerializedProperty pLerpCompassValue;
     private SerializedProperty pRotateCameraByCompass;
-    private OnlineMapsCameraOrbit cameraOrbit;
+    private SerializedProperty pUpdateEmulatorPositionByMarker;
+
+    #endregion
+
+    protected OnlineMaps map
+    {
+        get
+        {
+            if (_map == null)
+            {
+                _map = (target as OnlineMapsLocationService).GetComponent<OnlineMaps>();
+                if (_map == null) _map = OnlineMaps.instance;
+            }
+
+            return _map;
+        }
+    }
 
     private static GUIStyle toggleStyle
     {
@@ -48,7 +72,6 @@ public abstract class OnlineMapsLocationServiceEditorBase : Editor
 
     protected virtual void CacheSerializedProperties()
     {
-        if (serializedObject == null) return;
         pCreateMarkerInUserPosition = serializedObject.FindProperty("createMarkerInUserPosition");
         pMarkerType = serializedObject.FindProperty("markerType");
         pMarker3DPrefab = serializedObject.FindProperty("marker3DPrefab");
@@ -69,6 +92,7 @@ public abstract class OnlineMapsLocationServiceEditorBase : Editor
         pRestoreAfter = serializedObject.FindProperty("restoreAfter");
         pLerpCompassValue = serializedObject.FindProperty("lerpCompassValue");
         pRotateCameraByCompass = serializedObject.FindProperty("rotateCameraByCompass");
+        pUpdateEmulatorPositionByMarker = serializedObject.FindProperty("updateEmulatorPositionByMarker");
 
         cameraOrbit = (target as OnlineMapsLocationServiceBase).GetComponent<OnlineMapsCameraOrbit>();
     }
@@ -173,9 +197,15 @@ public abstract class OnlineMapsLocationServiceEditorBase : Editor
 
             if (GUILayout.Button("Copy position from Online Maps"))
             {
-                OnlineMaps map = (target as OnlineMapsLocationService).GetComponent<OnlineMaps>();
                 if (map != null) pEmulatorPosition.vector2Value = map.position;
             }
+
+            if (EditorApplication.isPlaying)
+            {
+                OnSelectPositionGUI();
+            }
+            
+            if (pCreateMarkerInUserPosition.boolValue) EditorGUILayout.PropertyField(pUpdateEmulatorPositionByMarker, new GUIContent("Update By Marker Position"));
 
             EditorGUI.BeginChangeCheck();
 
@@ -220,10 +250,32 @@ public abstract class OnlineMapsLocationServiceEditorBase : Editor
         if (EditorGUI.EndChangeCheck()) EditorUtility.SetDirty(target);
     }
 
+    private void OnSelectPositionGUI()
+    {
+        if (!selectLocationOnMap)
+        {
+            if (GUILayout.Button("Select Location On Map"))
+            {
+                selectLocationOnMap = true;
+                map.control.OnMapClick -= SelectLocationOnMap;
+                map.control.OnMapClick += SelectLocationOnMap;
+            }
+        }
+        else
+        {
+            EditorGUILayout.HelpBox("Click on the map to select the location.", MessageType.Info);
+            
+            if (GUILayout.Button("Cancel"))
+            {
+                selectLocationOnMap = false;
+                map.control.OnMapClick -= SelectLocationOnMap;
+            }
+        }
+    }
+
     private void OnUpdatePositionGUI()
     {
         EditorGUILayout.BeginVertical(GUI.skin.box);
-
 
         bool updatePosition = pUpdatePosition.boolValue;
         if (updatePosition)
@@ -253,5 +305,14 @@ public abstract class OnlineMapsLocationServiceEditorBase : Editor
         }
 
         EditorGUILayout.EndVertical();
+    }
+
+    private void SelectLocationOnMap()
+    {
+        selectLocationOnMap = false;
+        map.control.OnMapClick -= SelectLocationOnMap;
+        serializedObject.Update();
+        pEmulatorPosition.vector2Value = map.control.GetCoords();
+        serializedObject.ApplyModifiedProperties();
     }
 }

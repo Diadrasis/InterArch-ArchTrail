@@ -27,8 +27,8 @@ public class OnlineMapsGoogleDirections : OnlineMapsTextWebService
     /// Constructor
     /// </summary>
     /// <param name="key">Google API key</param>
-    /// <param name="origin">The address (string), coordinates (Vector2), or place ID (string prefixed with place_id:) from which you wish to calculate directions.</param>
-    /// <param name="destination">The address (string), coordinates (Vector2), or place ID (string prefixed with place_id:) to which you wish to calculate directions.</param>
+    /// <param name="origin">The address (string), coordinates (Vector2, OnlineMapsVector2d), or place ID (string prefixed with place_id:) from which you wish to calculate directions.</param>
+    /// <param name="destination">The address (string), coordinates (Vector2, OnlineMapsVector2d), or place ID (string prefixed with place_id:) to which you wish to calculate directions.</param>
     public OnlineMapsGoogleDirections(string key, object origin, object destination)
     {
         requestParams = new Params(origin, destination)
@@ -88,7 +88,13 @@ public class OnlineMapsGoogleDirections : OnlineMapsTextWebService
             url.Append(o.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
                 .Append(o.x.ToString(OnlineMapsUtils.numberFormat));
         }
-        else throw new Exception("Origin must be string or Vector2.");
+        else if (p.origin is OnlineMapsVector2d)
+        {
+            OnlineMapsVector2d o = (OnlineMapsVector2d)p.origin;
+            url.Append(o.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                .Append(o.x.ToString(OnlineMapsUtils.numberFormat));
+        }
+        else throw new Exception("Origin must be string, Vector2 or OnlineMapsVector2d.");
 
         url.Append("&destination=");
 
@@ -99,7 +105,13 @@ public class OnlineMapsGoogleDirections : OnlineMapsTextWebService
             url.Append(d.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
                 .Append(d.x.ToString(OnlineMapsUtils.numberFormat));
         }
-        else throw new Exception("Destination must be string or Vector2.");
+        else if (p.destination is OnlineMapsVector2d)
+        {
+            OnlineMapsVector2d d = (OnlineMapsVector2d)p.destination;
+            url.Append(d.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                .Append(d.x.ToString(OnlineMapsUtils.numberFormat));
+        }
+        else throw new Exception("Destination must be string, Vector2 or OnlineMapsVector2d.");
 
         if (p.mode.HasValue && p.mode.Value != Mode.driving) url.Append("&mode=").Append(Enum.GetName(typeof(Mode), p.mode.Value));
         if (p.waypoints != null)
@@ -124,7 +136,13 @@ public class OnlineMapsGoogleDirections : OnlineMapsTextWebService
                     waypointStr.Append(v.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
                         .Append(v.x.ToString(OnlineMapsUtils.numberFormat));
                 }
-                else throw new Exception("Waypoints must be string or Vector2.");
+                else if (w is OnlineMapsVector2d)
+                {
+                    OnlineMapsVector2d v = (OnlineMapsVector2d)w;
+                    waypointStr.Append(v.y.ToString(OnlineMapsUtils.numberFormat)).Append(",")
+                        .Append(v.x.ToString(OnlineMapsUtils.numberFormat));
+                }
+                else throw new Exception("Waypoints must be string, Vector2 or OnlineMapsVector2d.");
 
                 countWaypoints++;
 
@@ -157,12 +175,12 @@ public class OnlineMapsGoogleDirections : OnlineMapsTextWebService
     public class Params
     {
         /// <summary>
-        /// The address (string), coordinates (Vector2), or place ID (string prefixed with place_id:) from which you wish to calculate directions.
+        /// The address (string), coordinates (Vector2, OnlineMapsVector2d), or place ID (string prefixed with place_id:) from which you wish to calculate directions.
         /// </summary>
         public object origin;
 
         /// <summary>
-        /// The address (string), coordinates (Vector2), or place ID (string prefixed with place_id:) to which you wish to calculate directions.
+        /// The address (string), coordinates (Vector2, OnlineMapsVector2d), or place ID (string prefixed with place_id:) to which you wish to calculate directions.
         /// </summary>
         public object destination;
 
@@ -174,7 +192,7 @@ public class OnlineMapsGoogleDirections : OnlineMapsTextWebService
         /// <summary>
         /// Specifies an IEnumerate of waypoints. Waypoints alter a route by routing it through the specified location(s).<br/>
         /// The maximum number of waypoints is 8. <br/>
-        /// Each waypoint can be specified as a coordinates (Vector2), an encoded polyline (string prefixed with enc:), a place ID (string prefixed with place_id:), or an address which will be geocoded. 
+        /// Each waypoint can be specified as a coordinates (Vector2, OnlineMapsVector2d), an encoded polyline (string prefixed with enc:), a place ID (string prefixed with place_id:), or an address which will be geocoded. 
         /// </summary>
         public IEnumerable waypoints;
 
@@ -246,12 +264,12 @@ public class OnlineMapsGoogleDirections : OnlineMapsTextWebService
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="origin">The address (string), coordinates (Vector2), or place ID (string prefixed with place_id:) from which you wish to calculate directions.</param>
-        /// <param name="destination">The address (string), coordinates (Vector2), or place ID (string prefixed with place_id:) to which you wish to calculate directions.</param>
+        /// <param name="origin">The address (string), coordinates (Vector2, OnlineMapsVector2d), or place ID (string prefixed with place_id:) from which you wish to calculate directions.</param>
+        /// <param name="destination">The address (string), coordinates (Vector2, OnlineMapsVector2d), or place ID (string prefixed with place_id:) to which you wish to calculate directions.</param>
         public Params(object origin, object destination)
         {
-            if (!(origin is string || origin is Vector2)) throw new Exception("Origin must be string or Vector2.");
-            if (!(destination is string || destination is Vector2)) throw new Exception("Destination must be string or Vector2.");
+            if (!(origin is string || origin is Vector2 || origin is OnlineMapsVector2d)) throw new Exception("Origin must be string, Vector2 or OnlineMapsVector2d.");
+            if (!(destination is string || destination is Vector2 || destination is OnlineMapsVector2d)) throw new Exception("Destination must be string, Vector2 or OnlineMapsVector2d.");
 
             this.origin = origin;
             this.destination = destination;

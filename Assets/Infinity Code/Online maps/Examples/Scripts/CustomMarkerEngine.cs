@@ -13,6 +13,7 @@ namespace InfinityCode.OnlineMapsDemos
     {
         private List<MarkerInstance> markers;
 
+        public OnlineMapsRawImageTouchForwarder forwarder;
         public RectTransform container;
         public GameObject prefab;
         public MarkerData[] datas;
@@ -86,6 +87,16 @@ namespace InfinityCode.OnlineMapsDemos
             double py = marker.data.latitude;
 
             Vector2 screenPosition = control.GetScreenPosition(px, py);
+            if (forwarder != null)
+            {
+                if (!map.InMapView(px, py))
+                {
+                    marker.gameObject.SetActive(false);
+                    return;
+                }
+
+                screenPosition = forwarder.MapToForwarderSpace(screenPosition);
+            }
 
             if (screenPosition.x < 0 || screenPosition.x > Screen.width ||
                 screenPosition.y < 0 || screenPosition.y > Screen.height)

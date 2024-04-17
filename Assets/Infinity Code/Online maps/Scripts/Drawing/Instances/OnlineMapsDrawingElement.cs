@@ -92,6 +92,10 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
     private OnlineMapsElevationManagerBase _elevationManager;
     private bool elevationManagerInited = false;
 
+    /// <summary>
+    /// Gets or sets custom data by key.
+    /// </summary>
+    /// <param name="key">Key</param>
     public object this[string key]
     {
         get
@@ -102,6 +106,9 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         set { customFields[key] = value; }
     }
 
+    /// <summary>
+    /// Gets or sets the active state of the drawing element GameObject.
+    /// </summary>
     protected virtual bool active
     {
         get
@@ -115,8 +122,14 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         }
     }
 
+    /// <summary>
+    /// Creates a background material for the drawing element.
+    /// </summary>
     protected abstract bool createBackgroundMaterial { get; }
 
+    /// <summary>
+    /// Gets custom fields.
+    /// </summary>
     public Dictionary<string, object> customFields
     {
         get
@@ -134,11 +147,17 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         get { return OnlineMapsVector2d.zero; }
     }
 
+    /// <summary>
+    /// Default name of the drawing element.
+    /// </summary>
     protected virtual string defaultName
     {
         get { return "Drawing Element"; }
     }
 
+    /// <summary>
+    /// Gets the elevation manager.
+    /// </summary>
     protected OnlineMapsElevationManagerBase elevationManager
     {
         get
@@ -155,22 +174,34 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         }
     }
 
+    /// <summary>
+    /// Checks if the elevation is used.
+    /// </summary>
     protected bool hasElevation
     {
         get { return elevationManager != null && elevationManager.enabled; }
     }
 
+    /// <summary>
+    /// Instance of the drawing element.
+    /// </summary>
     public GameObject instance
     {
         get { return gameObject; }
     }
 
+    /// <summary>
+    /// Reference to DrawingElementManager.
+    /// </summary>
     public IOnlineMapsInteractiveElementManager manager
     {
         get { return _manager != null? _manager: OnlineMapsDrawingElementManager.instance; }
         set { _manager = value; }
     }
 
+    /// <summary>
+    /// Gets or sets the name of the drawing element.
+    /// </summary>
     public string name
     {
         get
@@ -186,6 +217,9 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         }
     }
 
+    /// <summary>
+    /// Gets or sets the render queue offset.
+    /// </summary>
     public int renderQueueOffset
     {
         get { return _renderQueueOffset; }
@@ -205,6 +239,9 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         }
     }
 
+    /// <summary>
+    /// Should the drawing element be split into pieces?
+    /// </summary>
     protected virtual bool splitToPieces
     {
         get { return false; }
@@ -256,6 +293,9 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         triangles.Add(ti + 3);
     }
 
+    /// <summary>
+    /// Destroys the instance of the drawing element.
+    /// </summary>
     public virtual void DestroyInstance()
     {
         if (gameObject != null)
@@ -1004,7 +1044,7 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
 
         OnlineMaps map = manager.map;
         int zoom = map.zoom;
-        float zoomCoof = map.zoomCoof;
+        float zoomFactor = map.zoomFactor;
 
         OnlineMapsProjection projection = map.projection;
         projection.CoordinatesToTile(tlx, tly, zoom, out sx, out sy);
@@ -1017,8 +1057,8 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
 
         double ppx = 0;
         Vector2 sizeInScene = (map.control as OnlineMapsControlBaseDynamicMesh).sizeInScene;
-        double scaleX = OnlineMapsUtils.tileSize * sizeInScene.x / map.buffer.renderState.width / zoomCoof;
-        double scaleY = OnlineMapsUtils.tileSize * sizeInScene.y / map.buffer.renderState.height / zoomCoof;
+        double scaleX = OnlineMapsUtils.tileSize * sizeInScene.x / map.buffer.renderState.width / zoomFactor;
+        double scaleY = OnlineMapsUtils.tileSize * sizeInScene.y / map.buffer.renderState.height / zoomFactor;
 
         double prx = 0, pry = 0;
 
@@ -1193,7 +1233,7 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         List<Vector2> activePoints = new List<Vector2>(localPoints.Count);
 
         long maxX = 1L << manager.map.zoom;
-        float maxSize = maxX * OnlineMapsUtils.tileSize * control.sizeInScene.x / manager.map.width / manager.map.zoomCoof;
+        float maxSize = maxX * OnlineMapsUtils.tileSize * control.sizeInScene.x / manager.map.width / manager.map.zoomFactor;
         float halfSize = maxSize / 2;
 
         float lastPointX = 0;
@@ -1202,7 +1242,7 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         float sizeX = control.sizeInScene.x;
         float sizeY = control.sizeInScene.y;
 
-        bestElevationYScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(tlx, tly, brx, bry);
+        bestElevationYScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(elevationManager, tlx, tly, brx, bry);
 
         if (vertices == null) vertices = new List<Vector3>(Mathf.Max(Mathf.NextPowerOfTwo(localPoints.Count * 4), 32));
         else vertices.Clear();
@@ -1431,6 +1471,10 @@ public abstract class OnlineMapsDrawingElement: IOnlineMapsInteractiveElement
         foreach (Material material in materials) material.renderQueue = control.drawingShader.renderQueue + renderQueueOffset + index;
     }
 
+    /// <summary>
+    /// Validate drawing element.
+    /// </summary>
+    /// <returns>The result of validation.</returns>
     public virtual bool Validate()
     {
         return true;

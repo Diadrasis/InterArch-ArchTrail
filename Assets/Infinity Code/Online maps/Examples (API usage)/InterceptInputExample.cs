@@ -11,6 +11,23 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/InterceptInputExample")]
     public class InterceptInputExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map control. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsControlBase control;
+        
+        private void Start()
+        {
+            // If the control is not specified, get the current instance.
+            if (control == null) control = OnlineMapsControlBase.instance;
+            
+            // Intercepts getting the cursor coordinates.
+            control.OnGetInputPosition += OnGetInputPosition;
+
+            // Intercepts getting the number of touches.
+            control.OnGetTouchCount += OnGetTouchCount;
+        }
+
         private Vector2 OnGetInputPosition()
         {
 
@@ -27,15 +44,6 @@ namespace InfinityCode.OnlineMapsExamples
         {
             // If pressed Z, then it will work like the left mouse button.
             return Input.GetKey(KeyCode.Z) ? 1 : 0;
-        }
-
-        private void Start()
-        {
-            // Intercepts getting the cursor coordinates.
-            OnlineMapsControlBase.instance.OnGetInputPosition += OnGetInputPosition;
-
-            // Intercepts getting the number of touches.
-            OnlineMapsControlBase.instance.OnGetTouchCount += OnGetTouchCount;
         }
     }
 }

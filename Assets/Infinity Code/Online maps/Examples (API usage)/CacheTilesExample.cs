@@ -4,6 +4,7 @@
 #if !UNITY_WP_8_1 || UNITY_EDITOR
 
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace InfinityCode.OnlineMapsExamples
@@ -15,6 +16,25 @@ namespace InfinityCode.OnlineMapsExamples
     public class CacheTilesExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        private static StringBuilder builder = new StringBuilder();
+
+        private void Start()
+        {
+            // If the map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
+            // Subscribe to the event of success download tile.
+            OnlineMapsTile.OnTileDownloaded += OnTileDownloaded;
+
+            // Intercepts requests to the download of the tile.
+            OnlineMapsTileManager.OnStartDownloadTile += OnStartDownloadTile;
+        }
+
+        /// <summary>
         /// Gets the local path for tile.
         /// </summary>
         /// <param name="tile">Reference to tile</param>
@@ -22,17 +42,22 @@ namespace InfinityCode.OnlineMapsExamples
         private static string GetTilePath(OnlineMapsTile tile)
         {
             OnlineMapsRasterTile rTile = tile as OnlineMapsRasterTile;
-            string[] parts =
-            {
-                Application.persistentDataPath,
-                "OnlineMapsTileCache",
-                rTile.mapType.provider.id,
-                rTile.mapType.id,
-                tile.zoom.ToString(),
-                tile.x.ToString(),
-                tile.y + ".png"
-            };
-            return string.Join("/", parts);
+            
+            builder.Length = 0;
+            builder.Append(Application.persistentDataPath);
+            builder.Append("/OnlineMapsTileCache/");
+            builder.Append(rTile.mapType.provider.id);
+            builder.Append("/");
+            builder.Append(rTile.mapType.id);
+            builder.Append("/");
+            builder.Append(tile.zoom);
+            builder.Append("/");
+            builder.Append(tile.x);
+            builder.Append("/");
+            builder.Append(tile.y);
+            builder.Append(".png");
+            
+            return builder.ToString();
         }
 
         /// <summary>
@@ -66,7 +91,7 @@ namespace InfinityCode.OnlineMapsExamples
                 }
 
                 // Redraw map.
-                OnlineMaps.instance.Redraw();
+                map.Redraw();
             }
             else
             {
@@ -90,15 +115,6 @@ namespace InfinityCode.OnlineMapsExamples
             if (!directory.Exists) directory.Create();
 
             File.WriteAllBytes(path, tile.www.bytes);
-        }
-
-        private void Start()
-        {
-            // Subscribe to the event of success download tile.
-            OnlineMapsTile.OnTileDownloaded += OnTileDownloaded;
-
-            // Intercepts requests to the download of the tile.
-            OnlineMapsTileManager.OnStartDownloadTile += OnStartDownloadTile;
         }
     }
 }

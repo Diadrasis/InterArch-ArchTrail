@@ -14,6 +14,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class DragAndZoomInertia : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Deceleration rate (0 - 1).
         /// </summary>
         public float friction = 0.9f;
@@ -30,8 +35,22 @@ namespace InfinityCode.OnlineMapsExamples
         private float pz;
         private const int maxSamples = 5;
 
-        private OnlineMaps map;
         private OnlineMapsControlBase control;
+
+        private void Start()
+        {
+            if (map == null) map = OnlineMaps.instance;
+            control = map.control;
+
+            // Subscribe to map events
+            control.OnMapPress += OnMapPress;
+            control.OnMapRelease += OnMapRelease;
+
+            // Initialize arrays of speed
+            speedX = new List<double>(maxSamples);
+            speedY = new List<double>(maxSamples);
+            speedZ = new List<float>(maxSamples);
+        }
 
         private void FixedUpdate()
         {
@@ -117,22 +136,6 @@ namespace InfinityCode.OnlineMapsExamples
             speedX.Clear();
             speedY.Clear();
             speedZ.Clear();
-        }
-
-
-        private void Start()
-        {
-            map = OnlineMaps.instance; ;
-            control = OnlineMapsControlBase.instance;
-
-            // Subscribe to map events
-            control.OnMapPress += OnMapPress;
-            control.OnMapRelease += OnMapRelease;
-
-            // Initialize arrays of speed
-            speedX = new List<double>(maxSamples);
-            speedY = new List<double>(maxSamples);
-            speedZ = new List<float>(maxSamples);
         }
     }
 }

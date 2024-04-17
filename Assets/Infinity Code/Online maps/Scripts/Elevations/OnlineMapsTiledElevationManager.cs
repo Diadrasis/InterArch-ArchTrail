@@ -354,6 +354,9 @@ public abstract class OnlineMapsTiledElevationManager<T> : OnlineMapsElevationMa
         }
 
         SetElevationData(tile, elevations);
+
+        if (OnElevationUpdated != null) OnElevationUpdated();
+
         return true;
     }
 

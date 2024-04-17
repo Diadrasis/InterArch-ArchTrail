@@ -32,6 +32,6 @@ public class OnlineMapsBingMapsTiledElevationManagerEditor : OnlineMapsTiledElev
         base.OnEnableLate();
 
         keyManager = (target as OnlineMapsBingMapsTiledElevationManager).GetComponent<OnlineMapsKeyManager>();
-        if (keyManager == null) keyManager = FindObjectOfType<OnlineMapsKeyManager>();
+        if (keyManager == null) keyManager = OnlineMapsUtils.FindObjectOfType<OnlineMapsKeyManager>();
     }
 }

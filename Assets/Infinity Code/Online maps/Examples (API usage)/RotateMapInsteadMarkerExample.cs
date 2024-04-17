@@ -11,18 +11,31 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/RotateMapInsteadMarkerExample")]
     public class RotateMapInsteadMarkerExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
+        /// Reference to the camera orbit. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsCameraOrbit cameraOrbit;
+        
         private OnlineMapsMarker marker;
-        private OnlineMapsCameraOrbit cameraOrbit;
 
         private void Start()
         {
-            cameraOrbit = OnlineMapsCameraOrbit.instance;
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
+            // If the camera orbit is not specified, get the current instance.
+            if (cameraOrbit == null) cameraOrbit = OnlineMapsCameraOrbit.instance;
 
             // Create a new marker.
-            marker = OnlineMapsMarkerManager.CreateItem(new Vector2(), "Player");
+            marker = map.markerManager.Create(new Vector2(), "Player");
 
             // Subscribe to UpdateBefore event.
-            OnlineMaps.instance.OnUpdateBefore += OnUpdateBefore;
+            map.OnUpdateBefore += OnUpdateBefore;
         }
 
         private void OnUpdateBefore()

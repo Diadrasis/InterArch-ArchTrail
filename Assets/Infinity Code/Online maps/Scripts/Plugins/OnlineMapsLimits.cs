@@ -20,7 +20,7 @@ public class OnlineMapsLimits : MonoBehaviour, IOnlineMapsSavableComponent
     /// <summary>
     /// The maximum zoom value. 
     /// </summary>
-    public float maxZoom = OnlineMaps.MAXZOOM;
+    public float maxZoom = OnlineMaps.MAXZOOM_EXT;
 
     /// <summary>
     /// The minimum latitude value.

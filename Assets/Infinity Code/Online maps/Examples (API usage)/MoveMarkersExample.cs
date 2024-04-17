@@ -11,7 +11,14 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/MoveMarkersExample")]
     public class MoveMarkersExample : MonoBehaviour
     {
-        // Move time
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
+        /// Time of movement between locations.
+        /// </summary>
         public float time = 10;
 
         private OnlineMapsMarker marker;
@@ -19,16 +26,23 @@ namespace InfinityCode.OnlineMapsExamples
         private Vector2 fromPosition;
         private Vector2 toPosition;
 
-        // Relative position (0-1) between from and to
+        /// <summary>
+        /// Relative position (0-1) between from and to
+        /// </summary>
         private float angle = 0.5f;
 
-        // Move direction
+        /// <summary>
+        /// Move direction
+        /// </summary>
         private int direction = 1;
 
         private void Start()
         {
-            OnlineMaps map = OnlineMaps.instance;
-            marker = OnlineMapsMarkerManager.CreateItem(map.position);
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
+            // Create a new marker.
+            marker = map.markerManager.Create(map.position);
             fromPosition = map.topLeftPosition;
             toPosition = map.bottomRightPosition;
         }
@@ -52,7 +66,7 @@ namespace InfinityCode.OnlineMapsExamples
 
             // Marks the map should be redrawn.
             // Map is not redrawn immediately. It will take some time.
-            OnlineMaps.instance.Redraw();
+            map.Redraw();
         }
     }
 }

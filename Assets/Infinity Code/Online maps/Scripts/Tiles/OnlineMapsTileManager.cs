@@ -239,51 +239,55 @@ public class OnlineMapsTileManager
         int countDownload = 0;
         int c = 0;
 
+        OnlineMapsTile[] _tiles;
+
         lock (OnlineMapsTile.lockTiles)
         {
-            for (int i = 0; i < tiles.Count; i++)
+            _tiles = tiles.ToArray();
+        }
+
+        for (int i = 0; i < _tiles.Length; i++)
+        {
+            OnlineMapsTile tile = _tiles[i];
+            if (tile.status == OnlineMapsTileStatus.loading && tile.www != null)
             {
-                OnlineMapsTile tile = tiles[i];
-                if (tile.status == OnlineMapsTileStatus.loading && tile.www != null)
-                {
-                    countDownload++;
-                    if (countDownload >= maxTileDownloads) return;
-                }
+                countDownload++;
+                if (countDownload >= maxTileDownloads) return;
             }
+        }
 
-            int needDownload = maxTileDownloads - countDownload;
+        int needDownload = maxTileDownloads - countDownload;
 
-            if (downloadTiles == null) downloadTiles = new OnlineMapsTile[maxTileDownloads];
+        if (downloadTiles == null) downloadTiles = new OnlineMapsTile[maxTileDownloads];
 
-            for (int i = 0; i < tiles.Count; i++)
+        for (int i = 0; i < _tiles.Length; i++)
+        {
+            OnlineMapsTile tile = _tiles[i];
+            if (tile.status != OnlineMapsTileStatus.none) continue;
+
+            if (c == 0)
             {
-                OnlineMapsTile tile = tiles[i];
-                if (tile.status != OnlineMapsTileStatus.none) continue;
+                downloadTiles[0] = tile;
+                c++;
+            }
+            else
+            {
+                int index = c;
+                int index2 = index - 1;
 
-                if (c == 0)
+                while (index2 >= 0)
                 {
-                    downloadTiles[0] = tile;
-                    c++;
+                    if (downloadTiles[index2].zoom <= tile.zoom) break;
+
+                    index2--;
+                    index--;
                 }
-                else
+
+                if (index < needDownload)
                 {
-                    int index = c;
-                    int index2 = index - 1;
-
-                    while (index2 >= 0)
-                    {
-                        if (downloadTiles[index2].zoom <= tile.zoom) break;
-
-                        index2--;
-                        index--;
-                    }
-
-                    if (index < needDownload)
-                    {
-                        for (int j = needDownload - 1; j > index; j--) downloadTiles[j] = downloadTiles[j - 1];
-                        downloadTiles[index] = tile;
-                        if (c < needDownload) c++;
-                    }
+                    for (int j = needDownload - 1; j > index; j--) downloadTiles[j] = downloadTiles[j - 1];
+                    downloadTiles[index] = tile;
+                    if (c < needDownload) c++;
                 }
             }
         }
@@ -344,6 +348,12 @@ public class OnlineMapsTileManager
                 yield break;
             }
 
+            if (tile.map == null)
+            {
+                tile.MarkError();
+                yield break;
+            }
+
             tile.www = new OnlineMapsWWW(tile.url);
             tile.www["tile"] = tile;
             tile.www.OnComplete += OnTileWWWComplete;
@@ -375,6 +385,7 @@ public class OnlineMapsTileManager
 
         if (tile.map == null)
         {
+            if (resourceRequest.asset != null) Resources.UnloadAsset(resourceRequest.asset);
             tile.MarkError();
             yield break;
         }
@@ -383,6 +394,8 @@ public class OnlineMapsTileManager
 
         if (texture != null)
         {
+            texture.name = tile.ToString();
+            
             texture.wrapMode = TextureWrapMode.Clamp;
             if (tile.map.control.resultIsTexture)
             {

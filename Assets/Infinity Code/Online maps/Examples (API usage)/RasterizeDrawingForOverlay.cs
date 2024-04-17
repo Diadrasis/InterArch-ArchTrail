@@ -1,6 +1,7 @@
 ﻿/*         INFINITY CODE         */
 /*   https://infinity-code.com   */
 
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -17,6 +18,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class RasterizeDrawingForOverlay : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+
+        /// <summary>
         /// Minimum zoom for rasterization
         /// </summary>
         public int zoomFrom = 1;
@@ -30,7 +36,12 @@ namespace InfinityCode.OnlineMapsExamples
         private IEnumerator routine;
         private Texture2D texture;
         private Color32[] colors;
-        private OnlineMaps map;
+
+        private void Start()
+        {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+        }
 
         /// <summary>
         /// Grows the Bounds to include the point
@@ -58,7 +69,6 @@ namespace InfinityCode.OnlineMapsExamples
             Destroy(texture);
             texture = null;
             colors = null;
-            map = null;
 
 #if UNITY_EDITOR
             UnityEditor.AssetDatabase.Refresh();
@@ -235,8 +245,6 @@ namespace InfinityCode.OnlineMapsExamples
             double lx, ty, rx, by;
             GetBounds(out lx, out ty, out rx, out by);
 
-            map = OnlineMaps.instance;
-
             // Initialize a temporary texture and color array
             texture = new Texture2D(256, 256, TextureFormat.ARGB32, false);
             colors = new Color32[256 * 256];
@@ -300,7 +308,7 @@ namespace InfinityCode.OnlineMapsExamples
             Vector2 bufferPosition = new Vector2(x, y);
 
             // Iterate each drawing element and draw it into color buffer
-            foreach (OnlineMapsDrawingElement el in map.control.drawingElementManager)
+            foreach (OnlineMapsDrawingElement el in map.drawingElementManager)
             {
                 el.Draw(colors, bufferPosition, 256, 256, zoom);
             }

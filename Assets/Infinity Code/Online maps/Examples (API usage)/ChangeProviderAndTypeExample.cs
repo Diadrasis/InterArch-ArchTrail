@@ -12,6 +12,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class ChangeProviderAndTypeExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Logs providers id and map types
         /// </summary>
         private void LogTypeList()
@@ -30,14 +35,17 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Show full provider list
             LogTypeList();
 
             // Select Google Satellite
-            OnlineMaps.instance.mapType = "google.satellite"; // providerID.typeID
+            map.mapType = "google.satellite"; // providerID.typeID
 
             // Select the first type for ArcGIS.
-            OnlineMaps.instance.mapType = "arcgis"; // providerID
+            map.mapType = "arcgis"; // providerID
         }
     }
 }

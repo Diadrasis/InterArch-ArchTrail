@@ -12,13 +12,21 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/OnDrawTooltipExample")]
     public class OnDrawTooltipExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Create new event OnDrawTooltip for all markers.
             OnlineMapsMarkerBase.OnMarkerDrawTooltip += OnMarkerDrawTooltip;
 
             // Create new event OnDrawTooltip for custom marker.
-            OnlineMapsMarkerManager.CreateItem(new Vector2(), null, "New marker").OnDrawTooltip += OnDrawTooltip;
+            map.markerManager.Create(new Vector2(), null, "New marker").OnDrawTooltip += OnDrawTooltip;
         }
 
         private void DrawBoxAroundMarker(OnlineMapsMarker marker)

@@ -16,7 +16,14 @@ using System.IO;
 
 public partial class OnlineMapsCache
 {
+    /// <summary>
+    /// Delegate of the event that occurs when you need to get data from the custom cache.
+    /// </summary>
     public delegate bool OnGetFromCustomCacheDelegate(string key, out byte[] bytes);
+    
+    /// <summary>
+    /// Event that occurs when you need to get data from the custom cache.
+    /// </summary>
     public static OnGetFromCustomCacheDelegate OnGetFromCustomCache;
 
     /// <summary>
@@ -33,6 +40,9 @@ public partial class OnlineMapsCache
     private int countCustomItems;
     private IEnumerator saveCustomCacheAtlasCoroutine;
 
+    /// <summary>
+    /// Returns the size of the custom cache.
+    /// </summary>
     public int customCacheSize
     {
         get
@@ -158,15 +168,30 @@ public partial class OnlineMapsCache
         saveCustomCacheAtlasCoroutine = null;
     }
 
+    /// <summary>
+    /// Custom cache atlas.
+    /// </summary>
     public class CustomCacheAtlas : CacheAtlas<CustomCacheItem>
     {
+        /// <summary>
+        /// Name of the atlas file.
+        /// </summary>
         public const string AtlasName = "customcacheatlas.dat";
 
+        /// <summary>
+        /// Returns the name of the atlas file.
+        /// </summary>
         protected override string atlasName
         {
             get { return AtlasName; }
         }
 
+        /// <summary>
+        /// Adds a new item to the atlas.
+        /// </summary>
+        /// <param name="cache">Cache</param>
+        /// <param name="key">Key</param>
+        /// <param name="bytes">Bytes</param>
         public void Add(OnlineMapsCache cache, string key, byte[] bytes)
         {
 #if ALLOW_FILECACHE
@@ -273,6 +298,12 @@ public partial class OnlineMapsCache
 #endif
         }
 
+        /// <summary>
+        /// Returns value from custom cache by key.
+        /// </summary>
+        /// <param name="cache">Cache</param>
+        /// <param name="key">Key</param>
+        /// <returns>Value or null</returns>
         public byte[] GetItem(OnlineMapsCache cache, string key)
         {
             int hash = key.GetHashCode();
@@ -287,13 +318,27 @@ public partial class OnlineMapsCache
         }
     }
 
+    /// <summary>
+    /// Custom cache item.
+    /// </summary>
     public class CustomCacheItem : CacheItem
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="size">Size of data</param>
         public CustomCacheItem(string key, int size) : this(key, size, DateTime.Now.Ticks)
         {
 
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="size">Size of data</param>
+        /// <param name="time">Creation time</param>
         public CustomCacheItem(string key, int size, long time)
         {
             this.key = key;
@@ -302,6 +347,11 @@ public partial class OnlineMapsCache
             this.time = time;
         }
 
+        /// <summary>
+        /// Returns value from item.
+        /// </summary>
+        /// <param name="cache">Cache</param>
+        /// <returns>Value or null</returns>
         public byte[] GetBytes(OnlineMapsCache cache)
         {
 #if ALLOW_FILECACHE
@@ -313,6 +363,11 @@ public partial class OnlineMapsCache
 #endif
         }
 
+        /// <summary>
+        /// Returns the full path to the file.
+        /// </summary>
+        /// <param name="cache">Cache</param>
+        /// <returns>Full path to the file</returns>
         public string GetFullPath(OnlineMapsCache cache)
         {
 #if ALLOW_FILECACHE

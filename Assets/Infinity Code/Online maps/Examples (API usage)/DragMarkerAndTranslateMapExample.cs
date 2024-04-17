@@ -12,6 +12,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class DragMarkerAndTranslateMapExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map control. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsControlBase3D control;
+        
+        /// <summary>
         /// Prefab of 3D marker.
         /// </summary>
         public GameObject prefab;
@@ -33,9 +38,10 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void Start()
         {
+            if (control == null) control = OnlineMapsControlBase3D.instance;
+            
             // Create a new 3D marker.
-            OnlineMapsMarker3D marker = OnlineMapsMarker3DManager.CreateItem(OnlineMaps.instance.position,
-                prefab);
+            OnlineMapsMarker3D marker = control.marker3DManager.Create(control.map.position, prefab);
 
             // Subscribe to OnDrag event.
             marker.OnDrag += OnMarkerDrag;
@@ -44,8 +50,8 @@ namespace InfinityCode.OnlineMapsExamples
         private void OnMarkerDrag(OnlineMapsMarkerBase marker)
         {
             // Stores the coordinates of the boundaries of the map.
-            Vector2 tl = OnlineMaps.instance.topLeftPosition;
-            Vector2 br = OnlineMaps.instance.bottomRightPosition;
+            Vector2 tl = control.map.topLeftPosition;
+            Vector2 br = control.map.bottomRightPosition;
 
             // Fix 180 meridian.
             Vector2 dist = tl - br;
@@ -72,7 +78,7 @@ namespace InfinityCode.OnlineMapsExamples
             if (offBR.y < scale.y) mapOffset.y = -offBR.y * Mathf.Lerp(minSpeed, maxSpeed, 1 - offBR.y / scale.y);
 
             // If offset not equal zero, then move the map.
-            if (mapOffset != Vector2.zero) OnlineMaps.instance.position += mapOffset;
+            if (mapOffset != Vector2.zero) control.map.position += mapOffset;
         }
     }
 }

@@ -36,16 +36,11 @@ public class OnlineMapsLocationService : OnlineMapsLocationServiceGenericBase<On
     private double _distance;
 
     /// <summary>
-    /// 
+    /// Distance in meters from the last location.
     /// </summary>
     public double distance
     {
         get { return _distance; }
-    }
-
-    public override bool IsLocationServiceRunning()
-    {
-        return Input.location.status == LocationServiceStatus.Running;
     }
 
     protected override void GetLocationFromSensor(out float longitude, out float latitude)
@@ -53,6 +48,11 @@ public class OnlineMapsLocationService : OnlineMapsLocationServiceGenericBase<On
         LocationInfo data = Input.location.lastData;
         longitude = data.longitude;
         latitude = data.latitude;
+    }
+
+    public override bool IsLocationServiceRunning()
+    {
+        return Input.location.status == LocationServiceStatus.Running;
     }
 
     protected override OnlineMapsJSONItem SaveSettings()

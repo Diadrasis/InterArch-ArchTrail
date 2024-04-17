@@ -1,6 +1,7 @@
 ﻿/*         INFINITY CODE         */
 /*   https://infinity-code.com   */
 
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -13,36 +14,25 @@ namespace InfinityCode.OnlineMapsExamples
     public class HereRoutingAPIExample : MonoBehaviour
     {
         /// <summary>
-        /// Application ID
+        /// Reference to the map. If not specified, the current instance will be used.
         /// </summary>
-        public string appId;
-
-        /// <summary>
-        /// Application code
-        /// </summary>
-        public string appCode;
-
+        public OnlineMaps map;
+        
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Looking for public transport route between the coordinates.
             OnlineMapsHereRoutingAPI.Find(
-                appId,
-                appCode,
-                new[] // Waypoints (2+)
+                new OnlineMapsHereRoutingAPI.Waypoint(37.38589, 55.90042), // Origin
+                new OnlineMapsHereRoutingAPI.Waypoint(37.6853002, 55.8635228), // Destination
+                new Dictionary<string, string>
                 {
-                    new OnlineMapsHereRoutingAPI.GeoWaypoint(37.38589, 55.90042),
-                    new OnlineMapsHereRoutingAPI.GeoWaypoint(37.6853002, 55.8635228)
-                },
-                new OnlineMapsHereRoutingAPI.RoutingMode // Routing mode
-                {
-                    transportMode = OnlineMapsHereRoutingAPI.RoutingMode.TransportModes.publicTransport
-                },
-                new OnlineMapsHereRoutingAPI.Params // Optional params
-                {
-                    language = "ru-ru",
-                    instructionFormat = OnlineMapsHereRoutingAPI.InstructionFormat.text,
-                    routeAttributes = OnlineMapsHereRoutingAPI.RouteAttributes.waypoints | OnlineMapsHereRoutingAPI.RouteAttributes.summary | OnlineMapsHereRoutingAPI.RouteAttributes.legs | OnlineMapsHereRoutingAPI.RouteAttributes.shape,
-                    alternatives = 3,
+                    {"transportMode", "bus" },
+                    {"lang",  "ru-ru"},
+                    {"alternatives", "3" },
+                    {"return", "polyline,actions,instructions" }
                 }
                 ).OnComplete += OnComplete;
         }
@@ -60,8 +50,6 @@ namespace InfinityCode.OnlineMapsExamples
 
             if (result != null)
             {
-                Debug.Log(result.metaInfo.timestamp);
-
                 Color[] colors =
                 {
                     Color.green,
@@ -74,10 +62,13 @@ namespace InfinityCode.OnlineMapsExamples
                 // Draw all the routes in different colors.
                 foreach (OnlineMapsHereRoutingAPIResult.Route route in result.routes)
                 {
-                    if (route.shape != null)
+                    foreach (OnlineMapsHereRoutingAPIResult.Section section in route.sections)
                     {
-                        OnlineMapsDrawingElement line = new OnlineMapsDrawingLine(route.shape.Select(v => new Vector2((float) v.longitude, (float) v.latitude)).ToList(), colors[colorIndex++]);
-                        OnlineMapsDrawingElementManager.AddItem(line);
+                        if (section.polylinePoints2d != null)
+                        {
+                            OnlineMapsDrawingElement line = new OnlineMapsDrawingLine(section.polylinePoints2d, colors[colorIndex++]);
+                            map.drawingElementManager.Add(line);
+                        }
                     }
                 }
             }

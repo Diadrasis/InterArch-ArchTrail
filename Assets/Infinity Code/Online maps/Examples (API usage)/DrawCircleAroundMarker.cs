@@ -13,6 +13,11 @@ namespace InfinityCode.OnlineMapsExamples
     public class DrawCircleAroundMarker : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Radius of the circle
         /// </summary>
         public float radiusKM = 0.1f;
@@ -23,18 +28,29 @@ namespace InfinityCode.OnlineMapsExamples
         public int segments = 32;
 
         /// <summary>
+        /// This method is called when the script starts
+        /// </summary>
+        private void Start()
+        {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
+            // Subscribe to click on map event
+            map.control.OnMapClick += OnMapClick;
+        }
+
+        /// <summary>
         /// This method is called when a user clicks on a map
         /// </summary>
         private void OnMapClick()
         {
             // Get the coordinates under cursor
             double lng, lat;
-            OnlineMapsControlBase.instance.GetCoords(out lng, out lat);
+            OnlineMapsControlBase control = map.control;
+            control.GetCoords(out lng, out lat);
 
             // Create a new marker under cursor
-            OnlineMapsMarkerManager.CreateItem(lng, lat, "Marker " + OnlineMapsMarkerManager.CountItems);
-
-            OnlineMaps map = OnlineMaps.instance;
+            control.markerManager.Create(lng, lat, "Marker " + control.markerManager.Count);
 
             // Get the coordinate at the desired distance
             double nlng, nlat;
@@ -67,16 +83,8 @@ namespace InfinityCode.OnlineMapsExamples
             }
 
             // Create a new polygon to draw a circle
-            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingPoly(points, Color.red, 3));
-        }
-
-        /// <summary>
-        /// This method is called when the script starts
-        /// </summary>
-        private void Start()
-        {
-            // Subscribe to click on map event
-            OnlineMapsControlBase.instance.OnMapClick += OnMapClick;
+            OnlineMapsDrawingPoly poly = new OnlineMapsDrawingPoly(points, Color.red, 3);
+            control.drawingElementManager.Add(poly);
         }
     }
 }

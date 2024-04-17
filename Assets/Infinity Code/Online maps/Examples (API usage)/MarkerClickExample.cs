@@ -11,18 +11,24 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/MarkerClickExample")]
     public class MarkerClickExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         private void Start()
         {
-            OnlineMaps map = OnlineMaps.instance;
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
 
             // Add OnClick events to static markers
-            foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
+            foreach (OnlineMapsMarker marker in map.markerManager)
             {
                 marker.OnClick += OnMarkerClick;
             }
 
             // Add OnClick events to dynamic markers
-            OnlineMapsMarker dynamicMarker = OnlineMapsMarkerManager.CreateItem(Vector2.zero, null, "Dynamic marker");
+            OnlineMapsMarker dynamicMarker = map.markerManager.Create(Vector2.zero, null, "Dynamic marker");
             dynamicMarker.OnClick += OnMarkerClick;
         }
 

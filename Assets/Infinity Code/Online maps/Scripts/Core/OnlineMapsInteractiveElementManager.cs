@@ -61,6 +61,9 @@ public abstract class OnlineMapsInteractiveElementManager<T, U>: MonoBehaviour, 
         }
     }
 
+    /// <summary>
+    /// Reference to the map
+    /// </summary>
     public OnlineMaps map
     {
         get { return _map; }
@@ -118,10 +121,10 @@ public abstract class OnlineMapsInteractiveElementManager<T, U>: MonoBehaviour, 
     /// </summary>
     public static void Init()
     {
-        _instance = FindObjectOfType<T>();
+        _instance = OnlineMapsUtils.FindObjectOfType<T>();
         if (_instance == null)
         {
-            OnlineMaps map = FindObjectOfType<OnlineMaps>();
+            OnlineMaps map = OnlineMapsUtils.FindObjectOfType<OnlineMaps>();
             if (map != null) map.gameObject.AddComponent<T>();
         }
     }
@@ -166,6 +169,9 @@ public abstract class OnlineMapsInteractiveElementManager<T, U>: MonoBehaviour, 
         return default(U);
     }
 
+    /// <summary>
+    /// Redraws the map
+    /// </summary>
     protected static void Redraw()
     {
         if (_instance != null && _instance._map != null) _instance._map.Redraw();
@@ -177,7 +183,11 @@ public abstract class OnlineMapsInteractiveElementManager<T, U>: MonoBehaviour, 
     /// <param name="collection">Collection of items</param>
     public static void SetItems(IEnumerable<U> collection)
     {
-        if (instance != null) instance.items = new List<U>(collection);
+        if (instance != null)
+        {
+            instance.items = new List<U>(collection);
+            foreach (U el in instance.items) el.manager = instance;
+        }
     }
 
     /// <summary>
@@ -209,6 +219,10 @@ public abstract class OnlineMapsInteractiveElementManager<T, U>: MonoBehaviour, 
         Redraw();
     }
 
+    /// <summary>
+    /// Gets the enumerator
+    /// </summary>
+    /// <returns>Enumerator</returns>
     public IEnumerator GetEnumerator()
     {
         return items.GetEnumerator();
@@ -217,6 +231,16 @@ public abstract class OnlineMapsInteractiveElementManager<T, U>: MonoBehaviour, 
     IEnumerator<U> IEnumerable<U>.GetEnumerator()
     {
         return items.GetEnumerator();
+    }
+
+    /// <summary>
+    /// Index of item
+    /// </summary>
+    /// <param name="element">Interactive element</param>
+    /// <returns>Index of item</returns>
+    public int IndexOf(IOnlineMapsInteractiveElement element)
+    {
+        return items.IndexOf((U)element);
     }
 
     protected virtual void OnDisable()

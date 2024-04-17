@@ -40,6 +40,7 @@ public class OnlineMapsMapboxElevationManager : OnlineMapsTiledElevationManager<
     {
         if (www.hasError)
         {
+            if (OnElevationFails != null) OnElevationFails(www.error);
             Debug.Log("Download error");
             return;
         }
@@ -51,6 +52,8 @@ public class OnlineMapsMapboxElevationManager : OnlineMapsTiledElevationManager<
 
         SetElevationTexture(tile, texture);
         OnlineMapsUtils.Destroy(texture);
+
+        if (OnElevationUpdated != null) OnElevationUpdated();
     }
 
     /// <summary>
@@ -120,5 +123,7 @@ public class OnlineMapsMapboxElevationManager : OnlineMapsTiledElevationManager<
         string url = "https://api.mapbox.com/v4/mapbox.terrain-rgb/" + tile.zoom + "/" + tile.x + "/" + tile.y + ".pngraw?access_token=" + token;
         OnlineMapsWWW www = new OnlineMapsWWW(url);
         www.OnComplete += delegate { OnTileDownloaded(tile, www); };
+
+        if (OnElevationRequested != null) OnElevationRequested();
     }
 }

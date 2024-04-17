@@ -11,13 +11,19 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/ShowMarkerLabelsByZoomExample")]
     public class ShowMarkerLabelsByZoomExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
         private void Start()
         {
-            OnlineMaps map = OnlineMaps.instance;
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
 
             // Create a new markers.
-            OnlineMapsMarker marker1 = OnlineMapsMarkerManager.CreateItem(new Vector2(0, 0), null, "Marker 1");
-            OnlineMapsMarker marker2 = OnlineMapsMarkerManager.CreateItem(new Vector2(10, 0), null, "Marker 2");
+            OnlineMapsMarker marker1 = map.markerManager.Create(0, 0, null, "Marker 1");
+            OnlineMapsMarker marker2 = map.markerManager.Create(10, 0, null, "Marker 2");
 
             // Store data about labels.
             marker1["data"] = new ShowMarkerLabelsByZoomItem(marker1.label, new OnlineMapsRange(3, 10));
@@ -30,8 +36,7 @@ namespace InfinityCode.OnlineMapsExamples
 
         private void OnChangeZoom()
         {
-            OnlineMaps map = OnlineMaps.instance;
-            foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
+            foreach (OnlineMapsMarker marker in map.markerManager)
             {
                 ShowMarkerLabelsByZoomItem item = marker["data"] as ShowMarkerLabelsByZoomItem;
                 if (item == null) continue;

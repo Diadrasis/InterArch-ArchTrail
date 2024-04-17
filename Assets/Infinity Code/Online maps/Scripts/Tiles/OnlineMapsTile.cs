@@ -361,7 +361,7 @@ public abstract class OnlineMapsTile
             if (ret != null) return ret;
         }
 
-        if (v == "zoom") return zoom.ToString();
+        if (v == "zoom" || v == "z") return zoom.ToString();
         if (v == "x") return x.ToString();
         if (v == "y") return y.ToString();
         if (v == "quad") return OnlineMapsUtils.TileToQuadKey(x, y, zoom);
@@ -376,7 +376,7 @@ public abstract class OnlineMapsTile
         if (status == OnlineMapsTileStatus.disposed) return;
         status = OnlineMapsTileStatus.disposed;
 
-        map.tileManager.Remove(this);
+        if (isMapTile) map.tileManager.Remove(this);
         if (OnDisposed != null) OnDisposed(this);
     }
 
@@ -523,7 +523,10 @@ public abstract class OnlineMapsTile
 
         foreach (OnlineMapsTile tile in map.tileManager.tiles)
         {
-            if (tile.status != OnlineMapsTileStatus.loaded && tile.status != OnlineMapsTileStatus.error) return;
+            if (tile.status != OnlineMapsTileStatus.loaded && tile.status != OnlineMapsTileStatus.error)
+            {
+                return;
+            }
         }
 
         OnAllTilesLoaded();

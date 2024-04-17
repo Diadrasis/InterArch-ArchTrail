@@ -54,6 +54,12 @@ public class OnlineMapsPanoConnector : MonoBehaviour
     public bool checkOverlayColor = true;
 
     /// <summary>
+    /// The radius for checking the presence of a color.
+    /// </summary>
+    [Range(0, 10)]
+    public int colorPresenceRadius = 2;
+
+    /// <summary>
     /// Use rotation from Online Maps Camera Orbit
     /// </summary>
     public bool useRotation = true;
@@ -164,9 +170,9 @@ public class OnlineMapsPanoConnector : MonoBehaviour
         int px = (int) Math.Round((tx - (int) tx) * 255);
         int py = 255 - (int) Math.Round((ty - (int) ty) * 255);
 
-        for (int x = Mathf.Max(0, px - 2); x < Mathf.Min(255, px + 3); x++)
+        for (int x = Mathf.Max(0, px - colorPresenceRadius); x < Mathf.Min(255, px + colorPresenceRadius + 1); x++)
         {
-            for (int y = Mathf.Max(0, py - 2); y < Mathf.Min(255, py + 3); y++)
+            for (int y = Mathf.Max(0, py - colorPresenceRadius); y < Mathf.Min(255, py + colorPresenceRadius + 1); y++)
             {
                 if (overlay.GetPixel(x, y) != Color.clear) return true;
             }
@@ -264,7 +270,7 @@ public class OnlineMapsPanoConnector : MonoBehaviour
         if (map == null)
         {
             map = GetComponent<OnlineMaps>();
-            if (map == null) map = FindObjectOfType<OnlineMaps>();
+            if (map == null) map = OnlineMapsUtils.FindObjectOfType<OnlineMaps>();
             if (map == null)
             {
                 Debug.Log("Cannot find the map");

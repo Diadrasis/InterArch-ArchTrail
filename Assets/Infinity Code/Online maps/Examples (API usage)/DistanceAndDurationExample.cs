@@ -12,14 +12,31 @@ namespace InfinityCode.OnlineMapsExamples
     [AddComponentMenu("Infinity Code/Online Maps/Examples (API Usage)/DistanceAndDurationExample")]
     public class DistanceAndDurationExample : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
+        /// Google API Key
+        /// </summary>
         public string googleAPIKey;
 
         private void Start()
         {
-            if (string.IsNullOrEmpty(googleAPIKey)) Debug.LogWarning("Please specify Google API Key");
+            if (map == null) map = OnlineMaps.instance;
+
+            if (string.IsNullOrEmpty(googleAPIKey))
+            {
+                Debug.LogWarning("Please specify Google API Key");
+                return;
+            }
 
             // Find route using Google Directions API
-            OnlineMapsGoogleDirections request = new OnlineMapsGoogleDirections(googleAPIKey, "Los Angeles", new Vector2(-118.178960f, 35.063995f));
+            // Origin and destination can be specified as coordinates or addresses
+            string origin = "Los Angeles";
+            Vector2 destination = new Vector2(-118.178960f, 35.063995f);
+            OnlineMapsGoogleDirections request = new OnlineMapsGoogleDirections(googleAPIKey, origin, destination);
             request.OnComplete += OnGoogleDirectionsComplete;
             request.Send();
         }
@@ -40,7 +57,8 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsGoogleDirectionsResult.Route route = result.routes[0];
 
             // Draw route on the map
-            OnlineMapsDrawingElementManager.AddItem(new OnlineMapsDrawingLine(route.overview_polyline, Color.red, 3));
+            OnlineMapsDrawingLine line = new OnlineMapsDrawingLine(route.overview_polyline, Color.red, 3);
+            map.drawingElementManager.Add(line);
 
             // Calculate the distance
             int distance = route.legs.Sum(l => l.distance.value); // meters

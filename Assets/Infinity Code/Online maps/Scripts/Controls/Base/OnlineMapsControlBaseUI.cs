@@ -16,12 +16,18 @@ using CurvedUI;
 /// <typeparam name="T">Type of display source.</typeparam>
 public abstract class OnlineMapsControlBaseUI<T> : OnlineMapsControlBase2D where T: MaskableGraphic
 {
+    /// <summary>
+    /// Image that displays the map.
+    /// </summary>
     protected T image;
 
 #if CURVEDUI
     private CurvedUISettings curvedUI;
 #endif
 
+    /// <summary>
+    /// Reference to the current camera.
+    /// </summary>
     protected Camera worldCamera
     {
         get
@@ -115,7 +121,6 @@ public abstract class OnlineMapsControlBaseUI<T> : OnlineMapsControlBase2D where
         else
         {
 #endif
-        if (!RectTransformUtility.RectangleContainsScreenPoint(image.rectTransform, position, worldCamera)) return false;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(image.rectTransform, position, worldCamera, out point);
         if (point == Vector2.zero) return false;
 #if CURVEDUI
@@ -135,9 +140,9 @@ public abstract class OnlineMapsControlBaseUI<T> : OnlineMapsControlBase2D where
 
         map.GetTilePosition(out tx, out ty);
 
-        float zoomCoof = map.zoomCoof;
-        tx -= countX * r.x * zoomCoof;
-        ty += countY * r.y * zoomCoof;
+        float zoomFactor = map.zoomFactor;
+        tx -= countX * r.x * zoomFactor;
+        ty += countY * r.y * zoomFactor;
 
         return true;
     }

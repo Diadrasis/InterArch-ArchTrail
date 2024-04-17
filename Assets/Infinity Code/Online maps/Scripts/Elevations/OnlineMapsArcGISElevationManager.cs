@@ -7,10 +7,11 @@ using UnityEngine;
 /// <summary>
 /// Implements the use of elevation data from ArcGIS
 /// </summary>
-[OnlineMapsPlugin("ArcGIS Elevations", typeof(OnlineMapsControlBaseDynamicMesh), "Elevations")]
-[AddComponentMenu("Infinity Code/Online Maps/Elevations/ArcGIS")]
 public class OnlineMapsArcGISElevationManager : OnlineMapsSinglePartElevationManager<OnlineMapsArcGISElevationManager>
 {
+    /// <summary>
+    /// Resolution of the request.
+    /// </summary>
     public int resolution = 32;
 
     private OnlineMapsWWW elevationRequest;

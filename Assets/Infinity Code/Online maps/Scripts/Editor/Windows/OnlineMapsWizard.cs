@@ -42,7 +42,7 @@ public class OnlineMapsWizard : EditorWindow
     private int providerIndex;
     private OnlineMapsProvider[] providers;
     private string[] providersTitle;
-    private string proxyURL = "http://service.infinity-code.com/redirect.php?";
+    private string proxyURL = "https://service.infinity-code.com/redirect.php?";
     private bool showCustomProviderTokens;
     private OnlineMapsSource source;
     private bool traffic;

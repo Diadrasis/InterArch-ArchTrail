@@ -86,20 +86,16 @@ public class OnlineMapsNGUITextureControl : OnlineMapsControlBase2D
         int countX = map.texture.width / OnlineMapsUtils.tileSize;
         int countY = map.texture.height / OnlineMapsUtils.tileSize;
 
-        float zoomCoof = map.zoomCoof;
-        tx += countX * localPos.x * zoomCoof;
-        ty -= countY * localPos.y * zoomCoof;
+        float zoomFactor = map.zoomFactor;
+        tx += countX * localPos.x * zoomFactor;
+        ty -= countY * localPos.y * zoomFactor;
 
         return true;
     }
 
     protected override bool HitTest(Vector2 position)
     {
-#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
-        return UICamera.currentTouch != null && UICamera.currentTouch.current == gameObject;
-#else
-        return UICamera.hoveredObject == gameObject;
-#endif
+        return true;
     }
 
 

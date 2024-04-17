@@ -26,7 +26,7 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
     public bool locked;
 
     /// <summary>
-    /// Relative area of ​​activity of the marker.
+    /// Relative area of activity of the marker.
     /// </summary>
     public Rect markerColliderRect = new Rect(-0.5f, -0.5f, 1, 1);
 
@@ -180,7 +180,7 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
     }
 
     /// <summary>
-    /// Area of ​​the screen, which is a marker at the current map display.
+    /// Area of the screen, which is a marker at the current map display.
     /// Note: When used as a source display Texture or Tileset, is not returned the correct value.
     /// </summary>
     /// <value>
@@ -304,14 +304,14 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
 
         double tlx, tly;
         map.projection.CoordinatesToTile(map.buffer.lastState.leftLongitude, map.buffer.renderState.topLatitude, map.buffer.renderState.zoom, out tlx, out tly);
-        float zoomCoof = map.zoomCoof;
-        tlx *= OnlineMapsUtils.tileSize / zoomCoof;
-        tly *= OnlineMapsUtils.tileSize / zoomCoof;
+        float zoomFactor = map.zoomFactor;
+        tlx *= OnlineMapsUtils.tileSize / zoomFactor;
+        tly *= OnlineMapsUtils.tileSize / zoomFactor;
 
         double tx, ty;
         map.projection.CoordinatesToTile(longitude, latitude, map.buffer.renderState.zoom, out tx, out ty);
-        tx *= OnlineMapsUtils.tileSize / zoomCoof;
-        ty *= OnlineMapsUtils.tileSize / zoomCoof;
+        tx *= OnlineMapsUtils.tileSize / zoomFactor;
+        ty *= OnlineMapsUtils.tileSize / zoomFactor;
 
         Vector2 pos = GetAlignedPosition((int)tx, (int)ty);
         float scaleX = controlRect.width / map.width;
@@ -321,11 +321,11 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
 
         if (isEntireWorld)
         {
-            if (pos.x < controlRect.x) pos.x += controlRect.width / zoomCoof;
+            if (pos.x < controlRect.x) pos.x += controlRect.width / zoomFactor;
         }
         else if (isBiggerThanBuffer)
         {
-            if (pos.x < controlRect.x) pos.x += controlRect.width * 2 / zoomCoof;
+            if (pos.x < controlRect.x) pos.x += controlRect.width * 2 / zoomFactor;
         }
 
         return new Rect(pos.x, pos.y, width * scaleX, height * scaleY);
@@ -347,9 +347,9 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
     {
         double px, py;
         map.projection.CoordinatesToTile(longitude, latitude, zoom, out px, out py);
-        float zoomCoof = map.buffer.renderState.zoomCoof;
-        px *= OnlineMapsUtils.tileSize / zoomCoof;
-        py *= OnlineMapsUtils.tileSize / zoomCoof;
+        float zoomFactor = map.buffer.renderState.zoomFactor;
+        px *= OnlineMapsUtils.tileSize / zoomFactor;
+        py *= OnlineMapsUtils.tileSize / zoomFactor;
 
         float w = width;
         float h = height;
@@ -357,8 +357,8 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
         OnlineMapsVector2i pos = GetAlignedPosition((int)px, (int)py);
         double mx, my;
         map.projection.CoordinatesToTile(coordinates.x, coordinates.y, zoom, out mx, out my);
-        mx *= OnlineMapsUtils.tileSize / zoomCoof;
-        my *= OnlineMapsUtils.tileSize / zoomCoof;
+        mx *= OnlineMapsUtils.tileSize / zoomFactor;
+        my *= OnlineMapsUtils.tileSize / zoomFactor;
         mx -= pos.x;
         my -= pos.y;
 
@@ -398,14 +398,6 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
         map.projection.CoordinatesToTile(coordinates.x, coordinates.y, 20, out p1x, out p1y);
         map.projection.CoordinatesToTile(longitude, latitude, 20, out p2x, out p2y);
         rotation = (float)(1.25 - OnlineMapsUtils.Angle2D(p1x, p1y, p2x, p2y) / 360);
-    }
-    public override OnlineMapsXML Save(OnlineMapsXML parent)
-    {
-        OnlineMapsXML element = base.Save(parent);
-        element.Create("Texture", texture);
-        element.Create("Align", (int)align);
-        element.Create("Rotation", rotation);
-        return element;
     }
 
     public override OnlineMapsJSONItem ToJSON()

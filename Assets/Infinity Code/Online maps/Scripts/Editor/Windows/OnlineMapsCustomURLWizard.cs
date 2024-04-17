@@ -43,7 +43,7 @@ public class OnlineMapsCustomURLWizard : EditorWindow
 
         if (GUILayout.Button("Apply"))
         {
-            OnlineMaps map = FindObjectOfType<OnlineMaps>();
+            OnlineMaps map = OnlineMapsUtils.FindObjectOfType<OnlineMaps>();
             if (map != null)
             {
                 map.customProviderURL = newUrl;
@@ -86,7 +86,7 @@ public class OnlineMapsCustomURLWizard : EditorWindow
         OnlineMapsCustomURLWizard window = GetWindow<OnlineMapsCustomURLWizard>("Custom URL Wizard");
         window.minSize = new Vector2(450, 350);
         window.minSize = Vector2.zero;
-        OnlineMaps map = FindObjectOfType<OnlineMaps>();
+        OnlineMaps map = OnlineMapsUtils.FindObjectOfType<OnlineMaps>();
         if (map != null)
         {
             window.url = map.customProviderURL;

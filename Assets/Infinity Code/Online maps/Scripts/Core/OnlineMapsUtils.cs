@@ -24,6 +24,9 @@ using UnityEditor;
 #endif
 public static class OnlineMapsUtils
 {
+    /// <summary>
+    /// The path to the persistent data.
+    /// </summary>
     public static string persistentDataPath;
 
     /// <summary>
@@ -76,11 +79,17 @@ public static class OnlineMapsUtils
     /// </summary>
     public const int sqrTileSize = tileSize * tileSize;
 
+    /// <summary>
+    /// Gets the CultureInfo object that is culture-independent (invariant).
+    /// </summary>
     public static CultureInfo cultureInfo
     {
         get { return CultureInfo.InvariantCulture; }
     }
 
+    /// <summary>
+    /// Gets the NumberFormatInfo object that is culture-independent (invariant).
+    /// </summary>
     public static NumberFormatInfo numberFormat
     {
         get { return cultureInfo.NumberFormat; }
@@ -171,6 +180,13 @@ public static class OnlineMapsUtils
         return Mathf.Atan2(p2z - p1z, p2x - p1x) + offset * Mathf.Deg2Rad;
     }
 
+    /// <summary>
+    /// Calculates the angle of a triangle in radians.
+    /// </summary>
+    /// <param name="A">Point A</param>
+    /// <param name="B">Point B</param>
+    /// <param name="C">Point C</param>
+    /// <returns>Angle in radians</returns>
     public static float AngleOfTriangle(Vector2 A, Vector2 B, Vector2 C)
     {
         float a = (B - C).magnitude;
@@ -194,6 +210,15 @@ public static class OnlineMapsUtils
         return n;
     }
 
+    /// <summary>
+    /// Calculates the point of intersection between two line segments defined by the given Vector2 objects.
+    /// </summary>
+    /// <param name="p1">The first endpoint of the first line segment.</param>
+    /// <param name="p2">The second endpoint of the first line segment.</param>
+    /// <param name="p3">The first endpoint of the second line segment.</param>
+    /// <param name="p4">The second endpoint of the second line segment.</param>
+    /// <returns>The point of intersection between the two line segments, or Vector2.zero if they do not intersect.</returns>
+
     public static Vector2 Crossing(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4)
     {
         if (Math.Abs(p3.x - p4.x) < float.Epsilon)
@@ -207,11 +232,24 @@ public static class OnlineMapsUtils
         return new Vector2(x, p3.y);
     }
 
+    /// <summary>
+    /// Deep copy object
+    /// </summary>
+    /// <param name="obj">Object to copy</param>
+    /// <typeparam name="T">Type of target object</typeparam>
+    /// <returns>Copy of object</returns>
     public static T DeepCopy<T>(object obj)
     {
         return (T) DeepCopy(obj, typeof (T));
     }
 
+    /// <summary>
+    /// Deep copy object
+    /// </summary>
+    /// <param name="obj">Object to copy</param>
+    /// <param name="targetType">Type of target object</param>
+    /// <returns>Copy of object</returns>
+    /// <exception cref="ArgumentException">If the object is not serializable.</exception>
     public static object DeepCopy(object obj, Type targetType)
     {
         if (obj == null) return null;
@@ -545,9 +583,31 @@ public static class OnlineMapsUtils
         return Math.Sqrt(sizeX * sizeX + sizeY * sizeY);
     }
 
+    /// <summary>
+    /// Calculates the dot product of two 2D vectors given their x and y components.
+    /// </summary>
+    /// <param name="lx">The x-component of the first vector.</param>
+    /// <param name="ly">The y-component of the first vector.</param>
+    /// <param name="rx">The x-component of the second vector.</param>
+    /// <param name="ry">The y-component of the second vector.</param>
+    /// <returns>The dot product of the two vectors.</returns>
     public static double Dot(double lx, double ly, double rx, double ry)
     {
         return lx * rx + ly * ry;
+    }
+    
+    /// <summary>
+    /// Returns the first active loaded object of Type type.
+    /// </summary>
+    /// <typeparam name="T">The type of object to find.</typeparam>
+    /// <returns>The first active loaded object that matches the specified type. It returns null if no Object matches the type.</returns>
+    public static T FindObjectOfType<T>() where T : Object
+    {
+#if UNITY_2023_1_OR_NEWER
+        return Object.FindFirstObjectByType<T>();
+#else
+        return Object.FindObjectOfType<T>();
+#endif
     }
 
     /// <summary>
@@ -817,6 +877,15 @@ public static class OnlineMapsUtils
         nlng = (l2 * Rad2Deg + 540) % 360 - 180;
     }
 
+    /// <summary>
+    /// Calculates the intersection point of two 2D lines defined by two points each, and returns a value indicating the state of the calculation.
+    /// </summary>
+    /// <param name="p11">The first point on the first line.</param>
+    /// <param name="p12">The second point on the first line.</param>
+    /// <param name="p21">The first point on the second line.</param>
+    /// <param name="p22">The second point on the second line.</param>
+    /// <param name="state">The state of the calculation.</param>
+    /// <returns>The intersection point of the two lines if it exists, or a Vector2.zero if the lines do not intersect.</returns>
     public static Vector2 GetIntersectionPointOfTwoLines(Vector2 p11, Vector2 p12, Vector2 p21, Vector2 p22, out int state)
     {
         Vector2 result = new Vector2();
@@ -836,6 +905,20 @@ public static class OnlineMapsUtils
         return result;
     }
 
+    /// <summary>
+    /// Calculates the intersection point of two 2D lines defined by four coordinates, and returns a value indicating the state of the calculation.
+    /// </summary>
+    /// <param name="p11x">The x-coordinate of the first point on the first line.</param>
+    /// <param name="p11y">The y-coordinate of the first point on the first line.</param>
+    /// <param name="p12x">The x-coordinate of the second point on the first line.</param>
+    /// <param name="p12y">The y-coordinate of the second point on the first line.</param>
+    /// <param name="p21x">The x-coordinate of the first point on the second line.</param>
+    /// <param name="p21y">The y-coordinate of the first point on the second line.</param>
+    /// <param name="p22x">The x-coordinate of the second point on the second line.</param>
+    /// <param name="p22y">The y-coordinate of the second point on the second line.</param>
+    /// <param name="resultx">An output parameter that will contain the x-coordinate of the intersection point if the calculation is successful, otherwise zero.</param>
+    /// <param name="resulty">An output parameter that will contain the y-coordinate of the intersection point if the calculation is successful, otherwise zero.</param>
+    /// <returns>A value indicating the state of the calculation.</returns>
     public static int GetIntersectionPointOfTwoLines(float p11x, float p11y, float p12x, float p12y, float p21x, float p21y, float p22x, float p22y, out float resultx, out float resulty)
     {
         int state;
@@ -858,11 +941,25 @@ public static class OnlineMapsUtils
         return state;
     }
 
+    /// <summary>
+    /// Calculates the intersection point of two 2D lines defined by two points each, and returns a value indicating the state of the calculation.
+    /// </summary>
+    /// <param name="p11">The first point on the first line.</param>
+    /// <param name="p12">The second point on the first line.</param>
+    /// <param name="p21">The first point on the second line.</param>
+    /// <param name="p22">The second point on the second line.</param>
+    /// <param name="state">The state of the calculation.</param>
+    /// <returns>The intersection point of the two lines if it exists, or a Vector2.zero if the lines do not intersect.</returns>
     public static Vector2 GetIntersectionPointOfTwoLines(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out int state)
     {
         return GetIntersectionPointOfTwoLines(new Vector2(p11.x, p11.z), new Vector2(p12.x, p12.z), new Vector2(p21.x, p21.z), new Vector2(p22.x, p22.z), out state);
     }
 
+    /// <summary>
+    /// Gets the object with the specified instance ID.
+    /// </summary>
+    /// <param name="tid">The instance ID of the object.</param>
+    /// <returns>The object with the specified instance ID.</returns>
     public static Object GetObject(int tid)
     {
 #if UNITY_EDITOR
@@ -873,6 +970,13 @@ public static class OnlineMapsUtils
 #endif
     }
 
+    /// <summary>
+    /// Appends to a StringBuilder the names of the enumeration flags that are set in the given integer value.
+    /// </summary>
+    /// <param name="builder">The StringBuilder to append to.</param>
+    /// <param name="key">The key to append to the StringBuilder before the enumeration value(s).</param>
+    /// <param name="type">The Type of the enumeration.</param>
+    /// <param name="value">The integer value representing the enumeration flags to check.</param>
     public static void GetValuesFromEnum(StringBuilder builder, string key, Type type, int value)
     {
         builder.Append("&").Append(key).Append("=");
@@ -904,6 +1008,12 @@ public static class OnlineMapsUtils
         return new Color32(r, g, b, 255);
     }
 
+    /// <summary>
+    /// Determines whether two rectangles intersect.
+    /// </summary>
+    /// <param name="a">The first rectangle.</param>
+    /// <param name="b">The second rectangle.</param>
+    /// <returns>True if the two rectangles intersect; otherwise, false.</returns>
     public static bool Intersect(Rect a, Rect b)
     {
         FlipNegative(ref a);
@@ -916,6 +1026,15 @@ public static class OnlineMapsUtils
         return true;
     }
 
+    /// <summary>
+    /// Determines if two line segments intersect and returns the intersection point.
+    /// </summary>
+    /// <param name="start1">The starting point of the first line segment.</param>
+    /// <param name="end1">The ending point of the first line segment.</param>
+    /// <param name="start2">The starting point of the second line segment.</param>
+    /// <param name="end2">The ending point of the second line segment.</param>
+    /// <param name="out_intersection">The intersection point if the line segments intersect, otherwise Vector2.zero.</param>
+    /// <returns>True if the line segments intersect, otherwise false.</returns>
     public static bool LineIntersection(Vector2 start1, Vector2 end1, Vector2 start2, Vector2 end2, out Vector2 out_intersection)
     {
         out_intersection = Vector2.zero;
@@ -945,6 +1064,20 @@ public static class OnlineMapsUtils
         return true;
     }
 
+    /// <summary>
+    /// Determines if two line segments intersect and returns the intersection point.
+    /// </summary>
+    /// <param name="s1x">The x-coordinate of the starting point of the first line segment.</param>
+    /// <param name="s1y">The y-coordinate of the starting point of the first line segment.</param>
+    /// <param name="e1x">The x-coordinate of the ending point of the first line segment.</param>
+    /// <param name="e1y">The y-coordinate of the ending point of the first line segment.</param>
+    /// <param name="s2x">The x-coordinate of the starting point of the second line segment.</param>
+    /// <param name="s2y">The y-coordinate of the starting point of the second line segment.</param>
+    /// <param name="e2x">The x-coordinate of the ending point of the second line segment.</param>
+    /// <param name="e2y">The y-coordinate of the ending point of the second line segment.</param>
+    /// <param name="intX">The x-coordinate of the intersection point if the line segments intersect, otherwise 0.</param>
+    /// <param name="intY">The y-coordinate of the intersection point if the line segments intersect, otherwise 0.</param>
+    /// <returns>True if the line segments intersect, otherwise false.</returns>
     public static bool LineIntersection(float s1x, float s1y, float e1x, float e1y, float s2x, float s2y, float e2x, float e2y, out float intX, out float intY)
     {
         intX = 0;
@@ -978,6 +1111,14 @@ public static class OnlineMapsUtils
         return true;
     }
 
+    ///<summary>
+    /// Returns the intersection point of two line segments, represented by their endpoints, or Vector2.zero if the segments do not intersect.
+    ///</summary>
+    ///<param name="p1">The first endpoint of the first line segment</param>
+    ///<param name="p2">The second endpoint of the first line segment</param>
+    ///<param name="p3">The first endpoint of the second line segment</param>
+    ///<param name="p4">The second endpoint of the second line segment</param>
+    ///<returns>The intersection point of the two line segments, or Vector2.zero if the segments do not intersect</returns>
     public static Vector2 LineIntersection(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4)
     {
         double x1lo, x1hi, y1lo, y1hi;
@@ -1067,12 +1208,25 @@ public static class OnlineMapsUtils
 
         return intersection;
     }
-
+    
+    /// <summary>
+    /// Returns true if both values have the same sign
+    /// </summary>
+    /// <param name="a">First value</param>
+    /// <param name="b">Second value</param>
+    /// <returns>True if both values have the same sign, false otherwise</returns>
     private static bool same_sign(double a, double b)
     {
         return a * b >= 0f;
     }
 
+    /// <summary>
+    /// Determines whether a point with the given coordinates is inside the specified polygon.
+    /// </summary>
+    /// <param name="poly">The list of vertices that define the polygon.</param>
+    /// <param name="x">The x-coordinate of the point to check.</param>
+    /// <param name="y">The y-coordinate of the point to check.</param>
+    /// <returns>true if the point is inside the polygon; otherwise, false.</returns>
     public static bool IsPointInPolygon(List<Vector2> poly, float x, float y)
     {
         int i, j;
@@ -1086,6 +1240,13 @@ public static class OnlineMapsUtils
         return c;
     }
 
+    /// <summary>
+    /// Determines whether a point with the given coordinates is inside the specified polygon.
+    /// </summary>
+    /// <param name="poly">IEnumerable of vertices that define the polygon. Can be Vector2, float, double or OnlineMapsVector2d.</param>
+    /// <param name="x">The x-coordinate of the point to check.</param>
+    /// <param name="y">The y-coordinate of the point to check.</param>
+    /// <returns>true if the point is inside the polygon; otherwise, false.</returns>
     public static bool IsPointInPolygon(IEnumerable poly, double x, double y)
     {
         //int i, j;
@@ -1202,6 +1363,13 @@ public static class OnlineMapsUtils
         return c;
     }
 
+    /// <summary>
+    /// Determines whether a point with the given coordinates is inside the specified polygon.
+    /// </summary>
+    /// <param name="poly">Array of vertices that define the polygon.</param>
+    /// <param name="x">The x-coordinate of the point to check.</param>
+    /// <param name="y">The y-coordinate of the point to check.</param>
+    /// <returns>true if the point is inside the polygon; otherwise, false.</returns>
     public static bool IsPointInPolygon(double[] poly, double x, double y)
     {
         int i, j;
@@ -1270,6 +1438,13 @@ public static class OnlineMapsUtils
         return Math.Sqrt((p2x - p1x) * (p2x - p1x) + (p2y - p1y) * (p2y - p1y));
     }
 
+    /// <summary>
+    /// Returns the nearest point on the segment.
+    /// </summary>
+    /// <param name="point">Point</param>
+    /// <param name="lineStart">Start of the segment</param>
+    /// <param name="lineEnd">End of segment</param>
+    /// <returns>Nearest point</returns>
     public static Vector2 NearestPointStrict(Vector2 point, Vector2 lineStart, Vector2 lineEnd)
     {
         Vector2 fullDirection = lineEnd - lineStart;
@@ -1278,6 +1453,17 @@ public static class OnlineMapsUtils
         return lineStart + Mathf.Clamp(closestPoint, 0, fullDirection.magnitude) * lineDirection;
     }
 
+    /// <summary>
+    /// Returns the nearest point on the segment.
+    /// </summary>
+    /// <param name="pointX">Point X</param>
+    /// <param name="pointY">Point Y</param>
+    /// <param name="lineStartX">Start X of the segment</param>
+    /// <param name="lineStartY">Start Y of the segment</param>
+    /// <param name="lineEndX">End X of the segment</param>
+    /// <param name="lineEndY">End Y of the segment</param>
+    /// <param name="nearestPointX">Nearest point X</param>
+    /// <param name="nearestPointY">Nearest point Y</param>
     public static void NearestPointStrict(double pointX, double pointY, double lineStartX, double lineStartY, double lineEndX, double lineEndY, out double nearestPointX, out double nearestPointY)
     {
         double fdX = lineEndX - lineStartX;
@@ -1296,6 +1482,13 @@ public static class OnlineMapsUtils
         nearestPointY = lineStartY + closestPoint * ldY;
     }
 
+    /// <summary>
+    /// Loops the value n, so that it is never larger than maxValue and never smaller than minValue.
+    /// </summary>
+    /// <param name="n">Value</param>
+    /// <param name="minValue">Minimum value</param>
+    /// <param name="maxValue">Maximum value</param>
+    /// <returns>Looped value from minValue to maxValue.</returns>
     public static double Repeat(double n, double minValue, double maxValue)
     {
         if (double.IsInfinity(n) || double.IsInfinity(minValue) || double.IsInfinity(maxValue) || double.IsNaN(n) || double.IsNaN(minValue) || double.IsNaN(maxValue)) return n;
@@ -1309,11 +1502,26 @@ public static class OnlineMapsUtils
         return n;
     }
 
+    /// <summary>
+    /// Returns the square of the magnitude of the segment
+    /// </summary>
+    /// <param name="p1x">Point 1 X</param>
+    /// <param name="p1y">Point 1 Y</param>
+    /// <param name="p2x">Point 2 X</param>
+    /// <param name="p2y">Point 2 Y</param>
+    /// <returns>Square of the magnitude</returns>
     public static double SqrMagnitude(double p1x, double p1y, double p2x, double p2y)
     {
         return (p2x - p1x) * (p2x - p1x) + (p2y - p1y) * (p2y - p1y);
     }
 
+    /// <summary>
+    /// Replaces multiple values in a string
+    /// </summary>
+    /// <param name="str">Input string</param>
+    /// <param name="origin">Values to be replaced</param>
+    /// <param name="replace">Values to replace</param>
+    /// <returns>String with replaced values</returns>
     public static string StrReplace(string str, string[] origin, string[] replace)
     {
         if (origin == null || replace == null) return str;
@@ -1322,6 +1530,10 @@ public static class OnlineMapsUtils
         return str;
     }
 
+    /// <summary>
+    /// The current thread sleeps for the specified number of milliseconds
+    /// </summary>
+    /// <param name="millisecondsTimeout">number of milliseconds</param>
     public static void ThreadSleep(int millisecondsTimeout)
     {
 #if !NETFX_CORE
@@ -1359,6 +1571,16 @@ public static class OnlineMapsUtils
         return quadKey.ToString();
     }
 
+    /// <summary>
+    /// Converts tile index to quadkey.
+    /// What is the tiles and quadkey, and how it works, you can read here:
+    /// http://msdn.microsoft.com/en-us/library/bb259689.aspx
+    /// </summary>
+    /// <param name="x">Tile X</param>
+    /// <param name="y">Tile Y</param>
+    /// <param name="zoom">Tile Zoom</param>
+    /// <param name="quadKey">StringBuilder where to write quadKey</param>
+    /// <returns>quadKey StringBuilder</returns>
     public static StringBuilder TileToQuadKey(int x, int y, int zoom, StringBuilder quadKey)
     {
         for (int i = zoom; i > 0; i--)
@@ -1376,6 +1598,11 @@ public static class OnlineMapsUtils
         return quadKey;
     }
 
+    /// <summary>
+    /// Triangulates list of points
+    /// </summary>
+    /// <param name="points">List of points</param>
+    /// <returns>List of vertex numbers</returns>
     public static List<int> Triangulate(List<Vector2> points)
     {
         List<int> indices = new List<int>(18);
@@ -1423,6 +1650,13 @@ public static class OnlineMapsUtils
         return indices;
     }
 
+    /// <summary>
+    /// Triangulates points
+    /// </summary>
+    /// <param name="points">An array of points containing the values [x, y, x, y...]</param>
+    /// <param name="countVertices">Number of vertices to be triangulated/param>
+    /// <param name="indices">List where vertex indices will be written</param>
+    /// <returns>Indices</returns>
     public static IEnumerable<int> Triangulate(float[] points, int countVertices, List<int> indices)
     {
         indices.Clear();
@@ -1485,26 +1719,26 @@ public static class OnlineMapsUtils
 
     private static float TriangulateArea(float[] points, int countVertices)
     {
-        int n = countVertices;
         float A = 0.0f;
-        for (int p = n - 1, q = 0; q < n; p = q++)
+        int n = countVertices * 2;
+        for (int p = n - 2, q = 0; q < n; p = q - 2)
         {
-            float pvx = points[p * 2];
-            float pvy = points[p * 2 + 1];
-            float qvx = points[q * 2];
-            float qvy = points[q * 2 + 1];
+            float pvx = points[p];
+            float pvy = points[p + 1];
+            float qvx = points[q++];
+            float qvy = points[q++];
 
             A += pvx * qvy - qvx * pvy;
         }
         return A * 0.5f;
     }
 
-    private static bool TriangulateInsideTriangle(Vector2 A, Vector2 B, Vector2 C, Vector2 P)
+    private static bool TriangulateInsideTriangle(Vector2 a, Vector2 b, Vector2 c, Vector2 p)
     {
-        float bp = (C.x - B.x) * (P.y - B.y) - (C.y - B.y) * (P.x - B.x);
-        float ap = (B.x - A.x) * (P.y - A.y) - (B.y - A.y) * (P.x - A.x);
-        float cp = (A.x - C.x) * (P.y - C.y) - (A.y - C.y) * (P.x - C.x);
-        return bp > 0.0f && cp > 0.0f && ap > 0.0f;
+        float bp = (c.x - b.x) * (p.y - b.y) - (c.y - b.y) * (p.x - b.x);
+        float ap = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
+        float cp = (a.x - c.x) * (p.y - c.y) - (a.y - c.y) * (p.x - c.x);
+        return bp >= 0.0f && cp >= 0.0f && ap >= 0.0f;
     }
 
     private static bool TriangulateInsideTriangle(float ax, float ay, float bx, float by, float cx, float cy, float px, float py)
@@ -1512,7 +1746,7 @@ public static class OnlineMapsUtils
         float bp = (cx - bx) * (py - by) - (cy - by) * (px - bx);
         float ap = (bx - ax) * (py - ay) - (by - ay) * (px - ax);
         float cp = (ax - cx) * (py - cy) - (ay - cy) * (px - cx);
-        return (bp >= 0.0f) && (cp >= 0.0f) && (ap >= 0.0f);
+        return bp >= 0.0f && cp >= 0.0f && ap >= 0.0f;
     }
 
     private static bool TriangulateSnip(List<Vector2> points, int u, int v, int w, int n, int[] V)
@@ -1531,18 +1765,25 @@ public static class OnlineMapsUtils
 
     private static bool TriangulateSnip(float[] points, int u, int v, int w, int n, int[] V)
     {
-        float ax = points[V[u] * 2];
-        float ay = points[V[u] * 2 + 1];
-        float bx = points[V[v] * 2];
-        float by = points[V[v] * 2 + 1];
-        float cx = points[V[w] * 2];
-        float cy = points[V[w] * 2 + 1];
+        int iu = V[u] * 2;
+        int iv = V[v] * 2;
+        int iw = V[w] * 2;
+
+        float ax = points[iu];
+        float ay = points[iu + 1];
+        float bx = points[iv];
+        float by = points[iv + 1];
+        float cx = points[iw];
+        float cy = points[iw + 1];
 
         if (Mathf.Epsilon > (bx - ax) * (cy - ay) - (by - ay) * (cx - ax)) return false;
+
         for (int p = 0; p < n; p++)
         {
             if (p == u || p == v || p == w) continue;
-            if (TriangulateInsideTriangle(ax, ay, bx, by, cx, cy, points[V[p] * 2], points[V[p] * 2 + 1])) return false;
+            
+            int ip = V[p] * 2;
+            if (TriangulateInsideTriangle(ax, ay, bx, by, cx, cy, points[ip], points[ip + 1])) return false;
         }
         return true;
     }

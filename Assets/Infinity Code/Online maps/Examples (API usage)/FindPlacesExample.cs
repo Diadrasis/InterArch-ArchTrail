@@ -13,12 +13,20 @@ namespace InfinityCode.OnlineMapsExamples
     public class FindPlacesExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// Google API Key
         /// </summary>
         public string apiKey;
 
         private void Start()
         {
+            // If the map is not specified, get the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Makes a request to Google Places API.
             OnlineMapsGooglePlaces.FindNearby(
                 apiKey,
@@ -57,7 +65,7 @@ namespace InfinityCode.OnlineMapsExamples
                 Debug.Log(result.location);
 
                 // Create a marker at the location of the result.
-                OnlineMapsMarker marker = OnlineMapsMarkerManager.CreateItem(result.location, result.name);
+                OnlineMapsMarker marker = map.markerManager.Create(result.location, result.name);
                 markers.Add(marker);
             }
 
@@ -67,8 +75,8 @@ namespace InfinityCode.OnlineMapsExamples
             OnlineMapsUtils.GetCenterPointAndZoom(markers.ToArray(), out center, out zoom);
 
             // Set map position and zoom.
-            OnlineMaps.instance.position = center;
-            OnlineMaps.instance.zoom = zoom + 1;
+            map.position = center;
+            map.zoom = zoom + 1;
         }
     }
 }

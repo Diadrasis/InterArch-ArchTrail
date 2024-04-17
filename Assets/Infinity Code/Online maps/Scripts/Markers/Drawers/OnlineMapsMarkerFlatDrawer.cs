@@ -80,7 +80,7 @@ public class OnlineMapsMarkerFlatDrawer : OnlineMapsMarker2DMeshDrawer
         OnlineMapsMarker marker = null;
 
         RaycastHit hit;
-        if (control.cl.Raycast(control.activeCamera.ScreenPointToRay(screenPosition), out hit, OnlineMapsUtils.maxRaycastDistance))
+        if (control.cl.Raycast(control.currentCamera.ScreenPointToRay(screenPosition), out hit, OnlineMapsUtils.maxRaycastDistance))
         {
             double lng = double.MinValue, lat = double.MaxValue;
             foreach (FlatMarker flatMarker in usedMarkers)
@@ -110,7 +110,7 @@ public class OnlineMapsMarkerFlatDrawer : OnlineMapsMarker2DMeshDrawer
         double tx, ty;
         map.projection.CoordinatesToTile(tlx, tly, zoom, out tx, out ty);
 
-        float yScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(tlx, tly, brx, bry);
+        float yScale = OnlineMapsElevationManagerBase.GetBestElevationYScale(control.elevationManager, tlx, tly, brx, bry);
 
         float cx = -control.sizeInScene.x / map.buffer.renderState.width;
         float cy = control.sizeInScene.y / map.buffer.renderState.height;
@@ -134,18 +134,18 @@ public class OnlineMapsMarkerFlatDrawer : OnlineMapsMarker2DMeshDrawer
         IEnumerable<OnlineMapsMarker> markers;
         if (control.markerManager.enabled)
         {
-            markers = control.markerManager.Where(delegate (OnlineMapsMarker marker)
+            markers = control.markerManager.Where(m =>
             {
-                if (!marker.enabled || !marker.range.InRange(zoom)) return false;
+                if (!m.enabled || !m.range.InRange(zoom)) return false;
 
                 if (OnCheckMarker2DVisibility != null)
                 {
-                    if (!OnCheckMarker2DVisibility(marker)) return false;
+                    if (!OnCheckMarker2DVisibility(m)) return false;
                 }
                 else if (control.checkMarker2DVisibility == OnlineMapsTilesetCheckMarker2DVisibility.pivot)
                 {
                     double mx, my;
-                    marker.GetPosition(out mx, out my);
+                    m.GetPosition(out mx, out my);
 
                     bool a = my > tly ||
                              my < bry ||
@@ -216,7 +216,7 @@ public class OnlineMapsMarkerFlatDrawer : OnlineMapsMarker2DMeshDrawer
 
         foreach (Mesh mesh in markersMeshes) mesh.Clear();
 
-        float zoomCoof = map.buffer.renderState.zoomCoof;
+        float zoomFactor = map.buffer.renderState.zoomFactor;
 
         Matrix4x4 matrix = new Matrix4x4();
         int meshIndex = 0;
@@ -236,10 +236,10 @@ public class OnlineMapsMarkerFlatDrawer : OnlineMapsMarker2DMeshDrawer
             if (fx < 0) fx += maxX;
             else if (fx > maxX) fx -= maxX;
 
-            fx /= zoomCoof;
+            fx /= zoomFactor;
 
             fx = fx * OnlineMapsUtils.tileSize - offset.x;
-            fy = (fy - ty) / zoomCoof * OnlineMapsUtils.tileSize - offset.y;
+            fy = (fy - ty) / zoomFactor * OnlineMapsUtils.tileSize - offset.y;
 
             if (marker.texture == null)
             {
@@ -413,6 +413,7 @@ public class OnlineMapsMarkerFlatDrawer : OnlineMapsMarker2DMeshDrawer
                 {
                     material.shader = control.markerMaterial.shader;
                     material.CopyPropertiesFromMaterial(control.markerMaterial);
+                    material.name = control.markerMaterial.name;
                 }
                 else
                 {

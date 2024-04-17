@@ -12,12 +12,20 @@ namespace InfinityCode.OnlineMapsExamples
     public class AMapSearchExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMaps map;
+        
+        /// <summary>
         /// AMap API Key
         /// </summary>
         public string key;
 
         private void Start()
         {
+            // If map is not specified, use the current instance.
+            if (map == null) map = OnlineMaps.instance;
+            
             // Start a new search
             OnlineMapsAMapSearch.Find(new OnlineMapsAMapSearch.TextParams(key)
             {
@@ -25,14 +33,14 @@ namespace InfinityCode.OnlineMapsExamples
                 keywords = "北京大学",
                 city = "beijing",
 
-            }).OnComplete += OnComplete; // Subscribe to OnComplete event
+            }).OnComplete += OnRequestComplete; // Subscribe to OnComplete event
         }
 
         /// <summary>
-        /// On request Complete
+        /// This method will be called when the search is completed.
         /// </summary>
         /// <param name="response">Response</param>
-        private void OnComplete(string response)
+        private void OnRequestComplete(string response)
         {
             // Log response
             Debug.Log(response);
@@ -50,7 +58,7 @@ namespace InfinityCode.OnlineMapsExamples
                 poi.GetLocation(out lng, out lat);
 
                 // Create a new marker for each POI
-                OnlineMapsMarkerManager.CreateItem(lng, lat, poi.name);
+                map.markerManager.Create(lng, lat, poi.name);
             }
         }
     }

@@ -12,20 +12,37 @@ namespace InfinityCode.OnlineMapsExamples
     public class SaveMarkersExample : MonoBehaviour
     {
         /// <summary>
+        /// Reference to the map control. If not specified, the current instance will be used.
+        /// </summary>
+        public OnlineMapsControlBase control;
+        
+        /// <summary>
         /// Key in PlayerPrefs
         /// </summary>
         private static string prefsKey = "markers";
 
         /// <summary>
+        /// Use this for initialization
+        /// </summary>
+        private void Start()
+        {
+            // If the control is not specified, get the current instance.
+            if (control == null) control = OnlineMapsControlBase.instance;
+            
+            // Try load markers
+            TryLoadMarkers();
+        }
+
+        /// <summary>
         /// Saves markers to PlayerPrefs as xml string
         /// </summary>
-        public static void SaveMarkers()
+        public void SaveMarkers()
         {
             // Create XMLDocument and first child
             OnlineMapsXML xml = new OnlineMapsXML("Markers");
 
             // Save markers data
-            foreach (OnlineMapsMarker marker in OnlineMapsMarkerManager.instance)
+            foreach (OnlineMapsMarker marker in control.markerManager)
             {
                 // Create marker node
                 OnlineMapsXML markerNode = xml.Create("Marker");
@@ -36,15 +53,6 @@ namespace InfinityCode.OnlineMapsExamples
             // Save xml string
             PlayerPrefs.SetString(prefsKey, xml.outerXml);
             PlayerPrefs.Save();
-        }
-
-        /// <summary>
-        /// Use this for initialization
-        /// </summary>
-        private void Start()
-        {
-            // Try load markers
-            TryLoadMarkers();
         }
 
         /// <summary>
@@ -69,7 +77,7 @@ namespace InfinityCode.OnlineMapsExamples
                 string label = node.Get<string>("Label");
 
                 // Create marker
-                OnlineMapsMarkerManager.CreateItem(position, label);
+                control.markerManager.Create(position, label);
             }
         }
     }

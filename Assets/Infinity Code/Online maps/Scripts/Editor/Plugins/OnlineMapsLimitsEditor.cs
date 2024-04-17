@@ -69,7 +69,7 @@ public class OnlineMapsLimitsEditor:Editor
         EditorGUI.BeginChangeCheck();
         EditorGUI.BeginDisabledGroup(!pUseZoomRange.boolValue);
 
-        EditorGUILayout.MinMaxSlider(new GUIContent("Zoom Range (" + min.ToString("F1") + "-" + max.ToString("F1") + ")"), ref min, ref max, OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM);
+        EditorGUILayout.MinMaxSlider(new GUIContent("Zoom Range (" + min.ToString("F1") + "-" + max.ToString("F1") + ")"), ref min, ref max, OnlineMaps.MINZOOM, OnlineMaps.MAXZOOM_EXT);
         EditorGUI.EndDisabledGroup();
         if (EditorGUI.EndChangeCheck())
         {
